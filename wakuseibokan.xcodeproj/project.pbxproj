@@ -1,0 +1,331 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		6268EB70192EDC1700740008 /* carrier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrier.cpp; sourceTree = "<group>"; };
+		6268EB71192EDC1700740008 /* carrier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = carrier.h; sourceTree = "<group>"; };
+		6268EB721930F39900740008 /* keplerivworld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = keplerivworld.cpp; sourceTree = "<group>"; };
+		6268EB731930F39900740008 /* keplerivworld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = keplerivworld.h; sourceTree = "<group>"; };
+		626C74F6193129410012D764 /* BoxVehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxVehicle.cpp; sourceTree = "<group>"; };
+		626C74F7193129410012D764 /* BoxVehicle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BoxVehicle.h; sourceTree = "<group>"; };
+		626C74F91932E5700012D764 /* vec3f.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vec3f.cpp; sourceTree = "<group>"; };
+		626C74FA1932E5700012D764 /* vec3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3f.h; sourceTree = "<group>"; };
+		626C74FB1932E5700012D764 /* yamathutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yamathutil.cpp; sourceTree = "<group>"; };
+		626C74FC1932E5700012D764 /* yamathutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yamathutil.h; sourceTree = "<group>"; };
+		62D754D1192B88A200FD6B43 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		62D754D2192B88AC00FD6B43 /* mainworkingstd.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mainworkingstd.cpp; sourceTree = "<group>"; };
+		62D754D4192B89B000FD6B43 /* DrawFonts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DrawFonts.cpp; sourceTree = "<group>"; };
+		62D754D5192B89B000FD6B43 /* DrawFonts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawFonts.h; sourceTree = "<group>"; };
+		62D754D6192B89B000FD6B43 /* FractalNoise.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FractalNoise.cpp; sourceTree = "<group>"; };
+		62D754D7192B89B000FD6B43 /* FractalNoise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FractalNoise.h; sourceTree = "<group>"; };
+		62D754DA192B89B000FD6B43 /* md2model.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = md2model.cpp; sourceTree = "<group>"; };
+		62D754DB192B89B000FD6B43 /* md2model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = md2model.h; sourceTree = "<group>"; };
+		62D754DE192B89B000FD6B43 /* sea.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = sea.bmp; sourceTree = "<group>"; };
+		62D754E1192B89B000FD6B43 /* imageloader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = imageloader.cpp; sourceTree = "<group>"; };
+		62D754E2192B89B000FD6B43 /* imageloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imageloader.h; sourceTree = "<group>"; };
+		62D754E3192B89B000FD6B43 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		62D754E4192B89B000FD6B43 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		62D754E5192B89B000FD6B43 /* terrain */ = {isa = PBXFileReference; lastKnownFileType = file; path = terrain; sourceTree = "<group>"; };
+		62D754E6192B89B000FD6B43 /* Terrain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
+		62D754E7192B89B000FD6B43 /* Terrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
+		62D754E8192B89B000FD6B43 /* vec3f.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vec3f.cpp; sourceTree = "<group>"; };
+		62D754E9192B89B000FD6B43 /* vec3f.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec3f.h; sourceTree = "<group>"; };
+		62D754F1192B89B000FD6B43 /* vtr.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = vtr.bmp; sourceTree = "<group>"; };
+		62D754F3192B89B000FD6B43 /* alpha.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = alpha.jpg; sourceTree = "<group>"; };
+		62D754F4192B89B000FD6B43 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		62D754F5192B89B000FD6B43 /* main.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = main.o; sourceTree = "<group>"; };
+		62D754F6192B89B000FD6B43 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		62D754F7192B89B000FD6B43 /* noise.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = noise.c; sourceTree = "<group>"; };
+		62D754F8192B89B000FD6B43 /* noise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = noise.h; sourceTree = "<group>"; };
+		62D754F9192B89B000FD6B43 /* noise.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = noise.o; sourceTree = "<group>"; };
+		62D754FA192B89B000FD6B43 /* reflection.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = reflection.jpg; sourceTree = "<group>"; };
+		62D754FB192B89B000FD6B43 /* water */ = {isa = PBXFileReference; lastKnownFileType = file; path = water; sourceTree = "<group>"; };
+		62D75507192C2FC300FD6B43 /* usercontrols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = usercontrols.cpp; sourceTree = "<group>"; };
+		62D75508192C2FC300FD6B43 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		62D7550E192C404800FD6B43 /* odeutils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = odeutils.cpp; sourceTree = "<group>"; };
+		62D7550F192C404800FD6B43 /* odeutils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = odeutils.h; sourceTree = "<group>"; };
+		62D75510192C408000FD6B43 /* camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
+		62D75511192C40BA00FD6B43 /* observable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = observable.h; sourceTree = "<group>"; };
+		62D75512192C415600FD6B43 /* Manta.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Manta.cpp; sourceTree = "<group>"; };
+		62D75513192C415600FD6B43 /* Manta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Manta.h; sourceTree = "<group>"; };
+		62D75514192C415600FD6B43 /* Vehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vehicle.cpp; sourceTree = "<group>"; };
+		62D75515192C415600FD6B43 /* Vehicle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vehicle.h; sourceTree = "<group>"; };
+		62D75516192C415600FD6B43 /* Walrus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Walrus.cpp; sourceTree = "<group>"; };
+		62D75517192C415600FD6B43 /* Walrus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Walrus.h; sourceTree = "<group>"; };
+		62D7551A192C432900FD6B43 /* openglutils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = openglutils.cpp; sourceTree = "<group>"; };
+		62D7551B192C432900FD6B43 /* openglutils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = openglutils.h; sourceTree = "<group>"; };
+		62D7551C192C437C00FD6B43 /* imageloader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = imageloader.cpp; sourceTree = "<group>"; };
+		62D7551D192C437C00FD6B43 /* imageloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imageloader.h; sourceTree = "<group>"; };
+		62D7551E192C53A800FD6B43 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		62D7551F192C53A800FD6B43 /* usercontrols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usercontrols.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		626C74F81932E5700012D764 /* math */ = {
+			isa = PBXGroup;
+			children = (
+				626C74F91932E5700012D764 /* vec3f.cpp */,
+				626C74FA1932E5700012D764 /* vec3f.h */,
+				626C74FB1932E5700012D764 /* yamathutil.cpp */,
+				626C74FC1932E5700012D764 /* yamathutil.h */,
+			);
+			path = math;
+			sourceTree = "<group>";
+		};
+		62D754C6192B887C00FD6B43 = {
+			isa = PBXGroup;
+			children = (
+				626C74F81932E5700012D764 /* math */,
+				6268EB721930F39900740008 /* keplerivworld.cpp */,
+				6268EB731930F39900740008 /* keplerivworld.h */,
+				6268EB70192EDC1700740008 /* carrier.cpp */,
+				6268EB71192EDC1700740008 /* carrier.h */,
+				62D754D3192B89B000FD6B43 /* font */,
+				62D754D6192B89B000FD6B43 /* FractalNoise.cpp */,
+				62D754D7192B89B000FD6B43 /* FractalNoise.h */,
+				62D754DA192B89B000FD6B43 /* md2model.cpp */,
+				62D754DB192B89B000FD6B43 /* md2model.h */,
+				62D7551F192C53A800FD6B43 /* usercontrols.h */,
+				62D75507192C2FC300FD6B43 /* usercontrols.cpp */,
+				62D7550E192C404800FD6B43 /* odeutils.cpp */,
+				62D7550F192C404800FD6B43 /* odeutils.h */,
+				62D75508192C2FC300FD6B43 /* camera.cpp */,
+				62D75510192C408000FD6B43 /* camera.h */,
+				62D7551C192C437C00FD6B43 /* imageloader.cpp */,
+				62D7551D192C437C00FD6B43 /* imageloader.h */,
+				62D75511192C40BA00FD6B43 /* observable.h */,
+				62D7551A192C432900FD6B43 /* openglutils.cpp */,
+				62D7551B192C432900FD6B43 /* openglutils.h */,
+				62D754DE192B89B000FD6B43 /* sea.bmp */,
+				62D754DF192B89B000FD6B43 /* terrain */,
+				62D754EA192B89B000FD6B43 /* units */,
+				62D754F1192B89B000FD6B43 /* vtr.bmp */,
+				62D754F2192B89B000FD6B43 /* water */,
+				62D754D2192B88AC00FD6B43 /* mainworkingstd.cpp */,
+				62D7551E192C53A800FD6B43 /* main.cpp */,
+				62D754D1192B88A200FD6B43 /* Makefile */,
+			);
+			sourceTree = "<group>";
+		};
+		62D754D3192B89B000FD6B43 /* font */ = {
+			isa = PBXGroup;
+			children = (
+				62D754D4192B89B000FD6B43 /* DrawFonts.cpp */,
+				62D754D5192B89B000FD6B43 /* DrawFonts.h */,
+			);
+			path = font;
+			sourceTree = "<group>";
+		};
+		62D754DF192B89B000FD6B43 /* terrain */ = {
+			isa = PBXGroup;
+			children = (
+				62D754E1192B89B000FD6B43 /* imageloader.cpp */,
+				62D754E2192B89B000FD6B43 /* imageloader.h */,
+				62D754E3192B89B000FD6B43 /* main.cpp */,
+				62D754E4192B89B000FD6B43 /* Makefile */,
+				62D754E5192B89B000FD6B43 /* terrain */,
+				62D754E6192B89B000FD6B43 /* Terrain.cpp */,
+				62D754E7192B89B000FD6B43 /* Terrain.h */,
+				62D754E8192B89B000FD6B43 /* vec3f.cpp */,
+				62D754E9192B89B000FD6B43 /* vec3f.h */,
+			);
+			path = terrain;
+			sourceTree = "<group>";
+		};
+		62D754EA192B89B000FD6B43 /* units */ = {
+			isa = PBXGroup;
+			children = (
+				62D75512192C415600FD6B43 /* Manta.cpp */,
+				62D75513192C415600FD6B43 /* Manta.h */,
+				62D75514192C415600FD6B43 /* Vehicle.cpp */,
+				62D75515192C415600FD6B43 /* Vehicle.h */,
+				62D75516192C415600FD6B43 /* Walrus.cpp */,
+				62D75517192C415600FD6B43 /* Walrus.h */,
+				626C74F6193129410012D764 /* BoxVehicle.cpp */,
+				626C74F7193129410012D764 /* BoxVehicle.h */,
+			);
+			path = units;
+			sourceTree = "<group>";
+		};
+		62D754F2192B89B000FD6B43 /* water */ = {
+			isa = PBXGroup;
+			children = (
+				62D754F3192B89B000FD6B43 /* alpha.jpg */,
+				62D754F4192B89B000FD6B43 /* main.c */,
+				62D754F5192B89B000FD6B43 /* main.o */,
+				62D754F6192B89B000FD6B43 /* Makefile */,
+				62D754F7192B89B000FD6B43 /* noise.c */,
+				62D754F8192B89B000FD6B43 /* noise.h */,
+				62D754F9192B89B000FD6B43 /* noise.o */,
+				62D754FA192B89B000FD6B43 /* reflection.jpg */,
+				62D754FB192B89B000FD6B43 /* water */,
+			);
+			path = water;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		62D754CB192B887C00FD6B43 /* wakuseibokan */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 62D754CE192B887C00FD6B43 /* Build configuration list for PBXLegacyTarget "wakuseibokan" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/rramele/work/wakuseibokan;
+			dependencies = (
+			);
+			name = wakuseibokan;
+			passBuildSettingsInEnvironment = 1;
+			productName = mycarrier;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		62D754C7192B887C00FD6B43 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = Baufest;
+			};
+			buildConfigurationList = 62D754CA192B887C00FD6B43 /* Build configuration list for PBXProject "wakuseibokan" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 62D754C6192B887C00FD6B43;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				62D754CB192B887C00FD6B43 /* wakuseibokan */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		62D754CC192B887C00FD6B43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				PKG_CONFIG_PATH = /Users/rramele/work/ode/lib/pkgconfig/;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		62D754CD192B887C00FD6B43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PKG_CONFIG_PATH = /Users/rramele/work/ode/lib/pkgconfig/;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		62D754CF192B887C00FD6B43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = wakuseibokan;
+			};
+			name = Debug;
+		};
+		62D754D0192B887C00FD6B43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = wakuseibokan;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		62D754CA192B887C00FD6B43 /* Build configuration list for PBXProject "wakuseibokan" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				62D754CC192B887C00FD6B43 /* Debug */,
+				62D754CD192B887C00FD6B43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		62D754CE192B887C00FD6B43 /* Build configuration list for PBXLegacyTarget "wakuseibokan" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				62D754CF192B887C00FD6B43 /* Debug */,
+				62D754D0192B887C00FD6B43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 62D754C7192B887C00FD6B43 /* Project object */;
+}
