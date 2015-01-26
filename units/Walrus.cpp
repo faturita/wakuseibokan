@@ -21,7 +21,6 @@ void Walrus::init()
 
 void Walrus::doMaterial()
 {
-    /**
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
 
     glEnable(GL_COLOR_MATERIAL);
@@ -30,8 +29,8 @@ void Walrus::doMaterial()
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
     glMateriali(GL_FRONT, GL_SHININESS,128);
-    **/
 }
+
 
 void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
 {
@@ -68,6 +67,21 @@ void Walrus::drawModel()
 	drawModel(0,0,pos[0],pos[1],pos[2]);
 }
 
+void Walrus::doControl(Controller controller)
+{
+    //engine[0] = -controller.roll;
+    //engine[1] = controller.yaw;
+    //engine[2] = -controller.pitch;
+    //steering = -controller.precesion;
+    
+    
+    setThrottle(-controller.pitch);
+    
+    xRotAngle = -controller.precesion*1000;
+    
+}
+
+
 void Walrus::drawDirectModel()
 {
     float modX=0.0f, modY=15.0f, modZ=0.0f;
@@ -83,6 +97,11 @@ void Walrus::drawDirectModel()
     pos += speed * forward;
 
     drawModel(xRotAngle, yRotAngle, modX, modY, modZ);
+}
+
+void Walrus::doDynamics()
+{
+    doDynamics(getBodyID());
 }
 
 void Walrus::doDynamics(dBodyID body)

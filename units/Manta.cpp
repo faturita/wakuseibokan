@@ -51,6 +51,23 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+
+void Manta::doControl(Controller controller)
+{
+    //engine[0] = -controller.roll;
+    //engine[1] = controller.yaw;
+    //engine[2] = -controller.pitch;
+    //steering = -controller.precesion;
+    
+    
+    setThrottle(-controller.pitch);
+    
+    xRotAngle = -controller.precesion*1000;
+    
+    yRotAngle = -controller.yaw;
+    
+}
+
 void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
 	position = getPos();
@@ -178,6 +195,11 @@ Vec3f windToBody(float dx, float dy, float dz,float alpha, float beta)
     return vec3f;
 }
 
+
+void Manta::doDynamics()
+{
+    doDynamics(getBodyID());
+}
 
 void Manta::doDynamics(dBodyID body)
 {

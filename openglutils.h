@@ -22,6 +22,9 @@ void doTransform (float pos[3], float R[12]);
 void drawBox(GLuint texturedId, float xx, float yy, float zz);
 void drawBox(float xx, float yy, float zz);
 
+void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side,float height);
+void drawBoxIsland(float xx, float yy, float zz, float side, float height);
+
 void drawFloor(float x, float y, float z);
 
 void drawLightning();

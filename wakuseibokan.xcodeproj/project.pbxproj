@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		6225E66E1A716DB0009051FF /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6225E66F1A7277D9009051FF /* opengltemplate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = opengltemplate.cpp; sourceTree = "<group>"; };
 		6268EB70192EDC1700740008 /* carrier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrier.cpp; sourceTree = "<group>"; };
 		6268EB71192EDC1700740008 /* carrier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = carrier.h; sourceTree = "<group>"; };
 		6268EB721930F39900740008 /* keplerivworld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = keplerivworld.cpp; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 		62D754C6192B887C00FD6B43 = {
 			isa = PBXGroup;
 			children = (
+				6225E66E1A716DB0009051FF /* README.md */,
 				626C74F81932E5700012D764 /* math */,
 				6268EB721930F39900740008 /* keplerivworld.cpp */,
 				6268EB731930F39900740008 /* keplerivworld.h */,
@@ -108,6 +111,7 @@
 				62D754F2192B89B000FD6B43 /* water */,
 				62D754D2192B88AC00FD6B43 /* mainworkingstd.cpp */,
 				62D7551E192C53A800FD6B43 /* main.cpp */,
+				6225E66F1A7277D9009051FF /* opengltemplate.cpp */,
 				62D754D1192B88A200FD6B43 /* Makefile */,
 			);
 			sourceTree = "<group>";
@@ -178,7 +182,7 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = /Users/rramele/work/wakuseibokan;
+			buildWorkingDirectory = ./;
 			dependencies = (
 			);
 			name = wakuseibokan;
@@ -245,7 +249,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
-				PKG_CONFIG_PATH = /Users/rramele/work/ode/lib/pkgconfig/;
+				PKG_CONFIG_PATH = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -278,7 +282,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PKG_CONFIG_PATH = /Users/rramele/work/ode/lib/pkgconfig/;
+				PKG_CONFIG_PATH = "";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -291,6 +295,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PKG_CONFIG_PATH = /usr/local/bin;
 				PRODUCT_NAME = wakuseibokan;
 			};
 			name = Debug;
@@ -300,6 +305,7 @@
 			buildSettings = {
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PKG_CONFIG_PATH = /usr/local/bin;
 				PRODUCT_NAME = wakuseibokan;
 			};
 			name = Release;

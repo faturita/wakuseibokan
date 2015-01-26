@@ -1,6 +1,8 @@
 #ifndef USERCONTROLS_H
 #define USERCONTROLS_H
 
+#include <assert.h>
+
 
 class Controller
 {
@@ -31,10 +33,22 @@ public:
     
 	bool pp;
     
+    bool finish=false;
+    
     void reset()
     {
         roll=pitch=precesion=yaw=0;
         thrust=0;
+    };
+    
+    void interrupt()
+    {
+        finish=true;
+    }
+    
+    bool isInterrupted()
+    {
+        return finish;
     };
 };
 

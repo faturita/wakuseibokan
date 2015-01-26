@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "carrier/yamathutil.h"
+#include "math/yamathutil.h"
 
 #include "camera.h"
 #include "usercontrols.h"
@@ -125,19 +125,19 @@ bool pp=false;
 void handleKeypress(unsigned char key, int x, int y) {
 	switch (key) {
 		case 27: //Escape key
-			exit(0);
+            controller.interrupt();
         case '+':Camera.dx+=0.1;break;
         case '-':Camera.dx-=0.1;break;
         case 32 :Camera.dx=0.00001; controller.thrust = 0;break;
         case '^':pp = !(pp);break;
-        case 'a':controller.roll-=0.1f;break;
-        case 'd':controller.roll+=0.1f;break;
-        case 'w':controller.pitch-=0.01f;break;
-        case 's':controller.pitch+=0.01f;break;
-        case 'z':controller.yaw-=0.1f;break;
-        case 'c':controller.yaw+=0.1f;break;
-        case 'v':controller.precesion-=0.1f;break;
-        case 'b':controller.precesion+=0.1f;break;
+        case 'a':controller.roll-=1.0f;break;
+        case 'd':controller.roll+=1.0f;break;
+        case 'w':controller.pitch-=1.0f;break;
+        case 's':controller.pitch+=1.0f;break;
+        case 'z':controller.yaw-=1.0f;break;
+        case 'c':controller.yaw+=1.0f;break;
+        case 'v':controller.precesion-=1.0f;break;
+        case 'b':controller.precesion+=1.0f;break;
         case '9':controller.thrust+=20.0f;break;
         case 'p':controller.pause = !controller.pause;break;
         case 'r':controller.thrust+=0.05;break;
@@ -146,18 +146,12 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '0':
         	controller.controlling = 0;
             controller.reset();
+            Camera.reset();
         break;
-        case '1':
-        	controller.controlling = 1;
+        case '1':case '2':case '3': case '4': case '5': case '6':
+        	controller.controlling = (int)(key-48);
             controller.reset();
         	//spd = _manta.getThrottle();
-
-        break;
-        case '2':
-        	controller.controlling = 2;
-            controller.reset();
-        	//spd = _walrus.getThrottle();
-
         break;
         case '!':Camera.control = 1;break;
         case '"':Camera.control = 2;break;

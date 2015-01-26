@@ -32,7 +32,7 @@
 #include <GL/glut.h>
 #endif
 
-#include "carrier/vec3f.h"
+#include "math/vec3f.h"
 
 struct MD2Vertex {
 	Vec3f pos;

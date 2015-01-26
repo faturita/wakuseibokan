@@ -8,6 +8,14 @@
 #ifndef TERRAIN_H_
 #define TERRAIN_H_
 
+#include "../odeutils.h"
+#include "../openglutils.h"
+
+
+#define HFIELD_WSTEP			60			// Vertex count along edge >= 2
+#define HFIELD_DSTEP			60
+
+
 //Represents a terrain, by storing a set of heights and normals at 2D locations
 class Terrain {
 	private:
@@ -160,6 +168,26 @@ class Terrain {
 
 Terrain* loadTerrain(const char* filename, float height);
 
+void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
+
+void drawTerrain(Terrain *_landmass, float fscale);
+
+void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
+
+
+class BoxIsland
+{
+private:
+    Terrain *_landmass;
+    
+    dReal heightfield_callback( void* pUserData, int x, int z );
+    
+public:
+    
+    dGeomID buildTerrainModel(dSpaceID space);
+    
+    void draw(float x, float y, float z, float side, float height);
+};
 
 
 #endif /* TERRAIN_H_ */

@@ -9,7 +9,7 @@
 #define CAMERA_H_
 
 #include <GLUT/glut.h>
-#include "carrier/yamathutil.h"
+#include "math/yamathutil.h"
 #include "observable.h"
 
 
@@ -21,6 +21,8 @@ public:
 	void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	Vec3f getForward();
 	Vec3f pos;
+    // Keep track of a non-body camera position.
+    Vec3f posi;
 	Vec3f getPos();
 	void setPos(Vec3f newpos);
 	float dx;
@@ -34,6 +36,8 @@ public:
     void lookAtFrom(Vec3f up, Vec3f pos, Vec3f forward);
     
     void lookAtFrom(Vec3f pos, Vec3f forward);
+    
+    void reset();
 } ;
 
 

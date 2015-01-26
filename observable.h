@@ -8,7 +8,7 @@
 #ifndef OBSERVABLE_H_
 #define OBSERVABLE_H_
 
-#include "carrier/yamathutil.h"
+#include "math/yamathutil.h"
 
 class Observable
 {

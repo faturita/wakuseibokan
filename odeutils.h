@@ -10,8 +10,8 @@
 
 #include <ode/ode.h>
 
-#include "carrier/vec3f.h"
-#include "carrier/yamathutil.h"
+#include "math/vec3f.h"
+#include "math/yamathutil.h"
 
 
 Vec3f ToVec3f(dReal *val, Vec3f retValue);

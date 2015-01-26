@@ -19,6 +19,8 @@ public:
 	void virtual drawDirectModel();
 	void doMaterial();
 	void virtual doDynamics(dBodyID);
+    void doDynamics();
+    void doControl(Controller controller);
 };
 
 #endif /* WALRUS_H_ */

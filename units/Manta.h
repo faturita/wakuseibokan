@@ -24,6 +24,8 @@ public:
 	void virtual drawModel();
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
+    void doDynamics();
+    void doControl(Controller controller);
 };
 
 #endif /* MANTA_H_ */

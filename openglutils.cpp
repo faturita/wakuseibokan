@@ -9,6 +9,13 @@
 
 #include <iostream>
 
+GLuint _textureIdSea;
+GLuint _textureBox;
+
+GLuint _textureSky;
+
+GLuint _textureLand;
+
 
 void CheckGLError() {
 	GLuint err = glGetError();
@@ -63,7 +70,7 @@ void drawArrow(float x, float y, float z)
     // RED
     glTranslatef(0.0f,0.0f,0.0f);
     glColor3f(1.0f,0.5f,0.5f);
-    glBegin(GL_LINE);
+    glBegin(GL_LINES);
     glVertex3f(0.0f,0.0f,0.0f);
     glVertex3f(x,y,z);
     glEnd();
@@ -83,12 +90,11 @@ void drawArrow()
 void drawArrow(float scale)
 {
     glPushMatrix();
-    glLineWidth(3.0f);
 
     // RED
     glTranslatef(0.0f,0.0f,0.0f);
     glColor3f(1.0f,0.0f,0.0f);
-    glBegin(GL_LINE);
+    glBegin(GL_LINES);
     glVertex3f(0.0f,0.0f,0.0f);
     glVertex3f(scale,0.0f,0.0f);
     glEnd();
@@ -103,7 +109,7 @@ void drawArrow(float scale)
     glPushMatrix();
     glTranslatef(0.0f,0.0f,0.0f);
     glColor3f(0.0f,1.0f,0.0f);
-    glBegin(GL_LINE);
+    glBegin(GL_LINES);
     glVertex3f(0.0f,0.0f,0.0f);
     glVertex3f(0.0f,scale,0.0f);
     glEnd();
@@ -118,7 +124,7 @@ void drawArrow(float scale)
     glPushMatrix();
     glTranslatef(0.0f,0.0f,0.0f);
     glColor3f(0.0f,0.0f,1.0f);
-    glBegin(GL_LINE);
+    glBegin(GL_LINES);
     glVertex3f(0.0f,0.0f,0.0f);
     glVertex3f(0.0f,0.0f,scale);
     glEnd();
@@ -134,6 +140,94 @@ void drawArrow(float scale)
 
 float boxangle = 0;
 
+void drawBoxIsland(float xx, float yy, float zz, float side, float height)
+{
+    drawBoxIsland(_textureBox,xx,yy,zz,side, height);
+}
+
+void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side, float height)
+{
+    int x=0, y=0, z=0;
+    
+     float BOX_SIZE = 7.0f; //The length of each side of the cube
+    
+    BOX_SIZE=side;
+    
+    //glLoadIdentity();
+    glPushMatrix();
+    glTranslatef(xx,yy,zz);
+    glBegin(GL_QUADS);
+    
+    //Top face
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glNormal3f(0.0, 1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, height / 2 + y, -BOX_SIZE / 2 + z);
+    glVertex3f(-BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, height / 2 + y, -BOX_SIZE / 2 + z);
+    
+    //Bottom face
+    glColor3f(1.0f, 0.0f, 1.0f);
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, -height / 2 + y, -BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, -height / 2 + y, -BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE /2 + z);
+    glVertex3f(-BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE / 2 + z);
+    
+    //Left face
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, -height / 2 + y, -BOX_SIZE / 2 + z);
+    glVertex3f(-BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE / 2 + z);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    glVertex3f(-BOX_SIZE / 2 + x, height / 2 + y, -BOX_SIZE / 2 + z);
+    
+    //Right face
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2 + x, -height / 2 + y, -BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, height / 2 + y, -BOX_SIZE / 2 + z);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    glVertex3f(BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE / 2 + z);
+    
+    glEnd();
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    
+    glBegin(GL_QUADS);
+    
+    //Front face
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE / 2 + z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2 + x, -height / 2 + y, BOX_SIZE / 2 + z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, height / 2 + y, BOX_SIZE / 2 + z);
+    
+    //Back face
+    glNormal3f(0.0, 0.0f, -1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2+ x, -height / 2+ y, -BOX_SIZE / 2+ z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2+ x, height / 2+ y, -BOX_SIZE / 2+ z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2+ x, height / 2+ y, -BOX_SIZE / 2+ z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2+ x, -height / 2+ y, -BOX_SIZE / 2+ z);
+    
+    glEnd();
+    glPopMatrix();
+    
+}
 
 
 void drawBox(GLuint _textureId, float xx, float yy, float zz)
@@ -224,10 +318,7 @@ void drawBox(GLuint _textureId, float xx, float yy, float zz)
 }
 
 
-GLuint _textureIdSea;
-GLuint _textureBox;
 
-GLuint _textureSky;
 
 void initTextures()
 {
@@ -242,6 +333,10 @@ void initTextures()
     
     image = loadBMP("clouds.bmp");
 	_textureSky = loadTexture(image);
+    delete image;
+    
+    image = loadBMP("terrain/grass.bmp");
+    _textureLand = loadTexture(image);
     delete image;
 }
 
@@ -284,6 +379,7 @@ void drawFloor(float x, float y, float z)
     glTexCoord2f (start, sstart);
     glVertex3f(horizon, 0.0f, -horizon);
     
+    glDisable(GL_TEXTURE_2D);
     glEnd();
     glPopMatrix();
 }
@@ -411,7 +507,7 @@ void drawBox(float xx, float yy, float zz)
     
     const float BOX_SIZE = 7.0f; //The length of each side of the cube
     static float boxangle = 0;            //The rotation of the box
-
+    
     drawBox(_textureBox,xx,yy,zz);
 }
 

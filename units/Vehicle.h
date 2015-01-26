@@ -10,8 +10,8 @@
 
 
 #include <stdio.h>
-#include "../carrier/vec3f.h"
-#include "../carrier/yamathutil.h"
+#include "../math/vec3f.h"
+#include "../math/yamathutil.h"
 #include "../md2model.h"
 #include "../openglutils.h"
 #include "../odeutils.h"
@@ -29,6 +29,9 @@ protected:
 	Vec3f forward;
 	float throttle;
     float engine[3];
+    float steering;
+    
+    dBodyID me;
 public:
 	float xRotAngle;
 	float yRotAngle;
@@ -44,7 +47,8 @@ public:
 	void setForward(float x, float y, float z);
 	Vec3f getForward();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-	void virtual drawModel();
+    void virtual drawModel() { assert( 0 || !"Should not be executed."); }
+    
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void setLocation(float fPos[3], float R[12]);
 
@@ -52,8 +56,13 @@ public:
 	float virtual getThrottle();
 
 	void virtual doDynamics(dBodyID);
+    void virtual doDynamics();
 
-
+    void virtual doControl(Controller);
+    
+    void virtual embody(dBodyID myBodySelf);
+    
+    dBodyID virtual getBodyID();
 
 };
 

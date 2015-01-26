@@ -178,7 +178,7 @@ Image* loadBMP(const char* filename) {
 			break;
 		case 124:
 			//Windows V5
-			assert(!"Can't load Windows V5 bitmaps");
+			assert(!"Can't load Windows V5 bitmaps (save it without color information)");
 			break;
 		default:
 			assert(!"Unknown bitmap format");

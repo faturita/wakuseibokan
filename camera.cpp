@@ -48,6 +48,12 @@ Camera::Camera()
     dx=0.05;
     dy=dz=yAngle=xAngle=0;
     pos[0]=0.0f;pos[1]= 30.0f;pos[2]= -70.0f;
+    posi=pos;
+}
+
+void Camera::reset()
+{
+    pos=posi;
 }
 
 void Camera::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
@@ -55,6 +61,7 @@ void Camera::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,xAngle, -yAngle );        //Note: need to calculate at each frame
     forward = getForward();
     position = pos;
+    posi=pos;
 }
 
 Vec3f Camera::getForward()
@@ -124,7 +131,7 @@ void Camera::lookAtFrom(Vec3f up, Vec3f poss, Vec3f forward)
     //pos[2]+=dz;
     
     // How to move in forward direction.
-    
+
     if (dx!=0) {
         pos[0]+=(forward[0]);
         pos[1]+=(forward[1]);

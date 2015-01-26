@@ -27,6 +27,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2);
 
 void initWorldModelling();
 
+void endWorldModelling();
+
 // **********************************************************************
 
 

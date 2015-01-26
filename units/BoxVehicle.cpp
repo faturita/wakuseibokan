@@ -20,7 +20,6 @@ void BoxVehicle::init()
     
     setForward(0,0,1);
     
-
 }
 
 void BoxVehicle::embody(dBodyID myBodySelf)
@@ -28,11 +27,12 @@ void BoxVehicle::embody(dBodyID myBodySelf)
 	dMass m;
     
     float myMass = 1.0f;
-    float radius = 1.0f;
-    float length = 1.0f;
+    float radius = 2.64f;
+    float length = 7.0f;
 
 	dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-	dMassSetBox(&m,1,length,length,length);
+	//dMassSetBox(&m,1,length,length,length);
+    dMassSetSphere(&m,1,radius);
 	dMassAdjust(&m, myMass*1.0f);
 	dBodySetMass(myBodySelf,&m);
     
@@ -61,17 +61,18 @@ void BoxVehicle::doMaterial()
 
 void BoxVehicle::doControl(Controller controller)
 {
-    engine[0] = controller.pitch;
+    engine[0] = -controller.roll;
     engine[1] = controller.yaw;
-    engine[2] = controller.roll;
+    engine[2] = -controller.pitch;
+    steering = -controller.precesion;
 }
 
-void BoxVehicle::drawModel(float yRot, float xRot, float x, float y, float z)
+void  BoxVehicle::drawModel(float yRot, float xRot, float x, float y, float z)
 {
 
 }
 
-void BoxVehicle::drawModel()
+void  BoxVehicle::drawModel()
 {
     int x=0, y=0, z=0;
     
@@ -84,6 +85,15 @@ void BoxVehicle::drawModel()
     //glLoadIdentity();
     glPushMatrix();
     glTranslatef(xx,yy,zz);
+    
+    
+    
+    // This will Rotate according to the R quaternion (which is a variable in Vehicle).
+    float f[3];
+    f[0] = 0; f[1] = 0; f[2] = 0;
+    
+    doTransform(f, R);
+    
     glRotatef(boxRotatingAngle, 0.0f, 0.0f, 1.0f);
     glBegin(GL_QUADS);
     
@@ -176,6 +186,8 @@ void BoxVehicle::doDynamics(dBodyID body)
 void BoxVehicle::stop()
 {
     engine[0]=engine[1]=engine[2]=0;
+    
+    repelling=true;
 }
 
 void BoxVehicle::doDynamics()
@@ -183,19 +195,29 @@ void BoxVehicle::doDynamics()
     
 	// This should be after the world step
 	/// stuff
-    //dVector3 result;
+    dVector3 result;
     
-    //dBodyVectorToWorld(me, 0,0,1,result);
-    //setForward(result[0],result[1],result[2]);
+    //printf("%14.5f,%14.5f, %14.5f\n", engine[0],engine[1],engine[2]);
+    
+    dBodyVectorToWorld(me, 0,0,1,result);
+    setForward(result[0],result[1],result[2]);
     if (fabs(engine[0])>0 || fabs(engine[1])>0 || fabs(engine[2])>0 )
     {
         //printf("Applying force %10.8f %10.8f %10.8f \n", engine[0],engine[1],engine[2]);
-        dBodyAddForce(me, engine[0],engine[1], engine[2]);
+        dBodyAddRelForce(me, engine[0],engine[1], engine[2]);
     }
     
     if (tweakOde) {dBodyAddForce(me, 0, 0, 0.3);tweakOde=(!tweakOde);}
     
-    dBodyAddForce(me, 0,9.81f,0);
+    // Antigravity field.
+    if (repelling)
+    {
+        printf ("Antigravity...\n");
+        //dBodyAddForce(me, 0,9.81f,0);
+    }
+        
+    
+    dBodyAddTorque(me,0,steering,0);
     
 	const dReal *dBodyPosition = dBodyGetPosition(me);
 	const dReal *dBodyRotation = dBodyGetRotation(me);

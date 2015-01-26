@@ -1,12 +1,14 @@
 ODEF=$(shell pkg-config ode --cflags)
 ODEFL=$(shell pkg-config ode --libs)
 CC = g++
-CFLAGS = -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers -I/Users/rramele/work/ode/include/
+CFLAGS = -w -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers -I/Users/rramele/work/ode/include/
 PROG = waku
 
-SRCSR = main.cpp camera.cpp odeutils.cpp terrain/imageloader.cpp md2model.cpp carrier/vec3f.cpp carrier/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp units/*.cpp
+SRCSR = main.cpp camera.cpp odeutils.cpp terrain/imageloader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp units/*.cpp
 
-SRCS = carrier.cpp keplerivworld.cpp usercontrols.cpp camera.cpp odeutils.cpp terrain/imageloader.cpp md2model.cpp carrier/vec3f.cpp carrier/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp units/*.cpp
+SRCS = carrier.cpp keplerivworld.cpp usercontrols.cpp camera.cpp odeutils.cpp terrain/imageloader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp units/*.cpp
+
+TESTSRC = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
 
 ifeq ($(shell uname),Darwin)
@@ -16,6 +18,9 @@ else
 endif
 
 all: $(PROG)
+
+test:
+	$(CC) $(CFLAGS) -o test $(TESTSRC) $(LIBS)
 
 $(PROG):	$(SRCS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)

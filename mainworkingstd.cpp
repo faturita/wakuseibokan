@@ -18,7 +18,7 @@
 #include "terrain/Terrain.h"
 #include "font/DrawFonts.h"
 
-#include "carrier/yamathutil.h"
+#include "math/yamathutil.h"
 
 #include "openglutils.h"
 

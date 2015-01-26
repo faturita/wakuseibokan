@@ -19,19 +19,22 @@ class BoxVehicle : public Vehicle
     float boxRotatingAngle;
     dBodyID me;
     bool tweakOde = true;
+    bool repelling = false;
     
 public:
-	void virtual init();
-	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-	void virtual drawModel();
-	void virtual drawDirectModel();
+	void  init();
+	void  drawModel(float yRot, float xRot, float x, float y, float z);
+    
+	void drawModel();
+    
+	void  drawDirectModel();
 	void doMaterial();
-	void virtual doDynamics(dBodyID);
-    void virtual doDynamics();
-    void virtual embody(dBodyID);
-    void virtual doControl(Controller);
-    dBodyID virtual getBodyID();
-    void virtual stop();
+	void  doDynamics(dBodyID);
+    void  doDynamics();
+    void  embody(dBodyID);
+    void  doControl(Controller);
+    dBodyID  getBodyID();
+    void  stop();
 };
 
 

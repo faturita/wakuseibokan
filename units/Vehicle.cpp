@@ -6,6 +6,7 @@
  */
 
 #include "Vehicle.h"
+#include <assert.h>
 
 Vehicle::Vehicle()
 {
@@ -122,13 +123,11 @@ void Vehicle::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void Vehicle::doDynamics(dBodyID body)
-{
-
-}
-
+/**
 void Vehicle::drawModel()
 {
+    assert(0 || !"Draw model should not be executed.\n");
+    
     float modX=0.0f, modY=0.0f, modZ=0.0f;
 
     modX = pos[0];
@@ -142,7 +141,7 @@ void Vehicle::drawModel()
     pos += speed * forward;
 
     drawModel(xRotAngle, yRotAngle, modX, modY, modZ);
-}
+}**/
 
 void Vehicle::setThrottle(float throttle)
 {
@@ -153,4 +152,43 @@ float Vehicle::getThrottle()
 {
 	return Vehicle::throttle;
 }
+
+void Vehicle::doControl(Controller controller)
+{
+    //engine[0] = controller.pitch;
+    //engine[1] = controller.yaw;
+    //engine[2] = controller.roll;
+}
+
+void  Vehicle::doDynamics(dBodyID) {
+    assert( 0 || !"This should not be executed.");
+}
+void  Vehicle::doDynamics() {
+    assert( 0 || !"This should not be executed.");
+}
+
+
+void  Vehicle::embody(dBodyID myBodySelf)
+{
+    dMass m;
+    
+    float myMass = 1.0f;
+    float radius = 2.64f;
+    float length = 7.0f;
+    
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    //dMassSetBox(&m,1,length,length,length);
+    dMassSetSphere(&m,1,radius);
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+    
+    me = myBodySelf;
+}
+
+dBodyID Vehicle::getBodyID()
+{
+    return me;
+}
+
+
 
