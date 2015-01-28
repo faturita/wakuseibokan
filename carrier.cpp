@@ -117,7 +117,12 @@ void drawHUD()
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
     
-	sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", Camera.dx, controller.roll,controller.pitch,controller.yaw,controller.precesion);
+    float speed=0;
+    
+    if (controller.controlling >0)
+        speed = vehicles[controller.controlling-1]->getSpeed();
+    
+	sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.roll,controller.pitch,controller.yaw,controller.precesion);
 	drawString(0,-60,1,str,0.2f);
     
 	sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.thrust);

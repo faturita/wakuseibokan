@@ -140,8 +140,8 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'b':controller.precesion+=1.0f;break;
         case '9':controller.thrust+=20.0f;break;
         case 'p':controller.pause = !controller.pause;break;
-        case 'r':controller.thrust+=0.05;break;
-        case 'f':controller.thrust-=0.05;break;
+        case 'r':controller.thrust-=0.05;break;
+        case 'f':controller.thrust+=0.05;break;
         case 'q':controller.reset();break;
         case '0':
         	controller.controlling = 0;
@@ -151,7 +151,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '1':case '2':case '3': case '4': case '5': case '6':
         	controller.controlling = (int)(key-48);
             controller.reset();
-        	//spd = _manta.getThrottle();
+        	//spd = vehicles.getThrottle();
         break;
         case '!':Camera.control = 1;break;
         case '"':Camera.control = 2;break;

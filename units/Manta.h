@@ -26,6 +26,8 @@ public:
 	void virtual doDynamics(dBodyID);
     void doDynamics();
     void doControl(Controller controller);
+    
+    void oldDynamics(dBodyID body);
 };
 
 #endif /* MANTA_H_ */

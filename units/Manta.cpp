@@ -31,7 +31,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f, R);
 
-        drawArrow();
+        //drawArrow();
         drawArrow(S[0],S[1],S[2]);
         drawArrow(V[0],V[1],V[2]);
 
@@ -60,11 +60,13 @@ void Manta::doControl(Controller controller)
     //steering = -controller.precesion;
     
     
-    setThrottle(-controller.pitch);
+    setThrottle(-controller.thrust*2*5);
     
-    xRotAngle = -controller.precesion*1000;
+    // roll
+    xRotAngle = controller.roll;
     
-    yRotAngle = -controller.yaw;
+    // pitch
+    yRotAngle = controller.pitch*0.1;
     
 }
 
@@ -199,6 +201,56 @@ Vec3f windToBody(float dx, float dy, float dz,float alpha, float beta)
 void Manta::doDynamics()
 {
     doDynamics(getBodyID());
+}
+
+
+void Manta::oldDynamics(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+    
+    Vec3f V;
+    V[0]=v[0];V[1]=v[1];V[2]=v[2];
+    
+    dVector3 velResult;
+    dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
+    
+    Vec3f VV;
+    VV[0]=velResult[0];VV[1]=velResult[1];VV[2]=velResult[2];
+    
+    //VV = (VV)/ VV.magnitude();
+    
+    V[0]=VV[0];V[1]=VV[1];V[2]=VV[2];
+    
+    Vec3f F;
+    F[0]=0;F[1]=0;F[2]=1;
+    
+    Vec3f vForward;
+    vForward = dBodyVectorToWorldVec3f(body,0,0,1,vForward);
+    
+    speed = V.magnitude();
+
+    dBodyAddTorque(body, 0, 0.001, 0 );
+    
+    dBodyAddRelTorque(body, 0, 0, -xRotAngle);
+    dBodyAddRelTorque(body,-yRotAngle*speed/1000,0, 0);
+    
+    dBodyAddRelForce(body, 0,0,getThrottle());
+    
+    printf ("Antigravity...\n");
+    dBodyAddForce(me, 0,9.81f,0);
+    
+    // This should be after the world step
+    /// stuff
+    dVector3 result;
+    
+    dBodyVectorToWorld(body, 0,0,1,result);
+    setForward(result[0],result[1],result[2]);
+    
+    const dReal *dBodyPosition = dBodyGetPosition(body);
+    const dReal *dBodyRotation = dBodyGetRotation(body);
+    
+    setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+    setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
 
 void Manta::doDynamics(dBodyID body)
@@ -343,10 +395,11 @@ void Manta::doDynamics(dBodyID body)
 	dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
 	dBodyAddRelTorque(body, rtWind[1], rtWind[0], rtWind[2]);
+    
+    dBodyAddTorque(body, 0, -xRotAngle*0.01, 0);
 
-	//dBodyAddRelTorque(body[0], Mt, Nt, Lt);
 
-	dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
+	//dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
 
 	// This should be after the world step
 	/// stuff

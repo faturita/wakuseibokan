@@ -64,7 +64,7 @@ void BoxVehicle::doControl(Controller controller)
     engine[0] = -controller.roll;
     engine[1] = controller.yaw;
     engine[2] = -controller.pitch;
-    steering = -controller.precesion;
+    steering = -controller.precesion*0.1;
 }
 
 void  BoxVehicle::drawModel(float yRot, float xRot, float x, float y, float z)

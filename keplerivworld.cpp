@@ -52,6 +52,12 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
         {
             printf ("Vehicle %d collisioned\n", i);
             //vehicles[0].stop();
+            
+            if (i ==3 && vehicles[3]->getSpeed()>20)
+            {
+                printf("Sorry your plane has crashed. You're dead.\n");
+                exit(2);
+            }
         }
     }
     
@@ -161,8 +167,8 @@ void initWorldModelling()
     
     body[0] = dBodyCreate(world);
     _boxVehicle1->embody(body[0]);
-    geoms[0] = dCreateSphere( space, 2.64f);
-    //geoms[0] = dCreateBox (space, 7, 7, 7);
+    //geoms[0] = dCreateSphere( space, 2.64f);
+    geoms[0] = dCreateBox (space, 17, 7, 17);
 	dGeomSetBody(geoms[0], body[0]);
     
 	body[1] = dBodyCreate(world);
@@ -173,7 +179,7 @@ void initWorldModelling()
     
     Walrus *_walrus1 = new Walrus();
     _walrus1->init();
-    _walrus1->setPos(0.0f, 40.0f, -600.0f);
+    _walrus1->setPos(0.0f, 5.0f, -600.0f);
     
     body[2] = dBodyCreate(world);
     _walrus1->embody(body[2]);
@@ -182,11 +188,12 @@ void initWorldModelling()
     
     Manta *_manta1 = new Manta();
     _manta1->init();
-    _manta1->setPos(30.0f, 5.0f, -650.0f);
+    _manta1->setPos(-30.0f, 5.0f, -650.0f);
     
     body[3] = dBodyCreate(world);
     _manta1->embody(body[3]);
     geoms[3] = dCreateSphere( space, 2.64f );
+    //geoms[3] = dCreateBox (space, 7, 7, 15);
     dGeomSetBody(geoms[3], body[3]);
     
 

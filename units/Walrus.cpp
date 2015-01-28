@@ -44,16 +44,18 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         glTranslatef(x, y, z);
 
         doTransform(f, R);
+        
+        drawArrow();
 
        	glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
         //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        doMaterial();
+        //doMaterial();
 
         _model->draw();
-        drawArrow();
+
         glPopMatrix();
     }
     else
@@ -77,7 +79,7 @@ void Walrus::doControl(Controller controller)
     
     setThrottle(-controller.pitch);
     
-    xRotAngle = -controller.precesion*1000;
+    xRotAngle = -controller.precesion;
     
 }
 
