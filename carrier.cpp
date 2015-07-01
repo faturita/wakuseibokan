@@ -24,6 +24,8 @@
 #import <OpenAL/al.h>
 #import <OpenAL/alc.h>
 
+#import "ThreeMaxLoader.h"
+
 
 /**
 #include "FractalNoise.h"
@@ -82,7 +84,9 @@ extern dGeomID sphere[NUM];
 
 extern std::vector<Vehicle*> vehicles;
 
-extern BoxIsland _boxIsland;
+//extern BoxIsland _boxIsland;
+
+extern std::vector<BoxIsland*> islands;
 
 
 void drawHUD()
@@ -156,6 +160,7 @@ void drawHUD()
 }
 
 
+
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -209,7 +214,12 @@ void drawScene() {
     //drawBoxIsland(300,5,300,1000,10);
     
     // Draw all terrain islands and so on.
-    _boxIsland.draw(300,5,300,1000,10);
+    //_boxIsland.draw(300,5,300,1000,10);
+    
+    // Draw vehicles and objects
+    for (int i=0; i<islands.size(); i++) {
+        (islands[i]->draw());
+    }
 
     
     drawBox(10,10,1400);
@@ -228,6 +238,13 @@ void drawScene() {
     
     drawBox(10,10,10);
     drawBox(-10,-10,-10);
+    
+    
+    // EXPERIMENTALLY: Draw 3DS models
+    obj_type object;
+    CThreeMaxLoader::Load3DS(&object,"ico.3ds");
+    CThreeMaxLoader::draw3DSModel(object);
+
     
     
     // Draw vehicles and objects
@@ -260,6 +277,13 @@ void initRendering() {
     
 	// Do not show hidden faces.
 	glEnable(GL_DEPTH_TEST);
+    
+    
+    // Enable wireframes
+    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    
+    
+    glShadeModel(GL_SMOOTH); // Type of shading for the polygons
     
 	glEnable(GL_COLOR_MATERIAL);
     

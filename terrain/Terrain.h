@@ -182,11 +182,15 @@ private:
     
     dReal heightfield_callback( void* pUserData, int x, int z );
     
+    float X,Y,Z;
+    
 public:
     
-    dGeomID buildTerrainModel(dSpaceID space);
+    dGeomID buildTerrainModel(dSpaceID space, const char* model);
     
-    void draw(float x, float y, float z, float side, float height);
+    //void draw(float x, float y, float z, float side, float height);
+    void draw();
+    void setLocation(float x, float y, float z);
 };
 
 

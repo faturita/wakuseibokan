@@ -22,10 +22,25 @@ void BoxVehicle::init()
     
 }
 
+int BoxVehicle::getType()
+{
+    return 1;
+}
+
+
+void BoxVehicle::embody(dWorldID world, dSpaceID space)
+{
+    me = dBodyCreate(world);
+    embody(me);
+    geom = dCreateSphere( space, 2.64f);
+    dGeomSetBody(geom, me);
+}
+
+
 void BoxVehicle::embody(dBodyID myBodySelf)
 {
 	dMass m;
-    
+
     float myMass = 1.0f;
     float radius = 2.64f;
     float length = 7.0f;

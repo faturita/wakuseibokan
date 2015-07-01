@@ -38,18 +38,21 @@ Terrain* loadTerrain(const char* filename, float height) {
 // This function is called by the world modeller to map x,z coordinates to heights.
 dReal hedightfield_callback( void* pUserData, int x, int z )
 {
-    dReal h = 5;
+    static dReal h = 5000;
     
     Terrain *_landmass = (Terrain*) pUserData;
     
     h = _landmass->getHeight(x, z);
+
+    //h = (-1) * fabs(x - 30) + 30;
+    
     
     //printf("%4d,%4d,%10.5f\n", x,z,h);
     
     return h;
 }
 
-dGeomID BoxIsland::buildTerrainModel(dSpaceID space)
+dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
     //_terrain = loadTerrain("terrain/island.bmp", 20);
     
@@ -57,31 +60,42 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space)
     
     //_baltimore = loadTerrain("terrain/baltimore.bmp", 40);
     
-    _landmass = loadTerrain("terrain/vulcano.bmp", 60);
+    //_landmass = loadTerrain("terrain/baltimore.bmp", 60);
+    
+    _landmass = loadTerrain(model, 60);
     
     printf("Landmass width: %d\n", _landmass->width());
     printf("Landmass heigth: %d\n",_landmass->length());
     
     dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
     
-    // Create an finite heightfield.
+    // Create a finite heightfield.
     dGeomHeightfieldDataBuildCallback( heightid, _landmass, hedightfield_callback,
                                       REAL( 600.0 ), REAL (600.0), HFIELD_WSTEP, HFIELD_DSTEP,
                                       REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
     
-    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6.0 ) );
+    // These boundaries are used to limit how the heightfield affects objects.
+    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6000.0 ) );
     
     dGeomID gheight = dCreateHeightfield( space, heightid, 1 );
     
-    dGeomSetPosition( gheight, 300, 0, 300 );
+    dGeomSetPosition( gheight, X, Y, Z );
     
     return gheight;
 }
 
-void BoxIsland::draw(float x, float y, float z, float side, float height)
+void BoxIsland::setLocation(float x, float y, float z)
+{
+    X = x;
+    Y = y;
+    Z = z;
+}
+
+void BoxIsland::draw()
     {
         glPushMatrix();
-        glTranslatef(300.0, 0.0f,300.0);
+        //glTranslatef(300.0, 0.0f,300.0);
+        glTranslatef(X,Y,Z);
         drawTerrain(_landmass,10.0f);
         glPopMatrix();
         

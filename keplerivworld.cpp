@@ -1,6 +1,8 @@
 //
 //  keplerivworld.cpp
-//  mycarrier
+//  wakuseiboukan
+//
+//  Dynamic World Model
 //
 //  Created by Rodrigo Ramele on 24/05/14.
 //  Copyright (c) 2014 Baufest. All rights reserved.
@@ -16,6 +18,7 @@
 #include "units/BoxVehicle.h"
 #include "units/Walrus.h"
 #include "units/Manta.h"
+#include "units/Buggy.h"
 
 #include "terrain/Terrain.h"
 
@@ -26,14 +29,51 @@ static dGeomID platform, ground;
 dWorldID world;
 dSpaceID space;
 dBodyID body[NUM];
-dJointID joint[NUM-1];
 dJointGroupID contactgroup;
-dGeomID geoms[NUM];
 
 std::vector<Vehicle*> vehicles;
 
+std::vector<BoxIsland*> islands;
 
-void nearCallback (void *data, dGeomID o1, dGeomID o2)
+
+
+// this is called by dSpaceCollide when two objects in space are
+// potentially colliding.
+
+ void nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+    int i,n;
+    
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2)) return;
+    
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
+            contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+            dContactSoftERP | dContactSoftCFM | dContactApprox1;
+            contact[i].surface.mu = dInfinity;
+            contact[i].surface.slip1 = 0.1;
+            contact[i].surface.slip2 = 0.1;
+            contact[i].surface.soft_erp = 0.5;
+            contact[i].surface.soft_cfm = 0.3;
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
+}
+
+//
+//  NearCallback is the collision handler callback function.
+//
+//
+void ngearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     /* exit without doing anything if the two bodies are connected by a joint */
     dBodyID b1,b2;
@@ -53,7 +93,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             printf ("Vehicle %d collisioned\n", i);
             //vehicles[0].stop();
             
-            if (i ==3 && vehicles[3]->getSpeed()>20)
+            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>30)
             {
                 printf("Sorry your plane has crashed. You're dead.\n");
                 exit(2);
@@ -69,9 +109,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
     
     //contact.surface.mode = dContactBounce ;
-    //contact.surface.mu = 0.1;
-    //contact.surface.mu2 = 0.1;
-    //contact.surface.bounce = 0.001;
+    contact.surface.mu = 0.1;
+    contact.surface.mu2 = 0.1;
+    contact.surface.bounce = 0.001;
     
     if (dCollide (o1,o2,1,&contact.geom,sizeof(dContactGeom))) {
         dJointID c = dJointCreateContact (world,contactgroup,&contact);
@@ -93,15 +133,14 @@ dGeomID gheight;
 #define HFIELD_DSAMP			( HFIELD_DEPTH / ( HFIELD_DSTEP-1 ) )
 
 
-
+// NO SE USA
 dReal heightfield_caldlback( void* pUserData, int x, int z )
 {
-    dReal h = 5;
+    dReal h = 100;
     
     return h;
 }
 
-BoxIsland _boxIsland;
 
 void initWorldModelling()
 {
@@ -152,101 +191,75 @@ void initWorldModelling()
     // Add this to destroy
     // dGeomHeightfieldDataDestroy( heightid );
     
-    gheight = _boxIsland.buildTerrainModel(space);
+    //_boxIsland.buildTerrainModel(space);
+    
+    
+    BoxIsland *baltimore = new BoxIsland();
+    baltimore->setLocation(300.0,5.0,300.0);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
+    
+   
+    BoxIsland *vulcano = new BoxIsland();
+    vulcano->setLocation(1300.0,5.0,1300.0);
+    vulcano->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
+    
+    
+    islands.push_back(baltimore);
+    islands.push_back(vulcano);
     
     
     //Init lands, fixed objects, and objects
     BoxVehicle *_boxVehicle1 = new BoxVehicle();
     _boxVehicle1->init();
-    _boxVehicle1->setPos(0.0f,40.0f,300.0f);
+    _boxVehicle1->setPos(-10.0f,40.0f,300.0f);
+
     
     BoxVehicle *_boxVehicle2 = new BoxVehicle();
     _boxVehicle2->init();
     _boxVehicle2->setPos(0.0f,40.0f,-300.0f);
 
+
+    // Start modelling BoxVehicles
+    _boxVehicle1->embody(world, space);
+    _boxVehicle2->embody(world, space);
     
-    body[0] = dBodyCreate(world);
-    _boxVehicle1->embody(body[0]);
-    //geoms[0] = dCreateSphere( space, 2.64f);
-    geoms[0] = dCreateBox (space, 17, 7, 17);
-	dGeomSetBody(geoms[0], body[0]);
     
-	body[1] = dBodyCreate(world);
-    _boxVehicle2->embody(body[1]);
-    geoms[1] = dCreateSphere( space, 2.64f);
-    //geoms[1] = dCreateBox (space, 7, 7, 7);
-	dGeomSetBody(geoms[1], body[1]);
     
-    Walrus *_walrus1 = new Walrus();
-    _walrus1->init();
-    _walrus1->setPos(0.0f, 5.0f, -600.0f);
-    
-    body[2] = dBodyCreate(world);
-    _walrus1->embody(body[2]);
-    geoms[2] = dCreateSphere( space, 2.64f );
-    dGeomSetBody(geoms[2], body[2]);
-    
+    // Add vehicles
     Manta *_manta1 = new Manta();
     _manta1->init();
-    _manta1->setPos(-30.0f, 5.0f, -650.0f);
+    _manta1->setPos(+130.0f, 30.0f, -1010.0f);
     
-    body[3] = dBodyCreate(world);
-    _manta1->embody(body[3]);
-    geoms[3] = dCreateSphere( space, 2.64f );
-    //geoms[3] = dCreateBox (space, 7, 7, 15);
-    dGeomSetBody(geoms[3], body[3]);
+    _manta1->embody(world, space);
     
+    
+    Walrus *_walrus2 = new Walrus();
+    _walrus2->init();
+    _walrus2->setPos(0.0f, 1.0f, -900.0f);
+    
+    _walrus2->embody(world, space);
+    
+    
+    Walrus *_walrus3 = new Walrus();
+    _walrus3->init();
+    _walrus3->setPos(0.0f, 5.0f, -1900.0f);
+    
+    _walrus3->embody(world, space);
+    
+    
+    Buggy *_buggy = new Buggy();
+    _buggy->init();
+    _buggy->setPos(0.0f, 0, 0);
+    
+    _buggy->embody(world, space);
 
     vehicles.push_back(_boxVehicle1);
     vehicles.push_back(_boxVehicle2);
-    vehicles.push_back(_walrus1);
     vehicles.push_back(_manta1);
+    vehicles.push_back(_walrus2);
+    vehicles.push_back(_walrus3);
+    vehicles.push_back(_buggy);
     
-    
-    
-    /**
-    Vec3f pos2;
-	pos2 = _walrus.getPos();
-	body[1] = dBodyCreate(world);
-	//dBodySetPosition(body[1],100.0f,20.0f,0.0f);
-    
-	dBodySetPosition(body[1], pos2[0], pos2[1], pos2[2]);
-	dMassSetBox(&m,1,SIDE,SIDE,SIDE);
-	dMassAdjust(&m, MASS*3.0f);
-	dBodySetMass(body[1],&m);
-	sphere[1] = dCreateSphere( space, RADIUS);
-	dGeomSetBody(sphere[1], body[1]);
-     **/
-    
-    
-    
-    
-    
-    /**
-	Vec3f pos;
-	pos = _manta.getPos();
-	body[0] = dBodyCreate(world);
-	printf ("%10.8f, %10.8f, %10.8f\n", pos[0],pos[1],pos[2]);
-	dBodySetPosition(body[0],pos[0],pos[1],pos[2]);
-	dMassSetBox(&m,1,SIDE,SIDE,SIDE);
-	dMassAdjust(&m, MASS*1);
-	dBodySetMass(body[0],&m);
-	sphere[0] = dCreateSphere( space, RADIUS);
-	dGeomSetBody(sphere[0], body[0]);
-    
-    
-	Vec3f pos2;
-	pos2 = _walrus.getPos();
-	body[1] = dBodyCreate(world);
-	//dBodySetPosition(body[1],100.0f,20.0f,0.0f);
-    
-	dBodySetPosition(body[1], pos2[0], pos2[1], pos2[2]);
-	dMassSetBox(&m,1,SIDE,SIDE,SIDE);
-	dMassAdjust(&m, MASS*3.0f);
-	dBodySetMass(body[1],&m);
-	sphere[1] = dCreateSphere( space, RADIUS);
-	dGeomSetBody(sphere[1], body[1]);
-    **/
     
     //buildTerrainModel(space,_vulcano,600.0f,-1340.0f, 0.0f, -1740.0f);
     
@@ -280,7 +293,7 @@ void buildTerrainModel(dSpaceID space, Terrain *_landmass, float fscale,float xx
     for(int z = 0; z < _landmass->length() - 1; z++) {
         
         for(int x = 0; x < _landmass->width(); x++) {
-            slopeData[z*_landmass->width() +x] = _landmass->getHeight(x, z)*fscale;
+            slopeData[z*_landmass->width() +x] = 0; /**_landmass->getHeight(x, z)*fscale+**/;
         }
     }
     
@@ -299,7 +312,6 @@ void buildTerrainModel(dSpaceID space, Terrain *_landmass, float fscale,float xx
     dGeomID slopeHeightID = dCreateHeightfield(space, slopeHeightData, 1); // fff
     
     dGeomSetPosition(slopeHeightID,xx,yy,zz);
-    
     
 }
 

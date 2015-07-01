@@ -70,7 +70,7 @@ void Vehicle::setLocation(float fPos[3], float R[12])
 
 	for(int i=0; i<12; i++)
 	{
-		Vehicle::R[i] =  R[i];
+        Vehicle::R[i] =  R[i];
 	}
 }
 
@@ -81,6 +81,11 @@ void Vehicle::init()
     if (_model != NULL)
         _model->setAnimation("run");
 
+}
+
+int Vehicle::getType()
+{
+    return 0;
 }
 
 void  Vehicle::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)

@@ -18,6 +18,11 @@ void Manta::init()
 
 }
 
+int Manta::getType()
+{
+    return 3;
+}
+
 void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
@@ -28,12 +33,14 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
     {
         glPushMatrix();
         glTranslatef(x, y, z);
+        
+        glScalef(2.0f,2.0f,2.0f);
 
         doTransform(f, R);
 
         //drawArrow();
-        drawArrow(S[0],S[1],S[2]);
-        drawArrow(V[0],V[1],V[2]);
+        drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
+        drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 		glRotatef(-180.0f, 0.0f, 0.0f, 1.0f);
@@ -68,6 +75,10 @@ void Manta::doControl(Controller controller)
     // pitch
     yRotAngle = controller.pitch*0.1;
     
+    //Manta::rudder = controller.precesion*0.1;
+    
+    Manta::addd = controller.precesion*0.1;
+    
 }
 
 void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
@@ -82,7 +93,7 @@ void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 	forward = forward.normalize();
 	orig = position;
 	Up[0]=Up[2]=0;Up[1]=4;
-	position = position - 10*forward + Up;
+	position = position - 20*forward + Up;
 	forward = orig-position;
 }
 
@@ -109,6 +120,34 @@ void Manta::drawDirectModel()
 
     drawModel(xRotAngle, yRotAngle, modX, modY, modZ);
 }
+
+
+void Manta::embody(dWorldID world, dSpaceID space)
+{
+    me = dBodyCreate(world);
+    embody(me);
+    geom = dCreateSphere( space, 2.64f);
+    dGeomSetBody(geom, me);
+}
+
+void Manta::embody(dBodyID myBodySelf)
+{
+    dMass m;
+    
+    float myMass = 1.0f;
+    float radius = 2.64f;
+    float length = 7.0f;
+    
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    //dMassSetBox(&m,1,length,length,length);
+    dMassSetSphere(&m,1,radius);
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+    
+    me = myBodySelf;
+    
+}
+
 
 /**
 void Manta::doDynamics(dBodyID body)
@@ -396,7 +435,11 @@ void Manta::doDynamics(dBodyID body)
 
 	dBodyAddRelTorque(body, rtWind[1], rtWind[0], rtWind[2]);
     
-    dBodyAddTorque(body, 0, -xRotAngle*0.01, 0);
+    //dBodyAddTorque(body, 0, -xRotAngle*0.01, 0);
+    
+    dBodyAddTorque(body,0,-Manta::addd,0);
+    
+    airspeddrarestoration();
 
 
 	//dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
@@ -410,10 +453,45 @@ void Manta::doDynamics(dBodyID body)
 
 	const dReal *dBodyPosition = dBodyGetPosition(body);
 	const dReal *dBodyRotation = dBodyGetRotation(body);
+    
 
 	setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 	setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
+
+
+/**
+void Manta::doDynamics(dBodyID body)
+{
+    
+    Vec3f Ft;
+    
+    Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
+    
+    dBodyAddRelForce(body, 0,0,getThrottle());
+    
+    
+    dBodyAddRelTorque(body, 0,-yRotAngle*0.01,-xRotAngle*0.1);
+
+    
+    // This should be after the world step
+    /// stuff
+    dVector3 result;
+    
+    dBodyVectorToWorld(body, 0,0,1,result);
+    setForward(result[0],result[1],result[2]);
+    
+    const dReal *dBodyPosition = dBodyGetPosition(body);
+    const dReal *dBodyRotation = dBodyGetRotation(body);
+    
+    
+    setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+    setLocation((float *)dBodyPosition, (float *)dBodyRotation);
+}
+
+**/
+
+
 
 
 /**
@@ -578,11 +656,10 @@ void Manta::doDynamics(dBodyID body)
 }
 **/
 
-/**
-void airspeddrarestoration()
+void Manta::airspeddrarestoration()
 {
 	// Airspeed drag restoration  (allign forward with linear velocity)
-	dReal *v = (dReal *)dBodyGetLinearVel(body);
+	dReal *v = (dReal *)dBodyGetLinearVel(me);
 
 	// Equal to gravity
 	//dBodyAddForce (body[0], 0,0.5,0);
@@ -595,10 +672,10 @@ void airspeddrarestoration()
 	Zero[0]=0.01; Zero[1]=0.01;Zero[2]=0.01;
 
 	dVector3 dv3O;
-	dBodyGetRelPointPos( body, 0,0,0, dv3O);
+	dBodyGetRelPointPos( me, 0,0,0, dv3O);
 
 	dVector3 dv3F;
-	dBodyGetRelPointPos( body, 0,0,1, dv3F);
+	dBodyGetRelPointPos( me, 0,0,1, dv3F);
 
 	dv3F[0] = (dv3F[0]-dv3O[0]);
 	dv3F[1] = (dv3F[1]-dv3O[1]);
@@ -615,10 +692,10 @@ void airspeddrarestoration()
 
 	if ( V.magnitude() > Zero.magnitude() )
 	{
-		dBodyAddTorque(body,R[0],R[1],R[2]);
+		dBodyAddTorque(me,R[0],R[1],R[2]);
 
 		dVector3 velResult;
-		dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
+		dBodyVectorFromWorld (me, V[0], V[1], V[2], velResult);
 
 		Vec3f Vl;
 		Vl[0]=velResult[0];Vl[1]=velResult[1];Vl[2]=velResult[2];
@@ -632,7 +709,7 @@ void airspeddrarestoration()
 		Vec3f L;
 		L = (fabs(P.dot(Vl))*(1.0f/(Vl.magnitude())))*K;
 
-		dBodyAddRelForce(body,L[0],L[1],L[2]);
+		dBodyAddRelForce(me,L[0],L[1],L[2]);
 
 		S[0]=L[0];
 		S[1]=L[1];
@@ -643,6 +720,5 @@ void airspeddrarestoration()
 		Manta::V[2]=V[2];
 	}
 
-
-}**/
+}
 

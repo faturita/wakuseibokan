@@ -17,12 +17,13 @@ class BoxVehicle : public Vehicle
 {
     GLuint _textureBox;
     float boxRotatingAngle;
-    dBodyID me;
+    dGeomID geom;
     bool tweakOde = true;
     bool repelling = false;
     
 public:
 	void  init();
+    int   getType();
 	void  drawModel(float yRot, float xRot, float x, float y, float z);
     
 	void drawModel();
@@ -32,6 +33,7 @@ public:
 	void  doDynamics(dBodyID);
     void  doDynamics();
     void  embody(dBodyID);
+    void  embody(dWorldID world, dSpaceID space);
     void  doControl(Controller);
     dBodyID  getBodyID();
     void  stop();

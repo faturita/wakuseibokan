@@ -32,10 +32,14 @@ protected:
     float steering;
     
     dBodyID me;
+    
 public:
 	float xRotAngle;
 	float yRotAngle;
 	Vehicle();
+    
+    int virtual getType();
+    
 	void virtual init();
 	void setSpeed(float speed);
 	float getSpeed();

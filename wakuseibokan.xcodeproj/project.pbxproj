@@ -19,6 +19,10 @@
 		626C74FA1932E5700012D764 /* vec3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3f.h; sourceTree = "<group>"; };
 		626C74FB1932E5700012D764 /* yamathutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yamathutil.cpp; sourceTree = "<group>"; };
 		626C74FC1932E5700012D764 /* yamathutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yamathutil.h; sourceTree = "<group>"; };
+		628241C51A805FE1007F53EA /* ThreeMaxLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeMaxLoader.cpp; sourceTree = "<group>"; };
+		628241C61A805FE1007F53EA /* ThreeMaxLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreeMaxLoader.h; sourceTree = "<group>"; };
+		6289985E1B3DE38A00FBC5A6 /* Buggy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Buggy.cpp; sourceTree = "<group>"; };
+		6289985F1B3DE38A00FBC5A6 /* Buggy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Buggy.h; sourceTree = "<group>"; };
 		62D754D1192B88A200FD6B43 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		62D754D2192B88AC00FD6B43 /* mainworkingstd.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mainworkingstd.cpp; sourceTree = "<group>"; };
 		62D754D4192B89B000FD6B43 /* DrawFonts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DrawFonts.cpp; sourceTree = "<group>"; };
@@ -91,6 +95,8 @@
 				62D754D3192B89B000FD6B43 /* font */,
 				62D754D6192B89B000FD6B43 /* FractalNoise.cpp */,
 				62D754D7192B89B000FD6B43 /* FractalNoise.h */,
+				628241C51A805FE1007F53EA /* ThreeMaxLoader.cpp */,
+				628241C61A805FE1007F53EA /* ThreeMaxLoader.h */,
 				62D754DA192B89B000FD6B43 /* md2model.cpp */,
 				62D754DB192B89B000FD6B43 /* md2model.h */,
 				62D7551F192C53A800FD6B43 /* usercontrols.h */,
@@ -152,6 +158,8 @@
 				62D75517192C415600FD6B43 /* Walrus.h */,
 				626C74F6193129410012D764 /* BoxVehicle.cpp */,
 				626C74F7193129410012D764 /* BoxVehicle.h */,
+				6289985E1B3DE38A00FBC5A6 /* Buggy.cpp */,
+				6289985F1B3DE38A00FBC5A6 /* Buggy.h */,
 			);
 			path = units;
 			sourceTree = "<group>";

@@ -19,6 +19,11 @@ void Walrus::init()
 
 }
 
+int Walrus::getType()
+{
+    return 2;
+}
+
 void Walrus::doMaterial()
 {
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
@@ -79,7 +84,7 @@ void Walrus::doControl(Controller controller)
     
     setThrottle(-controller.pitch);
     
-    xRotAngle = -controller.precesion;
+    xRotAngle = controller.precesion;
     
 }
 
@@ -99,6 +104,34 @@ void Walrus::drawDirectModel()
     pos += speed * forward;
 
     drawModel(xRotAngle, yRotAngle, modX, modY, modZ);
+}
+
+
+void Walrus::embody(dWorldID world, dSpaceID space)
+{
+    me = dBodyCreate(world);
+    embody(me);
+    //geom = dCreateSphere( space, 2.64f);
+    geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
+    dGeomSetBody(geom, me);
+}
+
+void Walrus::embody(dBodyID myBodySelf)
+{
+    dMass m;
+    
+    float myMass = 1.0f;
+    float radius = 2.64f;
+    float length = 7.0f;
+    
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    dMassSetBox(&m,1,length,length,length);
+    //dMassSetSphere(&m,1,radius);
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+    
+    me = myBodySelf;
+    
 }
 
 void Walrus::doDynamics()
@@ -145,19 +178,12 @@ void Walrus::doDynamics(dBodyID body)
 
 	dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
 
-
 	dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
-
-
 
 
 	// Walrus
 	dBodyAddRelForce (body,0, 0,getThrottle());
 	dBodyAddRelTorque( body, 0, -xRotAngle*0.001,0 );
-	//modAngleX=0;
-	//dJointAddHingeTorque(joint1,spd);
-	//dJointAddHingeTorque(joint2,spd);
-
 
 	// This should be after the world step
 	/// stuff

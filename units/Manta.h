@@ -13,12 +13,16 @@
 
 class Manta : public Vehicle
 {
+    dGeomID geom;
+    
 public:
 	float rudder;
 	float elevator;
 	float S[3];
 	float V[3];
+    float addd;
 	void virtual init();
+    int  virtual getType();
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 	void virtual drawModel();
@@ -28,6 +32,11 @@ public:
     void doControl(Controller controller);
     
     void oldDynamics(dBodyID body);
+    
+    void airspeddrarestoration();
+    
+    void embody(dWorldID world, dSpaceID space);
+    void embody(dBodyID myBodySelf);
 };
 
 #endif /* MANTA_H_ */

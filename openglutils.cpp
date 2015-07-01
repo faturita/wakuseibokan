@@ -62,14 +62,21 @@ void doTransform (float pos[3], float R[12])
   glMultMatrixf (matrix);
 }
 
+
 void drawArrow(float x, float y, float z)
+{
+    // Draw a pink arrow.
+    drawArrow(x,y,z,1.0f,0.5f,0.5f);
+}
+
+void drawArrow(float x, float y, float z,float red, float green, float blue)
 {
     glPushMatrix();
     glLineWidth(3.0f);
 
     // RED
     glTranslatef(0.0f,0.0f,0.0f);
-    glColor3f(1.0f,0.5f,0.5f);
+    glColor3f(red,green,blue);
     glBegin(GL_LINES);
     glVertex3f(0.0f,0.0f,0.0f);
     glVertex3f(x,y,z);
