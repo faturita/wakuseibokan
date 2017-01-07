@@ -8,6 +8,8 @@
 
 #include <GLUT/glut.h>
 
+#define dSINGLE
+
 #include <ode/ode.h>
 
 #include "FractalNoise.h"

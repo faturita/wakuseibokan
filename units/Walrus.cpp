@@ -5,6 +5,8 @@
  *      Author: faturita
  */
 
+#define dSINGLE
+
 #include "Walrus.h"
 
 void Walrus::init()

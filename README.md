@@ -2,6 +2,8 @@ Excited warfare on the seas of a Kepler IV.
 
 The time has come to conquer Kepler IV.
 
+![Manta taking off](screenshot1.png)
+
 Compiling and Installation
 --------------------------
 

@@ -8,6 +8,8 @@
 //  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
+#define dSINGLE
+
 #include <vector>
 
 #include "odeutils.h"
@@ -56,9 +58,9 @@ std::vector<BoxIsland*> islands;
         for (i=0; i<n; i++) {
             contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
             dContactSoftERP | dContactSoftCFM | dContactApprox1;
-            contact[i].surface.mu = dInfinity;
-            contact[i].surface.slip1 = 0.1;
-            contact[i].surface.slip2 = 0.1;
+            contact[i].surface.mu = 0;dInfinity;
+            contact[i].surface.slip1 = 0;0.1;
+            contact[i].surface.slip2 = 0;0.1;
             contact[i].surface.soft_erp = 0.5;
             contact[i].surface.soft_cfm = 0.3;
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);

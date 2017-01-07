@@ -5,6 +5,8 @@
  *      Author: faturita
  */
 
+#define dSINGLE
+
 #include "Vehicle.h"
 #include <assert.h>
 

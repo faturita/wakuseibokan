@@ -12,7 +12,7 @@ TESTSRC = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
 
 ifeq ($(shell uname),Darwin)
-	LIBS = -framework OpenGL -framework GLUT $(ODEFL)
+	LIBS = -framework OpenGL -framework GLUT $(ODEFL) ../ode/lib/libode.a
 else
 	LIBS = -lglut $(ODEFL)
 endif

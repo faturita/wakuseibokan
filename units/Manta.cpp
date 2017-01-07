@@ -5,6 +5,8 @@
  *      Author: faturita
  */
 
+#define dSINGLE
+
 #include "Manta.h"
 
 void Manta::init()

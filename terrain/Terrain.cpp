@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#define dSINGLE
+
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>

@@ -5,6 +5,8 @@
  *      Author: faturita
  */
 
+#define dSINGLE
+
 #include <ode/ode.h>
 #include "odeutils.h"
 
