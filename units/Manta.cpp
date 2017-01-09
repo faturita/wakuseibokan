@@ -141,8 +141,8 @@ void Manta::embody(dBodyID myBodySelf)
     float length = 7.0f;
     
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    //dMassSetBox(&m,1,length,length,length);
-    dMassSetSphere(&m,1,radius);
+    dMassSetBox(&m,1,length,length,length);
+    //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
     

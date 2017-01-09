@@ -46,10 +46,38 @@ std::vector<BoxIsland*> islands;
 {
     int i,n;
     
+    dBodyID b1,b2;
+    
     // only collide things with the ground
     int g1 = (o1 == ground );
     int g2 = (o2 == ground );
-    if (!(g1 ^ g2)) return;
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
+        
+        
+        //return;
+    }
+    
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
+    
+    for (int i=0; i<vehicles.size(); i++) {
+        Vehicle *vehicle = vehicles[i];
+        
+        if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
+        {
+            printf ("Vehicle %d collisioned\n", i);
+            //vehicles[0].stop();
+            
+            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>30)
+            {
+                printf("Sorry your plane has crashed. You're dead.\n");
+                exit(2);
+            }
+        }
+    }
     
     const int N = 10;
     dContact contact[N];
@@ -59,8 +87,8 @@ std::vector<BoxIsland*> islands;
             contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
             dContactSoftERP | dContactSoftCFM | dContactApprox1;
             contact[i].surface.mu = 0;dInfinity;
-            contact[i].surface.slip1 = 0;0.1;
-            contact[i].surface.slip2 = 0;0.1;
+            contact[i].surface.slip1 = 0.1;
+            contact[i].surface.slip2 = 0.1;
             contact[i].surface.soft_erp = 0.5;
             contact[i].surface.soft_cfm = 0.3;
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
@@ -75,7 +103,7 @@ std::vector<BoxIsland*> islands;
 //  NearCallback is the collision handler callback function.
 //
 //
-void ngearCallback (void *data, dGeomID o1, dGeomID o2)
+void nearCadllback (void *data, dGeomID o1, dGeomID o2)
 {
     /* exit without doing anything if the two bodies are connected by a joint */
     dBodyID b1,b2;
@@ -95,7 +123,7 @@ void ngearCallback (void *data, dGeomID o1, dGeomID o2)
             printf ("Vehicle %d collisioned\n", i);
             //vehicles[0].stop();
             
-            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>30)
+            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>300)
             {
                 printf("Sorry your plane has crashed. You're dead.\n");
                 exit(2);
@@ -104,21 +132,29 @@ void ngearCallback (void *data, dGeomID o1, dGeomID o2)
     }
     
     
-    contact.surface.mode |=
+    /**contact.surface.mode |=
     dContactMotionN |                   // velocity along normal
-    dContactMotion1 | dContactMotion2 | // and along the contact plane
+    dContactMotion1 |
+    dContactMotion2 | // and along the contact plane
     dContactFDir1;                      // don't forget to set the direction 1
-
+    **/
     
+    //contact.surface.mu = 0.1;
+    //contact.surface.mu2 = 0.1;
+    //contact.surface.bounce = 0.001;
+
     //contact.surface.mode = dContactBounce ;
-    contact.surface.mu = 0.1;
-    contact.surface.mu2 = 0.1;
-    contact.surface.bounce = 0.001;
+    
+    //contact.surface.mode |=
+    //dContactMotionN;
+    
+
     
     if (dCollide (o1,o2,1,&contact.geom,sizeof(dContactGeom))) {
         dJointID c = dJointCreateContact (world,contactgroup,&contact);
         dJointAttach (c,b1,b2);
     }
+
 }
 
 dGeomID gheight;
@@ -143,84 +179,19 @@ dReal heightfield_caldlback( void* pUserData, int x, int z )
     return h;
 }
 
-
-void initWorldModelling()
+void initWorldPopulation()
 {
-	dReal k;
-	dMass m;
-    
-	/* create world */
-	dInitODE();
-	world = dWorldCreate();
-	space = dHashSpaceCreate (0);
-    
-    // The parameter needs to be zero.
-	contactgroup = dJointGroupCreate (0);
-	dWorldSetGravity (world,0,-9.81f,0);
-    dWorldSetCFM (world,1e-5);
-    
-    // Set Damping
-    dWorldSetLinearDamping(world, 0.01);  // 0.00001
-    dWorldSetAngularDamping(world, 0.005);     // 0.005
-    dWorldSetMaxAngularSpeed(world, 200);
-    
-    // Set and get the depth of the surface layer around all geometry objects. Contacts are allowed to sink into the surface layer up to the given depth before coming to rest. The default value is zero. Increasing this to some small value (e.g. 0.001) can help prevent jittering problems due to contacts being repeatedly made and broken.
-    dWorldSetContactSurfaceLayer (world,0.001);
-    
-	ground = dCreatePlane (space,0,1,0,0);
-    
-    
-    // create lift platform
-    //platform = dCreateBox(space, 1000, 10, 1000);
-    //dGeomSetPosition(platform, 300, 5, 300);
-    
-    
-    //drawBoxIsland(300,5,300,1000,10);
-    
-    //dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
-    
-    // Create an finite heightfield.
-    //dGeomHeightfieldDataBuildCallback( heightid, NULL, heightfield_callback,
-    //                                  REAL( 1000.0 ), REAL (1000.0), HFIELD_WSTEP, HFIELD_DSTEP,
-    //                                  REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
-    
-    //dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6.0 ) );
-    
-    //gheight = dCreateHeightfield( space, heightid, 1 );
-    
-    //dGeomSetPosition( gheight, 300, 5, 300 );
-    
-    // Add this to destroy
-    // dGeomHeightfieldDataDestroy( heightid );
-    
-    //_boxIsland.buildTerrainModel(space);
-    
-    
-    BoxIsland *baltimore = new BoxIsland();
-    baltimore->setLocation(300.0,5.0,300.0);
-    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
-    
-   
-    BoxIsland *vulcano = new BoxIsland();
-    vulcano->setLocation(1300.0,5.0,1300.0);
-    vulcano->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
-    
-    
-    islands.push_back(baltimore);
-    islands.push_back(vulcano);
-    
-    
     //Init lands, fixed objects, and objects
     BoxVehicle *_boxVehicle1 = new BoxVehicle();
     _boxVehicle1->init();
     _boxVehicle1->setPos(-10.0f,40.0f,300.0f);
-
+    
     
     BoxVehicle *_boxVehicle2 = new BoxVehicle();
     _boxVehicle2->init();
     _boxVehicle2->setPos(0.0f,40.0f,-300.0f);
-
-
+    
+    
     // Start modelling BoxVehicles
     _boxVehicle1->embody(world, space);
     _boxVehicle2->embody(world, space);
@@ -251,16 +222,102 @@ void initWorldModelling()
     
     Buggy *_buggy = new Buggy();
     _buggy->init();
-    _buggy->setPos(0.0f, 0, 0);
+    _buggy->setPos(1300.0f, 10, 10);
     
     _buggy->embody(world, space);
-
+    
     vehicles.push_back(_boxVehicle1);
     vehicles.push_back(_boxVehicle2);
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
     vehicles.push_back(_buggy);
+    
+}
+
+void initWorldModelling()
+{
+	dReal k;
+	dMass m;
+    
+	/* create world */
+	dInitODE();
+	world = dWorldCreate();
+	space = dHashSpaceCreate (0);
+    
+    // The parameter needs to be zero.
+	contactgroup = dJointGroupCreate (0);
+	dWorldSetGravity (world,0,-9.81f,0);
+    dWorldSetCFM (world,1e-5);
+    
+    // Set Damping
+    dWorldSetLinearDamping(world, 0.01);  // 0.00001
+    dWorldSetAngularDamping(world, 0.005);     // 0.005
+    dWorldSetMaxAngularSpeed(world, 200);
+    
+    // Set and get the depth of the surface layer around all geometry objects. Contacts are allowed to sink into the surface layer up to the given depth before coming to rest. The default value is zero. Increasing this to some small value (e.g. 0.001) can help prevent jittering problems due to contacts being repeatedly made and broken.
+    dWorldSetContactSurfaceLayer (world,0.001);
+    
+	ground = dCreatePlane (space,0,1,0,0);
+    
+    
+    // create lift platform
+    //platform = dCreateBox(space, 100, 10, 100);
+    //dGeomSetPosition(platform, 0.0, 5, -300);
+    
+    
+    //drawBoxIsland(300,5,300,1000,10);
+    
+    //dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
+    
+    // Create an finite heightfield.
+    //dGeomHeightfieldDataBuildCallback( heightid, NULL, heightfield_callback,
+    //                                  REAL( 1000.0 ), REAL (1000.0), HFIELD_WSTEP, HFIELD_DSTEP,
+    //                                  REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
+    
+    //dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6.0 ) );
+    
+    //gheight = dCreateHeightfield( space, heightid, 1 );
+    
+    //dGeomSetPosition( gheight, 300, 5, 300 );
+    
+    // Add this to destroy
+    // dGeomHeightfieldDataDestroy( heightid );
+    
+    //_boxIsland.buildTerrainModel(space);
+    
+    
+    BoxIsland *baltimore = new BoxIsland();
+    baltimore->setLocation(300.0,0.0,300.0);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
+
+   
+    BoxIsland *runway = new BoxIsland();
+    runway->setLocation(1300.0,0.0,1300.0);
+    runway->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
+    
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setLocation(-1300.0,1.0,-1300.0);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp"); //,1000,10);
+    
+    
+    BoxIsland *vulcano = new BoxIsland();
+    vulcano->setLocation(-1300.0,1.0,-2300.0);
+    vulcano->buildTerrainModel(space,"terrain/vulcano.bmp"); //,1000,10);
+    
+    
+    BoxIsland *vulcrum = new BoxIsland();
+    vulcrum->setLocation(-2300.0,1.0,-1300.0);
+    vulcrum->buildTerrainModel(space,"terrain/vulcrum.bmp"); //,1000,10);
+    
+    islands.push_back(baltimore);
+    islands.push_back(runway);
+    islands.push_back(nemesis);
+    islands.push_back(vulcrum);
+    islands.push_back(vulcano);
+    
+    initWorldPopulation();
+    
     
     
     //buildTerrainModel(space,_vulcano,600.0f,-1340.0f, 0.0f, -1740.0f);
@@ -283,6 +340,7 @@ void endWorldModelling()
     dWorldDestroy (world);
     dCloseODE();
     
+    printf("God knows his rules and he has determined that this world must be terminated.\n");
     printf("The World has been terminated.\n");
 }
 

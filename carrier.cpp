@@ -91,6 +91,19 @@ extern std::vector<Vehicle*> vehicles;
 extern std::vector<BoxIsland*> islands;
 
 
+
+
+
+void disclaimer()
+{
+    printf ("惑星母艦\n");
+    printf ("Warfare on the seas of Kepler IV\n");
+}
+
+/**
+ * Draw the Head Up Display 
+ *
+ **/
 void drawHUD()
 {
     // This will make things dark.
@@ -218,11 +231,13 @@ void drawScene() {
     // Draw all terrain islands and so on.
     //_boxIsland.draw(300,5,300,1000,10);
     
-    // Draw vehicles and objects
+    // Draw islands.
     for (int i=0; i<islands.size(); i++) {
         (islands[i]->draw());
     }
 
+    
+    // Debug: Until the engine is complete I need these boxes to tell me where I am.
     
     drawBox(10,10,1400);
     drawBox(10,10,1300);
@@ -359,7 +374,8 @@ int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     
-	glutCreateWindow("Carrier Command");
+    disclaimer();
+	glutCreateWindow("Wakuseibokan");
     
     if (argc>1 && strcmp(argv[1],"-d")==0)
         glutInitWindowSize(1200, 800);
