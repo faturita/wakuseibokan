@@ -74,13 +74,13 @@ make
 sudo make install
 
 echo "Installation complete."
+```
 
 * Now download the ode-0.14.tar tarball.
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 * ./bootstrap
 * ./configure
 * make clean && make && sudo make install
-```
 
 
 Issues and missing stuff
