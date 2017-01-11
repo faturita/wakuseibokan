@@ -10,6 +10,28 @@
 #include <ode/ode.h>
 #include "odeutils.h"
 
+void firesound(int times)
+{
+    for(int i=0;i<times;i++)
+        printf ("%c", 7);
+    
+}
+
+void enginestart()
+{
+    system("afplay sounds/engine.mp3 &");
+}
+
+void takeoff()
+{
+    system("afplay sounds/takeoff.mp3 &");
+}
+
+void explosion()
+{
+    system("afplay sounds/explosion.mp3 &");
+}
+
 Vec3f ToVec3f(dReal *val, Vec3f retValue)
 {
 	retValue[0]=val[0];

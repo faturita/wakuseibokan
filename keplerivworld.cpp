@@ -68,13 +68,15 @@ std::vector<BoxIsland*> islands;
         
         if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
         {
-            printf ("Vehicle %d collisioned\n", i);
+            //printf ("Vehicle %d collisioned\n", i);
             //vehicles[0].stop();
             
-            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>30)
+            
+            if (vehicles[i]->getType()==2 && vehicles[i]->getSpeed()>300)
             {
-                printf("Sorry your plane has crashed. You're dead.\n");
-                exit(2);
+                printf("Walrus has been destroyed.\n");
+                explosion();
+                
             }
         }
     }
@@ -215,7 +217,7 @@ void initWorldPopulation()
     
     Walrus *_walrus3 = new Walrus();
     _walrus3->init();
-    _walrus3->setPos(0.0f, 5.0f, -1900.0f);
+    _walrus3->setPos(10.0f, 5.0f, -900.0f);
     
     _walrus3->embody(world, space);
     
@@ -244,6 +246,8 @@ void initWorldModelling()
 	dInitODE();
 	world = dWorldCreate();
 	space = dHashSpaceCreate (0);
+    
+    //dWorldSetAutoDisableFlag(World, 1);
     
     // The parameter needs to be zero.
 	contactgroup = dJointGroupCreate (0);
@@ -288,7 +292,7 @@ void initWorldModelling()
     
     
     BoxIsland *baltimore = new BoxIsland();
-    baltimore->setLocation(300.0,0.0,300.0);
+    baltimore->setLocation(300.0,0.3,300.0);
     baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
 
    
@@ -310,11 +314,32 @@ void initWorldModelling()
     vulcrum->setLocation(-2300.0,1.0,-1300.0);
     vulcrum->buildTerrainModel(space,"terrain/vulcrum.bmp"); //,1000,10);
     
+    BoxIsland *heightmap = new BoxIsland();
+    heightmap->setLocation(-23000.0,1.0,0.0);
+    heightmap->buildTerrainModel(space,"terrain/heightmap.bmp"); //,1000,10);
+    
+    BoxIsland *island = new BoxIsland();
+    island->setLocation(-23000.0,1.0,1000.0);
+    island->buildTerrainModel(space,"terrain/island.bmp"); //,1000,10);
+    
+    BoxIsland *thermopilae = new BoxIsland();
+    thermopilae->setLocation(6000.0f,1.0,1000.0);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
+    
+    
+    BoxIsland *nonsquareisland = new BoxIsland();
+    nonsquareisland->setLocation(6000.0f,-0.3,-1000.0);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+    
     islands.push_back(baltimore);
     islands.push_back(runway);
     islands.push_back(nemesis);
     islands.push_back(vulcrum);
     islands.push_back(vulcano);
+    islands.push_back(island);
+    islands.push_back(heightmap);
+    islands.push_back(thermopilae);
+    islands.push_back(nonsquareisland);
     
     initWorldPopulation();
     

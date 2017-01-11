@@ -56,16 +56,30 @@ public:
         return size;
     };
     
-    static void draw3DSModel(obj_type object)
+    static void draw3DSModel(obj_type object, float x, float y, float z, float scale)
     {
         int l_index;
         
+        glPushMatrix();
+        glTranslatef(x, y, z);
+        glScalef(scale,scale,scale);
+        glRotatef(90,1.0,0.0,0.0);
+        glRotatef(180,1.0,0.0,0.0);
+        
+        glEnable(GL_TEXTURE_2D);
+        //glBindTexture(GL_TEXTURE_2D, _textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        
         glBegin(GL_TRIANGLES); // glBegin and glEnd delimit the vertices that define a primitive (in our case triangles)
-        //glScalef(1.0f,1.0f,1.0f);
+
+
         for (l_index=0;l_index<object.polygons_qty;l_index++)
         {
             //----------------- FIRST VERTEX -----------------
             // Coordinates of the first vertex
+            glTexCoord2f(0.0f,0.0f);
             glVertex3f( object.vertex[ object.polygon[l_index].a ].x,
                        object.vertex[ object.polygon[l_index].a ].y,
                        object.vertex[ object.polygon[l_index].a ].z); //Vertex definition
@@ -73,18 +87,21 @@ public:
             //----------------- SECOND VERTEX -----------------
             // Coordinates of the second vertex
             //float x= object.vertex[ object.polygon[l_index].b ].x;
-            
+            glTexCoord2f(1.0f,0.0f);
             glVertex3f( object.vertex[ object.polygon[l_index].b ].x,
                        object.vertex[ object.polygon[l_index].b ].y,
                        object.vertex[ object.polygon[l_index].b ].z);
             
             //----------------- THIRD VERTEX -----------------
             // Coordinates of the Third vertex
+            glTexCoord2f(0.0f,1.0f);
             glVertex3f( object.vertex[ object.polygon[l_index].c ].x,
                        object.vertex[ object.polygon[l_index].c ].y,
                        object.vertex[ object.polygon[l_index].c ].z);
         }
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glPopMatrix();
     }
     
 	static char Load3DS (obj_type_ptr p_object, char *p_filename)

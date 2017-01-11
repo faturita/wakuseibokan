@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		6209320A1E2518F100974C71 /* OdeWorld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OdeWorld.cpp; sourceTree = "<group>"; };
+		6209320B1E2518F100974C71 /* OdeWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OdeWorld.h; sourceTree = "<group>"; };
 		6225E66E1A716DB0009051FF /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6225E66F1A7277D9009051FF /* opengltemplate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = opengltemplate.cpp; sourceTree = "<group>"; };
 		6268EB70192EDC1700740008 /* carrier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrier.cpp; sourceTree = "<group>"; };
@@ -92,6 +94,8 @@
 				6268EB731930F39900740008 /* keplerivworld.h */,
 				6268EB70192EDC1700740008 /* carrier.cpp */,
 				6268EB71192EDC1700740008 /* carrier.h */,
+				6209320A1E2518F100974C71 /* OdeWorld.cpp */,
+				6209320B1E2518F100974C71 /* OdeWorld.h */,
 				62D754D3192B89B000FD6B43 /* font */,
 				62D754D6192B89B000FD6B43 /* FractalNoise.cpp */,
 				62D754D7192B89B000FD6B43 /* FractalNoise.h */,

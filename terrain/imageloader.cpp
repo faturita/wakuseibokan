@@ -142,7 +142,7 @@ Image* loadBMP(const char* filename) {
 	input.ignore(8);
 	int dataOffset = readInt(input);
 	
-	//Read the header
+	//Read the header  USE RGB8x8x8
 	int headerSize = readInt(input);
 	int width;
 	int height;

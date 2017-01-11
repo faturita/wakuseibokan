@@ -19,6 +19,9 @@ endif
 
 all: $(PROG)
 
+OdeWorld:
+	$(CC) $(CFLAGS) -o OdeWorld OdeWorld.cpp $(LIBS)
+
 test:
 	$(CC) $(CFLAGS) -o test $(TESTSRC) $(LIBS)
 
@@ -31,3 +34,5 @@ base:
 
 clean:
 	rm -f $(PROG)
+	rm -f OdeWorld
+

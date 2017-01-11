@@ -9,7 +9,7 @@ Compiling and Installation
 
 'Requirements'
 * ODE: Open Dynamics Engine, version 0.14: https://bitbucket.org/odedevs/ode
-* Please follow the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+* Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
 
 
  make
@@ -86,11 +86,22 @@ echo "Installation complete."
 Issues and missing stuff
 ------------------------
 
-* Floor is working greatly!  Sea is good.  Sky can be improved.
-* Collision detection is working:  no friction.
-* Objects modelling:  Spheres work but they are hard to control the rotational movement.  Need improvement!
-* Island generation: Ok from heightmaps but has some issues with height calculation.  If the island is plain works great.
-*
-* Walrus mechanics works but can be improved.  The MD2 model is good but can be improved.
-* Manta mechanics (based on Microsoft Flight Simulator) works barely.  It is hard to control.
+* Floor is working great.
+** However, the floor is squared so when you fly high you see that the horizon changes weirdly.  Need improvement.
+** Sea is good.  
+** Sky must be improved.
+* Island generation works very good.
+** The engine is calculating the islands perfectly.
+** Islands are BMP heightmaps 60x60.  These values are hardcoded to 600x600 in the model.
+** Max height (255) is 60. Hardcoded.
+** Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement.
+* Collision detection has been improved.
+** Island heights works PERFECT for Walrus.  It is amazing how well they work.
+** There is some problem when you fly above the island, and a collision is fired when it should not.
+* 3DS Engine has been incorporated so I can now use 3DS models!!!!
+* Walrus mechanics works but can be improved, and the texture of the Walrus was fixed.
+** Walrus control, although it works, can be improved also.
+* OpenAL is not working very well on Mac Sierra and it is hard to find good samples.
+** I am using TEMPORARILY system calls and afplay.
+* Manta mechanics (based on Microsoft Flight Simulator) works barely.  It is impossible to control.
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.

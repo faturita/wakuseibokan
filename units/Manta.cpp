@@ -12,7 +12,7 @@
 void Manta::init()
 {
 	//Load the model
-	_model = MD2Model::load("manta.md2");
+	_model = MD2Model::load("mantagood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
 
@@ -129,6 +129,7 @@ void Manta::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     geom = dCreateSphere( space, 2.64f);
+    //geom = dCreateBox( space, 4.0f, 2.64f, 2.0f);
     dGeomSetBody(geom, me);
 }
 
@@ -141,7 +142,7 @@ void Manta::embody(dBodyID myBodySelf)
     float length = 7.0f;
     
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,length,length,length);
+    dMassSetBox(&m,1,4.0f,2.64f,10.0f);
     //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);

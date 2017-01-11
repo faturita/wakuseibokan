@@ -26,7 +26,7 @@ Terrain* loadTerrain(const char* filename, float height) {
 				(unsigned char)image->pixels[3 * (y * image->width + x)];
 			float h = height * ((color / 255.0f) - 0.5f);
 			t->setHeight(x, y, h+height/2.0);
-            printf("%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+            //printf("%4d,%4d,%10.5f\n", x,y,h+height/2.0);
 		}
 	}
 

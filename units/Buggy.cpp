@@ -137,10 +137,10 @@ void Buggy::doDynamics(dBodyID body)
 {
     //dReal *v = (dReal *)dBodyGetLinearVel(body);
     
-    dJointSetHinge2Param (carjoint[0],dParamVel2,yRotAngle);
+    dJointSetHinge2Param (carjoint[0],dParamVel2,getThrottle());
     dJointSetHinge2Param (carjoint[0],dParamFMax2,1000);
     
-    dJointSetHinge2Param (carjoint[2],dParamVel2,xRotAngle);
+    dJointSetHinge2Param (carjoint[2],dParamVel2,yRotAngle);
     dJointSetHinge2Param (carjoint[2],dParamFMax2,1000);
     
     // steering

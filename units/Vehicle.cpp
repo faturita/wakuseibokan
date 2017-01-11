@@ -79,7 +79,7 @@ void Vehicle::setLocation(float fPos[3], float R[12])
 void Vehicle::init()
 {
 	//Load the model
-	_model = MD2Model::load("manta.md2");
+	_model = MD2Model::load("walrusgood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
 

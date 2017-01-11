@@ -13,6 +13,10 @@
 #include "math/vec3f.h"
 #include "math/yamathutil.h"
 
+void firesound(int times);
+void enginestart();
+void takeoff();
+void explosion();
 
 Vec3f ToVec3f(dReal *val, Vec3f retValue);
 

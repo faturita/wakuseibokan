@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <stdarg.h>
 #include <math.h>
 
@@ -25,6 +29,7 @@
 
 #import <OpenAL/al.h>
 #import <OpenAL/alc.h>
+#import <AudioToolbox/AudioToolbox.h>
 
 #import "ThreeMaxLoader.h"
 
@@ -259,8 +264,8 @@ void drawScene() {
     
     // EXPERIMENTALLY: Draw 3DS models
     obj_type object;
-    CThreeMaxLoader::Load3DS(&object,"ico.3ds");
-    CThreeMaxLoader::draw3DSModel(object);
+    //CThreeMaxLoader::Load3DS(&object,"watertower.3ds");
+    //CThreeMaxLoader::draw3DSModel(object,300.0,20.0,300.0,1);
 
     
     
@@ -388,7 +393,6 @@ int main(int argc, char** argv) {
     
     //Initialize all the models and structures.
     initRendering();
-    
     
 	// OpenGL callback functions.
 	glutDisplayFunc(drawScene);

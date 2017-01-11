@@ -11,7 +11,7 @@
 
 void Walrus::init()
 {
-    _model = MD2Model::load("walrus.md2");
+    _model = MD2Model::load("walrusgood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
     else
@@ -73,7 +73,7 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
 
 void Walrus::drawModel()
 {
-	drawModel(0,0,pos[0],pos[1],pos[2]);
+	drawModel(0,0,pos[0],pos[1]+1.0,pos[2]);
 }
 
 void Walrus::doControl(Controller controller)
@@ -84,7 +84,7 @@ void Walrus::doControl(Controller controller)
     //steering = -controller.precesion;
     
     
-    setThrottle(-controller.pitch);
+    setThrottle(-controller.yaw);
     
     xRotAngle = controller.precesion;
     
@@ -114,7 +114,8 @@ void Walrus::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
+    //geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
+    geom = dCreateBox( space, 4.0f, 2.64f, 7.0f);
     dGeomSetBody(geom, me);
 }
 
@@ -182,10 +183,12 @@ void Walrus::doDynamics(dBodyID body)
 
 	dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
 
+    if ((speed)>1.0 && speed < 1.3)
+        enginestart();
 
 	// Walrus
 	dBodyAddRelForce (body,0, 0,getThrottle());
-	dBodyAddRelTorque( body, 0, -xRotAngle*0.001,0 );
+	dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
 
 	// This should be after the world step
 	/// stuff
