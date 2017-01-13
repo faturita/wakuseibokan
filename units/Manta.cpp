@@ -246,7 +246,7 @@ void Manta::doDynamics()
 }
 
 
-void Manta::oldDynamics(dBodyID body)
+void Manta::doDynamics(dBodyID body)
 {
     dReal *v = (dReal *)dBodyGetLinearVel(body);
     
@@ -295,7 +295,7 @@ void Manta::oldDynamics(dBodyID body)
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
 
-void Manta::doDynamics(dBodyID body)
+void Manta::oldDynamics(dBodyID body)
 {
 	dReal *v = (dReal *)dBodyGetLinearVel(body);
 

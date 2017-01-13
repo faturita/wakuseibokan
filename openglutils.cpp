@@ -236,6 +236,60 @@ void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side, 
     
 }
 
+/**
+ * When you draw the object, you move to height/2 to one side, and then height/2 to the other.
+ *
+ **/
+void drawRectangularBox(float width, float height, float length)
+{
+    float x = width/2, y = height/2, z = length/2;
+    glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
+    // Top face (y = 1.0f)
+
+    // Define vertices in counter-clockwise (CCW) order with normal pointing out
+    glColor3f(0.0f, 1.0f, 0.0f);     // Green
+    glVertex3f( x, y, -z);
+    glVertex3f(-x, y, -z);
+    glVertex3f(-x, y,  z);
+    glVertex3f( x, y,  z);
+    
+    // Bottom face (y = -1.0f)
+    glColor3f(1.0f, 0.5f, 0.0f);     // Orange
+    glVertex3f( x, -y,  z);
+    glVertex3f(-x, -y,  z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f( x, -y, -z);
+    
+    // Front face  (z = 1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f( x,  y, z);
+    glVertex3f(-x,  y, z);
+    glVertex3f(-x, -y, z);
+    glVertex3f( x, -y, z);
+    
+    // Back face (z = -1.0f)
+    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
+    glVertex3f( x, -y, -z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(-x,  y, -z);
+    glVertex3f( x,  y, -z);
+    
+    // Left face (x = -1.0f)
+    glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+    glVertex3f(-x,  y,  z);
+    glVertex3f(-x,  y, -z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(-x, -y,  z);
+    
+    // Right face (x = 1.0f)
+    glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
+    glVertex3f(x,  y, -z);
+    glVertex3f(x,  y,  z);
+    glVertex3f(x, -y,  z);
+    glVertex3f(x, -y, -z);
+    glEnd();  // End of drawing color-cube
+    
+}
 
 void drawBox(GLuint _textureId, float xx, float yy, float zz)
 {

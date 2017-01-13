@@ -21,8 +21,12 @@
 #include "units/Walrus.h"
 #include "units/Manta.h"
 #include "units/Buggy.h"
+#include "units/MultiBodyVehicle.h"
 
 #include "terrain/Terrain.h"
+
+
+extern  Controller controller;
 
 /* dynamics and collision objects */
 
@@ -81,6 +85,8 @@ std::vector<BoxIsland*> islands;
         }
     }
     
+    
+    
     const int N = 10;
     dContact contact[N];
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
@@ -88,11 +94,13 @@ std::vector<BoxIsland*> islands;
         for (i=0; i<n; i++) {
             contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
             dContactSoftERP | dContactSoftCFM | dContactApprox1;
-            contact[i].surface.mu = 0;dInfinity;
+            contact[i].surface.mu = dInfinity;
             contact[i].surface.slip1 = 0.1;
             contact[i].surface.slip2 = 0.1;
             contact[i].surface.soft_erp = 0.5;
             contact[i].surface.soft_cfm = 0.3;
+            
+            
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
             dJointAttach (c,
                           dGeomGetBody(contact[i].geom.g1),
@@ -228,12 +236,15 @@ void initWorldPopulation()
     
     _buggy->embody(world, space);
     
+    
+
     vehicles.push_back(_boxVehicle1);
     vehicles.push_back(_boxVehicle2);
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
     vehicles.push_back(_buggy);
+    
     
 }
 
@@ -292,7 +303,7 @@ void initWorldModelling()
     
     
     BoxIsland *baltimore = new BoxIsland();
-    baltimore->setLocation(300.0,0.3,300.0);
+    baltimore->setLocation(800.0,0.3,800.0);
     baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
 
    
@@ -341,9 +352,20 @@ void initWorldModelling()
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     
-    initWorldPopulation();
+    //initWorldPopulation();
     
+    MultiBodyVehicle *_mbody = new MultiBodyVehicle();
+    _mbody->init();
+    _mbody->setPos(30,30.0,30.0);
+    _mbody->embody(world, space);
     
+    //MultiBodyVehicle *_abody = new MultiBodyVehicle();
+    //_abody->init();
+    //_abody->setPos(60,5.0,-1000);
+    //_abody->embody(world, space);
+    
+    //vehicles.push_back(_abody);
+    vehicles.push_back(_mbody);
     
     //buildTerrainModel(space,_vulcano,600.0f,-1340.0f, 0.0f, -1740.0f);
     

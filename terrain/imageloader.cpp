@@ -200,53 +200,5 @@ Image* loadBMP(const char* filename) {
 	return new Image(pixels2.release(), width, height);
 }
 
-/**
- GLuint LoadImage(char* file)
- {
- 
- GLuint tex;
- 
- Image *img = loadBMP(file);
- 
- glGenTextures(1, &tex);
- glBindTexture(GL_TEXTURE_2D, tex);
- 
- glTexImage2D(   GL_TEXTURE_2D,
- 0,
- 0,
- img.width,
- img.height,
- 0,
- GL_BGR_EXT,
- GL_UNSIGNED_BYTE,
- img.pixels);
- 
- gluBuild2DMipmaps(   GL_TEXTURE_2D,
- 0,
- img.width,
- img.height,
- GL_BGR_EXT,
- GL_UNSIGNED_BYTE,
- img.pixels);
- 
- glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
- glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
- 
- //   The functions below cause the image to be stretched properly to cover the border lines preventing
- //      black lines from showing. Try commenting these out to see the effect.
- //
- glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
- glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
- 
- 
- delete img;
- return tex;
- }**/
-
-
-
-
-
-
 
 

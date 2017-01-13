@@ -1,3 +1,26 @@
+/* Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/* 
+ * Terrain Class - Handle island generation and heightmaps.
+ *
+ */
 #include <stdlib.h>
 
 #define dSINGLE
@@ -13,31 +36,46 @@
 #include "../math/vec3f.h"
 #include "Terrain.h"
 
+#define TERRAIN_SIDE_LENGTH 60.0f
+#define TERRAIN_SCALE       10.0f
+
+
+// The texture is preloaded somewhere else.
+extern GLuint _textureLand;
+
+
 using namespace std;
 
-//Loads a terrain from a heightmap.  The heights of the terrain range from
-//-height / 2 to height / 2.
-Terrain* loadTerrain(const char* filename, float height) {
-	Image* image = loadBMP(filename);
-	Terrain* t = new Terrain(image->width, image->height);
-	for(int y = 0; y < image->height; y++) {
-		for(int x = 0; x < image->width; x++) {
-			unsigned char color =
-				(unsigned char)image->pixels[3 * (y * image->width + x)];
-			float h = height * ((color / 255.0f) - 0.5f);
-			t->setHeight(x, y, h+height/2.0);
+//
+// Loads a terrain from a heightmap.  The heights of the terrain range from
+//   -height / 2 to height / 2.
+//
+Terrain* loadTerrain(const char* filename, float height)
+{
+    Image* image = loadBMP(filename);
+    Terrain* t = new Terrain(image->width, image->height);
+    for(int y = 0; y < image->height; y++) {
+        for(int x = 0; x < image->width; x++) {
+            unsigned char color =
+            (unsigned char)image->pixels[3 * (y * image->width + x)];
+            float h = height * ((color / 255.0f) - 0.5f);
+            t->setHeight(x, y, h+height/2.0);
             //printf("%4d,%4d,%10.5f\n", x,y,h+height/2.0);
-		}
-	}
-
-	delete image;
-	t->computeNormals();
-	return t;
+        }
+    }
+    
+    delete image;
+    t->computeNormals();
+    return t;
 }
 
 
 //
 // This function is called by the world modeller to map x,z coordinates to heights.
+//
+// @param pUserData contains the pointer to Terrain object that can be used to make the mapping.
+//
+//
 dReal hedightfield_callback( void* pUserData, int x, int z )
 {
     static dReal h = 5000;
@@ -45,8 +83,6 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
     Terrain *_landmass = (Terrain*) pUserData;
     
     h = _landmass->getHeight(x, z);
-
-    //h = (-1) * fabs(x - 30) + 30;
     
     
     //printf("%4d,%4d,%10.5f\n", x,z,h);
@@ -56,24 +92,18 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
 
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
-    //_terrain = loadTerrain("terrain/island.bmp", 20);
-    
-    //_vulcano = loadTerrain("terrain/vulcano.bmp",20);
-    
-    //_baltimore = loadTerrain("terrain/baltimore.bmp", 40);
-    
-    //_landmass = loadTerrain("terrain/baltimore.bmp", 60);
-    
-    _landmass = loadTerrain(model, 60);
+    _landmass = loadTerrain(model, TERRAIN_SIDE_LENGTH);
     
     printf("Landmass width: %d\n", _landmass->width());
     printf("Landmass heigth: %d\n",_landmass->length());
     
     dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
     
+    float realside = TERRAIN_SIDE_LENGTH * TERRAIN_SCALE * REAL( 1.0 );
+    
     // Create a finite heightfield.
     dGeomHeightfieldDataBuildCallback( heightid, _landmass, hedightfield_callback,
-                                      REAL( 600.0 ), REAL (600.0), HFIELD_WSTEP, HFIELD_DSTEP,
+                                      realside , realside, HFIELD_WSTEP, HFIELD_DSTEP,
                                       REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
     
     // These boundaries are used to limit how the heightfield affects objects.
@@ -94,22 +124,22 @@ void BoxIsland::setLocation(float x, float y, float z)
 }
 
 void BoxIsland::draw()
-    {
-        glPushMatrix();
-        //glTranslatef(300.0, 0.0f,300.0);
-        glTranslatef(X,Y,Z);
-        drawTerrain(_landmass,10.0f);
-        glPopMatrix();
-        
-        //drawBoxIsland(300,5,300,600,5*2);
-    }
+{
+    glPushMatrix();
+    //glTranslatef(300.0, 0.0f,300.0);
+    glTranslatef(X,Y,Z);
+    drawTerrain(_landmass,TERRAIN_SCALE);
+    glPopMatrix();
+    
+    //drawBoxIsland(300,5,300,600,5*2);
+}
 
 void drawTerrain(Terrain *_landmass, float fscale)
 {
     drawTerrain(_landmass, fscale, 0.3f, 0.9f, 0.0f);
 }
 
-extern GLuint _textureLand;
+
 
 void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
 {
@@ -145,12 +175,12 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
             //glVertex3f(x, hedightfield_callback(_landmass,x,z),z);
             float s = (float)x / (_landmass->width()- 1); // s in [0, 1]
             glTexCoord2f(s, t0);
-                
+            
             glVertex3f(x, _landmass->getHeight(x, z), z);
             normal = _landmass->getNormal(x, z + 1);
             glNormal3f(normal[0], normal[1], normal[2]);
             glTexCoord2f(s, t1);
-
+            
             glVertex3f(x, _landmass->getHeight(x, z + 1), z + 1);
             //glVertex3f(x, hedightfield_callback(_landmass,x,z+1), z+1);
         }

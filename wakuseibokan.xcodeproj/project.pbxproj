@@ -9,6 +9,8 @@
 /* Begin PBXFileReference section */
 		6209320A1E2518F100974C71 /* OdeWorld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OdeWorld.cpp; sourceTree = "<group>"; };
 		6209320B1E2518F100974C71 /* OdeWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OdeWorld.h; sourceTree = "<group>"; };
+		6209320C1E27341900974C71 /* MultiBodyVehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MultiBodyVehicle.cpp; sourceTree = "<group>"; };
+		6209320D1E27341900974C71 /* MultiBodyVehicle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MultiBodyVehicle.h; sourceTree = "<group>"; };
 		6225E66E1A716DB0009051FF /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6225E66F1A7277D9009051FF /* opengltemplate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = opengltemplate.cpp; sourceTree = "<group>"; };
 		6268EB70192EDC1700740008 /* carrier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrier.cpp; sourceTree = "<group>"; };
@@ -164,6 +166,8 @@
 				626C74F7193129410012D764 /* BoxVehicle.h */,
 				6289985E1B3DE38A00FBC5A6 /* Buggy.cpp */,
 				6289985F1B3DE38A00FBC5A6 /* Buggy.h */,
+				6209320C1E27341900974C71 /* MultiBodyVehicle.cpp */,
+				6209320D1E27341900974C71 /* MultiBodyVehicle.h */,
 			);
 			path = units;
 			sourceTree = "<group>";

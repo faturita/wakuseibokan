@@ -46,12 +46,4 @@ class Image {
 Image* loadBMP(const char* filename);
 
 
-
-
-
-
-
-
-
-
 #endif
