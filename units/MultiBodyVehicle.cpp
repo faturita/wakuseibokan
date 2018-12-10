@@ -94,32 +94,32 @@ void MultiBodyVehicle::doDynamics()
 
 void MultiBodyVehicle::doDynamics(dBodyID body)
 {
-    //dReal *v = (dReal *)dBodyGetLinearVel(body);
-    
-//    dJointSetHinge2Param (carjoint[0],dParamVel2,getThrottle());
-//    dJointSetHinge2Param (carjoint[0],dParamFMax2,1000);
+
+//    dJointSetHinge2Param (carjoint[2],dParamVel,0);
+//    dJointSetHinge2Param (carjoint[2],dParamFMax,1000);
+//    dJointSetHinge2Param (carjoint[2],dParamLoStop,-0.75);
+//    dJointSetHinge2Param (carjoint[2],dParamHiStop,0.75);
+//    dJointSetHinge2Param (carjoint[2],dParamFudgeFactor,0.1);
 //    
-//    dJointSetHinge2Param (carjoint[2],dParamVel2,yRotAngle);
+//    dJointSetHinge2Param (carjoint[3],dParamVel,0);
+//    dJointSetHinge2Param (carjoint[3],dParamFMax,1000);
+//    dJointSetHinge2Param (carjoint[3],dParamLoStop,-0.75);
+//    dJointSetHinge2Param (carjoint[3],dParamHiStop,0.75);
+//    dJointSetHinge2Param (carjoint[3],dParamFudgeFactor,0.1);
+//    
+//    dJointSetHinge2Param (carjoint[2],dParamVel2,getThrottle());
 //    dJointSetHinge2Param (carjoint[2],dParamFMax2,1000);
 //    
-//    // steering
-//    dReal v = dJointGetHinge2Angle1 (carjoint[0]);
-//    if (v > 0.1) v = 0.1;
-//    if (v < -0.1) v = -0.1;
-//    v *= 10.0;
-//    dJointSetHinge2Param (carjoint[0],dParamVel,0);
-//    dJointSetHinge2Param (carjoint[0],dParamFMax,1000);
-//    dJointSetHinge2Param (carjoint[0],dParamLoStop,-0.75);
-//    dJointSetHinge2Param (carjoint[0],dParamHiStop,0.75);
-//    dJointSetHinge2Param (carjoint[0],dParamFudgeFactor,0.1);
+//    dJointSetHinge2Param (carjoint[3],dParamVel2,getThrottle());
+//    dJointSetHinge2Param (carjoint[3],dParamFMax2,1000);
     
-    dBodyAddRelForce (body,0, 0,getThrottle());
+    //dBodyAddRelForce (body,0, 0,getThrottle());
     //dBodyAddForce(me, 0,9.81f,0);
     // This should be after the world step
     /// stuff
     dVector3 result;
     
-    dBodyAddRelForce(body, xRotAngle, 0, 0);
+    //dBodyAddRelForce(body, xRotAngle, 0, 0);
     
     dBodyVectorToWorld(body, 0,0,1,result);
     setForward(result[0],result[1],result[2]);
@@ -133,13 +133,15 @@ void MultiBodyVehicle::doDynamics(dBodyID body)
 }
 
 
-void wheel(float x, float y, float z,float xx, float yy, float zz)
+void wheel(float x, float y, float z,float xx, float yy, float zz, float R[12])
 {
     glPushMatrix();
     //glTranslatef(x, y, z);
     glTranslatef(xx, yy, zz);
+    doTransform(R);
     //glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
-    glutSolidSphere(2.0, 20, 50);
+    //glutSolidSphere(2.0, 20, 50);
+    drawRectangularBox(0.5, 2.0f, 2.0f);
     glPopMatrix();
 }
 
@@ -172,16 +174,20 @@ void MultiBodyVehicle::drawModel(float yRot, float xRot, float x, float y, float
     float LENGTH = 30.0f;
 
     const dReal *dBodyPosition1 = dBodyGetPosition(carbody[1]);
-    wheel (x,y,z,dBodyPosition1[0],dBodyPosition1[1],dBodyPosition1[2]);
-    const dReal     *dBodyPosition2 = dBodyGetPosition(carbody[2]);
-    wheel (x,y,z,dBodyPosition2[0],dBodyPosition2[1],dBodyPosition2[2]);
-    const dReal     *dBodyPosition3 = dBodyGetPosition(carbody[3]);
-    wheel (x,y,z,dBodyPosition3[0],dBodyPosition3[1],dBodyPosition3[2]);
-    const dReal     *dBodyPosition4 = dBodyGetPosition(carbody[4]);
-    wheel (x,y,z,dBodyPosition4[0],dBodyPosition4[1],dBodyPosition4[2]);
+    const dReal *dBodyRotation1 = dBodyGetRotation(carbody[1]);
+    wheel (x,y,z,dBodyPosition1[0],dBodyPosition1[1],dBodyPosition1[2], (float *)dBodyRotation1);
+    const dReal *dBodyPosition2 = dBodyGetPosition(carbody[2]);
+    const dReal *dBodyRotation2 = dBodyGetRotation(carbody[2]);
+    wheel (x,y,z,dBodyPosition2[0],dBodyPosition2[1],dBodyPosition2[2], (float *)dBodyRotation2);
+    const dReal *dBodyPosition3 = dBodyGetPosition(carbody[3]);
+    const dReal *dBodyRotation3 = dBodyGetRotation(carbody[3]);
+    wheel (x,y,z,dBodyPosition3[0],dBodyPosition3[1],dBodyPosition3[2], (float *)dBodyRotation3);
+    const dReal *dBodyPosition4 = dBodyGetPosition(carbody[4]);
+    const dReal *dBodyRotation4 = dBodyGetRotation(carbody[4]);
+    wheel (x,y,z,dBodyPosition4[0],dBodyPosition4[1],dBodyPosition4[2], (float *)dBodyRotation4);
     
     
-    printf("%10.8f, %10.8f, %10.8f\n",dBodyPosition1[0],dBodyPosition1[1],dBodyPosition1[2]);
+    //printf("%10.8f, %10.8f, %10.8f\n",dBodyPosition1[0],dBodyPosition1[1],dBodyPosition1[2]);
     
     glPopMatrix();
     
@@ -200,6 +206,7 @@ void MultiBodyVehicle::embody(dWorldID world, dSpaceID space)
     embody(me);
     //geom = dCreateSphere( space, 4.0f);
     //geom = dCreateBox( space, 10.0, 2.0f, 30.0f);
+    dBodySetPosition (me,pos[0],pos[1],pos[2]);
     box[0] = dCreateBox (0,10.0f,2.0f,30.0f);
     dGeomSetBody(box[0] , me);
 
@@ -213,7 +220,7 @@ void MultiBodyVehicle::embody(dWorldID world, dSpaceID space)
     float STARTZ=1;	// starting height of chassis
  
     
-    dBodySetPosition (me,pos[0],pos[1],pos[2]);
+    
     dMassSetBox (&m,1,10.0, 2.0f, 30.0f);
     //dMassSetSphere (&m,1,RADIUS);
     dMassAdjust (&m,CMASS);
@@ -228,21 +235,21 @@ void MultiBodyVehicle::embody(dWorldID world, dSpaceID space)
         dQuaternion q;
         dQFromAxisAndAngle (q,1,0,0,0);
         dBodySetQuaternion (carbody[i],q);
-        dMassSetSphere (&m,1,RADIUS);
+        dMassSetSphere (&m,1,RADIUS);//dMassSetCylinder(&m,1,1,RADIUS, 3.0f);
         dMassAdjust (&m,WMASS);
         dBodySetMass (carbody[i],&m);
-        sphere[i-1] = dCreateSphere (0,RADIUS);
+        sphere[i-1] = dCreateSphere (0,RADIUS);//dCreateCylinder(0,RADIUS,3.0f); //
         dGeomSetBody (sphere[i-1],carbody[i]);
     }
 
     WIDTH = 10.0f;
     LENGTH = 30.0f;
     
-    dBodySetPosition (carbody[1], WIDTH*0.5  ,+0.1,+0.5*LENGTH);
-    dBodySetPosition (carbody[2],-WIDTH*0.5  ,+0.1,+0.5*LENGTH);
+    dBodySetPosition (carbody[1], WIDTH*0.5+RADIUS  ,-1,+0.3*LENGTH);
+    dBodySetPosition (carbody[2],-WIDTH*0.5-RADIUS  ,-1,+0.3*LENGTH);
     
-    dBodySetPosition (carbody[3], WIDTH*0.5  ,+0.1,-0.5*LENGTH);
-    dBodySetPosition (carbody[4],-WIDTH*0.5  ,+0.1,-0.5*LENGTH);
+    dBodySetPosition (carbody[3], WIDTH*0.5+RADIUS  ,-1,-0.3*LENGTH);
+    dBodySetPosition (carbody[4],-WIDTH*0.5-RADIUS  ,-1,-0.3*LENGTH);
 
     //    //
 //    //
@@ -255,15 +262,15 @@ void MultiBodyVehicle::embody(dWorldID world, dSpaceID space)
 //        dJointSetHinge2Axis1 (carjoint[i],0,1,0);  // Axis 1 that comes from the structure
 //        dJointSetHinge2Axis2 (carjoint[i],0,0,1);  // Axis 2 where the wheels spin
 //    }
-//    //
-//    //    // set joint suspension
+////    //
+////    //    // set joint suspension
 //    for (int i=0; i<4; i++) {
 //        dJointSetHinge2Param (carjoint[i],dParamSuspensionERP,0.4);
 //        dJointSetHinge2Param (carjoint[i],dParamSuspensionCFM,0.8);
 //    }
-//    
+//
 //    // lock back wheels along the steering axis
-//    for (int i=1; i<4; i++) {
+//    for (int i=0; i<4; i++) {
 //        // set stops to make sure wheels always stay in alignment
 //        dJointSetHinge2Param (carjoint[i],dParamLoStop,0);
 //        dJointSetHinge2Param (carjoint[i],dParamHiStop,0);

@@ -94,7 +94,7 @@ std::vector<BoxIsland*> islands;
         for (i=0; i<n; i++) {
             contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
             dContactSoftERP | dContactSoftCFM | dContactApprox1;
-            contact[i].surface.mu = dInfinity;
+            contact[i].surface.mu = 0;dInfinity;
             contact[i].surface.slip1 = 0.1;
             contact[i].surface.slip2 = 0.1;
             contact[i].surface.soft_erp = 0.5;
@@ -308,7 +308,7 @@ void initWorldModelling()
 
    
     BoxIsland *runway = new BoxIsland();
-    runway->setLocation(1300.0,0.0,1300.0);
+    runway->setLocation(1800.0,0.3,1800.0);
     runway->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
     
     BoxIsland *nemesis = new BoxIsland();
@@ -356,7 +356,7 @@ void initWorldModelling()
     
     MultiBodyVehicle *_mbody = new MultiBodyVehicle();
     _mbody->init();
-    _mbody->setPos(30,30.0,30.0);
+    _mbody->setPos(30,1.0,-100.0);
     _mbody->embody(world, space);
     
     //MultiBodyVehicle *_abody = new MultiBodyVehicle();

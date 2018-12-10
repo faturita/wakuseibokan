@@ -62,6 +62,14 @@ void doTransform (float pos[3], float R[12])
   glMultMatrixf (matrix);
 }
 
+void doTransform(float R[12])
+{
+    float f[3];
+    f[0] = 0; f[1] = 0; f[2] = 0;
+    
+    doTransform(f, R);
+}
+
 
 void drawArrow(float x, float y, float z)
 {

@@ -346,8 +346,6 @@ void update(int value)
     }
     if (!controller.pause)
 	{
-		//_manta.doDynamics(body[0]);
-		//_walrus.doDynamics(body[1]);
         
         if (controller.controlling>0)
         {
