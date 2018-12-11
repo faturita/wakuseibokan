@@ -95,21 +95,21 @@ void MultiBodyVehicle::doDynamics()
 void MultiBodyVehicle::doDynamics(dBodyID body)
 {
 
-//    dJointSetHinge2Param (carjoint[2],dParamVel,0);
-//    dJointSetHinge2Param (carjoint[2],dParamFMax,1000);
-//    dJointSetHinge2Param (carjoint[2],dParamLoStop,-0.75);
-//    dJointSetHinge2Param (carjoint[2],dParamHiStop,0.75);
-//    dJointSetHinge2Param (carjoint[2],dParamFudgeFactor,0.1);
-//    
+    dJointSetHinge2Param (carjoint[2],dParamVel,0);
+    dJointSetHinge2Param (carjoint[2],dParamFMax,1000);
+    dJointSetHinge2Param (carjoint[2],dParamLoStop,-0.75);
+    dJointSetHinge2Param (carjoint[2],dParamHiStop,0.75);
+    dJointSetHinge2Param (carjoint[2],dParamFudgeFactor,0.1);
+
 //    dJointSetHinge2Param (carjoint[3],dParamVel,0);
 //    dJointSetHinge2Param (carjoint[3],dParamFMax,1000);
 //    dJointSetHinge2Param (carjoint[3],dParamLoStop,-0.75);
 //    dJointSetHinge2Param (carjoint[3],dParamHiStop,0.75);
 //    dJointSetHinge2Param (carjoint[3],dParamFudgeFactor,0.1);
-//    
+
 //    dJointSetHinge2Param (carjoint[2],dParamVel2,getThrottle());
 //    dJointSetHinge2Param (carjoint[2],dParamFMax2,1000);
-//    
+
 //    dJointSetHinge2Param (carjoint[3],dParamVel2,getThrottle());
 //    dJointSetHinge2Param (carjoint[3],dParamFMax2,1000);
     

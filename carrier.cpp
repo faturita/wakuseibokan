@@ -264,8 +264,8 @@ void drawScene() {
     
     // EXPERIMENTALLY: Draw 3DS models
     obj_type object;
-    //CThreeMaxLoader::Load3DS(&object,"watertower.3ds");
-    //CThreeMaxLoader::draw3DSModel(object,300.0,20.0,300.0,1);
+    CThreeMaxLoader::Load3DS(&object,"structures/watertower.3ds");
+    CThreeMaxLoader::draw3DSModel(object,300.0,20.0,300.0,1);
 
     
     

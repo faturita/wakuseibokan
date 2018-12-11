@@ -230,20 +230,20 @@ void initWorldPopulation()
     _walrus3->embody(world, space);
     
     
-    Buggy *_buggy = new Buggy();
-    _buggy->init();
-    _buggy->setPos(1300.0f, 10, 10);
+    //Buggy *_buggy = new Buggy();
+    //_buggy->init();
+    //_buggy->setPos(1300.0f, 10, 10);
     
-    _buggy->embody(world, space);
+    //_buggy->embody(world, space);
     
     
 
-    vehicles.push_back(_boxVehicle1);
-    vehicles.push_back(_boxVehicle2);
+    //vehicles.push_back(_boxVehicle1);
+    //vehicles.push_back(_boxVehicle2);
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
-    vehicles.push_back(_buggy);
+    //vehicles.push_back(_buggy);
     
     
 }
@@ -352,12 +352,12 @@ void initWorldModelling()
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     
-    //initWorldPopulation();
+    initWorldPopulation();
     
-    MultiBodyVehicle *_mbody = new MultiBodyVehicle();
-    _mbody->init();
-    _mbody->setPos(30,1.0,-100.0);
-    _mbody->embody(world, space);
+    //MultiBodyVehicle *_mbody = new MultiBodyVehicle();
+    //_mbody->init();
+    //_mbody->setPos(30,57.0,-100.0);
+    //_mbody->embody(world, space);
     
     //MultiBodyVehicle *_abody = new MultiBodyVehicle();
     //_abody->init();
@@ -365,7 +365,7 @@ void initWorldModelling()
     //_abody->embody(world, space);
     
     //vehicles.push_back(_abody);
-    vehicles.push_back(_mbody);
+    //vehicles.push_back(_mbody);
     
     //buildTerrainModel(space,_vulcano,600.0f,-1340.0f, 0.0f, -1740.0f);
     

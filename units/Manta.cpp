@@ -273,13 +273,13 @@ void Manta::doDynamics(dBodyID body)
 
     dBodyAddTorque(body, 0, 0.001, 0 );
     
-    dBodyAddRelTorque(body, 0, 0, -xRotAngle);
+    dBodyAddRelTorque(body, 0, -xRotAngle,0);
     dBodyAddRelTorque(body,-yRotAngle*speed/1000,0, 0);
     
     dBodyAddRelForce(body, 0,0,getThrottle());
     
-    printf ("Antigravity...\n");
-    dBodyAddForce(me, 0,9.81f,0);
+    //printf ("Antigravity...\n");
+    //dBodyAddForce(me, 0,9.81f,0);
     
     // This should be after the world step
     /// stuff
