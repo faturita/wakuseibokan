@@ -32,6 +32,8 @@ public:
     void doControl(Controller controller);
     
     void oldDynamics(dBodyID body);
+    Vec3f  getlinearvelocity(dBodyID body);
+    float getlinearforce(dBodyID body);
     
     void airspeddrarestoration();
     

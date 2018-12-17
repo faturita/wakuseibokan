@@ -295,6 +295,65 @@ void Manta::oldDynamics(dBodyID body)
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
 
+Vec3f Manta::getlinearvelocity(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    Vec3f V;
+    V[0]=v[0];V[1]=v[1];V[2]=v[2];
+
+    dVector3 velResult;
+    dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
+
+    Vec3f VV;
+    VV[0]=velResult[0];VV[1]=velResult[1];VV[2]=velResult[2];
+
+    //VV = (VV)/ VV.magnitude();
+
+    V[0]=VV[0];V[1]=VV[1];V[2]=VV[2];
+
+    return V;
+}
+
+float Manta::getlinearforce(dBodyID body)
+    {
+    Vec3f V;
+    V = getlinearvelocity(body);
+
+    Vec3f F;
+    F[0]=0;F[1]=0;F[2]=1;
+
+    Vec3f vForward;
+    vForward = dBodyVectorToWorldVec3f(body,0,0,1,vForward);
+
+    speed = V.magnitude();
+
+    float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
+    float alpha=0, beta=0;
+
+    if (V[2]!=0 && speed != 0)
+    {
+        alpha = -atan( V[1] / V[2] );//atan( VV[1] / VV[2]);
+        beta = asin( V[0] / speed );//atan( VV[0] / VV[2]);
+    }
+
+    if (speed == 0) speed = 1;
+    ih = (-yRotAngle)/speed;
+
+    aileron = (xRotAngle)/speed;
+
+    rudder = Manta::rudder;//modAngleP;
+
+    elevator = -Manta::elevator;//modAngleZ;
+
+    return alpha;
+}
+
+
+
+
+
+
 //void Manta::doDynamics(dBodyID body)
 //{
 //	dReal *v = (dReal *)dBodyGetLinearVel(body);
@@ -472,14 +531,63 @@ void Manta::doDynamics(dBodyID body)
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
     
     dBodyAddRelForce(body, 0,0,getThrottle());
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    dVector3 O;
+    dBodyGetRelPointPos( body, 0,0,0, O);
+
+    dVector3 F;
+    dBodyGetRelPointPos( body, 0,0,1, F);
+
+    F[0] = (F[0]-O[0]);
+    F[1] = (F[1]-O[1]);
+    F[2] = (F[2]-O[2]);
+
+
+    Vec3f vec3fF;
+    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    speed = vec3fV.magnitude();
+
+    Vec3f dump;
+    if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
+    {
+        dump = - ((vec3fV.cross(vec3fF).magnitude())/(vec3fV.magnitude()*vec3fF.magnitude())*10.0f) * vec3fV - 0.001 * vec3fV;
+    }
+
+    if (!isnan(dump[0]) && !isnan(dump[1]) && !isnan(dump[2]))
+    {
+        //dBodyAddForce(body, dump[0], dump[1], dump[2]);
+    }
+
     
     dBodyAddTorque(body,0,-Manta::addd,0);
     dBodyAddRelTorque(body,0,0,Manta::addd);
     //dBodyAddRelTorque(body, 0,-yRotAngle*0.01,-xRotAngle*0.1);
     dBodyAddRelTorque(body, 0,-xRotAngle*0.01,0);
     dBodyAddRelTorque(body, -yRotAngle*0.1,0,0);
-    //printf ("Antigravity...\n");
-    //dBodyAddForce(me, 0,9.81f,0);
+
+
+    float alpha = getlinearforce(body);
+
+    if (vec3fV[2]!=0)
+    {
+        //alpha = -atan( vec3fV[1] / vec3fV[2] );//atan( VV[1] / VV[2]);
+    }
+
+    printf("%5.2f,%5.2f\n",alpha,speed);
+    alpha = 0;
+
+    if (speed > 60)
+    {
+        //printf ("Antigravity...\n");
+        dBodyAddForce(me, 0,9.81f,0);
+    }
+
+
 
     // This should be after the world step
     /// stuff
