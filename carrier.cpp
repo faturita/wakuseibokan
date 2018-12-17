@@ -243,7 +243,8 @@ void drawScene() {
 
     
     // Debug: Until the engine is complete I need these boxes to tell me where I am.
-    
+    drawBox(10,10,1600);
+    drawBox(10,10,1500);
     drawBox(10,10,1400);
     drawBox(10,10,1300);
     drawBox(10,10,1200);
@@ -265,7 +266,7 @@ void drawScene() {
     // EXPERIMENTALLY: Draw 3DS models
     obj_type object;
     CThreeMaxLoader::Load3DS(&object,"structures/watertower.3ds");
-    CThreeMaxLoader::draw3DSModel(object,300.0,20.0,300.0,1);
+    CThreeMaxLoader::draw3DSModel(object,650.0,15.0,600.0,1);
 
     
     

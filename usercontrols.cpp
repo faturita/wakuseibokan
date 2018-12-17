@@ -141,6 +141,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '9':controller.thrust+=20.0f;break;
         case 'p':controller.pause = !controller.pause;break;
         case 'r':controller.thrust-=0.05;break;
+        case 'R':controller.thrust-=10.00;break;
         case 'f':controller.thrust+=0.05;break;
         case 'q':controller.reset();break;
         case '0':

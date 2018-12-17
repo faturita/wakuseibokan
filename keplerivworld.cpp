@@ -230,12 +230,17 @@ void initWorldPopulation()
     _walrus3->embody(world, space);
     
     
-    //Buggy *_buggy = new Buggy();
-    //_buggy->init();
-    //_buggy->setPos(1300.0f, 10, 10);
+    Buggy *_buggy = new Buggy();
+    _buggy->init();
+    _buggy->setPos(1300.0f, 10, 10);
     
-    //_buggy->embody(world, space);
-    
+    _buggy->embody(world, space);
+
+
+    MultiBodyVehicle *_mb = new MultiBodyVehicle();
+    _mb->init();
+    _mb->setPos(1600.0f,5.0f,10.0f);
+    _mb->embody(world,space);
     
 
     //vehicles.push_back(_boxVehicle1);
@@ -243,6 +248,7 @@ void initWorldPopulation()
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
+    //vehicles.push_back(_mb);
     //vehicles.push_back(_buggy);
     
     

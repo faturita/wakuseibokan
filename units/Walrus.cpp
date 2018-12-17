@@ -81,8 +81,7 @@ void Walrus::doControl(Controller controller)
     //engine[0] = -controller.roll;
     //engine[1] = controller.yaw;
     //engine[2] = -controller.pitch;
-    //steering = -controller.precesion;
-    
+    //steering = -controller.precesion;   
     
     setThrottle(-controller.yaw);
     

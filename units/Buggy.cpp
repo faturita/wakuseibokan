@@ -136,25 +136,29 @@ static dGeomID ground_box;
 void Buggy::doDynamics(dBodyID body)
 {
     //dReal *v = (dReal *)dBodyGetLinearVel(body);
-    
-    dJointSetHinge2Param (carjoint[0],dParamVel2,getThrottle());
+
+    //dJointSetHinge2Param (carjoint[0],dParamVel,getThrottle());
+    //dJointSetHinge2Param (carjoint[0],dParamFMax,1000);
+
+    dJointSetHinge2Param (carjoint[0],dParamVel2,yRotAngle);
     dJointSetHinge2Param (carjoint[0],dParamFMax2,1000);
     
-    dJointSetHinge2Param (carjoint[2],dParamVel2,yRotAngle);
-    dJointSetHinge2Param (carjoint[2],dParamFMax2,1000);
+    dJointSetHinge2Param (carjoint[1],dParamVel2,yRotAngle);
+    dJointSetHinge2Param (carjoint[1],dParamFMax2,1000);
     
     // steering
     dReal v = dJointGetHinge2Angle1 (carjoint[0]);
     if (v > 0.1) v = 0.1;
     if (v < -0.1) v = -0.1;
     v *= 10.0;
-    dJointSetHinge2Param (carjoint[0],dParamVel,0);
-    dJointSetHinge2Param (carjoint[0],dParamFMax,1000);
-    dJointSetHinge2Param (carjoint[0],dParamLoStop,-0.75);
-    dJointSetHinge2Param (carjoint[0],dParamHiStop,0.75);
-    dJointSetHinge2Param (carjoint[0],dParamFudgeFactor,0.1);
+    //dJointSetHinge2Param (carjoint[0],dParamVel,0);
+    //dJointSetHinge2Param (carjoint[0],dParamFMax,1000);
+    //dJointSetHinge2Param (carjoint[0],dParamLoStop,-0.75);
+    //dJointSetHinge2Param (carjoint[0],dParamHiStop,0.75);
+    //dJointSetHinge2Param (carjoint[0],dParamFudgeFactor,0.1);
     
     //dBodyAddRelForce (body,0, 0,getThrottle());
+
     
     // This should be after the world step
     /// stuff
@@ -178,6 +182,8 @@ void Buggy::embody(dBodyID myBodySelf)
 {
     
 }
+
+static const dVector3 yunit = { 0, 1, 0 }, zunit = { 0, 0, 1 };
 
 void Buggy::embody(dWorldID world, dSpaceID space)
 {
@@ -226,8 +232,9 @@ void Buggy::embody(dWorldID world, dSpaceID space)
         dJointAttach (carjoint[i],me,carbody[i+1]);
         const dReal *a = dBodyGetPosition (carbody[i+1]);
         dJointSetHinge2Anchor (carjoint[i],a[0],a[1],a[2]);
-        dJointSetHinge2Axis1 (carjoint[i],0,1,0);  // Axis 1 that comes from the structure
-        dJointSetHinge2Axis2 (carjoint[i],0,0,1);  // Axis 2 where the wheels spin
+        dJointSetHinge2Axes (carjoint[i], zunit, yunit);
+        //dJointSetHinge2Axis1 (carjoint[i],0,1,0);  // Axis 1 that comes from the structure
+        //dJointSetHinge2Axis2 (carjoint[i],0,0,1);  // Axis 2 where the wheels spin
     }
 //
 //    // set joint suspension
