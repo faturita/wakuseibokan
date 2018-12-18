@@ -68,6 +68,9 @@ public:
     
     dBodyID virtual getBodyID();
 
+    void setVector(float* V, Vec3f v);
+    void setVector(float *V, dVector3 v);
+
 };
 
 #endif /* VEHICLE_H_ */

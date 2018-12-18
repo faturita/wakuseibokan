@@ -41,7 +41,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f, R);
 
         //drawArrow();
-        drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
+        //drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
         drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
@@ -51,7 +51,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        _model->draw();
+        //_model->draw();
         glPopMatrix();
     }
     else
@@ -315,6 +315,7 @@ Vec3f Manta::getlinearvelocity(dBodyID body)
     return V;
 }
 
+
 float Manta::getlinearforce(dBodyID body)
     {
     Vec3f V;
@@ -329,7 +330,6 @@ float Manta::getlinearforce(dBodyID body)
     speed = V.magnitude();
 
     float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
-    float alpha=0, beta=0;
 
     if (V[2]!=0 && speed != 0)
     {
@@ -563,13 +563,29 @@ void Manta::doDynamics(dBodyID body)
         //dBodyAddForce(body, dump[0], dump[1], dump[2]);
     }
 
+    dVector3 velResult2;
+    dBodyVectorFromWorld (body, vec3fV[0], vec3fV[1], vec3fV[2], velResult2);
+
+    setVector((float *)&(Manta::V),velResult2);
+
     
-    dBodyAddTorque(body,0,-Manta::addd,0);
+    //dBodyAddTorque(body,0,-Manta::addd,0);
     dBodyAddRelTorque(body,0,0,Manta::addd);
     //dBodyAddRelTorque(body, 0,-yRotAngle*0.01,-xRotAngle*0.1);
     dBodyAddRelTorque(body, 0,-xRotAngle*0.01,0);
     dBodyAddRelTorque(body, -yRotAngle*0.1,0,0);
 
+    getlinearforce(body);
+
+    const dReal *dBodyRotations = dBodyGetRotation(body);
+
+    dVector3 velResult;
+    dBodyVectorFromWorld (body, dBodyRotations[0], dBodyRotations[1], dBodyRotations[2], velResult);
+
+    setVector((float *)&(Manta::V),velResult);
+
+    //dBodyAddRelTorque(body, 0,0,beta);
+    dBodyAddRelTorque(body,-velResult[0],-velResult[1],-velResult[2]);
 
     float alpha = getlinearforce(body);
 
@@ -578,8 +594,7 @@ void Manta::doDynamics(dBodyID body)
         //alpha = -atan( vec3fV[1] / vec3fV[2] );//atan( VV[1] / VV[2]);
     }
 
-    printf("%5.2f,%5.2f\n",alpha,speed);
-    alpha = 0;
+    printf("%5.2f,%5.2f,%5.2f\n",alpha,beta,speed);
 
     if (speed > 60)
     {

@@ -90,6 +90,20 @@ int Vehicle::getType()
     return 0;
 }
 
+void Vehicle::setVector(float* V, dVector3 v)
+{
+    V[0] = v[0];
+    V[1] = v[1];
+    V[2] = v[2];
+}
+
+void Vehicle::setVector(float* V, Vec3f v)
+{
+    V[0] = v[0];
+    V[1] = v[1];
+    V[2] = v[2];
+}
+
 void  Vehicle::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
 	position = getPos();

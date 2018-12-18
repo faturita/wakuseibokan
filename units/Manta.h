@@ -18,6 +18,10 @@ class Manta : public Vehicle
 public:
 	float rudder;
 	float elevator;
+
+    float alpha;
+    float beta;
+
 	float S[3];
 	float V[3];
     float addd;
