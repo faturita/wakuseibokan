@@ -71,6 +71,9 @@ public:
     void setVector(float* V, Vec3f v);
     void setVector(float *V, dVector3 v);
 
+    Vec3f dBodyGetLinearVelInBody(dBodyID body);
+    Vec3f dBodyGetRotationVelInBody(dBodyID body);
+
 };
 
 #endif /* VEHICLE_H_ */

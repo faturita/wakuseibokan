@@ -51,7 +51,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        //_model->draw();
+        _model->draw();
         glPopMatrix();
     }
     else
@@ -72,6 +72,8 @@ void Manta::doControl(Controller controller)
     setThrottle(-controller.thrust*2*5);
     
     // roll
+    if (controller.roll >4) controller.roll = 4;
+    if (controller.roll <-4) controller.roll = -4;
     xRotAngle = controller.roll;
     
     // pitch
@@ -568,6 +570,9 @@ void Manta::doDynamics(dBodyID body)
 
     setVector((float *)&(Manta::V),velResult2);
 
+    Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
+    setVector((float *)&(Manta::V),linearVelInBody);
+
     
     //dBodyAddTorque(body,0,-Manta::addd,0);
     dBodyAddRelTorque(body,0,0,Manta::addd);
@@ -585,7 +590,7 @@ void Manta::doDynamics(dBodyID body)
     setVector((float *)&(Manta::V),velResult);
 
     //dBodyAddRelTorque(body, 0,0,beta);
-    dBodyAddRelTorque(body,-velResult[0],-velResult[1],-velResult[2]);
+    //dBodyAddRelTorque(body,-velResult[0],-velResult[1],-velResult[2]);
 
     float alpha = getlinearforce(body);
 

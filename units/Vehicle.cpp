@@ -76,6 +76,34 @@ void Vehicle::setLocation(float fPos[3], float R[12])
 	}
 }
 
+Vec3f Vehicle::dBodyGetLinearVelInBody(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    dVector3 velResult2;
+    dBodyVectorFromWorld (body, vec3fV[0], vec3fV[1], vec3fV[2], velResult2);
+
+    vec3fV[0]= velResult2[0];vec3fV[1] = velResult2[1]; vec3fV[2] = velResult2[2];
+
+    return vec3fV;
+}
+
+Vec3f Vehicle::dBodyGetRotationVelInBody(dBodyID body)
+{
+    const dReal *dBodyRotations = dBodyGetRotation(body);
+
+    dVector3 velResult;
+    dBodyVectorFromWorld (body, dBodyRotations[0], dBodyRotations[1], dBodyRotations[2], velResult);
+
+    Vec3f vec3fV;
+    vec3fV[0]= dBodyRotations[0];vec3fV[1] = dBodyRotations[1]; vec3fV[2] = dBodyRotations[2];
+
+    return vec3fV;
+}
+
 void Vehicle::init()
 {
 	//Load the model
