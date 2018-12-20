@@ -200,6 +200,9 @@ void drawScene() {
         
         Vec3f up2,pos2;
         //Camera.getViewPort(up2,pos2,forward);
+
+        if (vehicles[ctrling]->getType() == 3)
+            Camera.yAngle = ((Manta*)vehicles[ctrling])->alpha*10;
     } else
     {
         Camera.getViewPort(up,pos,forward);

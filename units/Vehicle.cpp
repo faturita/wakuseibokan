@@ -76,6 +76,16 @@ void Vehicle::setLocation(float fPos[3], float R[12])
 	}
 }
 
+Vec3f Vehicle::dBodyGetLinearVelVec(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    return vec3fV;
+}
+
 Vec3f Vehicle::dBodyGetLinearVelInBody(dBodyID body)
 {
     dReal *v = (dReal *)dBodyGetLinearVel(body);
@@ -91,15 +101,15 @@ Vec3f Vehicle::dBodyGetLinearVelInBody(dBodyID body)
     return vec3fV;
 }
 
-Vec3f Vehicle::dBodyGetRotationVelInBody(dBodyID body)
+Vec3f Vehicle::dBodyGetAngularVelInBody(dBodyID body)
 {
-    const dReal *dBodyRotations = dBodyGetRotation(body);
+    const dReal* velResultWorld = dBodyGetAngularVel(body);
 
-    dVector3 velResult;
-    dBodyVectorFromWorld (body, dBodyRotations[0], dBodyRotations[1], dBodyRotations[2], velResult);
+    dVector3 velResultBody;
+    dBodyVectorFromWorld (body, velResultWorld[0], velResultWorld[1], velResultWorld[2], velResultBody);
 
     Vec3f vec3fV;
-    vec3fV[0]= dBodyRotations[0];vec3fV[1] = dBodyRotations[1]; vec3fV[2] = dBodyRotations[2];
+    vec3fV[0]= velResultBody[0];vec3fV[1] = velResultBody[1]; vec3fV[2] = velResultBody[2];
 
     return vec3fV;
 }

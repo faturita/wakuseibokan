@@ -39,6 +39,21 @@ GLuint loadTexture(Image* image) {
 	return textureId;
 }
 
+/**
+ * Receives a pos and a rotation matrix (which can be retrieved from ODE) and builds an extended
+ * rotation matrix for OpenGL.  This is a transpose matrix.
+ *
+ *  0  4  8   0
+ *  1  5  9   0
+ *  2  6 10   0
+ * P0 P1 P2   1
+ *
+ * After that uses OpenGL multiply function.
+ *
+ * @brief doTransform
+ * @param pos
+ * @param R
+ */
 void doTransform (float pos[3], float R[12])
 {
   GLfloat matrix[16];
@@ -62,6 +77,12 @@ void doTransform (float pos[3], float R[12])
   glMultMatrixf (matrix);
 }
 
+/**
+ * Performs a matrix rotation at the origin.
+ *
+ * @brief doTransform
+ * @param R
+ */
 void doTransform(float R[12])
 {
     float f[3];

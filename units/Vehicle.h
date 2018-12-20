@@ -72,7 +72,8 @@ public:
     void setVector(float *V, dVector3 v);
 
     Vec3f dBodyGetLinearVelInBody(dBodyID body);
-    Vec3f dBodyGetRotationVelInBody(dBodyID body);
+    Vec3f dBodyGetAngularVelInBody(dBodyID body);
+    Vec3f dBodyGetLinearVelVec(dBodyID body);
 
 };
 

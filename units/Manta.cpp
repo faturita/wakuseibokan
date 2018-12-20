@@ -72,8 +72,8 @@ void Manta::doControl(Controller controller)
     setThrottle(-controller.thrust*2*5);
     
     // roll
-    if (controller.roll >4) controller.roll = 4;
-    if (controller.roll <-4) controller.roll = -4;
+    if (controller.roll>4) controller.roll = 4;
+    if (controller.roll<-4) controller.roll = -4;
     xRotAngle = controller.roll;
     
     // pitch
@@ -96,7 +96,7 @@ void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 	forward = forward.normalize();
 	orig = position;
-	Up[0]=Up[2]=0;Up[1]=4;
+    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
 	position = position - 20*forward + Up;
 	forward = orig-position;
 }
@@ -528,83 +528,65 @@ float Manta::getlinearforce(dBodyID body)
 void Manta::doDynamics(dBodyID body)
 {
     
-    Vec3f Ft;
+    Vec3f Ft,vec3fV;
     
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
     
     dBodyAddRelForce(body, 0,0,getThrottle());
     dReal *v = (dReal *)dBodyGetLinearVel(body);
 
-    dVector3 O;
-    dBodyGetRelPointPos( body, 0,0,0, O);
-
-    dVector3 F;
-    dBodyGetRelPointPos( body, 0,0,1, F);
-
-    F[0] = (F[0]-O[0]);
-    F[1] = (F[1]-O[1]);
-    F[2] = (F[2]-O[2]);
-
-
-    Vec3f vec3fF;
-    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
-
-    Vec3f vec3fV;
-    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
-
-    speed = vec3fV.magnitude();
-
-    Vec3f dump;
-    if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
-    {
-        dump = - ((vec3fV.cross(vec3fF).magnitude())/(vec3fV.magnitude()*vec3fF.magnitude())*10.0f) * vec3fV - 0.001 * vec3fV;
-    }
-
-    if (!isnan(dump[0]) && !isnan(dump[1]) && !isnan(dump[2]))
-    {
-        //dBodyAddForce(body, dump[0], dump[1], dump[2]);
-    }
-
-    dVector3 velResult2;
-    dBodyVectorFromWorld (body, vec3fV[0], vec3fV[1], vec3fV[2], velResult2);
-
-    setVector((float *)&(Manta::V),velResult2);
-
     Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
     setVector((float *)&(Manta::V),linearVelInBody);
 
-    
-    //dBodyAddTorque(body,0,-Manta::addd,0);
-    dBodyAddRelTorque(body,0,0,Manta::addd);
-    //dBodyAddRelTorque(body, 0,-yRotAngle*0.01,-xRotAngle*0.1);
-    dBodyAddRelTorque(body, 0,-xRotAngle*0.01,0);
+
+    Vec3f linearVel = dBodyGetLinearVelVec(body);
+    Vec3f fw = getForward();
+
+    Vec3f restoration = fw.cross(linearVelInBody);
+
+    dBodyAddTorque(body, restoration[0]*0.001,restoration[1]*0.001,restoration[2]*0.001);
+
+
+
+
+    //dBodyAddRelTorque(body,0,0,Manta::addd);
+    dBodyAddRelTorque(body,0,-Manta::addd*0.1,0);
+    dBodyAddRelTorque(body, 0,0,xRotAngle*0.05);
+
     dBodyAddRelTorque(body, -yRotAngle*0.1,0,0);
 
-    getlinearforce(body);
-
-    const dReal *dBodyRotations = dBodyGetRotation(body);
-
-    dVector3 velResult;
-    dBodyVectorFromWorld (body, dBodyRotations[0], dBodyRotations[1], dBodyRotations[2], velResult);
-
-    setVector((float *)&(Manta::V),velResult);
+    Vec3f velResultBody = dBodyGetAngularVelInBody(body);
 
     //dBodyAddRelTorque(body, 0,0,beta);
-    //dBodyAddRelTorque(body,-velResult[0],-velResult[1],-velResult[2]);
+    //dBodyAddRelTorque(body,-velResultBody[0]*0.1,-velResultBody[1]*0.1,-velResultBody[2]*0.1);
 
     float alpha = getlinearforce(body);
+
+
+    dVector3 vHorizon;
+    dBodyVectorToWorld (body, 1, 0, 0, vHorizon);
+
+    dBodyAddTorque(body,0,-vHorizon[1]*0.8,0);
+
+    float lift = speed * speed * 0.5*alpha;
+    if (lift<0)
+        lift = 0.0;
+    if (lift>9.81)
+        lift = 9.82;
+    dBodyAddForce(me,0,lift,0);
+
 
     if (vec3fV[2]!=0)
     {
         //alpha = -atan( vec3fV[1] / vec3fV[2] );//atan( VV[1] / VV[2]);
     }
 
-    printf("%5.2f,%5.2f,%5.2f\n",alpha,beta,speed);
+    printf("%5.2f,%5.2f,%5.2f,%5.2f,(%5.2f,%5.2f,%5.2f),%5.2f\n",lift,vHorizon[1],alpha,beta,velResultBody[0],velResultBody[1],velResultBody[2],speed);
 
-    if (speed > 60)
+    //if (speed > 60)
     {
         //printf ("Antigravity...\n");
-        dBodyAddForce(me, 0,9.81f,0);
+        //dBodyAddForce(me, 0,9.81f,0);
     }
 
 
@@ -617,8 +599,7 @@ void Manta::doDynamics(dBodyID body)
     setForward(result[0],result[1],result[2]);
     
     const dReal *dBodyPosition = dBodyGetPosition(body);
-    const dReal *dBodyRotation = dBodyGetRotation(body);
-    
+    const dReal *dBodyRotation = dBodyGetRotation(body);   
     
     setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);

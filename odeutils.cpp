@@ -19,7 +19,7 @@ void firesound(int times)
 
 void enginestart()
 {
-    system("afplay sounds/engine.mp3 &");
+    system("afplay sounds/cruise.m4a &");
 }
 
 void takeoff()

@@ -38,7 +38,7 @@ public:
     void reset()
     {
         roll=pitch=precesion=yaw=0;
-        thrust=0;
+        //thrust=0;
     };
     
     void interrupt()
