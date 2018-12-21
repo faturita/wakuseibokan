@@ -81,7 +81,7 @@ void Manta::doControl(Controller controller)
     
     //Manta::rudder = controller.precesion*0.1;
     
-    Manta::addd = controller.precesion*0.1;
+    Manta::rudder = controller.precesion*0.1;
     
 }
 
@@ -248,283 +248,160 @@ void Manta::doDynamics()
 }
 
 
-void Manta::oldDynamics(dBodyID body)
+void Manta::doDynamics(dBodyID body)
 {
-    dReal *v = (dReal *)dBodyGetLinearVel(body);
-    
-    Vec3f V;
-    V[0]=v[0];V[1]=v[1];V[2]=v[2];
-    
-    dVector3 velResult;
-    dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
-    
-    Vec3f VV;
-    VV[0]=velResult[0];VV[1]=velResult[1];VV[2]=velResult[2];
-    
-    //VV = (VV)/ VV.magnitude();
-    
-    V[0]=VV[0];V[1]=VV[1];V[2]=VV[2];
-    
-    Vec3f F;
-    F[0]=0;F[1]=0;F[2]=1;
-    
-    Vec3f vForward;
-    vForward = dBodyVectorToWorldVec3f(body,0,0,1,vForward);
-    
-    speed = V.magnitude();
 
-    dBodyAddTorque(body, 0, 0.001, 0 );
+    Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
+    setVector((float *)&(Manta::V),linearVelInBody);
+
+
+    // Airrestoration.
+    Vec3f linearVel = dBodyGetLinearVelVec(body);
+    Vec3f fw = getForward();
+
+    Vec3f restoration = fw.cross(linearVelInBody);
+    //dBodyAddTorque(body, restoration[0]*0.01,restoration[1]*0.01,restoration[2]*0.01);
+
+    // Get speed, alpha and beta.
+    speed = linearVel.magnitude();
+
+    float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
+    Manta::alpha = Manta::beta = 0;
+
+
+    if (linearVel[2]!=0 && speed != 0)
+    {
+        alpha = -atan( linearVel[1] / linearVel[2] );//atan( VV[1] / VV[2]);
+        beta = asin( linearVel[0] / speed );//atan( VV[0] / VV[2]);
+    }
+
+    if (speed == 0) speed = 1;
+
+    // Set aileron rudder and elevator.
+    ih = (-yRotAngle)/speed;
+    aileron = (xRotAngle)/speed;
+    rudder = -Manta::rudder;//modAngleP;
+    elevator = -yRotAngle;//modAngleZ;
+
+
+    // Airflow parameters.
+    float density = 0.1f;   // Air density
+    float Sl = 0.9;   // Wing surface [m2]
+    float b = 0.01;   // Wing span [m]
+
+    // Airplane coefficients
+    float Cd, CL, Cm, Cl, Cy, Cn;
+
+
+    if (speed == 0)
+    {
+        Cd = CL = 0;
+
+    }
+    else
+    {
+        // Drag
+        Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+        // Lift
+        CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+    }
+
+    // Yaw
+    Cy = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
+
+    Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+    Cl = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
+
+    Cn = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
+
+
+    //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
+
+    float q = density * speed * speed / 2.0f;
+    float La;
+    Vec3f Fa;
+    float Ma;
+    float Na;
+
+    float Lt;
+    float Mt;
+    float Nt;
+
+    Vec3f Ft;
+
+    Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
+
+    Lt=Mt=Nt=0;
+
+    float D = Cd * q * Sl;
+    float L = CL * q * Sl;
+
+
+    Fa[0] = (+ (-D));
+
+    Fa[1] = (+ (Cy * q * Sl))*1;
+
+    Fa[2] = (+ (-L));
+
+
+    // y
+    Ma =  Cm * q * Sl;
+
+    // x
+    La =  -(Cl * q * Sl * b)*1;
+
+    // z
+    Na =  (Cn * q * Sl * b)*1;
+
+
+    Vec3f rtWind;
+    rtWind[0] = La;
+    rtWind[1] = Ma;
+    rtWind[2] = Na;
+
+    Vec3f rtPlane = windToBody(rtWind[0],rtWind[1],rtWind[2], alpha, beta);
+
+
+    Vec3f fPlane = Fa.rotateOnY(alpha).rotateOnZ(beta).rotateOnZ(-PI/2.0f).rotateOnX(-PI/2.0f);
+
+
+    Manta::S[0]=Ft[0]+fPlane[0];Manta::S[1]=Ft[1]+fPlane[1];Manta::S[2]=Ft[2]+fPlane[2];
+
+    printf ("%5.2f/%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", alpha, beta, fPlane[0],fPlane[1],fPlane[2]);
+
+    dBodyAddRelForce(body,fPlane[0],fPlane[1],fPlane[2]);
+    dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+    dBodyAddRelTorque(body, rtWind[1], rtWind[0], rtWind[2]);
     
-    dBodyAddRelTorque(body, 0, -xRotAngle,0);
-    dBodyAddRelTorque(body,-yRotAngle*speed/1000,0, 0);
+    //dBodyAddTorque(body, 0, -xRotAngle*0.01, 0);
     
-    dBodyAddRelForce(body, 0,0,getThrottle());
+    //dBodyAddTorque(body,0,-Manta::addd,0);
+    //dBodyAddRelTorque(body,0,0,Manta::addd);
     
-    //printf ("Antigravity...\n");
-    //dBodyAddForce(me, 0,9.81f,0);
-    
+    //airspeddrarestoration();
+
+
+    //dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
+
     // This should be after the world step
     /// stuff
     dVector3 result;
-    
+
     dBodyVectorToWorld(body, 0,0,1,result);
     setForward(result[0],result[1],result[2]);
-    
+
     const dReal *dBodyPosition = dBodyGetPosition(body);
     const dReal *dBodyRotation = dBodyGetRotation(body);
     
+
     setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
 
-Vec3f Manta::getlinearvelocity(dBodyID body)
-{
-    dReal *v = (dReal *)dBodyGetLinearVel(body);
 
-    Vec3f V;
-    V[0]=v[0];V[1]=v[1];V[2]=v[2];
-
-    dVector3 velResult;
-    dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
-
-    Vec3f VV;
-    VV[0]=velResult[0];VV[1]=velResult[1];VV[2]=velResult[2];
-
-    //VV = (VV)/ VV.magnitude();
-
-    V[0]=VV[0];V[1]=VV[1];V[2]=VV[2];
-
-    return V;
-}
-
-
-float Manta::getlinearforce(dBodyID body)
-    {
-    Vec3f V;
-    V = getlinearvelocity(body);
-
-    Vec3f F;
-    F[0]=0;F[1]=0;F[2]=1;
-
-    Vec3f vForward;
-    vForward = dBodyVectorToWorldVec3f(body,0,0,1,vForward);
-
-    speed = V.magnitude();
-
-    float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
-
-    if (V[2]!=0 && speed != 0)
-    {
-        alpha = -atan( V[1] / V[2] );//atan( VV[1] / VV[2]);
-        beta = asin( V[0] / speed );//atan( VV[0] / VV[2]);
-    }
-
-    if (speed == 0) speed = 1;
-    ih = (-yRotAngle)/speed;
-
-    aileron = (xRotAngle)/speed;
-
-    rudder = Manta::rudder;//modAngleP;
-
-    elevator = -Manta::elevator;//modAngleZ;
-
-    return alpha;
-}
-
-
-
-
-
-
-//void Manta::doDynamics(dBodyID body)
-//{
-//	dReal *v = (dReal *)dBodyGetLinearVel(body);
-
-//	Vec3f V;
-//	V[0]=v[0];V[1]=v[1];V[2]=v[2];
-
-//	dVector3 velResult;
-//	dBodyVectorFromWorld (body, V[0], V[1], V[2], velResult);
-
-//	Vec3f VV;
-//	VV[0]=velResult[0];VV[1]=velResult[1];VV[2]=velResult[2];
-
-//	//VV = (VV)/ VV.magnitude();
-
-//	V[0]=VV[0];V[1]=VV[1];V[2]=VV[2];
-
-//	Vec3f F;
-//	F[0]=0;F[1]=0;F[2]=1;
-
-//    Vec3f vForward;
-//    vForward = dBodyVectorToWorldVec3f(body,0,0,1,vForward);
-
-//	speed = V.magnitude();
-
-//	float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
-//	float alpha=0, beta=0;
-
-//	if (speed == 0 ) return;
-
-//	if (V[2]!=0 && speed != 0)
-//	{
-//		alpha = -atan( V[1] / V[2] );//atan( VV[1] / VV[2]);
-//		beta = asin( V[0] / speed );//atan( VV[0] / VV[2]);
-//	}
-
-//	if (speed == 0) speed = 1;
-//	ih = (-yRotAngle)/speed;
-
-//	aileron = (xRotAngle)/speed;
-
-//	rudder = Manta::rudder;//modAngleP;
-
-//	elevator = -Manta::elevator;//modAngleZ;
-
-
-//	float Cd, CL, Cm, Cl, Cy, Cn;
-
-//	float density = 0.1f;
-
-//    float Sl = 0.9;
-//	float b = 0.01;
-
-
-
-//	if (speed == 0)
-//	{
-//		Cd = CL = 0;
-
-//	}
-//	else
-//	{
-//		// Drag
-//		Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-//		// Lift
-//		CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-//	}
-
-//	// Yaw
-//	Cy = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
-
-//	Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-//	Cl = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
-
-//	Cn = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
-
-
-//	//printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
-
-//	float q = density * speed * speed / 2.0f;
-//	float La;
-//	Vec3f Fa;
-//	float Ma;
-//	float Na;
-
-//	float Lt;
-//	float Mt;
-//	float Nt;
-
-//	Vec3f Ft;
-
-//	Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
-
-//	Lt=Mt=Nt=0;
-
-//    float D = Cd * q * Sl;
-//    float L = CL * q * Sl;
-
-
-//	Fa[0] = (+ (-D));
-
-//    Fa[1] = (+ (Cy * q * Sl))*1;
-
-//	Fa[2] = (+ (-L));
-
-
-//	// y
-//    Ma =  Cm * q * Sl;
-
-//	// x
-//    La =  -(Cl * q * Sl * b)*1;
-
-//	// z
-//    Na =  (Cn * q * Sl * b)*1;
-
-
-//	Vec3f rtWind;
-//	rtWind[0] = La;
-//	rtWind[1] = Ma;
-//	rtWind[2] = Na;
-
-//	Vec3f rtPlane = windToBody(rtWind[0],rtWind[1],rtWind[2], alpha, beta);
-
-
-//	Vec3f fPlane = Fa.rotateOnY(alpha).rotateOnZ(beta).rotateOnZ(-PI/2.0f).rotateOnX(-PI/2.0f);
-
-//	Manta::S[0]=Ft[0]+fPlane[0];Manta::S[1]=Ft[1]+fPlane[1];Manta::S[2]=Ft[2]+fPlane[2];
-
-//	Manta::V[0]=V[0];Manta::V[1]=V[1];Manta::V[2]=V[2];
-
-//	//printf ("%10.8f/%10.8f/F=(%10.8f,%10.8f,%10.8f)\n", alpha, beta, fPlane[0],fPlane[1],fPlane[2]);
-
-//	// Angular dumping...
-//	dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
-
-//	dBodyAddRelForce(body,fPlane[0],fPlane[1],fPlane[2]);
-
-//	dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
-
-//    dBodyAddRelTorque(body, rtWind[1], rtWind[0], rtWind[2]);
-    
-//    //dBodyAddTorque(body, 0, -xRotAngle*0.01, 0);
-    
-//    dBodyAddTorque(body,0,-Manta::addd,0);
-//    dBodyAddRelTorque(body,0,0,Manta::addd);
-    
-//    //airspeddrarestoration();
-
-
-//	//dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
-
-//	// This should be after the world step
-//	/// stuff
-//    dVector3 result;
-
-//    dBodyVectorToWorld(body, 0,0,1,result);
-//    setForward(result[0],result[1],result[2]);
-
-//	const dReal *dBodyPosition = dBodyGetPosition(body);
-//	const dReal *dBodyRotation = dBodyGetRotation(body);
-    
-
-//	setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
-//	setLocation((float *)dBodyPosition, (float *)dBodyRotation);
-//}
-
-
+/**
 void Manta::doDynamics(dBodyID body)
 {
     
@@ -539,12 +416,13 @@ void Manta::doDynamics(dBodyID body)
     setVector((float *)&(Manta::V),linearVelInBody);
 
 
+    // Airrestoration.
     Vec3f linearVel = dBodyGetLinearVelVec(body);
     Vec3f fw = getForward();
 
     Vec3f restoration = fw.cross(linearVelInBody);
 
-    dBodyAddTorque(body, restoration[0]*0.001,restoration[1]*0.001,restoration[2]*0.001);
+    dBodyAddTorque(body, restoration[0]*0.01,restoration[1]*0.01,restoration[2]*0.01);
 
 
 
@@ -599,12 +477,12 @@ void Manta::doDynamics(dBodyID body)
     setForward(result[0],result[1],result[2]);
     
     const dReal *dBodyPosition = dBodyGetPosition(body);
-    const dReal *dBodyRotation = dBodyGetRotation(body);   
+    const dReal *dBodyRotation = dBodyGetRotation(body);
     
     setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
-
+**/
 
 
 
@@ -799,8 +677,6 @@ void Manta::airspeddrarestoration()
 
 	Vec3f F;
 	F[0] = dv3F[0];F[1] = dv3F[1]; F[2] = dv3F[2];
-
-
 
 
 	Vec3f R = (F.cross(V)/(V.magnitude()))*0.02 ;

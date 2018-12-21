@@ -130,8 +130,8 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '-':Camera.dx-=0.1;break;
         case 32 :Camera.dx=0.00001; controller.thrust = 0;break;
         case '^':pp = !(pp);break;
-        case 'a':controller.roll-=1.0f;break;
-        case 'd':controller.roll+=1.0f;break;
+        case 'a':case 'k':controller.roll-=1.0f;break;
+        case 'd':case 'l':controller.roll+=1.0f;break;
         case 'w':controller.pitch-=1.0f;break;
         case 's':controller.pitch+=1.0f;break;
         case 'z':controller.yaw-=1.0f;break;

@@ -35,10 +35,6 @@ public:
     void doDynamics();
     void doControl(Controller controller);
     
-    void oldDynamics(dBodyID body);
-    Vec3f  getlinearvelocity(dBodyID body);
-    float getlinearforce(dBodyID body);
-    
     void airspeddrarestoration();
     
     void embody(dWorldID world, dSpaceID space);
