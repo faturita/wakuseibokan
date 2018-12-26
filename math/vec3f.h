@@ -57,6 +57,8 @@ class Vec3f {
 		Vec3f rotateOnX(float alpha);
 		Vec3f rotateOnY(float alpha);
 		Vec3f rotateOnZ(float alpha);
+
+        Vec3f rotateOn(Vec3f u, float alpha);
 };
 
 Vec3f operator*(float scale, const Vec3f &v);

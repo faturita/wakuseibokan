@@ -167,6 +167,51 @@ Vec3f Vec3f::rotateOnZ(float alpha)
 
     return vec3f;
 }
+Vec3f Vec3f::rotateOn(Vec3f u, float alpha)
+{
+    float c[3];
+
+    float R[3][3];
+
+    float ca = cos(alpha);
+    float sa = sin(alpha);
+
+    u = u.normalize();
+
+    float ux = u[0];
+    float uy = u[1];
+    float uz = u[2];
+
+    // x y z
+    R[0][0] = ca + ux*ux*(1 - ca);
+    R[0][1] = ux*uy*(1-ca) - uz * sa;
+    R[0][2] = ux*ux*(1-ca)+uy*sa;
+
+    R[1][0] = uy*ux*(1-ca)+uz*sa;
+    R[1][1] = ca+uy*uy*(1-ca);
+    R[1][2] = uy*uz*(1-ca)-ux*sa;
+
+    R[2][0] = uz*ux*(1-ca)-uy*sa;
+    R[2][1] = uz*uy*(1-ca)+ux*sa;
+    R[2][2] = ca+uz*uz+(1-ca);
+
+
+    for (int i=0;i<3;i++)
+    {
+         c[i]=0;
+    }
+
+    for (int i=0;i<3;i++)
+    {
+        for (int j=0;j<3;j++)
+        {
+            c[i]+=(v[j]*R[i][j]);
+        }
+    }
+
+    Vec3f vec3f(c[0],c[1],c[2]);
+    return vec3f;
+}
 
 
 

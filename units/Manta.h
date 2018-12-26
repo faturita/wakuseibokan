@@ -18,6 +18,10 @@ class Manta : public Vehicle
 public:
 	float rudder;
 	float elevator;
+    float aileron;
+    float flaps;
+    float spoiler;
+    float ih;
 
     float alpha;
     float beta;
@@ -32,6 +36,7 @@ public:
 	void virtual drawModel();
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
+    void wrapDynamics(dBodyID body);
     void doDynamics();
     void doControl(Controller controller);
     

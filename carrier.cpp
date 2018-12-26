@@ -202,7 +202,7 @@ void drawScene() {
         //Camera.getViewPort(up2,pos2,forward);
 
         if (vehicles[ctrling]->getType() == 3)
-            Camera.yAngle = ((Manta*)vehicles[ctrling])->alpha*10;
+            Camera.yAngle = ((Manta*)vehicles[ctrling])->alpha*100;
     } else
     {
         Camera.getViewPort(up,pos,forward);

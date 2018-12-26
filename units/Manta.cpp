@@ -51,7 +51,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        _model->draw();
+        //_model->draw();
         glPopMatrix();
     }
     else
@@ -74,10 +74,10 @@ void Manta::doControl(Controller controller)
     // roll
     if (controller.roll>4) controller.roll = 4;
     if (controller.roll<-4) controller.roll = -4;
-    xRotAngle = controller.roll;
+    Manta::aileron = controller.roll;
     
     // pitch
-    yRotAngle = controller.pitch*0.1;
+    Manta::elevator = controller.pitch*0.1;
     
     //Manta::rudder = controller.precesion*0.1;
     
@@ -248,6 +248,22 @@ void Manta::doDynamics()
 }
 
 
+void Manta::wrapDynamics(dBodyID body)
+{
+    dVector3 result;
+
+    dBodyVectorToWorld(body, 0,0,1,result);
+    setForward(result[0],result[1],result[2]);
+
+    const dReal *dBodyPosition = dBodyGetPosition(body);
+    const dReal *dBodyRotation = dBodyGetRotation(body);
+
+
+    setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+    setLocation((float *)dBodyPosition, (float *)dBodyRotation);
+}
+
+
 void Manta::doDynamics(dBodyID body)
 {
 
@@ -265,31 +281,25 @@ void Manta::doDynamics(dBodyID body)
     // Get speed, alpha and beta.
     speed = linearVel.magnitude();
 
-    float elevator=0, rudder=0, ih=0, flaps=0, spoiler=0,aileron=0;
+    // Wind Frame angles.
     Manta::alpha = Manta::beta = 0;
 
 
     if (linearVel[2]!=0 && speed != 0)
     {
-        alpha = -atan( linearVel[1] / linearVel[2] );//atan( VV[1] / VV[2]);
+        alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
         beta = asin( linearVel[0] / speed );//atan( VV[0] / VV[2]);
+        beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
     }
 
-    if (speed == 0) speed = 1;
-
-    // Set aileron rudder and elevator.
-    ih = (-yRotAngle)/speed;
-    aileron = (xRotAngle)/speed;
-    rudder = -Manta::rudder;//modAngleP;
-    elevator = -yRotAngle;//modAngleZ;
-
+    if (speed == 0) speed = 1;    
 
     // Airflow parameters.
     float density = 0.1f;   // Air density
     float Sl = 0.9;   // Wing surface [m2]
     float b = 0.01;   // Wing span [m]
 
-    // Airplane coefficients
+    // Airplane control coefficients
     float Cd, CL, Cm, Cl, Cy, Cn;
 
 
@@ -316,14 +326,15 @@ void Manta::doDynamics(dBodyID body)
 
     Cn = 0.0000f + 0.5f * beta + 0.8 * aileron + 0.07 * rudder;
 
-
     //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
 
     float q = density * speed * speed / 2.0f;
+
     float La;
-    Vec3f Fa;
     float Ma;
     float Na;
+
+    Vec3f Fa;
 
     float Lt;
     float Mt;
@@ -338,11 +349,51 @@ void Manta::doDynamics(dBodyID body)
     float D = Cd * q * Sl;
     float L = CL * q * Sl;
 
+    // Drag
+    Fa[2] = 0;(+ (+D));
 
+    // Lateral Force
+    Fa[0] = (+ (Cy * q * Sl))*0;
+
+    // Lift
+    Fa[1] = (+ (+L));
+
+    //dBodyAddForce(me,0,9.81f,0);
+    //dBodyAddRelForce(me,0,0,getThrottle());
+    //dBodyAddRelTorque(body, -Manta::elevator, -Manta::rudder, Manta::aileron);
+
+
+    Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
+    //Vec3f forcesOnBody = Fa.rotateOnY(beta).rotateOnZ(beta).rotateOnZ(-PI/2.0f).rotateOnX(-PI/2.0f);
+
+    dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+    dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+
+    printf ("%5.2f/%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", alpha, beta, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+
+    wrapDynamics(body);
+    if (1==1) return;
+
+    // Set aileron rudder and elevator.
+    ih = (-yRotAngle)/speed;
+    aileron = (xRotAngle)/speed;
+    rudder = -Manta::rudder;//modAngleP;
+    //elevator = -yRotAngle;//modAngleZ;
+
+
+
+
+
+
+
+
+    // Drag
     Fa[0] = (+ (-D));
 
-    Fa[1] = (+ (Cy * q * Sl))*1;
+    // Lateral Force
+    Fa[1] = (+ (Cy * q * Sl))*0;
 
+    // Lift
     Fa[2] = (+ (-L));
 
 
