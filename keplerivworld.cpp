@@ -211,7 +211,7 @@ void initWorldPopulation()
     // Add vehicles
     Manta *_manta1 = new Manta();
     _manta1->init();
-    _manta1->setPos(+130.0f, 30.0f, -1010.0f);
+    _manta1->setPos(+130.0f, 1.0f, -1010.0f);
     
     _manta1->embody(world, space);
     
