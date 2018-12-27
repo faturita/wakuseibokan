@@ -350,7 +350,7 @@ void Manta::doDynamics(dBodyID body)
     float L = CL * q * Sl;
 
     // Drag
-    Fa[2] = 0;(+ (+D));
+    Fa[2] = (+ (-D));
 
     // Lateral Force
     Fa[0] = (+ (Cy * q * Sl))*0;
@@ -363,6 +363,7 @@ void Manta::doDynamics(dBodyID body)
     //dBodyAddRelTorque(body, -Manta::elevator, -Manta::rudder, Manta::aileron);
 
 
+    // Check alpha and beta limits before calculating the forces.
     Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
     //Vec3f forcesOnBody = Fa.rotateOnY(beta).rotateOnZ(beta).rotateOnZ(-PI/2.0f).rotateOnX(-PI/2.0f);
 
