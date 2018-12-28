@@ -82,26 +82,31 @@ echo "Installation complete."
 * ./configure
 * make clean && make && sudo make install
 
+Next steps
+----------
+* Adding Structures.
+* Improving viewport for Camera.
+
 
 Issues and missing stuff
 ------------------------
-
 * Floor is working great.
-** However, the floor is squared so when you fly high you see that the horizon changes weirdly.  Need improvement.
-** Sea is good.  
-** Sky must be improved.
+    * However, the floor is squared so when you fly high you see that the horizon changes weirdly.  Need improvement.
+    * Sea is good.  
+    * Sky must be improved.
 * Island generation works very good.
-** The engine is calculating the islands perfectly.
-** Islands are BMP heightmaps 60x60.  These values are hardcoded to 600x600 in the model.
-** Max height (255) is 60. Hardcoded.
-** Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement.
+    * The engine is calculating the islands perfectly.
+    * Islands are BMP heightmaps 60x60.  These values are hardcoded to 600x600 in the model.
+    * Max height (255) is 60. Hardcoded.
+    * Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement.
 * Collision detection has been improved.
-** Island heights works PERFECT for Walrus.  It is amazing how well they work.
-** There is some problem when you fly above the island, and a collision is fired when it should not.
+    * Island heights works PERFECT for Walrus.  It is amazing how well they work.
 * 3DS Engine has been incorporated so I can now use 3DS models!!!!
-* Walrus mechanics works but can be improved, and the texture of the Walrus was fixed.
-** Walrus control, although it works, can be improved also.
+* Walrus mechanics works but can be improved, and the texture of the Walrus is broken again.
+    * Walrus control, although it works, can be improved also.
 * OpenAL is not working very well on Mac Sierra and it is hard to find good samples.
-** I am using TEMPORARILY system calls and afplay.
-* Manta mechanics (based on Microsoft Flight Simulator) works barely.  It is impossible to control.
+    * I am using TEMPORARILY system calls and afplay.
+* Manta
+    * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
+    * I implemented a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.
