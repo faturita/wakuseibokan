@@ -1,5 +1,6 @@
 #include "SimplifiedManta.h"
 
+
 void SimplifiedManta::doControl(Controller controller)
 {
     //engine[0] = -controller.roll;
@@ -27,34 +28,28 @@ void SimplifiedManta::doControl(Controller controller)
     }
 }
 
+
 void SimplifiedManta::doDynamics(dBodyID body)
 {
-
-    dQuaternion quat,qroll,qpitch,qyaw;
-
     dMatrix3 R,R2;
     dRSetIdentity(R);
     dRFromEulerAngles (R, Manta::elevator*0.005,0,
                       -Manta::aileron*0.01);
 
-
-    //dRFromAxisAndAngle(R,0,0,1,Manta::aileron*0.05);
-
     angularPos[0] -= (Manta::rudder*0.01);
     angularPos[0] -= (Manta::aileron*0.001);
 
-    dQuaternion q,q1,q2,q3;
-    dQfromR(q,R);
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
     dRFromAxisAndAngle(R2,0,1,0,angularPos[0]);
 
     dQfromR(q2,R2);
 
-    dQMultiply0(q3,q2,q);
+    dQMultiply0(q3,q2,q1);
 
 
     dBodySetQuaternion(body,q3);
     //dBodySetRotation(body,R);
-
 
 
     speed += getThrottle() / 100.0f;

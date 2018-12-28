@@ -20,7 +20,7 @@
 #include "units/BoxVehicle.h"
 #include "units/Walrus.h"
 #include "units/Manta.h"
-#include "units/SimplifiedManta.h"
+#include "units/SimplifiedDynamicManta.h"
 #include "units/Buggy.h"
 #include "units/MultiBodyVehicle.h"
 
@@ -83,7 +83,14 @@ std::vector<BoxIsland*> islands;
                 explosion();
                 
             }
+
+            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>100)
+            {
+                printf("Sorry your plane has crashed. You're dead.\n");
+                exit(2);
+            }
         }
+
     }
     
     
@@ -210,7 +217,7 @@ void initWorldPopulation()
     
     
     // Add vehicles
-    SimplifiedManta *_manta1 = new SimplifiedManta();
+    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
     _manta1->init();
     _manta1->setPos(+130.0f, 10.0f, -1010.0f);
     
@@ -349,6 +356,16 @@ void initWorldModelling()
     nonsquareisland->setLocation(6000.0f,-0.3,-1000.0);
     nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
     
+
+    BoxIsland *atom = new BoxIsland();
+    atom->setLocation(1500.0f,-0.3,+10000.0);
+    atom->buildTerrainModel(space,"terrain/atom.bmp"); //,1000,10);
+
+
+    BoxIsland *baltandmore = new BoxIsland();
+    baltandmore->setLocation(-1600.0f,0.3,+20000.0);
+    baltandmore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
+
     islands.push_back(baltimore);
     islands.push_back(runway);
     islands.push_back(nemesis);
@@ -358,6 +375,8 @@ void initWorldModelling()
     islands.push_back(heightmap);
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
+    islands.push_back(atom);
+    islands.push_back(baltandmore);
     
     initWorldPopulation();
     

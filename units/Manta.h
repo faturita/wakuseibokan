@@ -13,9 +13,11 @@
 
 class Manta : public Vehicle
 {
-    dGeomID geom;
+
     
 public:
+    dGeomID geom;
+
 	float rudder;
 	float elevator;
     float aileron;

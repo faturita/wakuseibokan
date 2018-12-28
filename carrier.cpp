@@ -267,11 +267,18 @@ void drawScene() {
     
     
     // EXPERIMENTALLY: Draw 3DS models
-    obj_type object;
-    CThreeMaxLoader::Load3DS(&object,"structures/watertower.3ds");
-    CThreeMaxLoader::draw3DSModel(object,650.0,15.0,600.0,1);
+    //obj_type object;
+    //Load3DS(&object,"structures/watertower.3ds");
+    //draw3DSModel(object,650.0,15.0,600.0,1);
 
-    
+    draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1);
+
+    //Load3DS(&object,"structures/watertower.3ds");
+    draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1);
+
+    draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1);
+
+
     
     // Draw vehicles and objects
     for (int i=0; i<vehicles.size(); i++) {

@@ -45,6 +45,8 @@ units/Manta.cpp
 units/Manta.h
 units/MultiBodyVehicle.cpp
 units/MultiBodyVehicle.h
+units/SimplifiedDynamicManta.cpp
+units/SimplifiedDynamicManta.h
 units/SimplifiedManta.cpp
 units/SimplifiedManta.h
 units/Vehicle.cpp
