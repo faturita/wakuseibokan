@@ -23,6 +23,7 @@ public:
     float spoiler;
     float ih;
 
+    float param[10];
     float alpha;
     float beta;
 

@@ -45,6 +45,8 @@ units/Manta.cpp
 units/Manta.h
 units/MultiBodyVehicle.cpp
 units/MultiBodyVehicle.h
+units/SimplifiedManta.cpp
+units/SimplifiedManta.h
 units/Vehicle.cpp
 units/Vehicle.h
 units/Walrus.cpp

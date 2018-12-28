@@ -28,6 +28,9 @@ public:
     
 	// ModAngleP
 	float precesion;
+
+    // Custom parameters that can be entered from controller.
+    float param[10];
     
 	bool pause=false;
     

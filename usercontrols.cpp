@@ -156,6 +156,13 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.reset();
         	//spd = vehicles.getThrottle();
         break;
+        case 'i':
+            {
+            int param = 0;
+            std::cout << "Param:" << std::endl; std::cin >> param;
+            std::cout << "Value:" << std::endl; std::cin >> controller.param[param] ;
+            }
+        break;
         case '!':Camera.control = 1;break;
         case '"':Camera.control = 2;break;
         case '~':Camera.control = 0;break;

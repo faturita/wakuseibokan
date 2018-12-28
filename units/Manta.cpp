@@ -60,6 +60,12 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+float restrict(float value, float restriction)
+{
+    if (value>restriction) return restriction;
+    if (value<-restriction) return -restriction;
+    return value;
+}
 
 void Manta::doControl(Controller controller)
 {
@@ -83,6 +89,11 @@ void Manta::doControl(Controller controller)
     
     Manta::rudder = controller.precesion*0.1;
     
+    for(int i=0;i<10;i++)
+    {
+        if (controller.param[i]!=0)
+            Manta::param[i] = controller.param[i];
+    }
 }
 
 void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
@@ -139,7 +150,7 @@ void Manta::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 1.0f;
+    float myMass = 10.0f;
     float radius = 2.64f;
     float length = 7.0f;
 
@@ -151,6 +162,8 @@ void Manta::embody(dBodyID myBodySelf)
 
     me = myBodySelf;
 
+    Manta::param[0] = 0.9;
+    Manta::param[1] = 2;
 }
 
 
@@ -355,7 +368,7 @@ void Manta::doDynamics(dBodyID body)
     Fa[2] = 0;
 
     // Lateral Force on Structure
-    Fa[0] = (+ (Cy * q * Sl))*0;
+    Fa[0] = (- (Cy * q * Sl))*0;
 
     // Lift on Structure
     Fa[1] = (+ (+L));
@@ -365,7 +378,7 @@ void Manta::doDynamics(dBodyID body)
     //dBodyAddRelTorque(body, -Manta::elevator, -Manta::rudder, Manta::aileron);
 
     // y Rolling rotation
-    Ma = -( Cm * q * Sl )*1;
+    Ma = +( Cm * q * Sl )*1;
 
     // x Around lift
     La =  -(Cl * q * Sl * b)*1;
@@ -380,7 +393,7 @@ void Manta::doDynamics(dBodyID body)
 
 
     // Check alpha and beta limits before calculating the forces.
-    Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
+    Vec3f forcesOnBody = Fa;Fa.rotateOnX(alpha).rotateOnY(beta);
 
     dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
     dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
@@ -388,22 +401,21 @@ void Manta::doDynamics(dBodyID body)
 
     // Adding drag which is OPPOSED to linear movment
     Vec3f dragging = linearVel.normalize();
-    dragging = linearVel*(-(abs(D*0.1)));
+    dragging = linearVel*(-(abs(D*0.01)));
 
     dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
+
 
     // Airrestoration.
     Vec3f fw = getForward();
 
     Vec3f restoration = fw.cross(linearVel);
-    dBodyAddTorque(body, restoration[0]*0.001,restoration[1]*0.001,restoration[2]*0.001);
-
-
+    dBodyAddTorque(body, restoration[0]*Manta::param[1],restoration[1]*Manta::param[1],restoration[2]*Manta::param[1]);
 
     Vec3f torquesOnBody=rtWind.rotateOnX(alpha).rotateOnY(beta);
-    dBodyAddRelTorque(body, torquesOnBody[0], torquesOnBody[1], torquesOnBody[2]*0.9);
+    dBodyAddRelTorque(body, torquesOnBody[0], torquesOnBody[1], torquesOnBody[2]*Manta::param[0]);
 
-    printf ("%5.2f/%2.4f/%2.4f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f),M=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2],torquesOnBody[0],torquesOnBody[1],torquesOnBody[2]);
+    printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f),M=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2],torquesOnBody[0],torquesOnBody[1],torquesOnBody[2]);
 
     wrapDynamics(body);
 }

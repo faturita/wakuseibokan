@@ -20,6 +20,7 @@
 #include "units/BoxVehicle.h"
 #include "units/Walrus.h"
 #include "units/Manta.h"
+#include "units/SimplifiedManta.h"
 #include "units/Buggy.h"
 #include "units/MultiBodyVehicle.h"
 
@@ -209,9 +210,9 @@ void initWorldPopulation()
     
     
     // Add vehicles
-    Manta *_manta1 = new Manta();
+    SimplifiedManta *_manta1 = new SimplifiedManta();
     _manta1->init();
-    _manta1->setPos(+130.0f, 1.0f, -1010.0f);
+    _manta1->setPos(+130.0f, 10.0f, -1010.0f);
     
     _manta1->embody(world, space);
     
