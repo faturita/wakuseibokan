@@ -23,6 +23,7 @@
 #include "units/SimplifiedDynamicManta.h"
 #include "units/Buggy.h"
 #include "units/MultiBodyVehicle.h"
+#include "units/Balaenidae.h"
 
 #include "terrain/Terrain.h"
 
@@ -58,7 +59,7 @@ std::vector<BoxIsland*> islands;
     int g2 = (o2 == ground );
     if (!(g1 ^ g2))
     {
-        //printf ("Ground colliding..\n");
+        printf ("Ground colliding..\n");
         
         
         //return;
@@ -247,8 +248,13 @@ void initWorldPopulation()
 
     MultiBodyVehicle *_mb = new MultiBodyVehicle();
     _mb->init();
-    _mb->setPos(1600.0f,5.0f,10.0f);
+    _mb->setPos(100.0f,5.0f,+2000.0f);
     _mb->embody(world,space);
+
+    Balaenidae *_b = new Balaenidae();
+    _b->init();
+    _b->setPos(0.0f,5.0,+2000.0f);
+    _b->embody(world,space);
     
 
     //vehicles.push_back(_boxVehicle1);
@@ -256,8 +262,9 @@ void initWorldPopulation()
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
-    //vehicles.push_back(_mb);
+    vehicles.push_back(_mb);
     //vehicles.push_back(_buggy);
+    vehicles.push_back(_b);
     
     
 }

@@ -205,7 +205,7 @@ char Load3DS (obj_type_ptr p_object, char *p_filename)
 }
 
 
-int draw3DSModel(char *p_filename,float x, float y, float z, float scale)
+int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _textureMetal)
 {
     obj_type object;
     obj_type *p_object;
@@ -357,7 +357,7 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale)
 
 
     glEnable(GL_TEXTURE_2D);
-    //glBindTexture(GL_TEXTURE_2D, _textureId);
+    glBindTexture(GL_TEXTURE_2D, _textureMetal);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -366,6 +366,16 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale)
 
     for (l_index=0;l_index<object.polygons_qty;l_index++)
     {
+
+        //glColor3f((float)(l_index/2)/object.polygons_qty,(float)(l_index/2)/object.polygons_qty,(float)(l_index/2)/object.polygons_qty);
+
+        if (l_index % 3 == 0)
+            glColor3f(0.3f,0.3f,0.3f);
+        else if (l_index % 3 == 1)
+            glColor3f(0.5f,0.5f,0.5f);
+        else
+            glColor3f(0.2f,0.2f,0.2f);
+
         //----------------- FIRST VERTEX -----------------
         // Coordinates of the first vertex
         glTexCoord2f(0.0f,0.0f);
@@ -377,6 +387,7 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale)
         // Coordinates of the second vertex
         //float x= object.vertex[ object.polygon[l_index].b ].x;
         glTexCoord2f(1.0f,0.0f);
+
         glVertex3f( object.vertex[ object.polygon[l_index].b ].x,
                    object.vertex[ object.polygon[l_index].b ].y,
                    object.vertex[ object.polygon[l_index].b ].z);

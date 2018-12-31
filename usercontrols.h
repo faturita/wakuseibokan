@@ -2,6 +2,8 @@
 #define USERCONTROLS_H
 
 #include <assert.h>
+#include <string>
+#include <iostream>
 
 
 class Controller
@@ -37,11 +39,15 @@ public:
 	bool pp;
     
     bool finish=false;
+
+    bool teletype=false;
+
+    std::string str;
     
     void reset()
     {
         roll=pitch=precesion=yaw=0;
-        //thrust=0;
+        thrust=0;
     };
     
     void interrupt()
@@ -52,6 +58,11 @@ public:
     bool isInterrupted()
     {
         return finish;
+    };
+
+    bool isTeletype()
+    {
+        return teletype;
     };
 };
 

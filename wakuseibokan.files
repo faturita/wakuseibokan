@@ -1,3 +1,4 @@
+Balaenidae.h
 FractalNoise.cpp
 FractalNoise.h
 OdeWorld.cpp
@@ -37,6 +38,8 @@ terrain/imageloader.h
 terrain/main.cpp
 terrain/vec3f.cpp
 terrain/vec3f.h
+units/Balaenidae.cpp
+units/Balaenidae.h
 units/BoxVehicle.cpp
 units/BoxVehicle.h
 units/Buggy.cpp

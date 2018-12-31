@@ -249,5 +249,18 @@ dBodyID Vehicle::getBodyID()
     return me;
 }
 
+void Vehicle::wrapDynamics(dBodyID body)
+{
+    dVector3 result;
 
+    dBodyVectorToWorld(body, 0,0,1,result);
+    setForward(result[0],result[1],result[2]);
+
+    const dReal *dBodyPosition = dBodyGetPosition(body);
+    const dReal *dBodyRotation = dBodyGetRotation(body);
+
+
+    setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+    setLocation((float *)dBodyPosition, (float *)dBodyRotation);
+}
 

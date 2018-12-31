@@ -47,8 +47,6 @@ typedef struct {
 
  char Load3DS (obj_type_ptr p_object, char *p_filename);
 
- int draw3DSModel(char *p_filename,float x, float y, float z, float scale);
-
-
+ int draw3DSModel(char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal);
 
 #endif // !defined(AFX_THREEMAXLOADER_H__A3159AC5_B308_40E0_814C_5B537800FD30__INCLUDED_)

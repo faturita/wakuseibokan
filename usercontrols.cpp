@@ -123,7 +123,18 @@ void processMousePassiveMotion(int x, int y) {
 bool pp=false;
 
 void handleKeypress(unsigned char key, int x, int y) {
-	switch (key) {
+    if (controller.isTeletype())
+    {
+        if (key == 13)
+        {
+            controller.teletype = false;
+            controller.str.clear();
+        } else {
+            controller.str += key;
+        }
+    } else
+
+    switch (key) {
 		case 27: //Escape key
             controller.interrupt();
         case '+':Camera.dx+=0.1;break;
@@ -167,6 +178,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '"':Camera.control = 2;break;
         case '~':Camera.control = 0;break;
         case 'S':gltWriteTGA("file.tga");break;
+        case 't':controller.teletype = true;break;
 	}
 }
 

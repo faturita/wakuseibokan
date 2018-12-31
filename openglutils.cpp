@@ -16,6 +16,7 @@ GLuint _textureSky;
 
 GLuint _textureLand;
 
+GLuint _textureMetal;
 
 void CheckGLError() {
 	GLuint err = glGetError();
@@ -413,7 +414,11 @@ void drawBox(GLuint _textureId, float xx, float yy, float zz)
 void initTextures()
 {
 
-    Image* image = loadBMP("reflection.bmp");
+    Image* image = loadBMP("units/metal.bmp");
+    _textureMetal = loadTexture(image);
+    delete image;
+
+    image = loadBMP("reflection.bmp");
 	_textureIdSea = loadTexture(image);
     delete image;
     

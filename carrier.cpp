@@ -31,7 +31,7 @@
 #import <OpenAL/alc.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-#import "ThreeMaxLoader.h"
+#include "ThreeMaxLoader.h"
 
 
 /**
@@ -96,7 +96,8 @@ extern std::vector<Vehicle*> vehicles;
 extern std::vector<BoxIsland*> islands;
 
 
-
+// @FIXME Change
+extern GLuint _textureBox;
 
 
 void disclaimer()
@@ -133,7 +134,7 @@ void drawHUD()
     
     float fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%5.2f,%5.2f,%5.2f)\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2]);
+    sprintf (str, "fps %4.2f  Cam: (%5.2f\t,%5.2f\t,%5.2f\t)\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2]);
 	// width, height, 0 0 upper left
 	drawString(0,-30,1,str,0.2f);
     
@@ -151,6 +152,12 @@ void drawHUD()
     
 	sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.thrust);
 	drawString(0,-90,1,str,0.2f);
+
+    if (controller.isTeletype())
+    {
+        sprintf(str, ">>>%s",controller.str.c_str());
+        drawString(0,-180,1,str,0.2f);
+    }
     
     
     glMatrixMode(GL_MODELVIEW);
@@ -271,15 +278,13 @@ void drawScene() {
     //Load3DS(&object,"structures/watertower.3ds");
     //draw3DSModel(object,650.0,15.0,600.0,1);
 
-    draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1);
+    draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1,_textureBox);
 
     //Load3DS(&object,"structures/watertower.3ds");
-    draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1);
+    draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1,_textureBox);
 
-    draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1);
+    draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1,_textureBox);
 
-
-    
     // Draw vehicles and objects
     for (int i=0; i<vehicles.size(); i++) {
         (vehicles[i]->drawModel());
