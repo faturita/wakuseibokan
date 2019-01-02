@@ -37,7 +37,8 @@
 #include "Terrain.h"
 
 #define TERRAIN_SIDE_LENGTH 60.0f
-#define TERRAIN_SCALE       10.0f
+#define TERRAIN_MAX_HEIGHT  60.0f
+#define TERRAIN_SCALE       100.0f
 
 
 // The texture is preloaded somewhere else.
@@ -92,7 +93,7 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
 
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
-    _landmass = loadTerrain(model, TERRAIN_SIDE_LENGTH);
+    _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
     
     printf("Landmass width: %d\n", _landmass->width());
     printf("Landmass heigth: %d\n",_landmass->length());
@@ -107,7 +108,7 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
                                       REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
     
     // These boundaries are used to limit how the heightfield affects objects.
-    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +600.0 ) ); // +6000 decia
+    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), TERRAIN_MAX_HEIGHT ); // +6000 decia
     
     dGeomID gheight = dCreateHeightfield( space, heightid, 1 );
     

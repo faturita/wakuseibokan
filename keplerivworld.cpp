@@ -54,6 +54,25 @@ std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
 // this is called by dSpaceCollide when two objects in space are
 // potentially colliding.
 
+void inline groundcollisions(dBodyID body)
+{
+    for (int i=0; i<vehicles.size(); i++)
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == body)
+        {
+            if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
+            {
+                explosion();
+                controller.reset();
+                vehicle->setThrottle(0.0f);
+            }
+        }
+    }
+
+}
+
+
  void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
@@ -73,9 +92,34 @@ std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
         //return;
     }
     
-    b1 = dGeomGetBody(o1);
-    b2 = dGeomGetBody(o2);
-    if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+    if (o1 == ground)
+    {
+        groundcollisions(dGeomGetBody(o2));
+    } else if (o2 == ground) {
+        groundcollisions(dGeomGetBody(o1));
+    } else {
+        b1 = dGeomGetBody(o1);
+        b2 = dGeomGetBody(o2);
+        if (b1 && b2 && dAreConnected (b1,b2)) return;
+    }
+
+
+    for (int j=0;j<islands.size();j++)
+    {
+        if (o1 == islands[j]->getGeom())
+        {
+            groundcollisions(dGeomGetBody(o2));
+        }
+        if (o2 == islands[j]->getGeom())
+        {
+            groundcollisions(dGeomGetBody(o1));
+        }
+
+    }
+
+
+
 
 
 
@@ -359,7 +403,7 @@ void initWorldModelling()
     
     //_boxIsland.buildTerrainModel(space);
     
-    
+    /**
     BoxIsland *baltimore = new BoxIsland();
     baltimore->setLocation(800.0,0.3,800.0);
     baltimore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
@@ -404,13 +448,13 @@ void initWorldModelling()
     BoxIsland *atom = new BoxIsland();
     atom->setLocation(1500.0f,-0.3,+10000.0);
     atom->buildTerrainModel(space,"terrain/atom.bmp"); //,1000,10);
-
+**/
 
     BoxIsland *baltandmore = new BoxIsland();
-    baltandmore->setLocation(-1600.0f,0.3,+20000.0);
-    baltandmore->buildTerrainModel(space,"terrain/baltimore.bmp"); //,1000,10);
+    baltandmore->setLocation(-1600.0f,-0.3,+20000.0);
+    baltandmore->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
 
-    islands.push_back(baltimore);
+    /**islands.push_back(baltimore);
     islands.push_back(runway);
     islands.push_back(nemesis);
     islands.push_back(vulcrum);
@@ -420,6 +464,7 @@ void initWorldModelling()
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     islands.push_back(atom);
+    **/
     islands.push_back(baltandmore);
     
     initWorldPopulation();
