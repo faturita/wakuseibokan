@@ -107,13 +107,20 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
                                       REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
     
     // These boundaries are used to limit how the heightfield affects objects.
-    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6000.0 ) );
+    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +600.0 ) ); // +6000 decia
     
     dGeomID gheight = dCreateHeightfield( space, heightid, 1 );
     
     dGeomSetPosition( gheight, X, Y, Z );
+
+    islandGeom = gheight;
     
     return gheight;
+}
+
+dGeomID BoxIsland::getGeom()
+{
+    return islandGeom;
 }
 
 void BoxIsland::setLocation(float x, float y, float z)

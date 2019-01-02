@@ -12,4 +12,6 @@
 
 void drawString(float x, float y , float xz, char *string, GLfloat stroke_scale);
 
+void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_scale, GLfloat r, GLfloat g, GLfloat b);
+
 #endif /* DRAWFONTS_H_ */

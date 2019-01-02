@@ -58,6 +58,7 @@ public:
 
 	void virtual setThrottle(float thorttle);
 	float virtual getThrottle();
+    void virtual upThrottle(float throttle);
 
 	void virtual doDynamics(dBodyID);
     void virtual doDynamics();

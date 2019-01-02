@@ -183,6 +183,8 @@ private:
     dReal heightfield_callback( void* pUserData, int x, int z );
     
     float X,Y,Z;
+
+    dGeomID islandGeom;
     
 public:
     
@@ -191,6 +193,8 @@ public:
     //void draw(float x, float y, float z, float side, float height);
     void draw();
     void setLocation(float x, float y, float z);
+
+    dGeomID getGeom();
 };
 
 

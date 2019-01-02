@@ -26,40 +26,11 @@
 
 #include <vector>
 
-
-#import <OpenAL/al.h>
-#import <OpenAL/alc.h>
-#import <AudioToolbox/AudioToolbox.h>
-
 #include "ThreeMaxLoader.h"
-
-
-/**
-#include "FractalNoise.h"
-#include "terrain/imageloader.h"
-#include "md2model.h"
-#include "terrain/Terrain.h"
-
-
-#include "math/yamathutil.h"
-
-
-
-
-#include "odeutils.h"
-#include "units/Manta.h"
-#include "units/Walrus.h"
-
-
-
-#include "carrier.h"
-**/
 
 #include "font/DrawFonts.h"
 
 #include "math/yamathutil.h"
-
-
 
 #include "usercontrols.h"
 #include "camera.h"
@@ -94,6 +65,8 @@ extern std::vector<Vehicle*> vehicles;
 //extern BoxIsland _boxIsland;
 
 extern std::vector<BoxIsland*> islands;
+
+extern std::vector<std::string> messages;
 
 
 // @FIXME Change
@@ -158,6 +131,22 @@ void drawHUD()
         sprintf(str, ">>>%s",controller.str.c_str());
         drawString(0,-180,1,str,0.2f);
     }
+
+    // Message board
+    if (messages.size()>0)
+    {
+        for(int i=0;i<messages.size();i++)
+        {
+            std::string line = messages[i];
+            if (i==0)
+                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
+            else
+                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f);
+        }
+
+    }
+
+
     
     
     glMatrixMode(GL_MODELVIEW);

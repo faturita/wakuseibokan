@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <vector>
+#include <iostream>
+
 #include "math/yamathutil.h"
 
 #include "camera.h"
@@ -23,6 +26,7 @@ Controller controller;
 // control = 1  Manta
 // control = 2 Walrus
 
+extern std::vector<std::string> messages;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -127,8 +131,15 @@ void handleKeypress(unsigned char key, int x, int y) {
     {
         if (key == 13)
         {
+            // Send message to message board
+            messages.insert(messages.begin(),controller.str);
+
+            if (messages.size()>5)
+                messages.pop_back();
+
             controller.teletype = false;
             controller.str.clear();
+
         } else {
             controller.str += key;
         }

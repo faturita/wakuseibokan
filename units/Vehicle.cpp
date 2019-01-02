@@ -204,7 +204,12 @@ void Vehicle::drawModel()
 
 void Vehicle::setThrottle(float throttle)
 {
-	Vehicle::throttle = throttle;
+    Vehicle::throttle = throttle;
+}
+
+void Vehicle::upThrottle(float throttle)
+{
+    Vehicle::throttle += throttle;
 }
 
 float Vehicle::getThrottle()

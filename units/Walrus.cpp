@@ -182,8 +182,8 @@ void Walrus::doDynamics(dBodyID body)
 
 	dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
 
-    if ((speed)>1.0 && speed < 1.3)
-        enginestart();
+    //if ((speed)>1.0 && speed < 1.3)
+        //enginestart();
 
 	// Walrus
 	dBodyAddRelForce (body,0, 0,getThrottle());

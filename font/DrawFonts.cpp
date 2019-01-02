@@ -189,7 +189,7 @@ draw_stuff()
 }**/
 
 
-void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_scale)
+void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_scale, GLfloat r, GLfloat g, GLfloat b)
 {
 	/**
 	void* bitmap_fonts[7] = {
@@ -230,11 +230,19 @@ void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_sc
 	glPushMatrix(); {
 		glTranslatef(x, y, z);
 
+        glColor3f(r,g,b);
 		glScalef(stroke_scale, stroke_scale, stroke_scale);
 		print_stroke_string(
 		  stroke_fonts[0], string);
+        glColor3f(1.0f,1.0f,1.0f);
 	} glPopMatrix();
 
+}
+
+
+void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_scale)
+{
+    drawString(x,y,z,string,stroke_scale,1.0f,1.0f,1.0f);
 }
 
 

@@ -11,6 +11,7 @@
 #define dSINGLE
 
 #include <vector>
+#include <unordered_map>
 
 #include "odeutils.h"
 
@@ -44,6 +45,11 @@ std::vector<Vehicle*> vehicles;
 std::vector<BoxIsland*> islands;
 
 
+std::vector<std::string> messages;
+
+
+std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
+
 
 // this is called by dSpaceCollide when two objects in space are
 // potentially colliding.
@@ -53,14 +59,16 @@ std::vector<BoxIsland*> islands;
     int i,n;
     
     dBodyID b1,b2;
+
+    bool isWater = false;
     
     // only collide things with the ground
     int g1 = (o1 == ground );
     int g2 = (o2 == ground );
     if (!(g1 ^ g2))
     {
-        printf ("Ground colliding..\n");
-        
+        //printf ("Ground colliding..\n");
+        isWater = true;
         
         //return;
     }
@@ -68,8 +76,11 @@ std::vector<BoxIsland*> islands;
     b1 = dGeomGetBody(o1);
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
-    
-    for (int i=0; i<vehicles.size(); i++) {
+
+
+
+
+    /*for (int i=0; i<vehicles.size(); i++) {
         Vehicle *vehicle = vehicles[i];
         
         if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
@@ -88,11 +99,34 @@ std::vector<BoxIsland*> islands;
             if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>100)
             {
                 printf("Sorry your plane has crashed. You're dead.\n");
-                exit(2);
+                if (o1 == ground)
+                {
+                    printf("It has collided with the ground.\n");
+                    printf("Height:\n",vehicles[i]->getPos()[1]);
+                }
+                if (o2 == ground)
+                {
+                    printf("It has collided with the ground.\n");
+                    printf("Height:\n",vehicles[i]->getPos()[1]);
+                }
+                for (int j=0;j<islands.size();j++)
+                {
+                    if ((o2 == islands[j]->getGeom()) || (o1 == islands[j]->getGeom()))
+                    {
+                        printf("It has collided with the island.\n");
+                        //printf("Height:\n",vehicles[i]->getPos()[1]);
+                        int a;
+                        //std::cin >> a;
+                        ((Manta*)vehicle)->setThrottle(0.0f);
+                        controller.reset();
+                        explosion();
+                    }
+                }
+                //exit(2);
             }
         }
 
-    }
+    }**/
     
     
     
@@ -104,6 +138,7 @@ std::vector<BoxIsland*> islands;
             contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
             dContactSoftERP | dContactSoftCFM | dContactApprox1;
             contact[i].surface.mu = 0;dInfinity;
+
             contact[i].surface.slip1 = 0.1;
             contact[i].surface.slip2 = 0.1;
             contact[i].surface.soft_erp = 0.5;
@@ -227,14 +262,14 @@ void initWorldPopulation()
     
     Walrus *_walrus2 = new Walrus();
     _walrus2->init();
-    _walrus2->setPos(0.0f, 1.0f, -900.0f);
+    _walrus2->setPos(0.0f, 0.0f, -900.0f);
     
     _walrus2->embody(world, space);
     
     
     Walrus *_walrus3 = new Walrus();
     _walrus3->init();
-    _walrus3->setPos(10.0f, 5.0f, -900.0f);
+    _walrus3->setPos(600.0f, 0.0f, -200.0f);
     
     _walrus3->embody(world, space);
     
@@ -248,12 +283,12 @@ void initWorldPopulation()
 
     MultiBodyVehicle *_mb = new MultiBodyVehicle();
     _mb->init();
-    _mb->setPos(100.0f,5.0f,+2000.0f);
+    _mb->setPos(100.0f,0.0f,+2000.0f);
     _mb->embody(world,space);
 
     Balaenidae *_b = new Balaenidae();
     _b->init();
-    _b->setPos(0.0f,5.0,+2000.0f);
+    _b->setPos(0.0f,50.0f,+2000.0f);
     _b->embody(world,space);
     
 
@@ -265,7 +300,9 @@ void initWorldPopulation()
     vehicles.push_back(_mb);
     //vehicles.push_back(_buggy);
     vehicles.push_back(_b);
-    
+
+    for(int i=0;i<vehicles.size();i++)
+        vehiclesInWorld[vehicles[i]->getBodyID()] = vehicles[i];
     
 }
 

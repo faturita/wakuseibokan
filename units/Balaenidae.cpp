@@ -35,7 +35,7 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(50.0f,50.0f,50.0f);
+        glScalef(50.0f,20.0f,50.0f);
 
         doTransform(f, R);
 
@@ -68,7 +68,7 @@ void Balaenidae::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 100.0f, 70.0f, 500.0f);   // scale 50
+    geom = dCreateBox( space, 100.0f, 40, 500.0f);   // scale 50
     dGeomSetBody(geom, me);
 }
 

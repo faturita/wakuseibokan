@@ -182,7 +182,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
     dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
 
-    printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+    //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
 
     wrapDynamics(body);
 
