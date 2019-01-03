@@ -9,6 +9,7 @@ protected:
     dGeomID geom;
     float rudder;
 public:
+    ~Balaenidae();
     Balaenidae();
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void init();

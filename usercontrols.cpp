@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <vector>
 #include <iostream>
@@ -131,14 +132,20 @@ void handleKeypress(unsigned char key, int x, int y) {
     {
         if (key == 13)
         {
-            // Send message to message board
-            messages.insert(messages.begin(),controller.str);
+            // Analyze commands.
+            if (strcmp(controller.str.c_str(),"map")==0)
+                controller.view = 2;
+            else {
+                // Send message to message board
+                messages.insert(messages.begin(),controller.str);
 
-            if (messages.size()>5)
-                messages.pop_back();
+                if (messages.size()>5)
+                    messages.pop_back();
 
-            controller.teletype = false;
-            controller.str.clear();
+                controller.teletype = false;
+                controller.str.clear();
+            }
+
 
         } else {
             controller.str += key;
@@ -174,7 +181,8 @@ void handleKeypress(unsigned char key, int x, int y) {
             Camera.reset();
         break;
         case '1':case '2':case '3': case '4': case '5': case '6':
-        	controller.controlling = (int)(key-48);
+            controller.view = 1;
+            controller.controlling = (int)(key-48);
             controller.reset();
         	//spd = vehicles.getThrottle();
         break;

@@ -9,6 +9,7 @@
 
 #include "Vehicle.h"
 #include <assert.h>
+#include "../md2model.h"
 
 Vehicle::Vehicle()
 {
@@ -117,7 +118,7 @@ Vec3f Vehicle::dBodyGetAngularVelInBody(dBodyID body)
 void Vehicle::init()
 {
 	//Load the model
-	_model = MD2Model::load("walrusgood.md2");
+    _model = MD2Model::loadModel("walrusgood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
 

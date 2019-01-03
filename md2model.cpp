@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace {
+namespace md2model {
 	//Normals used in the MD2 file format
 	float NORMALS[486] =
 		{-0.525731f,  0.000000f,  0.850651f,
@@ -320,7 +320,7 @@ MD2Model::MD2Model() {
 }
 
 //Loads the MD2 model
-MD2Model* MD2Model::load(const char* filename) {
+MD2Model* MD2Model::loadModel(const char* filename) {
 	ifstream input;
 	input.open(filename, istream::binary);
 	
@@ -331,33 +331,33 @@ MD2Model* MD2Model::load(const char* filename) {
 		printf ("This is not a MD2 file %s\n",filename);
 		return NULL;
 	}
-	if (readInt(input) != 8) { //The version number
+    if (md2model::readInt(input) != 8) { //The version number
 		printf ("Version number is not right\n");
 		return NULL;
 	}
 	
-	int textureWidth = readInt(input);   //The width of the textures
-	int textureHeight = readInt(input);  //The height of the textures
-	readInt(input);                      //The number of bytes per frame
-	int numTextures = readInt(input);    //The number of textures
+    int textureWidth = md2model::readInt(input);   //The width of the textures
+    int textureHeight = md2model::readInt(input);  //The height of the textures
+    md2model::readInt(input);                      //The number of bytes per frame
+    int numTextures = md2model::readInt(input);    //The number of textures
 	if (numTextures != 1) {
 		printf ("There are more than one texture %d\n", numTextures);
 		//return NULL;
 	}
-	int numVertices = readInt(input);    //The number of vertices
-	int numTexCoords = readInt(input);   //The number of texture coordinates
-	int numTriangles = readInt(input);   //The number of triangles
-	readInt(input);                      //The number of OpenGL commands
-	int numFrames = readInt(input);      //The number of frames
+    int numVertices = md2model::readInt(input);    //The number of vertices
+    int numTexCoords = md2model::readInt(input);   //The number of texture coordinates
+    int numTriangles = md2model::readInt(input);   //The number of triangles
+    md2model::readInt(input);                      //The number of OpenGL commands
+    int numFrames = md2model::readInt(input);      //The number of frames
 	
 	//Offsets (number of bytes after the beginning of the file to the beginning
 	//of where certain data appear)
-	int textureOffset = readInt(input);  //The offset to the textures
-	int texCoordOffset = readInt(input); //The offset to the texture coordinates
-	int triangleOffset = readInt(input); //The offset to the triangles
-	int frameOffset = readInt(input);    //The offset to the frames
-	readInt(input);                      //The offset to the OpenGL commands
-	readInt(input);                      //The offset to the end of the file
+    int textureOffset = md2model::readInt(input);  //The offset to the textures
+    int texCoordOffset = md2model::readInt(input); //The offset to the texture coordinates
+    int triangleOffset = md2model::readInt(input); //The offset to the triangles
+    int frameOffset = md2model::readInt(input);    //The offset to the frames
+    md2model::readInt(input);                      //The offset to the OpenGL commands
+    md2model::readInt(input);                      //The offset to the end of the file
 	
 	//Load the texture
 	input.seekg(textureOffset, ios_base::beg);
@@ -370,7 +370,7 @@ MD2Model* MD2Model::load(const char* filename) {
 
 	strcpy ( buffer, "vtr.bmp");
 	Image* image = loadBMP(buffer);
-	GLuint textureId = loadTexture(image);
+    GLuint textureId = md2model::loadTexture(image);
 	delete image;
 	MD2Model* model = new MD2Model();
 	model->textureId = textureId;
@@ -380,8 +380,8 @@ MD2Model* MD2Model::load(const char* filename) {
 	model->texCoords = new MD2TexCoord[numTexCoords];
 	for(int i = 0; i < numTexCoords; i++) {
 		MD2TexCoord* texCoord = model->texCoords + i;
-		texCoord->texCoordX = (float)readShort(input) / textureWidth;
-		texCoord->texCoordY = 1 - (float)readShort(input) / textureHeight;
+        texCoord->texCoordX = (float)md2model::readShort(input) / textureWidth;
+        texCoord->texCoordY = 1 - (float)md2model::readShort(input) / textureHeight;
 	}
 	
 	//Load the triangles
@@ -391,10 +391,10 @@ MD2Model* MD2Model::load(const char* filename) {
 	for(int i = 0; i < numTriangles; i++) {
 		MD2Triangle* triangle = model->triangles + i;
 		for(int j = 0; j < 3; j++) {
-			triangle->vertices[j] = readUShort(input);
+            triangle->vertices[j] = md2model::readUShort(input);
 		}
 		for(int j = 0; j < 3; j++) {
-			triangle->texCoords[j] = readUShort(input);
+            triangle->texCoords[j] = md2model::readUShort(input);
 		}
 	}
 	
@@ -405,8 +405,8 @@ MD2Model* MD2Model::load(const char* filename) {
 	for(int i = 0; i < numFrames; i++) {
 		MD2Frame* frame = model->frames + i;
 		frame->vertices = new MD2Vertex[numVertices];
-		Vec3f scale = readVec3f(input);
-		Vec3f translation = readVec3f(input);
+        Vec3f scale = md2model::readVec3f(input);
+        Vec3f translation = md2model::readVec3f(input);
 		input.read(frame->name, 16);
 		
 		for(int j = 0; j < numVertices; j++) {
@@ -420,9 +420,9 @@ MD2Model* MD2Model::load(const char* filename) {
 											  scale[2] * v[2]);
 			input.read(buffer, 1);
 			int normalIndex = (int)((unsigned char)buffer[0]);
-			vertex->normal = Vec3f(NORMALS[3 * normalIndex],
-								   NORMALS[3 * normalIndex + 1],
-								   NORMALS[3 * normalIndex + 2]);
+            vertex->normal = Vec3f(md2model::NORMALS[3 * normalIndex],
+                                   md2model::NORMALS[3 * normalIndex + 1],
+                                   md2model::NORMALS[3 * normalIndex + 2]);
 		}
 	}
 	

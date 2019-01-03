@@ -8,10 +8,11 @@
 #define dSINGLE
 
 #include "Walrus.h"
+#include "../md2model.h"
 
 void Walrus::init()
 {
-    _model = MD2Model::load("walrusgood.md2");
+    _model = (Model*)MD2Model::loadModel("walrusgood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
     else

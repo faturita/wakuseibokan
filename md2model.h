@@ -33,6 +33,7 @@
 #endif
 
 #include "math/vec3f.h"
+#include "model.h"
 
 struct MD2Vertex {
 	Vec3f pos;
@@ -54,7 +55,7 @@ struct MD2Triangle {
 	int texCoords[3]; //The indices of the texture coordinates of the triangle
 };
 
-class MD2Model {
+class MD2Model : public Model {
 	private:
 		MD2Frame* frames;
 		int numFrames;
@@ -83,11 +84,11 @@ class MD2Model {
 		//lasts one unit of time.
 		void advance(float dt);
 		//Draws the current state of the animated model.
-		void draw();
+        void virtual draw();
 		
 		//Loads an MD2Model from the specified file.  Returns NULL if there was
 		//an error loading it.
-		static MD2Model* load(const char* filename);
+        static MD2Model* loadModel(const char* filename);
 };
 
 

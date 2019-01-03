@@ -47,6 +47,8 @@
 #include "imageloader.h"
 #include "terrain/Terrain.h"
 
+#include "map.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -283,7 +285,11 @@ void drawScene() {
     }
     
     // GO with the HUD
-    drawHUD();
+    switch (controller.view)
+    {
+    case 1: drawHUD();break;
+    case 2: drawMap();break;
+    }
     
 	glDisable(GL_TEXTURE_2D);
 	

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "../math/vec3f.h"
 #include "../math/yamathutil.h"
-#include "../md2model.h"
+#include "../model.h"
 #include "../openglutils.h"
 #include "../odeutils.h"
 #include "../observable.h"
@@ -23,7 +23,7 @@ class Vehicle : Observable
 {
 protected:
 	Vec3f pos;
-	MD2Model* _model;
+    Model* _model;
 	float speed;
 	float R[12];
 	Vec3f forward;
@@ -34,7 +34,7 @@ protected:
     dBodyID me;
     
 public:
-    bool letMeGo;
+    bool inert;
 	float xRotAngle;
 	float yRotAngle;
 	Vehicle();

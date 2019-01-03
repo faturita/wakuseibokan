@@ -32,6 +32,16 @@ void explosion()
     system("afplay sounds/explosion.mp3 &");
 }
 
+void coast()
+{
+    system("afplay sounds/Coast.m4a &");
+}
+
+void honk()
+{
+    system("afplay sounds/BoatHonk.m4a &");
+}
+
 Vec3f ToVec3f(dReal *val, Vec3f retValue)
 {
 	retValue[0]=val[0];

@@ -15,6 +15,9 @@ public:
     
 	// Index to Observable interfaces.
 	int camera;
+
+    // Which view mode is currently active.
+    int view=1;
     
 	// R+,F-
 	float thrust;

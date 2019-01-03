@@ -404,3 +404,58 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
     glPopMatrix();
 }
 
+
+T3DSModel::T3DSModel()
+{
+
+}
+T3DSModel::~T3DSModel()
+{
+
+}
+
+//Switches to the given animation
+void T3DSModel::setAnimation(const char* name)
+{
+
+}
+//Draws the current state of the animated model.
+void T3DSModel::draw()
+{
+    draw3DSModel(filename,x,y,z,scale,_texture);
+}
+void T3DSModel::draw(GLuint *)
+{
+
+}
+void T3DSModel::setFilename(const char* p_filename)
+{
+    strcpy(filename,p_filename);
+}
+void T3DSModel::setLocation(float x,float y,float z)
+{
+    T3DSModel::x=x;
+    T3DSModel::y=y;
+    T3DSModel::z=z;
+}
+void T3DSModel::setScale(float scale)
+{
+    T3DSModel::scale=scale;
+}
+void T3DSModel::setTexture(GLuint _textureMetal)
+{
+    T3DSModel::_texture=_textureMetal;
+}
+
+//Loads an MD2Model from the specified file.  Returns NULL if there was
+//an error loading it.
+T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal)
+{
+    T3DSModel* td = new T3DSModel();
+    td->setFilename(p_filename);
+    td->setLocation(x,y,z);
+    td->setScale(scale);
+    td->setTexture(_textureMetal);
+    return td;
+}
+

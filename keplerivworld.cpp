@@ -63,7 +63,7 @@ void inline releasecontrol(dBodyID body)
         {
             if (vehicle->getType() == 3)
             {
-                vehicle->letMeGo = true;
+                vehicle->inert = true;
             }
         }
     }
@@ -240,7 +240,6 @@ void inline groundcollisions(dBodyID body)
                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
                 contact[i].surface.mu = dInfinity;
-                printf("Contact between units...\n",n);
                 contact[i].surface.slip1 = 0;
                 contact[i].surface.slip2 = 0;
 
@@ -351,57 +350,48 @@ void initWorldPopulation()
     //Init lands, fixed objects, and objects
     BoxVehicle *_boxVehicle1 = new BoxVehicle();
     _boxVehicle1->init();
-    _boxVehicle1->setPos(-10.0f,40.0f,300.0f);
-    
-    
-    BoxVehicle *_boxVehicle2 = new BoxVehicle();
-    _boxVehicle2->init();
-    _boxVehicle2->setPos(0.0f,40.0f,-300.0f);
+    _boxVehicle1->setPos(+200.0f,40.0f,-3800.0f);
     
     
     // Start modelling BoxVehicles
     _boxVehicle1->embody(world, space);
-    _boxVehicle2->embody(world, space);
-    
     
     
     // Add vehicles
     SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
     _manta1->init();
-    _manta1->setPos(+130.0f, 10.0f, -1010.0f);
-    
+    _manta1->setPos(+130.0f, 10.0f, -4000.0f);
     _manta1->embody(world, space);
     
     
     Walrus *_walrus2 = new Walrus();
     _walrus2->init();
-    _walrus2->setPos(0.0f, 0.0f, -900.0f);
-    
+    _walrus2->setPos(10.0f, 10.0f, -3400.0f);
     _walrus2->embody(world, space);
     
-    
+
     Walrus *_walrus3 = new Walrus();
     _walrus3->init();
-    _walrus3->setPos(600.0f, 0.0f, -200.0f);
+    _walrus3->setPos(0.0f, 10.0f, -3400.0f);
     
     _walrus3->embody(world, space);
     
     
-    Buggy *_buggy = new Buggy();
-    _buggy->init();
-    _buggy->setPos(1300.0f, 10, 10);
+//    Buggy *_buggy = new Buggy();
+//    _buggy->init();
+//    _buggy->setPos(1300.0f, 10, 10);
     
-    _buggy->embody(world, space);
+//    _buggy->embody(world, space);
 
 
     MultiBodyVehicle *_mb = new MultiBodyVehicle();
     _mb->init();
-    _mb->setPos(100.0f,0.0f,+2000.0f);
+    _mb->setPos(0.0f,0.0f,+2200.0f);
     _mb->embody(world,space);
 
     Balaenidae *_b = new Balaenidae();
     _b->init();
-    _b->setPos(0.0f,50.0f,+2000.0f);
+    _b->setPos(0.0f,50.0f,-2200.0f);
     _b->embody(world,space);
     
 
@@ -519,9 +509,13 @@ void initWorldModelling()
     atom->buildTerrainModel(space,"terrain/atom.bmp"); //,1000,10);
 **/
 
-    BoxIsland *baltandmore = new BoxIsland();
-    baltandmore->setLocation(-1600.0f,-1.0,+9000.0);
-    baltandmore->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
+    BoxIsland *thermopilae = new BoxIsland();
+    thermopilae->setLocation(0.0f,-1.0,0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
+
+    //BoxIsland *baltandmore = new BoxIsland();
+    //baltandmore->setLocation(-1600.0f,-1.0,+8500.0);
+    //baltandmore->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
 
     /**islands.push_back(baltimore);
     islands.push_back(runway);
@@ -534,7 +528,7 @@ void initWorldModelling()
     islands.push_back(nonsquareisland);
     islands.push_back(atom);
     **/
-    islands.push_back(baltandmore);
+    islands.push_back(thermopilae);
     
     initWorldPopulation();
     

@@ -9,11 +9,12 @@
 #define dSINGLE
 
 #include "Buggy.h"
+#include "../md2model.h"
 
 
 void Buggy::init()
 {
-    _model = MD2Model::load("walrus.md2");
+    _model = MD2Model::loadModel("walrus.md2");
     if (_model != NULL)
         _model->setAnimation("run");
     else

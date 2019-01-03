@@ -8,11 +8,12 @@
 #define dSINGLE
 
 #include "Manta.h"
+#include "../md2model.h"
 
 void Manta::init()
 {
 	//Load the model
-	_model = MD2Model::load("mantagood.md2");
+    _model = MD2Model::loadModel("mantagood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
 

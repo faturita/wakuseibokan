@@ -1,7 +1,13 @@
 #include "Balaenidae.h"
 #include "../ThreeMaxLoader.h"
+#include "../odeutils.h"
 
 extern GLuint _textureMetal;
+
+Balaenidae::~Balaenidae()
+{
+    delete _model;
+}
 
 Balaenidae::Balaenidae()
 {
@@ -11,11 +17,11 @@ Balaenidae::Balaenidae()
 void Balaenidae::init()
 {
     //Load the model
-    //_model = MD2Model::load("mantagood.md2");
-    //if (_model != NULL)
-    //    _model->setAnimation("run");
+    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",0.0f,0.0f,0.0f,1,_textureMetal);
+    if (_model != NULL)
+        _model->setAnimation("run");
 
-    setForward(0,0,1);
+    setForward(0,0,1);    
 
 }
 
@@ -30,8 +36,8 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
     f[0] = 0; f[1] = 0; f[2] = 0;
 
     //Draw the saved model
-    //if (_model != NULL)
-    //{
+    if (_model != NULL)
+    {
         glPushMatrix();
         glTranslatef(x, y, z);
 
@@ -52,15 +58,14 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        //_model->draw();
-        draw3DSModel("units/carrier.3ds",0.0f,0.0f,0.0f,1,_textureMetal);
+        _model->draw();
 
         glPopMatrix();
-    //}
-    //else
-    //{
-        //printf ("model is null\n");
-    //}
+    }
+    else
+    {
+        printf ("model is null\n");
+    }
 }
 
 void Balaenidae::embody(dWorldID world, dSpaceID space)
@@ -92,6 +97,8 @@ void Balaenidae::embody(dBodyID myBodySelf)
 
 void Balaenidae::doControl(Controller controller)
 {
+    if (getThrottle()==0 and controller.thrust != 0)
+        honk();
     setThrottle(-controller.thrust*2*5);
 
     Balaenidae::rudder = controller.roll;

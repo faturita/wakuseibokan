@@ -165,7 +165,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
     dQMultiply0(q3,q2,q1);
 
 
-    if (!Vehicle::letMeGo)
+    if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
 
     //dBodySetRotation(body,R);

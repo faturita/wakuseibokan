@@ -17,6 +17,7 @@ void firesound(int times);
 void enginestart();
 void takeoff();
 void explosion();
+void honk();
 
 Vec3f ToVec3f(dReal *val, Vec3f retValue);
 
