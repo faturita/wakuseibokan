@@ -46,6 +46,8 @@ units/Buggy.cpp
 units/Buggy.h
 units/Manta.cpp
 units/Manta.h
+units/Missile.cpp
+units/Missile.h
 units/MultiBodyVehicle.cpp
 units/MultiBodyVehicle.h
 units/SimplifiedDynamicManta.cpp

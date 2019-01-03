@@ -34,6 +34,7 @@ protected:
     dBodyID me;
     
 public:
+    bool letMeGo;
 	float xRotAngle;
 	float yRotAngle;
 	Vehicle();

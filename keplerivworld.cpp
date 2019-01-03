@@ -54,6 +54,52 @@ std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
 // this is called by dSpaceCollide when two objects in space are
 // potentially colliding.
 
+void inline releasecontrol(dBodyID body)
+{
+    for (int i=0; i<vehicles.size(); i++)
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == body)
+        {
+            if (vehicle->getType() == 3)
+            {
+                vehicle->letMeGo = true;
+            }
+        }
+    }
+}
+bool inline isManta(dBodyID body)
+{
+    for (int i=0; i<vehicles.size(); i++)
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == body)
+        {
+            if (vehicle->getType() == 3)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool inline isCarrier(dBodyID body)
+{
+    for (int i=0; i<vehicles.size(); i++)
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == body)
+        {
+            if (vehicle->getType() == 4)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void inline groundcollisions(dBodyID body)
 {
     for (int i=0; i<vehicles.size(); i++)
@@ -80,6 +126,7 @@ void inline groundcollisions(dBodyID body)
     dBodyID b1,b2;
 
     bool isWater = false;
+    bool isIsland = false;
     
     // only collide things with the ground
     int g1 = (o1 == ground );
@@ -99,23 +146,28 @@ void inline groundcollisions(dBodyID body)
     } else if (o2 == ground) {
         groundcollisions(dGeomGetBody(o1));
     } else {
+
+        for (int j=0;j<islands.size();j++)
+        {
+            if (o1 == islands[j]->getGeom())
+            {
+                groundcollisions(dGeomGetBody(o2));
+                isIsland = true;
+            }
+            if (o2 == islands[j]->getGeom())
+            {
+                groundcollisions(dGeomGetBody(o1));
+                isIsland == true;
+            }
+
+        }
+    }
+
+    if (!isIsland && !isWater)
+    {
         b1 = dGeomGetBody(o1);
         b2 = dGeomGetBody(o2);
         if (b1 && b2 && dAreConnected (b1,b2)) return;
-    }
-
-
-    for (int j=0;j<islands.size();j++)
-    {
-        if (o1 == islands[j]->getGeom())
-        {
-            groundcollisions(dGeomGetBody(o2));
-        }
-        if (o2 == islands[j]->getGeom())
-        {
-            groundcollisions(dGeomGetBody(o1));
-        }
-
     }
 
 
@@ -179,12 +231,29 @@ void inline groundcollisions(dBodyID body)
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
     if (n > 0) {
         for (i=0; i<n; i++) {
-            contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-            dContactSoftERP | dContactSoftCFM | dContactApprox1;
-            contact[i].surface.mu = 0;dInfinity;
 
-            contact[i].surface.slip1 = 0.1;
-            contact[i].surface.slip2 = 0.1;
+
+            if ( ((isManta(dGeomGetBody(contact[i].geom.g1)) && isCarrier(dGeomGetBody(contact[i].geom.g2))) ) ||
+                (isManta(dGeomGetBody(contact[i].geom.g2)) && isCarrier(dGeomGetBody(contact[i].geom.g1))) )
+                {
+                contact[i].surface.mode =
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                contact[i].surface.mu = dInfinity;
+                printf("Contact between units...\n",n);
+                contact[i].surface.slip1 = 0;
+                contact[i].surface.slip2 = 0;
+
+                releasecontrol(dGeomGetBody(contact[i].geom.g1));
+            } else {
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mu = 0;dInfinity;
+                contact[i].surface.slip1 = 0.1;
+                contact[i].surface.slip2 = 0.1;
+            }
+
+
             contact[i].surface.soft_erp = 0.5;
             contact[i].surface.soft_cfm = 0.3;
             
@@ -336,7 +405,7 @@ void initWorldPopulation()
     _b->embody(world,space);
     
 
-    //vehicles.push_back(_boxVehicle1);
+    vehicles.push_back(_boxVehicle1);
     //vehicles.push_back(_boxVehicle2);
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
@@ -451,8 +520,8 @@ void initWorldModelling()
 **/
 
     BoxIsland *baltandmore = new BoxIsland();
-    baltandmore->setLocation(-1600.0f,-0.3,+20000.0);
-    baltandmore->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+    baltandmore->setLocation(-1600.0f,-1.0,+9000.0);
+    baltandmore->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
 
     /**islands.push_back(baltimore);
     islands.push_back(runway);

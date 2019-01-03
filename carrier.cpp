@@ -274,6 +274,9 @@ void drawScene() {
 
     draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1,_textureBox);
 
+    draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+
+
     // Draw vehicles and objects
     for (int i=0; i<vehicles.size(); i++) {
         (vehicles[i]->drawModel());

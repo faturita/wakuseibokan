@@ -37,8 +37,8 @@
 #include "Terrain.h"
 
 #define TERRAIN_SIDE_LENGTH 60.0f
-#define TERRAIN_MAX_HEIGHT  60.0f
-#define TERRAIN_SCALE       100.0f
+#define TERRAIN_MAX_HEIGHT  100.0f
+#define TERRAIN_SCALE       60.0f
 
 
 // The texture is preloaded somewhere else.
@@ -84,8 +84,7 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
     Terrain *_landmass = (Terrain*) pUserData;
     
     h = _landmass->getHeight(x, z);
-    
-    
+       
     //printf("%4d,%4d,%10.5f\n", x,z,h);
     
     return h;
