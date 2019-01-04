@@ -45,6 +45,8 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
         //drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
         drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
+        //drawRectangularBox(16.0f/2.0f, 5.2f/2.0f, 8.0f/2.0f);
+
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 		glRotatef(-180.0f, 0.0f, 0.0f, 1.0f);
 
@@ -53,12 +55,42 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         _model->draw();
+
         glPopMatrix();
     }
     else
     {
     	printf ("model is null\n");
     }
+}
+
+void Manta::embody(dWorldID world, dSpaceID space)
+{
+    me = dBodyCreate(world);
+    embody(me);
+    //geom = dCreateSphere( space, 2.64f);
+    geom = dCreateBox( space,8.0f,1.6f,4.0f);
+    dGeomSetBody(geom, me);
+}
+
+void Manta::embody(dBodyID myBodySelf)
+{
+    dMass m;
+
+    float myMass = 1.0f;
+    float radius = 2.64f;
+    float length = 7.0f;
+
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    dMassSetBox(&m,1,8.0f,1.6f,4.0f);
+    //dMassSetSphere(&m,1,radius);
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+
+    me = myBodySelf;
+
+    Manta::param[0] = 0.9;
+    Manta::param[1] = 2;
 }
 
 float restrict(float value, float restriction)
@@ -138,34 +170,7 @@ void Manta::drawDirectModel()
 }
 
 
-void Manta::embody(dWorldID world, dSpaceID space)
-{
-    me = dBodyCreate(world);
-    embody(me);
-    //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 4.0f, 2.64f, 2.0f);
-    dGeomSetBody(geom, me);
-}
 
-void Manta::embody(dBodyID myBodySelf)
-{
-    dMass m;
-
-    float myMass = 10.0f;
-    float radius = 2.64f;
-    float length = 7.0f;
-
-    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,4.0f,2.64f,10.0f);
-    //dMassSetSphere(&m,1,radius);
-    dMassAdjust(&m, myMass*1.0f);
-    dBodySetMass(myBodySelf,&m);
-
-    me = myBodySelf;
-
-    Manta::param[0] = 0.9;
-    Manta::param[1] = 2;
-}
 
 
 /**

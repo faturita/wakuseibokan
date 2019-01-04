@@ -50,12 +50,18 @@ typedef struct {
 
  int draw3DSModel(char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal);
 
+ obj_type load3DSModel(char *p_filename);
+
+ int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint _textureMetal);
+
+
  class T3DSModel : Model {
      private:
          GLuint _texture;
          float scale;
          float x,y,z;
          char filename[256];
+         obj_type object;
          T3DSModel();
      public:
          ~T3DSModel();
@@ -64,6 +70,7 @@ typedef struct {
          void setLocation(float x,float y,float z);
          void setScale(float scale);
          void setTexture(GLuint _textureMetal);
+         void setObject(obj_type object);
 
          //Switches to the given animation
          void setAnimation(const char* name);

@@ -114,7 +114,7 @@ void MultiBodyVehicle::doDynamics(dBodyID body)
 //    dJointSetHinge2Param (carjoint[3],dParamFMax2,1000);
     
     //dBodyAddRelForce (body,0, 0,getThrottle());
-    //dBodyAddForce(me, 0,9.81f,0);
+    dBodyAddForce(me, 0,9.81f,0);
     // This should be after the world step
     /// stuff
     dVector3 result;

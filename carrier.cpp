@@ -47,6 +47,8 @@
 #include "imageloader.h"
 #include "terrain/Terrain.h"
 
+#include "structures/Structure.h"
+
 #include "map.h"
 
 extern  Controller controller;
@@ -67,6 +69,8 @@ extern std::vector<Vehicle*> vehicles;
 //extern BoxIsland _boxIsland;
 
 extern std::vector<BoxIsland*> islands;
+
+extern std::vector<Structure*> structures;
 
 extern std::vector<std::string> messages;
 
@@ -269,12 +273,18 @@ void drawScene() {
     //Load3DS(&object,"structures/watertower.3ds");
     //draw3DSModel(object,650.0,15.0,600.0,1);
 
-    draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1,_textureBox);
+    //draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1,_textureBox);
 
     //Load3DS(&object,"structures/watertower.3ds");
-    draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1,_textureBox);
+    //draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1,_textureBox);
 
-    draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1,_textureBox);
+    //draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1,_textureBox);
+
+
+    for(int i=0;i<structures.size();i++)
+    {
+        structures[i]->drawModel();
+    }
 
     draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 

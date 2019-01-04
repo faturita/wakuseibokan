@@ -5,7 +5,7 @@ void SimplifiedDynamicManta::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 4.0f, 2.64f, 2.0f);
+    geom = dCreateBox( space, 8.0f,1.6f,4.0f);
     dGeomSetBody(geom, me);
 }
 
@@ -16,7 +16,7 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
     float myMass = 10.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,4.0f,2.64f,10.0f);
+    dMassSetBox(&m,1,8.0f,1.6f,4.0f);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
 
@@ -45,6 +45,12 @@ void SimplifiedDynamicManta::doControl(Controller controller)
     //Manta::rudder = controller.precesion*0.1;
 
     Manta::rudder = controller.precesion;
+
+    if (controller.precesion!=0)
+        inert = true;
+
+    if (controller.precesion==0)
+        inert = false;
 
     for(int i=0;i<10;i++)
     {

@@ -123,7 +123,7 @@ void Walrus::embody(dBodyID myBodySelf)
 {
     dMass m;
     
-    float myMass = 1.0f;
+    float myMass = 20.0f;
     float radius = 2.64f;
     float length = 7.0f;
     

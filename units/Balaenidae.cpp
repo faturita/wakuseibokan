@@ -17,7 +17,7 @@ Balaenidae::Balaenidae()
 void Balaenidae::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",0.0f,0.0f,0.0f,1,_textureMetal);
+    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,_textureMetal);
     if (_model != NULL)
         _model->setAnimation("run");
 
@@ -49,6 +49,8 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
         //drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
         //drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
+        //drawRectangularBox(100.0f/50.0f, 40.0f/20.0f, 500.f/50.0f);
+
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(-180.0f, 0.0f, 0.0f, 1.0f);
         glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
@@ -59,6 +61,7 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         _model->draw();
+
 
         glPopMatrix();
     }
@@ -86,7 +89,7 @@ void Balaenidae::embody(dBodyID myBodySelf)
     float length = 7.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,4.0f,2.64f,10.0f);
+    dMassSetBox(&m,1,100.0f, 40, 500.0f);
     //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);

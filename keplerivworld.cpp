@@ -28,6 +28,8 @@
 
 #include "terrain/Terrain.h"
 
+#include "structures/Structure.h"
+
 
 extern  Controller controller;
 
@@ -43,7 +45,7 @@ dJointGroupID contactgroup;
 std::vector<Vehicle*> vehicles;
 
 std::vector<BoxIsland*> islands;
-
+std::vector<Structure*> structures;
 
 std::vector<std::string> messages;
 
@@ -63,7 +65,13 @@ void inline releasecontrol(dBodyID body)
         {
             if (vehicle->getType() == 3)
             {
-                vehicle->inert = true;
+                if (!vehicle->inert)
+                {
+                    vehicle->inert = true;
+                    controller.reset();
+                    vehicle->doControl(controller);
+                    vehicle->setThrottle(0.0f);
+                }
             }
         }
     }
@@ -100,6 +108,18 @@ bool inline isCarrier(dBodyID body)
     return false;
 }
 
+bool inline isIsland(dGeomID candidate)
+{
+    for (int j=0;j<islands.size();j++)
+    {
+        if (candidate == islands[j]->getGeom())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void inline groundcollisions(dBodyID body)
 {
     for (int i=0; i<vehicles.size(); i++)
@@ -111,6 +131,7 @@ void inline groundcollisions(dBodyID body)
             {
                 explosion();
                 controller.reset();
+                vehicle->doControl(controller);
                 vehicle->setThrottle(0.0f);
             }
         }
@@ -119,56 +140,29 @@ void inline groundcollisions(dBodyID body)
 }
 
 
+
+
  void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
     
     dBodyID b1,b2;
-
-    bool isWater = false;
-    bool isIsland = false;
     
     // only collide things with the ground
     int g1 = (o1 == ground );
     int g2 = (o2 == ground );
     if (!(g1 ^ g2))
     {
-        //printf ("Ground colliding..\n");
-        isWater = true;
+        printf ("Ground colliding..\n");
         
         //return;
     }
     
 
-    if (o1 == ground)
-    {
-        groundcollisions(dGeomGetBody(o2));
-    } else if (o2 == ground) {
-        groundcollisions(dGeomGetBody(o1));
-    } else {
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
 
-        for (int j=0;j<islands.size();j++)
-        {
-            if (o1 == islands[j]->getGeom())
-            {
-                groundcollisions(dGeomGetBody(o2));
-                isIsland = true;
-            }
-            if (o2 == islands[j]->getGeom())
-            {
-                groundcollisions(dGeomGetBody(o1));
-                isIsland == true;
-            }
-
-        }
-    }
-
-    if (!isIsland && !isWater)
-    {
-        b1 = dGeomGetBody(o1);
-        b2 = dGeomGetBody(o2);
-        if (b1 && b2 && dAreConnected (b1,b2)) return;
-    }
 
 
 
@@ -232,16 +226,34 @@ void inline groundcollisions(dBodyID body)
     if (n > 0) {
         for (i=0; i<n; i++) {
 
+            if ((ground == contact[i].geom.g1) || (ground == contact[i].geom.g2))
+            {
+                groundcollisions(dGeomGetBody(contact[i].geom.g1));
+                groundcollisions(dGeomGetBody(contact[i].geom.g2));
+            }
 
+            if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+            {
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+                printf("On islando....\n");
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2;
+                contact[i].surface.slip1 = 0.1;
+                contact[i].surface.slip2 = 0.1;
+            } else
             if ( ((isManta(dGeomGetBody(contact[i].geom.g1)) && isCarrier(dGeomGetBody(contact[i].geom.g2))) ) ||
                 (isManta(dGeomGetBody(contact[i].geom.g2)) && isCarrier(dGeomGetBody(contact[i].geom.g1))) )
                 {
-                contact[i].surface.mode =
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
 
                 contact[i].surface.mu = dInfinity;
                 contact[i].surface.slip1 = 0;
                 contact[i].surface.slip2 = 0;
+                contact[i].surface.bounce = 0.2;
 
                 releasecontrol(dGeomGetBody(contact[i].geom.g1));
             } else {
@@ -386,7 +398,7 @@ void initWorldPopulation()
 
     MultiBodyVehicle *_mb = new MultiBodyVehicle();
     _mb->init();
-    _mb->setPos(0.0f,0.0f,+2200.0f);
+    _mb->setPos(0.0f,100.0f,+2200.0f);
     _mb->embody(world,space);
 
     Balaenidae *_b = new Balaenidae();
@@ -529,6 +541,14 @@ void initWorldModelling()
     islands.push_back(atom);
     **/
     islands.push_back(thermopilae);
+
+
+    Structure *structure = new Structure();
+    structure->init();
+    structure->setPos(0.0f,25.0f,-1000.0f);
+    structure->embody(world,space);
+
+    structures.push_back(structure);
     
     initWorldPopulation();
     
