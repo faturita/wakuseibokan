@@ -76,6 +76,19 @@ void inline releasecontrol(dBodyID body)
         }
     }
 }
+
+bool inline isStructure(dGeomID candidate)
+{
+    for (int i=0; i<structures.size(); i++)
+    {
+        if (candidate == structures[i]->getGeom())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool inline isManta(dBodyID body)
 {
     for (int i=0; i<vehicles.size(); i++)
@@ -153,7 +166,7 @@ void inline groundcollisions(dBodyID body)
     int g2 = (o2 == ground );
     if (!(g1 ^ g2))
     {
-        printf ("Ground colliding..\n");
+        //printf ("Ground colliding..\n");
         
         //return;
     }
@@ -162,63 +175,6 @@ void inline groundcollisions(dBodyID body)
     b1 = dGeomGetBody(o1);
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
-
-
-
-
-
-
-
-
-    /*for (int i=0; i<vehicles.size(); i++) {
-        Vehicle *vehicle = vehicles[i];
-        
-        if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
-        {
-            //printf ("Vehicle %d collisioned\n", i);
-            //vehicles[0].stop();
-            
-            
-            if (vehicles[i]->getType()==2 && vehicles[i]->getSpeed()>300)
-            {
-                printf("Walrus has been destroyed.\n");
-                explosion();
-                
-            }
-
-            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>100)
-            {
-                printf("Sorry your plane has crashed. You're dead.\n");
-                if (o1 == ground)
-                {
-                    printf("It has collided with the ground.\n");
-                    printf("Height:\n",vehicles[i]->getPos()[1]);
-                }
-                if (o2 == ground)
-                {
-                    printf("It has collided with the ground.\n");
-                    printf("Height:\n",vehicles[i]->getPos()[1]);
-                }
-                for (int j=0;j<islands.size();j++)
-                {
-                    if ((o2 == islands[j]->getGeom()) || (o1 == islands[j]->getGeom()))
-                    {
-                        printf("It has collided with the island.\n");
-                        //printf("Height:\n",vehicles[i]->getPos()[1]);
-                        int a;
-                        //std::cin >> a;
-                        ((Manta*)vehicle)->setThrottle(0.0f);
-                        controller.reset();
-                        explosion();
-                    }
-                }
-                //exit(2);
-            }
-        }
-
-    }**/
-    
-    
     
     const int N = 10;
     dContact contact[N];
@@ -232,12 +188,17 @@ void inline groundcollisions(dBodyID body)
                 groundcollisions(dGeomGetBody(contact[i].geom.g2));
             }
 
+            if ( (isStructure(contact[i].geom.g1) || isStructure(contact[i].geom.g2))  )
+            {
+                printf("Structure Collision\n");
+                groundcollisions(dGeomGetBody(contact[i].geom.g1));
+                groundcollisions(dGeomGetBody(contact[i].geom.g2));
+            } else
+
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
             {
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-
-                printf("On islando....\n");
 
                 contact[i].surface.mu = 0;
                 contact[i].surface.bounce = 0.2;
@@ -372,7 +333,7 @@ void initWorldPopulation()
     // Add vehicles
     SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
     _manta1->init();
-    _manta1->setPos(+130.0f, 10.0f, -4000.0f);
+    _manta1->setPos(+0.0f, 25.0f, -4000.0f);
     _manta1->embody(world, space);
     
     
@@ -541,7 +502,6 @@ void initWorldModelling()
     islands.push_back(atom);
     **/
     islands.push_back(thermopilae);
-
 
     Structure *structure = new Structure();
     structure->init();
