@@ -118,3 +118,4 @@ References
 * OpenGL Textures: https://learnopengl.com/Getting-started/Textures
 * OpenGL Demura Blog: http://demura.net/english
 * Langevin Functions: https://journals.sagepub.com/doi/full/10.1177/1081286518811876
+* https://ccrma.stanford.edu/software/stk/download.html
