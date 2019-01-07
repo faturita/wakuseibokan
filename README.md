@@ -110,3 +110,19 @@ Issues and missing stuff
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
     * I implemented a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.
+
+Sounds
+------
+
+* ffmpeg -i input.m4a output.wav
+* ./playaudio hellosine.wav 44100 1.0
+* https://github.com/thestk/stk/blob/master/INSTALL.md
+
+References
+----------
+* Normalize error: https://github.com/resibots/robdyn/issues/3
+* ODE http://ode.org/wiki/index.php?title=Main_Page
+* OpenGL Textures: https://learnopengl.com/Getting-started/Textures
+* OpenGL Demura Blog: http://demura.net/english
+* Langevin Functions: https://journals.sagepub.com/doi/full/10.1177/1081286518811876
+* https://ccrma.stanford.edu/software/stk/download.html
