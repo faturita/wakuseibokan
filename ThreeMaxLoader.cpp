@@ -498,6 +498,8 @@ void calculateCenterOfMass(obj_type &object)
     }
 
     printf("Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
+
+    printf("Geometrical offset: %10.5f\t%10.5f\t%10.5f\n",(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2);
 }
 
 int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _texture)
@@ -723,7 +725,7 @@ void T3DSModel::draw()
 }
 void T3DSModel::draw(GLuint _texture)
 {
-    draw3DSModel(T3DSModel::object,x,y,z,scale,_texture);
+    draw3DSModel(T3DSModel::object,x,y,z,scalex,scaley,scalez,_texture);
 }
 void T3DSModel::setFilename(const char* p_filename)
 {
@@ -735,9 +737,11 @@ void T3DSModel::setLocation(float x,float y,float z)
     T3DSModel::y=y;
     T3DSModel::z=z;
 }
-void T3DSModel::setScale(float scale)
+void T3DSModel::setScale(float scalex,float scaley,float scalez)
 {
-    T3DSModel::scale=scale;
+    T3DSModel::scalex=scalex;
+    T3DSModel::scaley=scaley;
+    T3DSModel::scalez=scalez;
 }
 void T3DSModel::setTexture(GLuint texture)
 {
@@ -753,13 +757,18 @@ void T3DSModel::setObject(obj_type object)
 //Loads an MD2Model from the specified file.
 T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scale,GLuint texture)
 {
+    return loadModel(p_filename,x,y,z,scale,scale,scale,texture);
+}
+
+T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scalex, float scaley, float scalez,GLuint texture)
+{
     T3DSModel* td = new T3DSModel();
+    printf("Model:%s\n",p_filename);
     td->setFilename(p_filename);
     td->setLocation(x,y,z);
-    td->setScale(scale);
+    td->setScale(scalex,scaley,scalez);
     td->setTexture(texture);
     td->setObject(load3DSModel(p_filename));
     return td;
 }
-
 

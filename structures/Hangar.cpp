@@ -1,25 +1,25 @@
-#include "Runway.h"
+#include "Hangar.h"
 
-Runway::Runway()
+Hangar::Hangar()
 {
 
 }
 
-void Runway::init()
+void Hangar::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/runway.3ds",-466.06f,0.0f,0.0f,20,1,10,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/hangar2.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
     if (_model != NULL)
         _model->setAnimation("run");
 
-    Structure::height=2;
-    Structure::length=20;
-    Structure::width=1000;
+    Structure::height=50;
+    Structure::length=64.90;
+    Structure::width=85.72;
 
     setForward(0,0,1);
 }
 
-void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
+void Hangar::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
@@ -31,6 +31,9 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
         glTranslatef(x, y, z);
 
         glScalef(1.0f,1.0f,1.0f);
+
+        glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
 
         _model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);

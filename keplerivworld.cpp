@@ -32,6 +32,7 @@
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
+#include "structures/Hangar.h"
 
 
 extern  Controller controller;
@@ -522,8 +523,14 @@ void initWorldModelling()
     runway->setPos(0.0f,5.0f,0.0f);
     runway->embody(world,space);
 
+    Hangar *hangar = new Hangar();
+    hangar->init();
+    hangar->setPos(-550.0f,5.0f,0.0f);
+    hangar->embody(world,space);
+
     structures.push_back(structure);
     structures.push_back(runway);
+    structures.push_back(hangar);
 
     initWorldPopulation();
 

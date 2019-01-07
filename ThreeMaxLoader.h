@@ -58,7 +58,7 @@ typedef struct {
  class T3DSModel : Model {
      private:
          GLuint texture;
-         float scale;
+         float scalex,scaley,scalez;
          float x,y,z;
          char filename[256];
          obj_type object;
@@ -68,7 +68,7 @@ typedef struct {
 
          void setFilename(const char* p_filename);
          void setLocation(float x,float y,float z);
-         void setScale(float scale);
+         void setScale(float scalex,float scaley, float scalez);
          void setTexture(GLuint texture);
          void setObject(obj_type object);
 
@@ -81,6 +81,7 @@ typedef struct {
          //Loads an MD2Model from the specified file.  Returns NULL if there was
          //an error loading it.
          static T3DSModel* loadModel(const char *p_filename,float x, float y, float z, float scale,GLuint texture);
+         static T3DSModel* loadModel(const char *p_filename,float x, float y, float z, float scalex, float scaley, float scalez, GLuint texture);
  };
 
 #endif // !defined(AFX_THREEMAXLOADER_H__A3159AC5_B308_40E0_814C_5B537800FD30__INCLUDED_)
