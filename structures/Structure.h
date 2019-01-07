@@ -1,6 +1,9 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
+#define COLLISIONABLE 1
+#define LANDINGABLE   2
+
 #include "../units/Vehicle.h"
 #include "../ThreeMaxLoader.h"
 
@@ -29,6 +32,8 @@ public:
     void embody(dWorldID world, dSpaceID space);
 
     void embody(dBodyID myBodySelf);
+
+    int getType();
 
 
     // Camera

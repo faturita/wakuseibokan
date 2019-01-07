@@ -135,6 +135,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             // Analyze commands.
             if (strcmp(controller.str.c_str(),"map")==0)
                 controller.view = 2;
+            else if (strcmp(controller.str.c_str(),"control")==0)
+            {
+                std::cout << "Which:" << std::endl; std::cin >> controller.controlling;
+            }
             else {
                 // Send message to message board
                 messages.insert(messages.begin(),controller.str);

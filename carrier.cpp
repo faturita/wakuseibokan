@@ -273,7 +273,8 @@ void drawScene() {
     // Draw island structures.
     draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 
-    draw3DSModel("structures/Hangar.3ds",1200.0+100,20.0,-100,1,_textureBox);
+    //draw3DSModel("structures/turretbase.3ds",0.0,20.0,-1000,1,_textureBox);
+
 
     for(int i=0;i<structures.size();i++)
     {

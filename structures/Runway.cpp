@@ -42,3 +42,8 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
         printf ("model is null\n");
     }
 }
+
+int Runway::getType()
+{
+    return LANDINGABLE;
+}

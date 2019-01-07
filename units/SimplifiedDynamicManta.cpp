@@ -36,6 +36,9 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
     setThrottle(-controller.thrust*2*5);
 
+    if (getThrottle()>0)
+        Manta::inert = false;
+
     // roll
     Manta::aileron = controller.roll;
 
@@ -45,12 +48,6 @@ void SimplifiedDynamicManta::doControl(Controller controller)
     //Manta::rudder = controller.precesion*0.1;
 
     Manta::rudder = controller.precesion;
-
-    if (controller.precesion!=0)
-        inert = true;
-
-    if (controller.precesion==0)
-        inert = false;
 
     for(int i=0;i<10;i++)
     {

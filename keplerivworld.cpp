@@ -33,6 +33,7 @@
 #include "structures/Structure.h"
 #include "structures/Runway.h"
 #include "structures/Hangar.h"
+#include "structures/Turret.h"
 
 
 extern  Controller controller;
@@ -89,6 +90,18 @@ bool inline isStructure(dGeomID candidate)
     for (int i=0; i<structures.size(); i++)
     {
         if (candidate == structures[i]->getGeom())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool inline isRunway(dGeomID candidate)
+{
+    for (int i=0; i<structures.size(); i++)
+    {
+        if (candidate == structures[i]->getGeom() && structures[i]->getType()==LANDINGABLE)
         {
             return true;
         }
@@ -195,6 +208,18 @@ void inline groundcollisions(dBodyID body)
                 groundcollisions(dGeomGetBody(contact[i].geom.g2));
             }
 
+            if ( (isRunway(contact[i].geom.g1) || isRunway(contact[i].geom.g2))  )
+            {
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+                contact[i].surface.mu = 0.99;dInfinity;
+                contact[i].surface.slip1 = 0.9;
+                contact[i].surface.slip2 = 0.9;
+                contact[i].surface.bounce = 0.2;
+
+                releasecontrol(dGeomGetBody(contact[i].geom.g1));
+            } else
             if ( (isStructure(contact[i].geom.g1) || isStructure(contact[i].geom.g2))  )
             {
                 //printf("Structure Collision\n");
@@ -420,31 +445,6 @@ void initWorldModelling()
 	ground = dCreatePlane (space,0,1,0,0);
     
     
-    // create lift platform
-    //platform = dCreateBox(space, 100, 10, 100);
-    //dGeomSetPosition(platform, 0.0, 5, -300);
-    
-    
-    //drawBoxIsland(300,5,300,1000,10);
-    
-    //dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
-    
-    // Create an finite heightfield.
-    //dGeomHeightfieldDataBuildCallback( heightid, NULL, heightfield_callback,
-    //                                  REAL( 1000.0 ), REAL (1000.0), HFIELD_WSTEP, HFIELD_DSTEP,
-    //                                  REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
-    
-    //dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), REAL( +6.0 ) );
-    
-    //gheight = dCreateHeightfield( space, heightid, 1 );
-    
-    //dGeomSetPosition( gheight, 300, 5, 300 );
-    
-    // Add this to destroy
-    // dGeomHeightfieldDataDestroy( heightid );
-    
-    //_boxIsland.buildTerrainModel(space);
-    
     /**
     BoxIsland *baltimore = new BoxIsland();
     baltimore->setLocation(800.0,0.3,800.0);
@@ -525,12 +525,19 @@ void initWorldModelling()
 
     Hangar *hangar = new Hangar();
     hangar->init();
-    hangar->setPos(-550.0f,5.0f,0.0f);
+    hangar->setPos(-550.0f,5.0f, 0.0f);
     hangar->embody(world,space);
 
+    Turret *turret = new Turret();
+    turret->init();
+    turret->setPos(100.0f,5.0f, -100.0f);
+    hangar->embody(world,space);
+
+    structures.push_back(turret);
     structures.push_back(structure);
     structures.push_back(runway);
     structures.push_back(hangar);
+
 
     initWorldPopulation();
 

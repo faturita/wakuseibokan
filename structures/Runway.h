@@ -10,6 +10,8 @@ public:
     Runway();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
+
+    int getType();
 };
 
 #endif // RUNWAY_H

@@ -40,6 +40,8 @@ structures/Runway.cpp
 structures/Runway.h
 structures/Structure.cpp
 structures/Structure.h
+structures/Turret.cpp
+structures/Turret.h
 terrain/Terrain.cpp
 terrain/Terrain.h
 terrain/imageloader.cpp

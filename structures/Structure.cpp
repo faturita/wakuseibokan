@@ -16,6 +16,11 @@ void Structure::setTexture(GLuint texture)
     Structure::texture = texture;
 }
 
+int Structure::getType()
+{
+    return COLLISIONABLE;
+}
+
 void Structure::init()
 {
     //Load the model

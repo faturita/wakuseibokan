@@ -8,6 +8,7 @@ SRCS = carrier.cpp keplerivworld.cpp usercontrols.cpp camera.cpp odeutils.cpp ma
 
 TESTSRC = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
+#g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT $(ODEFL)
