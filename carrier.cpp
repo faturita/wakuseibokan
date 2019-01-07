@@ -72,11 +72,14 @@ extern std::vector<BoxIsland*> islands;
 
 extern std::vector<Structure*> structures;
 
+extern std::vector<Vehicle*> controlables;
+
 extern std::vector<std::string> messages;
 
 
 // @FIXME Change
 extern GLuint _textureBox;
+extern GLuint _textureMetal;
 
 
 void disclaimer()
@@ -124,7 +127,7 @@ void drawHUD()
     float speed=0;
     
     if (controller.controlling >0)
-        speed = vehicles[controller.controlling-1]->getSpeed();
+        speed = controlables[controller.controlling-1]->getSpeed();
     
 	sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.roll,controller.pitch,controller.yaw,controller.precesion);
 	drawString(0,-60,1,str,0.2f);
@@ -198,13 +201,13 @@ void drawScene() {
     if (controller.controlling >0 )
     {
         ctrling = controller.controlling-1;
-        vehicles[ctrling]->getViewPort(up,pos,forward);
+        controlables[ctrling]->getViewPort(up,pos,forward);
         
         Vec3f up2,pos2;
         //Camera.getViewPort(up2,pos2,forward);
 
-        if (vehicles[ctrling]->getType() == 3)
-            Camera.yAngle = ((Manta*)vehicles[ctrling])->alpha*100;
+        if (controlables[ctrling]->getType() == 3)
+            Camera.yAngle = ((Manta*)controlables[ctrling])->alpha*100;
     } else
     {
         Camera.getViewPort(up,pos,forward);
@@ -266,27 +269,19 @@ void drawScene() {
     
     drawBox(10,10,10);
     drawBox(-10,-10,-10);
-    
-    
-    // EXPERIMENTALLY: Draw 3DS models
-    //obj_type object;
-    //Load3DS(&object,"structures/watertower.3ds");
-    //draw3DSModel(object,650.0,15.0,600.0,1);
 
-    //draw3DSModel("structures/watertower.3ds",650.0,15.0,600.0,1,_textureBox);
+    // Draw island structures.
+    draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 
-    //Load3DS(&object,"structures/watertower.3ds");
-    //draw3DSModel("structures/construction.3ds",650.0,15.0,500.0,1,_textureBox);
-
-    //draw3DSModel("structures/structure.3ds",650.0+100,15.0,700.0+300.0,1,_textureBox);
-
+    draw3DSModel("structures/Hangar.3ds",1200.0+100,20.0,-100,1,_textureBox);
 
     for(int i=0;i<structures.size();i++)
     {
+        // @NOTE Textures are loaded up to this point so they are set into the objects now.
+        structures[i]->setTexture(_textureMetal);
         structures[i]->drawModel();
     }
-
-    draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+    //draw3DSModel("structures/runway.3ds",0.0f,5.0,0.0f,10,_textureBox);
 
 
     // Draw vehicles and objects
@@ -373,7 +368,7 @@ void update(int value)
         
         if (controller.controlling>0)
         {
-            vehicles[controller.controlling-1]->doControl(controller);
+            controlables[controller.controlling-1]->doControl(controller);
         }
         
         for (int i=0; i<vehicles.size(); i++) {

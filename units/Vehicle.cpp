@@ -225,6 +225,11 @@ void Vehicle::doControl(Controller controller)
     //engine[2] = controller.roll;
 }
 
+Controller Vehicle::getController()
+{
+    return myCopy;
+}
+
 void  Vehicle::doDynamics(dBodyID) {
     assert( 0 || !"This should not be executed.");
 }

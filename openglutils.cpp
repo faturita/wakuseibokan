@@ -8,6 +8,7 @@
 #include "openglutils.h"
 
 #include <iostream>
+#include <vector>
 
 GLuint _textureIdSea;
 GLuint _textureBox;
@@ -17,6 +18,10 @@ GLuint _textureSky;
 GLuint _textureLand;
 
 GLuint _textureMetal;
+
+
+std::vector<GLuint*> textures;
+
 
 void CheckGLError() {
 	GLuint err = glGetError();

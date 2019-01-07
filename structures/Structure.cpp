@@ -1,16 +1,25 @@
 #include "Structure.h"
 
-extern GLuint _textureBox;
-
 Structure::Structure()
 {
 
 }
 
+Structure::~Structure()
+{
+    if (_model != NULL)
+            delete _model;
+}
+
+void Structure::setTexture(GLuint texture)
+{
+    Structure::texture = texture;
+}
+
 void Structure::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/structure.3ds",160.99f,-19.48f,76.36f,1,_textureBox);
+    _model = (Model*)T3DSModel::loadModel("structures/structure.3ds",160.99f,-19.48f,76.36f,1,Structure::texture);
     if (_model != NULL)
         _model->setAnimation("run");
 
@@ -39,7 +48,7 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        _model->draw();
+        _model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
@@ -64,4 +73,32 @@ void Structure::embody(dWorldID world, dSpaceID space)
 void Structure::embody(dBodyID myBodySelf)
 {
 
+}
+
+
+void Structure::doControl(Controller controller)
+{
+    Structure::inclination = controller.yaw;
+    Structure::azimuth = controller.roll;
+}
+
+Vec3f Structure::getForward()
+{
+    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,Structure::inclination);
+    return forward;
+}
+
+void Structure::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+{
+    position = getPos();
+    forward = getForward();
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    forward = forward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
+    position = position - 5*forward + Up;
+    forward = orig-position;
 }

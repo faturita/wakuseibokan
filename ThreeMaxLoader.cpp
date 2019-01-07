@@ -354,20 +354,20 @@ obj_type load3DSModel(const char *p_filename)
     return object;
 }
 
-int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint _textureMetal)
+int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float scaley, float scalez, GLuint _texture)
 {
 
     int l_index;
 
     glPushMatrix();
     glTranslatef(x, y, z);
-    glScalef(scale,scale,scale);
+    glScalef(scalex,scaley,scalez);
     glRotatef(90,1.0,0.0,0.0);
     glRotatef(180,1.0,0.0,0.0);
 
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureMetal);
+    glBindTexture(GL_TEXTURE_2D, _texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -416,7 +416,10 @@ int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint 
     glPopMatrix();
 }
 
-
+int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint _texture)
+{
+    return draw3DSModel(object,x,y,z,scale,scale,scale,_texture);
+}
 void calculateCenterOfMass(obj_type &object)
 {
     int l_index;
@@ -497,7 +500,7 @@ void calculateCenterOfMass(obj_type &object)
     printf("Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
 }
 
-int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _textureMetal)
+int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _texture)
 {
     obj_type object;
     obj_type *p_object;
@@ -649,7 +652,7 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
 
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureMetal);
+    glBindTexture(GL_TEXTURE_2D, _texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -704,6 +707,7 @@ T3DSModel::T3DSModel()
 T3DSModel::~T3DSModel()
 {
 
+
 }
 
 //Switches to the given animation
@@ -715,11 +719,11 @@ void T3DSModel::setAnimation(const char* name)
 void T3DSModel::draw()
 {
     //draw3DSModel(filename,x,y,z,scale,_texture);
-    draw3DSModel(T3DSModel::object,x,y,z,scale,_texture);
+    draw(T3DSModel::texture);
 }
-void T3DSModel::draw(GLuint *)
+void T3DSModel::draw(GLuint _texture)
 {
-
+    draw3DSModel(T3DSModel::object,x,y,z,scale,_texture);
 }
 void T3DSModel::setFilename(const char* p_filename)
 {
@@ -735,9 +739,9 @@ void T3DSModel::setScale(float scale)
 {
     T3DSModel::scale=scale;
 }
-void T3DSModel::setTexture(GLuint _textureMetal)
+void T3DSModel::setTexture(GLuint texture)
 {
-    T3DSModel::_texture=_textureMetal;
+    T3DSModel::texture=texture;
 }
 
 void T3DSModel::setObject(obj_type object)
@@ -747,14 +751,15 @@ void T3DSModel::setObject(obj_type object)
 }
 
 //Loads an MD2Model from the specified file.
-T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal)
+T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scale,GLuint texture)
 {
     T3DSModel* td = new T3DSModel();
     td->setFilename(p_filename);
     td->setLocation(x,y,z);
     td->setScale(scale);
-    td->setTexture(_textureMetal);
+    td->setTexture(texture);
     td->setObject(load3DSModel(p_filename));
     return td;
 }
+
 

@@ -368,6 +368,7 @@ MD2Model* MD2Model::loadModel(const char* filename) {
 		//return NULL;
 	}
 
+    // @FIXME: It should be incorporated to the texture model of the engine.
 	strcpy ( buffer, "vtr.bmp");
 	Image* image = loadBMP(buffer);
     GLuint textureId = md2model::loadTexture(image);
@@ -475,6 +476,10 @@ void MD2Model::advance(float dt) {
     //printf ("Time: %f\n", time);
 }
 
+void MD2Model::draw(GLuint texture)
+{
+    assert( 0 || !"Should not be executed.");
+}
 void MD2Model::draw() {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textureId);

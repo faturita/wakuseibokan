@@ -89,7 +89,8 @@ void Balaenidae::embody(dBodyID myBodySelf)
     float length = 7.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,100.0f, 40, 500.0f);
+    //dMassSetBox(&m,1,1.0f, 4, 5.0f);
+    dMassSetBox(&m, 1,100.0f, 40, 500.0f);
     //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
@@ -142,7 +143,7 @@ void Balaenidae::doDynamics(dBodyID body)
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
     dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
-    dBodyAddRelTorque(body,0.0f,Balaenidae::rudder,0.0f);
+    dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
     wrapDynamics(body);
 }

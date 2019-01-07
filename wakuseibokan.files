@@ -34,6 +34,8 @@ odeutils.h
 opengltemplate.cpp
 openglutils.cpp
 openglutils.h
+structures/Runway.cpp
+structures/Runway.h
 structures/Structure.cpp
 structures/Structure.h
 terrain/Terrain.cpp

@@ -32,6 +32,8 @@ protected:
     float steering;
     
     dBodyID me;
+
+    Controller myCopy;
     
 public:
     bool inert;
@@ -65,6 +67,7 @@ public:
     void virtual doDynamics();
 
     void virtual doControl(Controller);
+    Controller getController();
     
     void virtual embody(dBodyID myBodySelf);
 

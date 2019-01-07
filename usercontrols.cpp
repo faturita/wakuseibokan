@@ -180,8 +180,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.reset();
             Camera.reset();
         break;
-        case '1':case '2':case '3': case '4': case '5': case '6':
-            controller.view = 1;
+        case '1':case '2':case '3': case '4': case '5': case '6':case '7':
             controller.controlling = (int)(key-48);
             controller.reset();
         	//spd = vehicles.getThrottle();
@@ -193,8 +192,8 @@ void handleKeypress(unsigned char key, int x, int y) {
             std::cout << "Value:" << std::endl; std::cin >> controller.param[param] ;
             }
         break;
-        case '!':Camera.control = 1;break;
-        case '"':Camera.control = 2;break;
+        case '!':controller.view = 1;break;
+        case '@':controller.view = 3;break;
         case '~':Camera.control = 0;break;
         case 'S':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;

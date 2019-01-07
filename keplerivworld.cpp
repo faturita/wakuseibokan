@@ -10,6 +10,8 @@
 
 #define dSINGLE
 
+#define kmf *1000.0f
+
 #include <vector>
 #include <unordered_map>
 
@@ -29,6 +31,7 @@
 #include "terrain/Terrain.h"
 
 #include "structures/Structure.h"
+#include "structures/Runway.h"
 
 
 extern  Controller controller;
@@ -49,6 +52,9 @@ std::vector<Structure*> structures;
 
 std::vector<std::string> messages;
 
+
+
+std::vector<Vehicle*> controlables;
 
 std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
 
@@ -190,7 +196,7 @@ void inline groundcollisions(dBodyID body)
 
             if ( (isStructure(contact[i].geom.g1) || isStructure(contact[i].geom.g2))  )
             {
-                printf("Structure Collision\n");
+                //printf("Structure Collision\n");
                 groundcollisions(dGeomGetBody(contact[i].geom.g1));
                 groundcollisions(dGeomGetBody(contact[i].geom.g2));
             } else
@@ -378,7 +384,10 @@ void initWorldPopulation()
     vehicles.push_back(_b);
 
     for(int i=0;i<vehicles.size();i++)
+    {
         vehiclesInWorld[vehicles[i]->getBodyID()] = vehicles[i];
+        controlables.push_back(vehicles[i]);
+    }
     
 }
 
@@ -472,9 +481,7 @@ void initWorldModelling()
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
     
     
-    BoxIsland *nonsquareisland = new BoxIsland();
-    nonsquareisland->setLocation(6000.0f,-0.3,-1000.0);
-    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+
     
 
     BoxIsland *atom = new BoxIsland();
@@ -486,9 +493,10 @@ void initWorldModelling()
     thermopilae->setLocation(0.0f,-1.0,0.0f);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
 
-    //BoxIsland *baltandmore = new BoxIsland();
-    //baltandmore->setLocation(-1600.0f,-1.0,+8500.0);
-    //baltandmore->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
+    BoxIsland *nonsquareisland = new BoxIsland();
+    nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+
 
     /**islands.push_back(baltimore);
     islands.push_back(runway);
@@ -502,15 +510,27 @@ void initWorldModelling()
     islands.push_back(atom);
     **/
     islands.push_back(thermopilae);
+    islands.push_back(nonsquareisland);
 
     Structure *structure = new Structure();
     structure->init();
     structure->setPos(0.0f,25.0f,-1000.0f);
     structure->embody(world,space);
 
+    Runway *runway = new Runway();
+    runway->init();
+    runway->setPos(0.0f,5.0f,0.0f);
+    runway->embody(world,space);
+
     structures.push_back(structure);
-    
+    structures.push_back(runway);
+
     initWorldPopulation();
+
+
+    for(int i=0;i<structures.size();i++)
+        controlables.push_back(structures[i]);
+
     
     //MultiBodyVehicle *_mbody = new MultiBodyVehicle();
     //_mbody->init();

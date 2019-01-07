@@ -85,6 +85,7 @@ class MD2Model : public Model {
 		void advance(float dt);
 		//Draws the current state of the animated model.
         void virtual draw();
+        void virtual draw(GLuint texture);
 		
 		//Loads an MD2Model from the specified file.  Returns NULL if there was
 		//an error loading it.

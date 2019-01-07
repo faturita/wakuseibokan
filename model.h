@@ -8,6 +8,7 @@ class Model
 {
 public:
     void virtual draw() = 0;
+    void virtual draw(GLuint texture) = 0;
     void virtual setAnimation(const char *name) = 0;
 };
 
