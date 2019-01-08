@@ -47,12 +47,8 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //drawRectangularBox(16.0f/2.0f, 5.2f/2.0f, 8.0f/2.0f);
 
+        glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
-		glRotatef(-180.0f, 0.0f, 0.0f, 1.0f);
-
-		//glRotatef(yRot, 0.0f, 0.0f, 1.0f);
-
-        //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         _model->draw();
 

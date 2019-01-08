@@ -36,6 +36,11 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
     setThrottle(-controller.thrust*2*5);
 
+    if (controller.yaw>0)
+        antigravity = true;
+    else if (controller.yaw==0)
+        antigravity = false;
+
     if (getThrottle()>0)
         Manta::inert = false;
 
@@ -170,6 +175,9 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
+
+    if (Manta::antigravity)
+        dBodyAddForce(body,0,9.81f,0);
 
     //dBodySetRotation(body,R);
 

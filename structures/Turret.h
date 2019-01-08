@@ -11,6 +11,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
+    Vec3f getForward();
 };
 
 #endif // TURRET_H

@@ -78,15 +78,11 @@ void Walrus::drawModel()
 }
 
 void Walrus::doControl(Controller controller)
-{
-    //engine[0] = -controller.roll;
-    //engine[1] = controller.yaw;
-    //engine[2] = -controller.pitch;
-    //steering = -controller.precesion;   
+{ 
     
-    setThrottle(-controller.yaw);
+    setThrottle(-controller.thrust);
     
-    xRotAngle = controller.precesion;
+    xRotAngle = controller.roll;
     
 }
 

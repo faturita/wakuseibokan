@@ -64,6 +64,7 @@ std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
 // this is called by dSpaceCollide when two objects in space are
 // potentially colliding.
 
+
 void inline releasecontrol(dBodyID body)
 {
     for (int i=0; i<vehicles.size(); i++)
@@ -218,7 +219,7 @@ void inline groundcollisions(dBodyID body)
                 contact[i].surface.slip2 = 0.9;
                 contact[i].surface.bounce = 0.2;
 
-                releasecontrol(dGeomGetBody(contact[i].geom.g1));
+                //releasecontrol(dGeomGetBody(contact[i].geom.g1));
             } else
             if ( (isStructure(contact[i].geom.g1) || isStructure(contact[i].geom.g2))  )
             {
@@ -531,7 +532,7 @@ void initWorldModelling()
     Turret *turret = new Turret();
     turret->init();
     turret->setPos(100.0f,5.0f, -100.0f);
-    hangar->embody(world,space);
+    turret->embody(world,space);
 
     structures.push_back(turret);
     structures.push_back(structure);
