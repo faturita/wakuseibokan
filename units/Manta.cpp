@@ -104,25 +104,26 @@ void Manta::doControl(Controller controller)
     //steering = -controller.precesion;
     
     
-    setThrottle(-controller.thrust*2*5);
+    setThrottle(-controller.registers.thrust*2*5);
     
     // roll
-    if (controller.roll>4) controller.roll = 4;
-    if (controller.roll<-4) controller.roll = -4;
-    Manta::aileron = controller.roll;
+    if (controller.registers.roll>4) controller.registers.roll = 4;
+    if (controller.registers.roll<-4) controller.registers.roll = -4;
+    Manta::aileron = controller.registers.roll;
     
     // pitch
-    Manta::elevator = controller.pitch*0.1;
+    Manta::elevator = controller.registers.pitch*0.1;
     
     //Manta::rudder = controller.precesion*0.1;
     
-    Manta::rudder = controller.precesion*0.1;
+    Manta::rudder = controller.registers.precesion*0.1;
     
     for(int i=0;i<10;i++)
     {
         if (controller.param[i]!=0)
             Manta::param[i] = controller.param[i];
     }
+
 }
 
 void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)

@@ -101,11 +101,11 @@ void Balaenidae::embody(dBodyID myBodySelf)
 
 void Balaenidae::doControl(Controller controller)
 {
-    if (getThrottle()==0 and controller.thrust != 0)
+    if (getThrottle()==0 and controller.registers.thrust != 0)
         honk();
-    setThrottle(-controller.thrust*2*5);
+    setThrottle(-controller.registers.thrust*2*5);
 
-    Balaenidae::rudder = controller.roll;
+    Balaenidae::rudder = controller.registers.roll;
 }
 
 void Balaenidae::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)

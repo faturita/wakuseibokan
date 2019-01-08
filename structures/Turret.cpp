@@ -46,13 +46,24 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
 
         draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
 
-        glTranslatef((firing+=100),0.0f,0.0f);
-        drawArrow(100.0f,0.0f,0.0f,0.0,1.0,0.0);
+        // Gun shots
+        //glTranslatef((firing+=100),0.0f,0.0f);
+        //drawArrow(100.0f,0.0f,0.0f,0.0,1.0,0.0);
 
-        if (firing==1000) firing=0;
+
+        // Laser Beam
+        //drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
 
         //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();
+
+        /**glPushMatrix();
+        glLoadIdentity();
+        glLoadMatrixf(modelview);
+        glTranslatef((firing+=50),0.0f,0.0f);
+        drawArrow(100.0f,0.0f,0.0f,1.0,0.0,0.0);
+
+        glPopMatrix();**/
     }
     else
     {

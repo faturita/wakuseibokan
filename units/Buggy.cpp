@@ -87,11 +87,11 @@ void Buggy::doControl(Controller controller)
     //steering = -controller.precesion;
     
     
-    setThrottle(-controller.pitch);
+    setThrottle(-controller.registers.pitch);
     
-    xRotAngle = controller.precesion;
+    xRotAngle = controller.registers.precesion;
     
-    yRotAngle = controller.roll;
+    yRotAngle = controller.registers.roll;
     
 }
 

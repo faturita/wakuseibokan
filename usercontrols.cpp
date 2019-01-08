@@ -18,6 +18,8 @@
 
 #include "camera.h"
 #include "usercontrols.h"
+#include "units/Vehicle.h"
+#include "actions/Action.h"
 
 Camera Camera;
 
@@ -28,6 +30,10 @@ Controller controller;
 // control = 2 Walrus
 
 extern std::vector<std::string> messages;
+
+extern std::vector<Vehicle*> controlables;
+
+extern std::vector<Action*> actions;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -161,32 +167,34 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.interrupt();
         case '+':Camera.dx+=0.1;break;
         case '-':Camera.dx-=0.1;break;
-        case 32 :Camera.dx=0.00001; controller.thrust = 0;break;
+        case 32 :Camera.dx=0.00001; controller.registers.thrust = 0;break;
         case '^':pp = !(pp);break;
-        case 'a':case 'k':controller.roll-=1.0f;break;
-        case 'd':case 'l':controller.roll+=1.0f;break;
-        case 'w':controller.pitch-=1.0f;break;
-        case 's':controller.pitch+=1.0f;break;
-        case 'z':controller.yaw-=1.0f;break;
-        case 'c':controller.yaw+=1.0f;break;
-        case 'v':controller.precesion-=1.0f;break;
-        case 'b':controller.precesion+=1.0f;break;
-        case '9':controller.thrust+=20.0f;break;
+        case 'a':case 'k':controller.registers.roll-=1.0f;break;
+        case 'd':case 'l':controller.registers.roll+=1.0f;break;
+        case 'w':controller.registers.pitch-=1.0f;break;
+        case 's':controller.registers.pitch+=1.0f;break;
+        case 'z':controller.registers.yaw-=1.0f;break;
+        case 'c':controller.registers.yaw+=1.0f;break;
+        case 'v':controller.registers.precesion-=1.0f;break;
+        case 'b':controller.registers.precesion+=1.0f;break;
+        case '9':controller.registers.thrust+=20.0f;break;
         case 'p':controller.pause = !controller.pause;break;
-        case 'r':controller.thrust-=0.05;break;
-        case 'R':controller.thrust-=10.00;break;
-        case 'f':controller.thrust+=0.05;break;
-        case 'F':controller.thrust+=10.00;break;
+        case 'r':controller.registers.thrust-=0.05;break;
+        case 'R':controller.registers.thrust-=10.00;break;
+        case 'f':controller.registers.thrust+=0.05;break;
+        case 'F':controller.registers.thrust+=10.00;break;
         case 'q':controller.reset();break;
-        case 'Q':controller.thrust = 0.0;break;
+        case 'Q':controller.registers.thrust = 0.0;break;
         case '0':
         	controller.controlling = 0;
             controller.reset();
             Camera.reset();
         break;
         case '1':case '2':case '3': case '4': case '5': case '6':case '7':
+            controlables[controller.controlling-1]->setControlRegisters(controller.registers);
             controller.controlling = (int)(key-48);
-            controller.reset();
+            //controller.reset();
+            controller.registers = controlables[controller.controlling-1]->getControlRegisters();
         	//spd = vehicles.getThrottle();
         break;
         case 'i':

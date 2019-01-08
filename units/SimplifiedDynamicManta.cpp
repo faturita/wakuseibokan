@@ -34,31 +34,32 @@ void SimplifiedDynamicManta::doControl(Controller controller)
     //steering = -controller.precesion;
 
 
-    setThrottle(-controller.thrust*2*5);
+    setThrottle(-controller.registers.thrust*2*5);
 
-    if (controller.yaw>0)
+    if (controller.registers.yaw>0)
         antigravity = true;
-    else if (controller.yaw==0)
+    else if (controller.registers.yaw==0)
         antigravity = false;
 
     if (getThrottle()>0)
         Manta::inert = false;
 
     // roll
-    Manta::aileron = controller.roll;
+    Manta::aileron = controller.registers.roll;
 
     // pitch
-    Manta::elevator = controller.pitch;
+    Manta::elevator = controller.registers.pitch;
 
     //Manta::rudder = controller.precesion*0.1;
 
-    Manta::rudder = controller.precesion;
+    Manta::rudder = controller.registers.precesion;
 
     for(int i=0;i<10;i++)
     {
         if (controller.param[i]!=0)
             Manta::param[i] = controller.param[i];
     }
+
 }
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)

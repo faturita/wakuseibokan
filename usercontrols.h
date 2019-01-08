@@ -5,13 +5,31 @@
 #include <string>
 #include <iostream>
 
+struct controlregister
+{
+    // R+,F-
+    float thrust=0;
+
+    // ModAngleX
+    float roll=0;
+
+    // ModAngleY
+    float pitch=0;
+
+    // ModAngleZ
+    float yaw=0;
+
+    // ModAngleP
+    float precesion=0;
+};
+
 
 class Controller
 {
 public:
     
 	// Device ID to be controller.
-	int controlling;
+    int controlling=1;
     
 	// Index to Observable interfaces.
 	int camera;
@@ -19,20 +37,7 @@ public:
     // Which view mode is currently active.
     int view=1;
     
-	// R+,F-
-	float thrust;
-    
-	// ModAngleX
-	float roll;
-    
-	// ModAngleY
-	float pitch;
-    
-	// ModAngleZ
-	float yaw;
-    
-	// ModAngleP
-	float precesion;
+    struct controlregister registers;
 
     // Custom parameters that can be entered from controller.
     float param[10];
@@ -49,8 +54,8 @@ public:
     
     void reset()
     {
-        roll=pitch=precesion=yaw=0;
-        thrust=0;
+        registers.roll=registers.pitch=registers.precesion=registers.yaw=0;
+        registers.thrust=0;
     };
     
     void interrupt()

@@ -83,8 +83,8 @@ void Structure::embody(dBodyID myBodySelf)
 
 void Structure::doControl(Controller controller)
 {
-    Structure::inclination = controller.yaw;
-    Structure::azimuth = controller.roll;
+    Structure::inclination = controller.registers.pitch;
+    Structure::azimuth = controller.registers.roll;
 }
 
 Vec3f Structure::getForward()

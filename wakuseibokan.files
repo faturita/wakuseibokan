@@ -5,6 +5,8 @@ OdeWorld.cpp
 OdeWorld.h
 ThreeMaxLoader.cpp
 ThreeMaxLoader.h
+actions/Action.cpp
+actions/Action.h
 anothermain.cpp
 camera.cpp
 camera.h

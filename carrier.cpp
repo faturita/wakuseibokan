@@ -129,10 +129,10 @@ void drawHUD()
     if (controller.controlling >0)
         speed = controlables[controller.controlling-1]->getSpeed();
     
-	sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.roll,controller.pitch,controller.yaw,controller.precesion);
+    sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-	sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.thrust);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.registers.thrust);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -217,8 +217,8 @@ void drawScene() {
             pos[1]+=(forward[1]);
             pos[2]+=(forward[2]);
             
-            pos[2]+=controller.pitch;
-            pos[0]+=controller.roll;
+            pos[2]+=controller.registers.pitch;
+            pos[0]+=controller.registers.roll;
         }
     }
     

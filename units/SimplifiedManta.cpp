@@ -9,23 +9,24 @@ void SimplifiedManta::doControl(Controller controller)
     //steering = -controller.precesion;
 
 
-    setThrottle(-controller.thrust*2*5);
+    setThrottle(-controller.registers.thrust*2*5);
 
     // roll
-    Manta::aileron = controller.roll;
+    Manta::aileron = controller.registers.roll;
 
     // pitch
-    Manta::elevator = controller.pitch;
+    Manta::elevator = controller.registers.pitch;
 
     //Manta::rudder = controller.precesion*0.1;
 
-    Manta::rudder = controller.precesion;
+    Manta::rudder = controller.registers.precesion;
 
     for(int i=0;i<10;i++)
     {
         if (controller.param[i]!=0)
             Manta::param[i] = controller.param[i];
     }
+
 }
 
 

@@ -225,9 +225,9 @@ void Vehicle::doControl(Controller controller)
     //engine[2] = controller.roll;
 }
 
-Controller Vehicle::getController()
+void Vehicle::setControlRegisters(struct controlregister reg)
 {
-    return myCopy;
+    Vehicle::myCopy = reg;
 }
 
 void  Vehicle::doDynamics(dBodyID) {
@@ -258,6 +258,11 @@ void  Vehicle::embody(dBodyID myBodySelf)
 dBodyID Vehicle::getBodyID()
 {
     return me;
+}
+
+struct controlregister Vehicle::getControlRegisters()
+{
+    return myCopy;
 }
 
 void Vehicle::wrapDynamics(dBodyID body)

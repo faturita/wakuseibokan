@@ -6,6 +6,8 @@
 class Turret : public Structure
 {
 public:
+    GLfloat modelview[16];
+
     Turret();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);

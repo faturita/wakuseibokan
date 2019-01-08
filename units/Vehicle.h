@@ -33,7 +33,7 @@ protected:
     
     dBodyID me;
 
-    Controller myCopy;
+    struct controlregister myCopy;
     
 public:
     bool inert;
@@ -67,7 +67,6 @@ public:
     void virtual doDynamics();
 
     void virtual doControl(Controller);
-    Controller getController();
     
     void virtual embody(dBodyID myBodySelf);
 
@@ -81,6 +80,9 @@ public:
     Vec3f dBodyGetLinearVelInBody(dBodyID body);
     Vec3f dBodyGetAngularVelInBody(dBodyID body);
     Vec3f dBodyGetLinearVelVec(dBodyID body);
+
+    struct controlregister getControlRegisters();
+    void setControlRegisters(struct controlregister);
 
 };
 

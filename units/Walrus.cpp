@@ -80,9 +80,9 @@ void Walrus::drawModel()
 void Walrus::doControl(Controller controller)
 { 
     
-    setThrottle(-controller.thrust);
+    setThrottle(-controller.registers.thrust);
     
-    xRotAngle = controller.roll;
+    xRotAngle = controller.registers.roll;
     
 }
 
