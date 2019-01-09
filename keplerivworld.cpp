@@ -514,31 +514,13 @@ void initWorldModelling()
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
 
-    Structure *structure = new Structure();
-    structure->init();
-    structure->setPos(0.0f,25.0f,-1000.0f);
-    structure->embody(world,space);
+    structures.push_back(thermopilae->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Structure(),    0.0f,-1000.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Runway()   ,    0.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
 
-    Runway *runway = new Runway();
-    runway->init();
-    runway->setPos(0.0f,5.0f,0.0f);
-    runway->embody(world,space);
-
-    Hangar *hangar = new Hangar();
-    hangar->init();
-    hangar->setPos(-550.0f,5.0f, 0.0f);
-    hangar->embody(world,space);
-
-    Turret *turret = new Turret();
-    turret->init();
-    turret->setPos(100.0f,5.0f, -100.0f);
-    turret->embody(world,space);
-
-    structures.push_back(turret);
-    structures.push_back(structure);
-    structures.push_back(runway);
-    structures.push_back(hangar);
-
+    structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
 
     initWorldPopulation();
 

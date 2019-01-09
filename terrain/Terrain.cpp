@@ -143,6 +143,31 @@ void BoxIsland::draw()
     //drawBoxIsland(300,5,300,600,5*2);
 }
 
+/**
+ * x, z values are SCALED.  They are relative to the island center in 3600x3600 dimensions (3.6 km)
+ *
+ * @brief BoxIsland::addStructure
+ * @param structure
+ * @param x
+ * @param z
+ * @param space
+ * @param world
+ * @return
+ */
+Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world)
+{
+    // This should be half the height of the structure. @FIXME
+    float heightOffset = 5.0+_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+    structure->init();
+    structure->setPos(X+x,heightOffset,Z+z);
+    structure->embody(world,space);
+
+    // @NOTE: when the structure is destroyed this pointer must be eliminated.
+    structures.push_back(structure);
+
+    return structure;
+}
+
 void drawTerrain(Terrain *_landmass, float fscale)
 {
     drawTerrain(_landmass, fscale, 0.3f, 0.9f, 0.0f);

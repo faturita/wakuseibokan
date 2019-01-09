@@ -8,8 +8,12 @@
 #ifndef TERRAIN_H_
 #define TERRAIN_H_
 
+#include <iostream>
+#include <vector>
+
 #include "../odeutils.h"
 #include "../openglutils.h"
+#include "../structures/Structure.h"
 
 
 #define HFIELD_WSTEP			60			// Vertex count along edge >= 2
@@ -70,7 +74,8 @@ class Terrain {
 
 		//Returns the height at (x, z)
 		float getHeight(int x, int z) {
-			return hs[z][x];
+            assert ((z>=0 && z<l && x>=0 && x<w) || !"Terrain has reached out of scope.");
+            return hs[z][x];
 		}
 
 		//Computes the normals, if they haven't been computed yet
@@ -185,6 +190,8 @@ private:
     float X,Y,Z;
 
     dGeomID islandGeom;
+
+    std::vector<Structure*> structures;
     
 public:
     
@@ -195,6 +202,8 @@ public:
     void setLocation(float x, float y, float z);
 
     dGeomID getGeom();
+
+    Structure* addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world);
 };
 
 
