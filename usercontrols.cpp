@@ -16,13 +16,16 @@
 
 #include "math/yamathutil.h"
 
+#include "container.h"
+
 #include "camera.h"
 #include "usercontrols.h"
 #include "units/Vehicle.h"
-#include "actions/Action.h"
 
 Camera Camera;
 
+extern dWorldID world;
+extern dSpaceID space;
 
 Controller controller;
 
@@ -33,7 +36,7 @@ extern std::vector<std::string> messages;
 
 extern std::vector<Vehicle*> controlables;
 
-extern std::vector<Action*> actions;
+extern container<Vehicle*> vehicles;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -209,6 +212,9 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '~':Camera.control = 0;break;
         case 'S':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
+        case 'h':
+            vehicles.push_back((controlables[controller.controlling-1])->fire(world,space));
+        break;
 	}
 }
 

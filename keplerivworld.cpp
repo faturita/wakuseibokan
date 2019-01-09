@@ -14,6 +14,9 @@
 
 #include <vector>
 #include <unordered_map>
+#include <mutex>
+
+#include "container.h"
 
 #include "odeutils.h"
 
@@ -35,7 +38,6 @@
 #include "structures/Hangar.h"
 #include "structures/Turret.h"
 
-
 extern  Controller controller;
 
 /* dynamics and collision objects */
@@ -47,7 +49,7 @@ dSpaceID space;
 dBodyID body[NUM];
 dJointGroupID contactgroup;
 
-std::vector<Vehicle*> vehicles;
+container<Vehicle*> vehicles;
 
 std::vector<BoxIsland*> islands;
 std::vector<Structure*> structures;
@@ -202,7 +204,6 @@ void inline groundcollisions(dBodyID body)
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
     if (n > 0) {
         for (i=0; i<n; i++) {
-
             if ((ground == contact[i].geom.g1) || (ground == contact[i].geom.g2))
             {
                 groundcollisions(dGeomGetBody(contact[i].geom.g1));
@@ -424,7 +425,9 @@ void initWorldModelling()
 	dMass m;
     
 	/* create world */
-	dInitODE();
+    dInitODE();
+    //dInitODE2(dInitFlagManualThreadCleanup);
+    //dAllocateODEDataForThread(dAllocateMaskAll);
 	world = dWorldCreate();
 	space = dHashSpaceCreate (0);
     
@@ -523,7 +526,6 @@ void initWorldModelling()
     structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
 
     initWorldPopulation();
-
 
     for(int i=0;i<structures.size();i++)
         controlables.push_back(structures[i]);

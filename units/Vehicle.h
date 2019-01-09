@@ -34,12 +34,15 @@ protected:
     dBodyID me;
 
     struct controlregister myCopy;
+
+    int ttl=-1;  //Live for ever.
     
 public:
     bool inert;
 	float xRotAngle;
 	float yRotAngle;
 	Vehicle();
+    ~Vehicle();
     
     int virtual getType();
     
@@ -52,9 +55,10 @@ public:
 	void setPos(float x, float y, float z);
 	Vec3f getPos();
 	void setForward(float x, float y, float z);
+    void setForward(Vec3f);
 	Vec3f getForward();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-    void virtual drawModel() { assert( 0 || !"Should not be executed."); }
+    void virtual drawModel();
     
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void setLocation(float fPos[3], float R[12]);
@@ -83,6 +87,10 @@ public:
 
     struct controlregister getControlRegisters();
     void setControlRegisters(struct controlregister);
+
+    virtual Vehicle* fire(dWorldID world, dSpaceID space);
+
+    virtual int getTtl();
 
 };
 

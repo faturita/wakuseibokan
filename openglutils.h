@@ -18,6 +18,7 @@ void drawArrow();
 void drawArrow(float scale);
 void drawArrow(float x, float y, float z);
 void drawArrow(float x, float y, float z,float red, float green, float blue);
+void drawArrow(float x, float y, float z,float red, float green, float blue, float linewidth);
 void doTransform (float pos[3], float R[12]);
 void doTransform(float R[12]);
 void drawRectangularBox(float width, float height, float length);

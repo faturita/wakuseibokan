@@ -14,6 +14,8 @@ public:
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     Vec3f getForward();
+
+    Vehicle* fire(dWorldID world, dSpaceID space);
 };
 
 #endif // TURRET_H

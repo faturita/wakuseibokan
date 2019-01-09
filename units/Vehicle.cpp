@@ -20,6 +20,12 @@ Vehicle::Vehicle()
 	R[0]=R[5]=R[10]=1;
 }
 
+Vehicle::~Vehicle()
+{
+    dBodyDestroy(me);
+    printf("Vehicle Good bye....\n");
+}
+
 void Vehicle::setXRotAngle(float xRotAngle)
 {
 	Vehicle::xRotAngle = xRotAngle;
@@ -58,6 +64,10 @@ void Vehicle::setForward(float x, float y, float z)
 	forward[0]=x;
 	forward[1]=y;
 	forward[2]=z;
+}
+void Vehicle::setForward(Vec3f p)
+{
+    forward = p;
 }
 
 Vec3f Vehicle::getForward()
@@ -183,6 +193,11 @@ void Vehicle::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+void Vehicle::drawModel()
+{
+    drawModel(0,0,pos[0],pos[1],pos[2]);
+}
+
 /**
 void Vehicle::drawModel()
 {
@@ -233,8 +248,14 @@ void Vehicle::setControlRegisters(struct controlregister reg)
 void  Vehicle::doDynamics(dBodyID) {
     assert( 0 || !"This should not be executed.");
 }
-void  Vehicle::doDynamics() {
-    assert( 0 || !"This should not be executed.");
+void  Vehicle::doDynamics()
+{
+    doDynamics(getBodyID());
+}
+
+Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
+{
+    assert(0 || !"This should not be executed.");
 }
 
 
@@ -258,6 +279,11 @@ void  Vehicle::embody(dBodyID myBodySelf)
 dBodyID Vehicle::getBodyID()
 {
     return me;
+}
+
+int Vehicle::getTtl()
+{
+    return Vehicle::ttl;
 }
 
 struct controlregister Vehicle::getControlRegisters()

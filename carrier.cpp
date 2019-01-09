@@ -25,12 +25,15 @@
 #include <ode/ode.h>
 
 #include <vector>
+#include <mutex>
 
 #include "ThreeMaxLoader.h"
 
 #include "font/DrawFonts.h"
 
 #include "math/yamathutil.h"
+
+#include "container.h"
 
 #include "usercontrols.h"
 #include "camera.h"
@@ -64,7 +67,7 @@ extern dJointID joint[NUM-1];
 extern dJointGroupID contactgroup;
 extern dGeomID sphere[NUM];
 
-extern std::vector<Vehicle*> vehicles;
+extern container<Vehicle*> vehicles;
 
 //extern BoxIsland _boxIsland;
 
@@ -371,9 +374,23 @@ void update(int value)
         {
             controlables[controller.controlling-1]->doControl(controller);
         }
+
+        printf("Elements alive now: %d\n", vehicles.size());
         
         for (int i=0; i<vehicles.size(); i++) {
             vehicles[i]->doDynamics();
+        }
+
+
+        for(int i=0;i<vehicles.size();i++)
+        {
+            printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+            if (vehicles[i]->getType()==5 && vehicles[i]->getTtl()==0)
+            {
+                printf("Eliminating....\n");
+                vehicles.erase(i);
+                //delete vehicles[i];
+            }
         }
 
         
@@ -406,7 +423,7 @@ int main(int argc, char** argv) {
         glutFullScreen();
     
 
-    //dAllocateODEDataForThread(dAllocateMaskAll);
+    // Initialize ODE, create islands, structures and populate the world.
     initWorldModelling();
     
     //Initialize all the models and structures.
@@ -427,8 +444,7 @@ int main(int argc, char** argv) {
 	glutEntryFunc(processMouseEntry);
     
 	// this is the first time to call to update.
-	glutTimerFunc(25, update, 0);
-    
+	glutTimerFunc(25, update, 0);  
     
 	// main loop, hang here.
 	glutMainLoop();

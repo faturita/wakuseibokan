@@ -104,10 +104,10 @@ void drawArrow(float x, float y, float z)
     drawArrow(x,y,z,1.0f,0.5f,0.5f);
 }
 
-void drawArrow(float x, float y, float z,float red, float green, float blue)
+void drawArrow(float x, float y, float z,float red, float green, float blue, float linewidth)
 {
     glPushMatrix();
-    glLineWidth(3.0f);
+    glLineWidth(linewidth);
 
     // RED
     glTranslatef(0.0f,0.0f,0.0f);
@@ -122,6 +122,11 @@ void drawArrow(float x, float y, float z,float red, float green, float blue)
     glutSolidCone(0.100,0.5f,10,10);
 
     glPopMatrix();
+}
+
+void drawArrow(float x, float y, float z, float red, float green, float blue)
+{
+    drawArrow(x,y,z,red,green,blue,3.0f);
 }
 
 void drawArrow()
