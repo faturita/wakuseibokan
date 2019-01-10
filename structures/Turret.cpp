@@ -3,6 +3,7 @@
 
 Turret::Turret()
 {
+    Turret::zoom = 20.0f;
 
 }
 
@@ -89,7 +90,7 @@ void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     forward = forward.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position + 20*forward;
+    position = position + abs(zoom)*forward;
     forward = -orig+position;
 }
 
@@ -135,4 +136,13 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 
     // I can set power or something here.
     return (Vehicle*)action;
+}
+
+
+void Turret::doControl(Controller controller)
+{
+    inclination = controller.registers.pitch * (20.0f/zoom);
+    azimuth = controller.registers.roll * (20.0f/zoom);
+
+    zoom = 20.0f + controller.registers.precesion*100;
 }

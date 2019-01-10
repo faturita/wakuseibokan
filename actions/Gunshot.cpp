@@ -2,12 +2,14 @@
 
 Gunshot::Gunshot()
 {
-    ttl = 500;
+    ttl = 100;
 }
 
 Gunshot::~Gunshot()
 {
+    dGeomDestroy(geom);
     dBodyDestroy(me);
+
     printf("Good bye....\n");
 }
 

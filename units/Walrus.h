@@ -11,9 +11,7 @@
 #include "Vehicle.h"
 
 class Walrus : public Vehicle
-{
-    dGeomID geom;
-    
+{   
 public:
 	void virtual init();
     int  virtual getType();

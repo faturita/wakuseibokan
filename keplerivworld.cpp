@@ -69,19 +69,22 @@ std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
 
 void inline releasecontrol(dBodyID body)
 {
-    for (int i=0; i<vehicles.size(); i++)
+    synchronized(vehicles.m_mutex)
     {
-        Vehicle *vehicle = vehicles[i];
-        if (vehicle->getBodyID() == body)
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
         {
-            if (vehicle->getType() == 3)
+            Vehicle *vehicle = vehicles[i];
+            if (vehicle->getBodyID() == body)
             {
-                if (!vehicle->inert)
+                if (vehicle->getType() == 3)
                 {
-                    vehicle->inert = true;
-                    controller.reset();
-                    vehicle->doControl(controller);
-                    vehicle->setThrottle(0.0f);
+                    if (!vehicle->inert)
+                    {
+                        vehicle->inert = true;
+                        controller.reset();
+                        vehicle->doControl(controller);
+                        vehicle->setThrottle(0.0f);
+                    }
                 }
             }
         }
@@ -114,34 +117,46 @@ bool inline isRunway(dGeomID candidate)
 
 bool inline isManta(dBodyID body)
 {
-    for (int i=0; i<vehicles.size(); i++)
+    bool result = false;
+    synchronized(vehicles.m_mutex)
     {
-        Vehicle *vehicle = vehicles[i];
-        if (vehicle->getBodyID() == body)
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
         {
-            if (vehicle->getType() == 3)
+            Vehicle *vehicle = vehicles[i];
+            if (vehicle->getBodyID() == body)
             {
-                return true;
+                if (vehicle->getType() == 3)
+                {
+                    result = true;
+                    break;
+                }
             }
         }
+        result = false;
     }
-    return false;
+    return result;
 }
 
 bool inline isCarrier(dBodyID body)
 {
-    for (int i=0; i<vehicles.size(); i++)
+    bool result = false;
+    synchronized(vehicles.m_mutex)
     {
-        Vehicle *vehicle = vehicles[i];
-        if (vehicle->getBodyID() == body)
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
         {
-            if (vehicle->getType() == 4)
+            Vehicle *vehicle = vehicles[i];
+            if (vehicle->getBodyID() == body)
             {
-                return true;
+                if (vehicle->getType() == 4)
+                {
+                    result = true;
+                    break;
+                }
             }
         }
+        result = false;
     }
-    return false;
+    return result;
 }
 
 bool inline isIsland(dGeomID candidate)
@@ -158,21 +173,23 @@ bool inline isIsland(dGeomID candidate)
 
 void inline groundcollisions(dBodyID body)
 {
-    for (int i=0; i<vehicles.size(); i++)
+    synchronized(vehicles.m_mutex)
     {
-        Vehicle *vehicle = vehicles[i];
-        if (vehicle->getBodyID() == body)
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
         {
-            if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
+            Vehicle *vehicle = vehicles[i];
+            if (vehicle->getBodyID() == body)
             {
-                explosion();
-                controller.reset();
-                vehicle->doControl(controller);
-                vehicle->setThrottle(0.0f);
+                if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
+                {
+                    explosion();
+                    controller.reset();
+                    vehicle->doControl(controller);
+                    vehicle->setThrottle(0.0f);
+                }
             }
         }
     }
-
 }
 
 
@@ -288,7 +305,7 @@ void nearCadllback (void *data, dGeomID o1, dGeomID o2)
     if (b1 && b2 && dAreConnected (b1,b2)) return;
     
     
-    for (int i=0; i<vehicles.size(); i++) {
+    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
         Vehicle *vehicle = vehicles[i];
         
         if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
@@ -411,7 +428,7 @@ void initWorldPopulation()
     //vehicles.push_back(_buggy);
     vehicles.push_back(_b);
 
-    for(int i=0;i<vehicles.size();i++)
+    for(int i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
     {
         vehiclesInWorld[vehicles[i]->getBodyID()] = vehicles[i];
         controlables.push_back(vehicles[i]);

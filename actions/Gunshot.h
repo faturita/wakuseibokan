@@ -6,7 +6,6 @@
 class Gunshot : public Vehicle
 {
 protected:
-    dGeomID geom;
     float height;
     float width;
     float length;

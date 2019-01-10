@@ -32,6 +32,7 @@ protected:
     float steering;
     
     dBodyID me;
+    dGeomID geom;
 
     struct controlregister myCopy;
 

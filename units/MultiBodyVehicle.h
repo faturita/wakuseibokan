@@ -20,7 +20,6 @@
 
 class MultiBodyVehicle : public Vehicle
 {
-    dGeomID geom;
     GLuint _textureBox;
     
     

@@ -8,6 +8,8 @@ class Turret : public Structure
 public:
     GLfloat modelview[16];
 
+    float zoom;
+
     Turret();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
@@ -16,6 +18,8 @@ public:
     Vec3f getForward();
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+
+    void doControl(Controller);
 };
 
 #endif // TURRET_H

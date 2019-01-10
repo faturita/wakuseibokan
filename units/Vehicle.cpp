@@ -23,7 +23,8 @@ Vehicle::Vehicle()
 Vehicle::~Vehicle()
 {
     dBodyDestroy(me);
-    printf("Vehicle Good bye....\n");
+    dGeomDestroy(geom);
+    //printf("Vehicle Good bye....\n");
 }
 
 void Vehicle::setXRotAngle(float xRotAngle)

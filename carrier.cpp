@@ -289,8 +289,12 @@ void drawScene() {
 
 
     // Draw vehicles and objects
-    for (int i=0; i<vehicles.size(); i++) {
-        (vehicles[i]->drawModel());
+    synchronized(vehicles.m_mutex)
+    {
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        {
+            (vehicles[i]->drawModel());
+        }
     }
     
     // GO with the HUD
@@ -357,10 +361,17 @@ void handleResize(int w, int h) {
 	gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ 10450.0f  /**+ yyy**/);
 }
 
+static bool did=false;
 
 void update(int value)
 {
 	// Derive the control to the correct object
+
+    if (!did)
+    {
+        dAllocateODEDataForThread(dAllocateMaskAll);
+        did=true;
+    }
     
     if (controller.isInterrupted())
     {
@@ -375,36 +386,41 @@ void update(int value)
             controlables[controller.controlling-1]->doControl(controller);
         }
 
-        printf("Elements alive now: %d\n", vehicles.size());
+        //printf("Elements alive now: %d\n", vehicles.size());
         
-        for (int i=0; i<vehicles.size(); i++) {
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
             vehicles[i]->doDynamics();
         }
 
 
-        for(int i=0;i<vehicles.size();i++)
+        synchronized(vehicles.m_mutex)
         {
-            printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-            if (vehicles[i]->getType()==5 && vehicles[i]->getTtl()==0)
+            for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
             {
-                printf("Eliminating....\n");
-                vehicles.erase(i);
-                //delete vehicles[i];
+                //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                if (vehicles[i]->getType()==5 && vehicles[i]->getTtl()==0)
+                {
+                    //printf("Eliminating....\n");
+                    dBodyDisable(vehicles[i]->getBodyID());
+                    vehicles.erase(i);
+                    //delete vehicles[i];
+                    //dBodyDestroy(vehicles[i]->getBodyID());
+                }
             }
         }
 
         
 		// Ok, done with the dynamics
         
-		dSpaceCollide (space,0,&nearCallback);
-		dWorldStep (world,0.05);
+        dSpaceCollide (space,0,&nearCallback);
+        dWorldStep (world,0.05);
         
 		/* remove all contact joints */
 		dJointGroupEmpty (contactgroup);
 	}
     
 	glutPostRedisplay();
-	glutTimerFunc(25, update, 0);
+    glutTimerFunc(30, update, 0);
 }
 
 
@@ -425,6 +441,31 @@ int main(int argc, char** argv) {
 
     // Initialize ODE, create islands, structures and populate the world.
     initWorldModelling();
+
+    const char *conf = dGetConfiguration ();
+
+    printf("ODE Configuration: %s\n", conf);
+
+    // Draw vehicles and objects
+    printf("Size %d\n", vehicles.size());
+    synchronized(vehicles.m_mutex)
+    {
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        {
+            printf("Index (%d) %d - %d\n", i, vehicles[i]->getType(), vehicles[i]->getTtl());
+        }
+    }
+
+    //vehicles.erase(4);
+
+    printf("Size %d\n", vehicles.size());
+    synchronized(vehicles.m_mutex)
+    {
+        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        {
+            printf("Index (%d) %d - %d\n", i, vehicles[i]->getType(), vehicles[i]->getTtl());
+        }
+    }
     
     //Initialize all the models and structures.
     initRendering();
