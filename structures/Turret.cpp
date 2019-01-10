@@ -52,7 +52,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
 
 
         // Laser Beam
-        //drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
+        drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
 
         //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();
@@ -90,8 +90,8 @@ void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     forward = forward.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position + abs(zoom)*forward;
-    forward = -orig+position;
+    position = position + (abs(zoom))*forward;
+    //forward = -orig+position;
 }
 
 
@@ -138,11 +138,16 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
-
+/**
+ * The values are modified from the rc
+ * @brief Turret::doControl
+ * @param controller
+ */
 void Turret::doControl(Controller controller)
 {
-    inclination = controller.registers.pitch * (20.0f/zoom);
-    azimuth = controller.registers.roll * (20.0f/zoom);
-
     zoom = 20.0f + controller.registers.precesion*100;
+
+    inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;
+    azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
+
 }
