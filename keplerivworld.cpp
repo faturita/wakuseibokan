@@ -13,8 +13,8 @@
 #define kmf *1000.0f
 
 #include <vector>
-#include <unordered_map>
 #include <mutex>
+#include <unordered_map>
 
 #include "container.h"
 
@@ -56,40 +56,96 @@ std::vector<Structure*> structures;
 
 std::vector<std::string> messages;
 
-
-
 std::vector<Vehicle*> controlables;
 
-std::unordered_map<dBodyID, Vehicle*> vehiclesInWorld;
+// SYNC
+Vehicle* gVehicle(dBodyID body)
+{
+    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == body)
+        {
+            return vehicle;
+        }
+    }
+    return NULL;
+}
 
+void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
+{
+    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+    {
+        Vehicle *vehicle = vehicles[i];
+        if (vehicle->getBodyID() == b1)
+        {
+            v1 = vehicle;
+        }
+        if (vehicle->getBodyID() == b2)
+        {
+            v2 = vehicle;
+        }
+    }
+}
 
-// this is called by dSpaceCollide when two objects in space are
-// potentially colliding.
-
+// SYNC
+void releasecontrol(Vehicle* vehicle)
+{
+    if (vehicle && vehicle->getType() == 3)
+    {
+        if (!vehicle->inert)
+        {
+            vehicle->inert = true;
+            controller.reset();
+            vehicle->doControl(controller);
+            vehicle->setThrottle(0.0f);
+        }
+    }
+}
 
 void inline releasecontrol(dBodyID body)
 {
     synchronized(vehicles.m_mutex)
     {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
-        {
-            Vehicle *vehicle = vehicles[i];
-            if (vehicle->getBodyID() == body)
-            {
-                if (vehicle->getType() == 3)
-                {
-                    if (!vehicle->inert)
-                    {
-                        vehicle->inert = true;
-                        controller.reset();
-                        vehicle->doControl(controller);
-                        vehicle->setThrottle(0.0f);
-                    }
-                }
-            }
-        }
+        Vehicle* vehicle = gVehicle(body);
+        releasecontrol(vehicle);
     }
 }
+
+bool inline isType(dBodyID body, int type)
+{
+    bool result = false;
+    synchronized(vehicles.m_mutex)
+    {
+        Vehicle *vehicle = gVehicle(body);
+        if (vehicle && vehicle->getBodyID() == body)
+        {
+            if (vehicle->getType() == type)
+            {
+                result = true;
+                break;
+            }
+        }
+        result = false;
+    }
+    return result;
+}
+
+bool inline isManta(dBodyID body)
+{
+    return isType(body,3);
+}
+
+bool inline isCarrier(dBodyID body)
+{
+    return isType(body, 4);
+}
+
+bool inline isAction(dBodyID body)
+{
+    return isType(body, 5);
+}
+
 
 bool inline isStructure(dGeomID candidate)
 {
@@ -115,49 +171,6 @@ bool inline isRunway(dGeomID candidate)
     return false;
 }
 
-bool inline isManta(dBodyID body)
-{
-    bool result = false;
-    synchronized(vehicles.m_mutex)
-    {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
-        {
-            Vehicle *vehicle = vehicles[i];
-            if (vehicle->getBodyID() == body)
-            {
-                if (vehicle->getType() == 3)
-                {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        result = false;
-    }
-    return result;
-}
-
-bool inline isCarrier(dBodyID body)
-{
-    bool result = false;
-    synchronized(vehicles.m_mutex)
-    {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
-        {
-            Vehicle *vehicle = vehicles[i];
-            if (vehicle->getBodyID() == body)
-            {
-                if (vehicle->getType() == 4)
-                {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        result = false;
-    }
-    return result;
-}
 
 bool inline isIsland(dGeomID candidate)
 {
@@ -175,24 +188,19 @@ void inline groundcollisions(dBodyID body)
 {
     synchronized(vehicles.m_mutex)
     {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        Vehicle *vehicle = gVehicle(body);
+        if (vehicle && vehicle->getBodyID() == body)
         {
-            Vehicle *vehicle = vehicles[i];
-            if (vehicle->getBodyID() == body)
+            if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
             {
-                if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
-                {
-                    explosion();
-                    controller.reset();
-                    vehicle->doControl(controller);
-                    vehicle->setThrottle(0.0f);
-                }
+                explosion();
+                controller.reset();
+                vehicle->doControl(controller);
+                vehicle->setThrottle(0.0f);
             }
         }
     }
 }
-
-
 
 
  void nearCallback (void *data, dGeomID o1, dGeomID o2)
@@ -268,7 +276,20 @@ void inline groundcollisions(dBodyID body)
                 contact[i].surface.bounce = 0.2;
 
                 releasecontrol(dGeomGetBody(contact[i].geom.g1));
-            } else {
+            } else
+            if (  isAction(dGeomGetBody(contact[i].geom.g1)) || isAction(dGeomGetBody(contact[i].geom.g2)) )
+            {
+
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mu = 0;dInfinity;
+                contact[i].surface.slip1 = 0.1;
+                contact[i].surface.slip2 = 0.1;
+
+
+                //messages.insert(messages.begin(), std::string("Carrier is under fire!"));
+
+            }  else {
                 contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
                 contact[i].surface.mu = 0;dInfinity;
@@ -417,20 +438,19 @@ void initWorldPopulation()
     _b->init();
     _b->setPos(0.0f,50.0f,-2200.0f);
     _b->embody(world,space);
-    
+
+    //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
     vehicles.push_back(_boxVehicle1);
-    //vehicles.push_back(_boxVehicle2);
     vehicles.push_back(_manta1);
     vehicles.push_back(_walrus2);
     vehicles.push_back(_walrus3);
     vehicles.push_back(_mb);
-    //vehicles.push_back(_buggy);
     vehicles.push_back(_b);
+
 
     for(int i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
     {
-        vehiclesInWorld[vehicles[i]->getBodyID()] = vehicles[i];
         controlables.push_back(vehicles[i]);
     }
     

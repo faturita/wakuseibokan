@@ -159,23 +159,12 @@ void drawHUD()
     }
 
     
-    
+    // Displays the target mark at the center. The position of the center cross depends on camera angles.
     glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); {
 		glTranslatef(0, -400, 1);
         
         glLineWidth(2.5);
-        //glColor3f(1.0, 0.0, 0.0);
-        /**glBegin(GL_LINES);
-        glVertex3f(590, 0.0, 0.0);
-        glVertex3f(690, 0, 0);
-        glEnd();
-        
-        
-        glBegin(GL_LINES);
-        glVertex3f(590, Camera.yAngle, 0.0);
-        glVertex3f(690, + Camera.yAngle, 0);
-        glEnd();**/
 
         int uc=550;
         int lc=0+50;
@@ -495,7 +484,12 @@ void update(int value)
 
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+
+    // Switch up OpenGL version (at the time of writing compatible with 2.1)
+    if (true)
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    else
+        glutInitDisplayMode (GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     
     disclaimer();
 	glutCreateWindow("Wakuseibokan");
@@ -504,6 +498,16 @@ int main(int argc, char** argv) {
         glutInitWindowSize(1200, 800);
     else
         glutFullScreen();
+
+    // OpenGL Configuration information
+    /* get version info */
+    const GLubyte* renderer;
+    const GLubyte* version;
+
+    renderer = glGetString (GL_RENDERER);
+    version = glGetString (GL_VERSION);
+    printf ("Renderer: %s\n", renderer);
+    printf ("OpenGL version supported: %s\n", version);
     
 
     // Initialize ODE, create islands, structures and populate the world.
@@ -530,9 +534,13 @@ int main(int argc, char** argv) {
     {
         for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
         {
-            printf("Index (%d) %d - %d\n", i, vehicles[i]->getType(), vehicles[i]->getTtl());
+            printf("Body ID (%p) Index (%d) %d - %d\n", (void*)vehicles[i]->getBodyID(), i, vehicles[i]->getType(), vehicles[i]->getTtl());
         }
     }
+
+    //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
+
+    //printf("Manta is located in %lu\n",*a);
     
     //Initialize all the models and structures.
     initRendering();

@@ -217,7 +217,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'S':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
         case 'h':
-            vehicles.push_back((controlables[controller.controlling-1])->fire(world,space));
+            Vehicle *action = (controlables[controller.controlling-1])->fire(world,space);
+            int *idx = new int();
+            *idx = vehicles.push_back(action);
+            dBodySetData( action->getBodyID(), (void*)idx);
         break;
 	}
 }

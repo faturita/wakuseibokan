@@ -42,7 +42,7 @@ template<class T> void container<T>::unlockme()
     usleep(1);
 }
 
-template<class T> void container<T>::push_back(T value)
+template<class T> size_t container<T>::push_back(T value)
 {
     size_t i=0;
     size_t count=0;
@@ -53,6 +53,8 @@ template<class T> void container<T>::push_back(T value)
     }
 
     elem[i] = value;
+
+    return i;
 }
 
 

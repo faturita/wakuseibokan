@@ -24,7 +24,7 @@ public:
     std::recursive_mutex m_mutex;
     container();
 
-    void push_back(T value);
+    size_t push_back(T value);
 
     bool isSafe();
 
