@@ -4,7 +4,9 @@ CC = g++
 CFLAGS = -w -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
-SRCS = carrier.cpp keplerivworld.cpp usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp units/*.cpp structures/*.cpp actions/*.cpp
+SRCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) keplerivworld.cpp carrier.cpp
+OBJS = $(SRCS:.cpp=.o)
+
 
 TESTSRC = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
@@ -24,14 +26,17 @@ OdeWorld:
 test:
 	$(CC) $(CFLAGS) -o test $(TESTSRC) $(LIBS)
 
-$(PROG):	$(SRCS)
-	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+$(PROG):	$(OBJS)
+	@echo "Object files are $(OBJS)"
+	$(CC) $(CFLAGS) $(LIBS) -o $@ $^
     
 base:
 	$(CC) $(CFLAGS) -o cube $(SRCSR) $(LIBS)
 
+.cpp.o:		$(SRCS)		
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(PROG)
 	rm -f OdeWorld
-
+	rm -f $(OBJS)

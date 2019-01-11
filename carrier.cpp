@@ -233,6 +233,17 @@ void drawHUD()
         glVertex3f(uc+100-50+2, + Camera.yAngle, 0);
         glEnd();
 
+        glBegin(GL_LINES);
+        glVertex3f(uc+50, Camera.yAngle-10, 0.0);
+        glVertex3f(uc+50, + Camera.yAngle-2, 0);
+        glEnd();
+
+
+        glBegin(GL_LINES);
+        glVertex3f(uc+50, Camera.yAngle+10, 0.0);
+        glVertex3f(uc+50, + Camera.yAngle+2, 0);
+        glEnd();
+
         
 	} glPopMatrix();
     

@@ -3,3 +3,6 @@ ode-0.13
 waku
 .DS_Store
 */xcuserdata/*
+*.creator.user.*
+*.o
+/**/*.o
