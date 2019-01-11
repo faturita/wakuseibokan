@@ -177,51 +177,61 @@ void drawHUD()
         glVertex3f(690, + Camera.yAngle, 0);
         glEnd();**/
 
-        int uc=590;
+        int uc=550;
+        int lc=0+50;
         int w=40;
         int h=40;
 
 
         glBegin(GL_LINES);
-        glVertex3f(uc,    -h, 0.0);
-        glVertex3f(uc,   0.0, 0);
+        glVertex3f(uc,    lc-h, 0);
+        glVertex3f(uc,   lc, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc,     0.0, 0);
-        glVertex3f(uc+w,   0.0, 0);
+        glVertex3f(uc,     lc, 0);
+        glVertex3f(uc+w,   lc, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc, -100+h, 0);
-        glVertex3f(uc, -100, 0);
+        glVertex3f(uc, lc-100+h, 0);
+        glVertex3f(uc, lc-100, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc, -100,0);
-        glVertex3f(uc+w, -100, 0);
+        glVertex3f(uc, lc-100,0);
+        glVertex3f(uc+w, lc-100, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100-w, 0, 0);
-        glVertex3f(uc+100, 0, 0);
+        glVertex3f(uc+100-w, lc, 0);
+        glVertex3f(uc+100, lc, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100, 0 ,0);
-        glVertex3f(uc+100, -h, 0);
+        glVertex3f(uc+100, lc ,0);
+        glVertex3f(uc+100, lc-h, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100, -100+h, 0);
-        glVertex3f(uc+100,-100,0);
+        glVertex3f(uc+100, lc-100+h, 0);
+        glVertex3f(uc+100,lc-100,0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100, -100, 0);
-        glVertex3f(uc+100-w, -100, 0);
+        glVertex3f(uc+100, lc-100, 0);
+        glVertex3f(uc+100-w, lc-100, 0);
         glEnd();
 
+        glBegin(GL_LINES);
+        glVertex3f(uc+50-10, Camera.yAngle, 0.0);
+        glVertex3f(uc+50-2, + Camera.yAngle, 0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(uc+100-50+10, Camera.yAngle, 0.0);
+        glVertex3f(uc+100-50+2, + Camera.yAngle, 0);
+        glEnd();
 
         
 	} glPopMatrix();

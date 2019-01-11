@@ -15,9 +15,9 @@ Gunshot::~Gunshot()
 
 void Gunshot::init()
 {
-    Gunshot::height=2;
-    Gunshot::length=2;
-    Gunshot::width=2;
+    Gunshot::height=0.1f;
+    Gunshot::length=0.1f;
+    Gunshot::width=0.1f;
 
     setForward(0,0,1);
 }
@@ -74,7 +74,7 @@ void Gunshot::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 0.1f, 0.1f, 0.1f);   // scale 50
+    geom = dCreateBox( space, Gunshot::width, Gunshot::height, Gunshot::length);
     dGeomSetBody(geom, me);
 }
 
@@ -85,7 +85,7 @@ void Gunshot::embody(dBodyID myBodySelf)
     float myMass = 1000.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m, 1,0.1f, 0.1f, 0.1f);
+    dMassSetBox(&m, 1,Gunshot::width, Gunshot::height, Gunshot::length);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
 

@@ -29,9 +29,6 @@ extern dSpaceID space;
 
 Controller controller;
 
-// control = 1  Manta
-// control = 2 Walrus
-
 extern std::vector<std::string> messages;
 
 extern std::vector<Vehicle*> controlables;
@@ -142,12 +139,19 @@ void handleKeypress(unsigned char key, int x, int y) {
         if (key == 13)
         {
             // Analyze commands.
+
+            size_t n = controller.str.find("control");
+
+            if (n != std::string::npos)
+            {
+                // @FIXME input data should be verified.
+                const char *content = controller.str.substr(8).c_str();
+
+                controller.controlling = atoi(content);
+            } else
+
             if (strcmp(controller.str.c_str(),"map")==0)
                 controller.view = 2;
-            else if (strcmp(controller.str.c_str(),"control")==0)
-            {
-                std::cout << "Which:" << std::endl; std::cin >> controller.controlling;
-            }
             else {
                 // Send message to message board
                 messages.insert(messages.begin(),controller.str);
@@ -155,9 +159,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (messages.size()>5)
                     messages.pop_back();
 
-                controller.teletype = false;
-                controller.str.clear();
             }
+            controller.teletype = false;
+            controller.str.clear();
 
 
         } else {
