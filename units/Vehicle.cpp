@@ -254,6 +254,11 @@ void  Vehicle::doDynamics()
     doDynamics(getBodyID());
 }
 
+void Vehicle::antigravity(dBodyID myBodySelf)
+{
+    dBodyAddForce(myBodySelf, 0,9.81f,0);
+}
+
 Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
 {
     assert(0 || !"This should not be executed.");

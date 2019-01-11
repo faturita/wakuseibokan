@@ -37,6 +37,7 @@
 #include "structures/Runway.h"
 #include "structures/Hangar.h"
 #include "structures/Turret.h"
+#include "structures/Warehouse.h"
 
 extern  Controller controller;
 
@@ -88,8 +89,28 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
     }
 }
 
+
 // SYNC
-void releasecontrol(Vehicle* vehicle)
+bool landed(Vehicle *manta)
+{
+    if (manta && manta->getType() == 3)
+    {
+        messages.insert(messages.begin(), std::string("Manta has landed on Island."));
+    }
+    return true;
+}
+// SYNC
+bool hit(Vehicle *vehicle)
+{
+    if (vehicle && vehicle->getType() == 4)
+    {
+        messages.insert(messages.begin(), std::string("Carrier is under fire!"));
+    }
+    return true;
+}
+
+// SYNC
+bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == 3)
     {
@@ -99,8 +120,10 @@ void releasecontrol(Vehicle* vehicle)
             controller.reset();
             vehicle->doControl(controller);
             vehicle->setThrottle(0.0f);
+            messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
         }
     }
+    return true;
 }
 
 void inline releasecontrol(dBodyID body)
@@ -112,21 +135,29 @@ void inline releasecontrol(dBodyID body)
     }
 }
 
+
+// SYNC
+bool inline isType(Vehicle *vehicle, int type)
+{
+    bool result = false;
+    if (vehicle)
+    {
+        if (vehicle->getType() == type)
+        {
+            result = true;
+        }
+    }
+    return result;
+}
+
+
 bool inline isType(dBodyID body, int type)
 {
     bool result = false;
     synchronized(vehicles.m_mutex)
     {
         Vehicle *vehicle = gVehicle(body);
-        if (vehicle && vehicle->getBodyID() == body)
-        {
-            if (vehicle->getType() == type)
-            {
-                result = true;
-                break;
-            }
-        }
-        result = false;
+        result = isType(vehicle,type);
     }
     return result;
 }
@@ -136,14 +167,29 @@ bool inline isManta(dBodyID body)
     return isType(body,3);
 }
 
+bool inline isManta(Vehicle* vehicle)
+{
+    return isType(vehicle,3);
+}
+
 bool inline isCarrier(dBodyID body)
 {
     return isType(body, 4);
 }
 
+bool inline isCarrier(Vehicle* vehicle)
+{
+    return isType(vehicle,4);
+}
+
 bool inline isAction(dBodyID body)
 {
     return isType(body, 5);
+}
+
+bool inline isAction(Vehicle* vehicle)
+{
+    return isType(vehicle, 5);
 }
 
 
@@ -184,26 +230,168 @@ bool inline isIsland(dGeomID candidate)
     return false;
 }
 
+// SYNC
+bool inline groundcollisions(Vehicle *vehicle)
+{
+    if (vehicle)
+    {
+        if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
+        {
+            explosion();
+            controller.reset();
+            vehicle->doControl(controller);
+            vehicle->setThrottle(0.0f);
+        }
+    }
+    return true;
+}
+
 void inline groundcollisions(dBodyID body)
 {
     synchronized(vehicles.m_mutex)
     {
         Vehicle *vehicle = gVehicle(body);
-        if (vehicle && vehicle->getBodyID() == body)
-        {
-            if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
-            {
-                explosion();
-                controller.reset();
-                vehicle->doControl(controller);
-                vehicle->setThrottle(0.0f);
-            }
-        }
+        groundcollisions(vehicle);
     }
 }
 
 
- void nearCallback (void *data, dGeomID o1, dGeomID o2)
+void nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+   int i,n;
+
+   dBodyID b1,b2;
+
+   // only collide things with the ground
+   int g1 = (o1 == ground );
+   int g2 = (o2 == ground );
+   if (!(g1 ^ g2))
+   {
+       //printf ("Ground colliding..\n");
+
+       //return;
+   }
+
+
+   b1 = dGeomGetBody(o1);
+   b2 = dGeomGetBody(o2);
+   if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+   const int N = 10;
+   dContact contact[N];
+   n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+   if (n > 0) {
+       for (i=0; i<n; i++) {
+           synchronized(vehicles.m_mutex)
+           {
+               Vehicle *v1=NULL,*v2=NULL;
+               gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
+
+
+               if ( (ground == contact[i].geom.g1  &&  groundcollisions(v2)) ||
+                    (ground == contact[i].geom.g2  &&  groundcollisions(v1)) )
+               {
+                   // Nothing to do here....
+               }
+
+
+               if ( (isRunway(contact[i].geom.g1) && isManta(v2)) ||
+                    (isRunway(contact[i].geom.g2) && isManta(v1)) )
+               {
+                   contact[i].surface.mode = dContactBounce |
+                   dContactApprox1;
+
+                   contact[i].surface.mu = 0.99;dInfinity;
+                   contact[i].surface.slip1 = 0.9;
+                   contact[i].surface.slip2 = 0.9;
+                   contact[i].surface.bounce = 0.2;
+
+               } else
+               if ( (isRunway(contact[i].geom.g1) || isRunway(contact[i].geom.g2))  )
+               {
+                   contact[i].surface.mode = dContactBounce |
+                   dContactApprox1;
+
+                   contact[i].surface.mu = 0.99;dInfinity;
+                   contact[i].surface.slip1 = 0.9;
+                   contact[i].surface.slip2 = 0.9;
+                   contact[i].surface.bounce = 0.2;
+
+                   //releasecontrol(dGeomGetBody(contact[i].geom.g1));
+               } else
+               if ( (isStructure(contact[i].geom.g1) &&  groundcollisions(v2)) ||
+                    (isStructure(contact[i].geom.g2) &&  groundcollisions(v1))  )
+               {
+                   //printf("Structure Collision\n");
+               } else
+
+               if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+               {
+                   contact[i].surface.mode = dContactBounce |
+                   dContactApprox1;
+
+                   contact[i].surface.mu = 0;
+                   contact[i].surface.bounce = 0.2;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+               } else
+               if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
+                    ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
+                   {
+                   contact[i].surface.mode = dContactBounce |
+                   dContactApprox1;
+
+                   contact[i].surface.mu = dInfinity;
+                   contact[i].surface.slip1 = 0;
+                   contact[i].surface.slip2 = 0;
+                   contact[i].surface.bounce = 0.2;
+
+               } else
+               if (  (isAction(v2) ) ||
+                     (isAction(v1) ) )
+               {
+
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+
+                   printf("Manta hit\n");
+               } else
+               if (  (isCarrier(v1) && isAction(v2) && hit(v1)) ||
+                     (isCarrier(v2) && isAction(v1) && hit(v2)) )
+               {
+
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+
+                   printf("Carrier hit\n");
+               }  else {
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+               }
+            }
+
+           contact[i].surface.soft_erp = 0.5;
+           contact[i].surface.soft_cfm = 0.3;
+
+
+           dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+           dJointAttach (c,
+                         dGeomGetBody(contact[i].geom.g1),
+                         dGeomGetBody(contact[i].geom.g2));
+       }
+   }
+}
+
+ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
     
@@ -462,6 +650,7 @@ void initWorldModelling()
 	dMass m;
     
 	/* create world */
+    dRandSetSeed(1);
     dInitODE();
     //dInitODE2(dInitFlagManualThreadCleanup);
     //dAllocateODEDataForThread(dAllocateMaskAll);
@@ -558,40 +747,24 @@ void initWorldModelling()
     structures.push_back(thermopilae->addStructure(new Structure(),    0.0f,-1000.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Runway()   ,    0.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Warehouse(),-1000.0f,    0.0f,space,world));
 
     structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    structures.push_back(nonsquareisland->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
 
     initWorldPopulation();
 
     for(int i=0;i<structures.size();i++)
+    {
         controlables.push_back(structures[i]);
+    }
 
-    
-    //MultiBodyVehicle *_mbody = new MultiBodyVehicle();
-    //_mbody->init();
-    //_mbody->setPos(30,57.0,-100.0);
-    //_mbody->embody(world, space);
-    
-    //MultiBodyVehicle *_abody = new MultiBodyVehicle();
-    //_abody->init();
-    //_abody->setPos(60,5.0,-1000);
-    //_abody->embody(world, space);
-    
-    //vehicles.push_back(_abody);
-    //vehicles.push_back(_mbody);
-    
-    //buildTerrainModel(space,_vulcano,600.0f,-1340.0f, 0.0f, -1740.0f);
-    
-    //buildTerrainModel(space, _terrain,600.0f, 640.0f, 0.0f, 340.0f );
-    
-    //buildTerrainModel(space, _terrain,600.0f, -940.0f, 0.0f, -740.0f );
-    
-    //buildTerrainModel(space, _vulcano,600.0f, -1340.0f, 0.0f, -1740.0f );
-    
-    //buildTerrainModel(space, _baltimore,600.0f, 0.0f, 0.0f, 0.0f);
-    
-    //buildTerrainModel(space, _nemesis,600.0f, 2340.0f, 0.0f, 1220.0f );
+    for(int i=0;i<controlables.size();i++)
+    {
+        printf("[%d] - Controlables type %d\n",i,controlables[i]->getType());
+    }
+
 }
 
 void endWorldModelling()
@@ -605,34 +778,4 @@ void endWorldModelling()
     printf("The World has been terminated.\n");
 }
 
-
-void buildTerrainModel(dSpaceID space, Terrain *_landmass, float fscale,float xx,float yy,float zz)
-{
-    float slopeData[_landmass->width()*_landmass->length()];
-    float scale = fscale / fmax(_landmass->width() - 1, _landmass->length() - 1);
-    fscale = 10.0f;
-    for(int z = 0; z < _landmass->length() - 1; z++) {
-        
-        for(int x = 0; x < _landmass->width(); x++) {
-            slopeData[z*_landmass->width() +x] = 0; /**_landmass->getHeight(x, z)*fscale+**/;
-        }
-    }
-    
-    float xsamples = _landmass->width(),zsamples = _landmass->width(), xdelta = 10, zdelta =10;
-    
-    dHeightfieldDataID slopeHeightData = dGeomHeightfieldDataCreate (); // data geom
-    
-    float width = xsamples*xdelta; // 5 samples at delta of 1 unit
-    float depth = zsamples*zdelta; // 5 samples at delta of 1 unit
-    
-    dGeomHeightfieldDataBuildSingle(slopeHeightData,slopeData,
-                                    0,width,depth, xsamples, zsamples, 1.0f, 5.0f,10.0f, 0); // last 4
-    
-    //dGeomHeightfieldDataSetBounds (slopeHeightData, 0.0f, 100.0f); // sort
-    
-    dGeomID slopeHeightID = dCreateHeightfield(space, slopeHeightData, 1); // fff
-    
-    dGeomSetPosition(slopeHeightID,xx,yy,zz);
-    
-}
 

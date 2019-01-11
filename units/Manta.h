@@ -49,6 +49,8 @@ public:
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
+
+    Vehicle* fire(dWorldID world, dSpaceID space);
 };
 
 #endif /* MANTA_H_ */

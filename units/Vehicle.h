@@ -74,6 +74,7 @@ public:
     void virtual doControl(Controller);
     
     void virtual embody(dBodyID myBodySelf);
+    void antigravity(dBodyID myBodySelf);
 
     void wrapDynamics(dBodyID body);
     

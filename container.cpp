@@ -8,7 +8,7 @@ template<class T> container<T>::container()
 {
     e_size = 0;
 
-    for(int i=0;i<10000;i++)
+    for(int i=0;i<MAX;i++)
         elem[i]= NULL;
 
 }
@@ -46,11 +46,13 @@ template<class T> size_t container<T>::push_back(T value)
 {
     size_t i=0;
     size_t count=0;
-    for(i=0;i<10000;i++)
+    for(i=0;i<MAX;i++)
     {
         if (elem[i] == NULL)
             break;
     }
+
+    assert( i < MAX || !"The container is full and cannot hold more values.");
 
     elem[i] = value;
 
@@ -61,8 +63,8 @@ template<class T> size_t container<T>::push_back(T value)
 template<class T> T container<T>::operator[](size_t index)
 {
     T t;
-    //if (index>e_size)
-    //    assert(!"This should not happen");
+    if (index>MAX)
+        assert(!"This should not happen");
     if (elem[index] == NULL)
         assert(!"Pointer is null");
     //printf("Accessing %d\n", index);
@@ -74,7 +76,7 @@ template<class T> size_t container<T>::size()
 {
     size_t i=0;
     size_t count=0;
-    for(i=0;i<10000;i++)
+    for(i=0;i<MAX;i++)
     {
         if (elem[i] != NULL)
             count++;
@@ -84,6 +86,8 @@ template<class T> size_t container<T>::size()
 
 template<class T> void container<T>::prune()
 {
+    assert(!"Deprecated!");
+
     for(int i=0;i<prunning.size();i++)
         delete prunning[i];
 }
@@ -91,12 +95,12 @@ template<class T> void container<T>::prune()
 template<class T> bool container<T>::exists(size_t index)
 {
     size_t i=index;
-    while ( (i>=0 && i<10000) && elem[i] == NULL)
+    while ( (i>=0 && i<MAX) && elem[i] == NULL)
     {
         i++;
     }
 
-    if (i>=10000)
+    if (i>=MAX)
     {
         return false;
     }
@@ -109,14 +113,14 @@ template<class T> bool container<T>::exists(size_t index)
 template<class T> size_t container<T>::first()
 {
     size_t i=0;
-    while ( (i>=0 && i<10000) && elem[i] == NULL) i++;
+    while ( (i>=0 && i<MAX) && elem[i] == NULL) i++;
     return i;
 }
 
 template<class T> size_t container<T>::next(size_t index)
 {
     size_t i=index+1;
-    while ( (i>=0 && i<10000) && elem[i] == NULL) i++;
+    while ( (i>=0 && i<MAX) && elem[i] == NULL) i++;
 
     return i;
 

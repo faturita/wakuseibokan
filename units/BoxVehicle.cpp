@@ -230,10 +230,10 @@ void BoxVehicle::doDynamics()
     if (repelling)
     {
         printf ("Antigravity...\n");
-        //dBodyAddForce(me, 0,9.81f,0);
+        dBodyAddForce(me, 0,9.81f,0);
     }
-        
-    
+
+
     dBodyAddTorque(me,0,steering,0);
     
 	const dReal *dBodyPosition = dBodyGetPosition(me);

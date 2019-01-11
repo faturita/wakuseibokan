@@ -471,6 +471,9 @@ void update(int value)
         dSpaceCollide (space,0,&nearCallback);
         dWorldStep (world,0.05);
         
+
+        //dWorldQuickStep()
+
 		/* remove all contact joints */
 		dJointGroupEmpty (contactgroup);
 	}

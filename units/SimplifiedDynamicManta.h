@@ -11,6 +11,9 @@ public:
     void doControl(Controller controller);
     void embody(dBodyID myBodySelf);
     void embody(dWorldID world, dSpaceID space);
+
+
+    Vehicle* fire(dWorldID world, dSpaceID space);
 };
 
 #endif // SIMPLIFIEDMANTA_H

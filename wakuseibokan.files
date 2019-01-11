@@ -48,6 +48,8 @@ structures/Structure.cpp
 structures/Structure.h
 structures/Turret.cpp
 structures/Turret.h
+structures/Warehouse.cpp
+structures/Warehouse.h
 terrain/Terrain.cpp
 terrain/Terrain.h
 terrain/imageloader.cpp

@@ -1,6 +1,8 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+#define MAX 10000
+
 #include <vector>
 #include <mutex>
 
@@ -13,7 +15,7 @@ protected:
     //std::vector<T> elements;
     std::mutex mlock;
 
-    T elem[10000];
+    T elem[MAX];
 
     size_t e_size;
 

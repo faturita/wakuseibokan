@@ -222,4 +222,33 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
     }
 }
 
+void buildTerrainModel(dSpaceID space, Terrain *_landmass, float fscale,float xx,float yy,float zz)
+{
+    float slopeData[_landmass->width()*_landmass->length()];
+    float scale = fscale / fmax(_landmass->width() - 1, _landmass->length() - 1);
+    fscale = 10.0f;
+    for(int z = 0; z < _landmass->length() - 1; z++) {
+
+        for(int x = 0; x < _landmass->width(); x++) {
+            slopeData[z*_landmass->width() +x] = 0; /**_landmass->getHeight(x, z)*fscale+**/;
+        }
+    }
+
+    float xsamples = _landmass->width(),zsamples = _landmass->width(), xdelta = 10, zdelta =10;
+
+    dHeightfieldDataID slopeHeightData = dGeomHeightfieldDataCreate (); // data geom
+
+    float width = xsamples*xdelta; // 5 samples at delta of 1 unit
+    float depth = zsamples*zdelta; // 5 samples at delta of 1 unit
+
+    dGeomHeightfieldDataBuildSingle(slopeHeightData,slopeData,
+                                    0,width,depth, xsamples, zsamples, 1.0f, 5.0f,10.0f, 0); // last 4
+
+    //dGeomHeightfieldDataSetBounds (slopeHeightData, 0.0f, 100.0f); // sort
+
+    dGeomID slopeHeightID = dCreateHeightfield(space, slopeHeightData, 1); // fff
+
+    dGeomSetPosition(slopeHeightID,xx,yy,zz);
+
+}
 

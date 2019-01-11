@@ -1,5 +1,7 @@
 #include "SimplifiedDynamicManta.h"
 
+#include "../actions/Gunshot.h"
+
 void SimplifiedDynamicManta::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
@@ -201,3 +203,47 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
     wrapDynamics(body);
 
 }
+
+
+Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
+{
+    Gunshot *action = new Gunshot();
+    // Need axis conversion.
+    action->init();
+
+
+
+    Vec3f position = getPos();
+    position[1] += 0.0f; // Move upwards to the center of the real rotation.
+    forward = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 40*forward;
+    forward = -orig+position;
+
+    Vec3f Ft = forward*100;
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+
+    action->setPos(position[0],position[1],position[2]);
+    action->embody(world,space);
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+

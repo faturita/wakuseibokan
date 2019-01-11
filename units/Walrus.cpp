@@ -10,6 +10,8 @@
 #include "Walrus.h"
 #include "../md2model.h"
 
+#include "../actions/Gunshot.h"
+
 void Walrus::init()
 {
     _model = (Model*)MD2Model::loadModel("walrusgood.md2");
@@ -112,6 +114,7 @@ void Walrus::embody(dWorldID world, dSpaceID space)
     //geom = dCreateSphere( space, 2.64f);
     //geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
     geom = dCreateBox( space, 4.0f, 2.64f, 7.0f);
+    //geom = dCreateBox (space,10.0f,2.0f,30.0f);
     dGeomSetBody(geom, me);
 }
 
@@ -124,7 +127,7 @@ void Walrus::embody(dBodyID myBodySelf)
     float length = 7.0f;
     
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,length,length,length);
+    dMassSetBox(&m,1,4.0f, 2.64f, 7.0f);
     //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
@@ -151,7 +154,6 @@ void Walrus::doDynamics(dBodyID body)
 	F[0] = (F[0]-O[0]);
 	F[1] = (F[1]-O[1]);
 	F[2] = (F[2]-O[2]);
-
 
 	Vec3f vec3fF;
 	vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
@@ -201,3 +203,48 @@ void Walrus::doDynamics(dBodyID body)
 
 
 }
+
+
+
+
+
+Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
+{
+    Gunshot *action = new Gunshot();
+    // Need axis conversion.
+    action->init();
+
+    Vec3f position = getPos();
+    position[1] += 0.0f; // Move upwards to the center of the real rotation.
+    forward = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 40*forward;
+    forward = -orig+position;
+
+    Vec3f Ft = forward*100;
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+
+    action->setPos(position[0],position[1],position[2]);
+    action->embody(world,space);
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+
