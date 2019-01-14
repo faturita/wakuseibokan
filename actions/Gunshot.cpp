@@ -2,7 +2,7 @@
 
 Gunshot::Gunshot()
 {
-    ttl = 100;
+    Vehicle::setTtl(100);
 }
 
 Gunshot::~Gunshot()
@@ -61,9 +61,6 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 void Gunshot::doDynamics(dBodyID body)
 {
     //dBodyAddForce(body,0,9.81f,0);
-
-    if (ttl>0)
-        ttl--;
 
     wrapDynamics(body);
 }

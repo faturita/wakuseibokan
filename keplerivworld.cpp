@@ -91,6 +91,22 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
     }
 }
 
+// SYNC
+bool stranded(Vehicle *carrier, Island *island)
+{
+    if (island && carrier && carrier->getType() == 4 && carrier->getStatus() != Balaenidae::OFFSHORING)
+    {
+        Balaenidae *b = (Balaenidae*)carrier;
+
+        b->offshore();
+        controller.reset();
+        b->doControl(controller);
+        b->setStatus(Balaenidae::OFFSHORING);
+        char str[256];
+        sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
+        messages.insert(messages.begin(), str);
+    }
+}
 
 // SYNC
 bool landed(Vehicle *manta, Island *island)
@@ -102,7 +118,7 @@ bool landed(Vehicle *manta, Island *island)
             char str[256];
             sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
             messages.insert(messages.begin(), str);
-            manta->setStatus(0);
+            manta->setStatus(Manta::LANDED);
             manta->setThrottle(0.0f);
             controller.reset();
             manta->doControl(controller);
@@ -245,6 +261,15 @@ Structure* getRunway(dGeomID candidate)
     return NULL;
 }
 
+Island* getIsland(dGeomID candidate)
+{
+    for (int j=0;j<islands.size();j++)
+    {
+        if (candidate == islands[j]->getGeom())
+            return islands[j];
+    }
+    return NULL;
+}
 
 bool inline isIsland(dGeomID candidate)
 {
@@ -362,6 +387,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.bounce = 0.2;
                    contact[i].surface.slip1 = 0.1;
                    contact[i].surface.slip2 = 0.1;
+
+                   if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
+                   if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
                } else
                if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                     ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -659,12 +687,15 @@ void initWorldModelling()
 
     islands.push_back(nemesis);
 
+    /**
     structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
+    **/
+
     structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
 
     structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));

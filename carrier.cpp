@@ -442,6 +442,7 @@ void update(int value)
             controlables[controller.controlling-1]->doControl(controller);
         }
 
+        // Autocontrol (AI).
         for(int i=0;i<controlables.size();i++)
         {
             if (controlables[i]->isAuto())
@@ -450,9 +451,10 @@ void update(int value)
 
 
         //printf("Elements alive now: %d\n", vehicles.size());
-        
+        // As the sync problem only arises when you delete something, there's no problem here.
         for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
             vehicles[i]->doDynamics();
+            vehicles[i]->tick();
         }
 
 
@@ -486,6 +488,7 @@ void update(int value)
 	}
     
 	glutPostRedisplay();
+    // @NOTE: update time should be adapted to real FPS.
     glutTimerFunc(25, update, 0);
 }
 

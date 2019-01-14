@@ -151,6 +151,20 @@ void Balaenidae::doDynamics(dBodyID body)
 
     dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
+    if (offshoring == 1) {
+        offshoring=0;
+        setStatus(Balaenidae::SAILING);
+    }
+    else if (offshoring > 0)
+    {
+        // Add a retractive force to keep it out of the island.
+        Vec3f ap = Balaenidae::ap;
+
+        setThrottle(0.0);
+        dBodyAddRelForce(body,ap[0],ap[1],-ap[2]*10000);
+        offshoring--;
+    }
+
 
     // Buyoncy
     //if (pos[1]<0.0f)
@@ -172,6 +186,12 @@ void Balaenidae::doControl()
         c.registers.thrust = 0;
 
     doControl(c);
+}
+
+void Balaenidae::offshore()
+{
+    Balaenidae::offshoring = 100;
+    Balaenidae::ap = getForward();
 }
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)

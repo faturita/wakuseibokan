@@ -343,6 +343,16 @@ int Vehicle::getTtl()
     return Vehicle::ttl;
 }
 
+void Vehicle::setTtl(int ttlvalue)
+{
+    Vehicle::ttl = ttlvalue;
+}
+
+void Vehicle::tick()
+{
+    Vehicle::ttl--;
+}
+
 struct controlregister Vehicle::getControlRegisters()
 {
     return myCopy;
@@ -350,6 +360,11 @@ struct controlregister Vehicle::getControlRegisters()
 
 void Vehicle::wrapDynamics(dBodyID body)
 {
+    Vec3f linearVel = dBodyGetLinearVelVec(body);
+
+    // Get speed, alpha and beta.
+    speed = linearVel.magnitude();
+
     dVector3 result;
 
     dBodyVectorToWorld(body, 0,0,1,result);

@@ -2,7 +2,7 @@
 
 LaserBeam::LaserBeam()
 {
-    ttl = 100;
+    Vehicle::setTtl(100);
     range = 4000.0f;
 }
 
@@ -63,10 +63,6 @@ void LaserBeam::drawModel(float yRot, float xRot, float x, float y, float z)
 void LaserBeam::doDynamics(dBodyID body)
 {
     //dBodyAddForce(body,0,9.81f,0);
-
-    if (ttl>0)
-        ttl--;
-
     //wrapDynamics(body);
 }
 

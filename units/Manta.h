@@ -15,8 +15,9 @@ enum MANTASTATUS {IN_CARRIER, ON_DECK, LANDED, FLYING};
 class Manta : public Vehicle
 {
 
-    
 public:
+    static const int LANDED = 0;
+
     bool antigravity;
 
 	float rudder;

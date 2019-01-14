@@ -9,7 +9,13 @@ class Balaenidae : public Vehicle
 protected:
     dGeomID geom;
     float rudder;
+    int offshoring = 0;
+    Vec3f ap;
 public:
+
+    static const int OFFSHORING = 1;
+    static const int SAILING = 0;
+
     ~Balaenidae();
     Balaenidae();
     void drawModel(float yRot, float xRot, float x, float y, float z);
@@ -28,6 +34,9 @@ public:
     void doDynamics(dBodyID body);
 
     void drawModel();
+
+    void offshore();
+
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type);
 
     void launch(Manta* m);

@@ -18,9 +18,12 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
+enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5 };
 
 class Vehicle : Observable
 {
+private:
+    int ttl=-1;  //Live for ever.
 protected:
 	Vec3f pos;
     Model* _model;
@@ -36,11 +39,11 @@ protected:
 
     struct controlregister myCopy;
 
-    int ttl=-1;  //Live for ever.
-
     bool aienable = false;
 
     int status;
+
+    void setTtl(int ttlvalue);
     
 public:
     bool inert;
@@ -104,6 +107,7 @@ public:
     virtual Vehicle* fire(dWorldID world, dSpaceID space);
 
     virtual int getTtl();
+    void tick();
 
     bool isAuto();
     void setEnableAI();
