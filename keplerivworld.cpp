@@ -117,6 +117,10 @@ bool hit(Vehicle *vehicle)
     {
         messages.insert(messages.begin(), std::string("Carrier is under fire!"));
     }
+    if (vehicle && vehicle->getType() == 3)
+    {
+        messages.insert(messages.begin(), std::string("Manta is under fire!"));
+    }
     return true;
 }
 
@@ -382,17 +386,30 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.slip2 = 0.1;
 
                    printf("Carrier hit\n");
+               } else
+               if (  (isManta(v1) && isAction(v2) && hit(v1)) ||
+                     (isManta(v2) && isAction(v1) && hit(v2)) )
+               {
+
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+
+                   printf("Manta hit\n");
                }  else {
                    contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                    dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
                    contact[i].surface.mu = 0;dInfinity;
                    contact[i].surface.slip1 = 0.1;
                    contact[i].surface.slip2 = 0.1;
                }
             }
 
-           contact[i].surface.soft_erp = 0.5;
-           contact[i].surface.soft_cfm = 0.3;
+           contact[i].surface.soft_erp = .5;   // 0 in both will force the surface to be tight.
+           contact[i].surface.soft_cfm = .3;
 
 
            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
@@ -571,9 +588,7 @@ void initWorldModelling()
     runway->setLocation(1800.0,0.3,1800.0);
     runway->buildTerrainModel(space,"terrain/runway.bmp"); //,1000,10);
     
-    BoxIsland *nemesis = new BoxIsland();
-    nemesis->setLocation(-1300.0,1.0,-1300.0);
-    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp"); //,1000,10);
+
     
     
     BoxIsland *vulcano = new BoxIsland();
@@ -609,17 +624,22 @@ void initWorldModelling()
     BoxIsland *thermopilae = new BoxIsland();
     thermopilae->setName("Thermopilae");
     thermopilae->setLocation(0.0f,-1.0,0.0f);
-    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     BoxIsland *nonsquareisland = new BoxIsland();
     nonsquareisland->setName("Atolon");
     nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
-    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
     BoxIsland *vulcano = new BoxIsland();
     vulcano->setName("Vulcano");
     vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
     vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
 
     /**islands.push_back(baltimore);
@@ -637,6 +657,8 @@ void initWorldModelling()
     islands.push_back(nonsquareisland);
     islands.push_back(vulcano);
 
+    islands.push_back(nemesis);
+
     structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
@@ -648,6 +670,16 @@ void initWorldModelling()
     structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
     structures.push_back(nonsquareisland->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+
+
+    structures.push_back(vulcano->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    structures.push_back(vulcano->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    structures.push_back(vulcano->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+
+
+    structures.push_back(nemesis->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    structures.push_back(nemesis->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    structures.push_back(nemesis->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
 
     initWorldPopulation();
 

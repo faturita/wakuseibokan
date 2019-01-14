@@ -151,6 +151,11 @@ void Balaenidae::doDynamics(dBodyID body)
 
     dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
+
+    // Buyoncy
+    //if (pos[1]<0.0f)
+    //    dBodyAddRelForce(me,0.0,9.81*20050.0f,0.0);
+
     wrapDynamics(body);
 }
 

@@ -108,6 +108,28 @@ void drawMap()
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
 
+
+        for(int i=0;i<10;i++)
+        {
+            glLineWidth(2.5);
+            glColor3f(0.0, 1.0, 0.0);
+            glBegin(GL_LINES);
+            glVertex3f(   1, -500+i*100, 0.0);
+            glVertex3f(1200, -500+i*100, 0.0);
+            glEnd();
+        }
+
+        for(int i=0;i<12;i++)
+        {
+            glLineWidth(2.5);
+            glColor3f(0.0, 1.0, 0.0);
+            glBegin(GL_LINES);
+            glVertex3f(   1+i*100,  500, 0.0);
+            glVertex3f(   1+i*100, -500, 0.0);
+            glEnd();
+        }
+
+
         /**
         glLineWidth(2.5);
         glColor3f(1.0, 0.0, 0.0);
@@ -128,14 +150,14 @@ void drawMap()
         {
             BoxIsland *b = islands[i];
 
-            drawString(600+(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,1.0f,1.0f,1.0f);
+            drawString(600-(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,1.0f,1.0f,1.0f);
         }
 
         for(int i=0;i<islands.size();i++)
         {
             BoxIsland *b = islands[i];
 
-            placeIsland(600+(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
+            placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
         }
 
 
