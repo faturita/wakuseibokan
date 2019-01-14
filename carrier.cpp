@@ -442,6 +442,13 @@ void update(int value)
             controlables[controller.controlling-1]->doControl(controller);
         }
 
+        for(int i=0;i<controlables.size();i++)
+        {
+            if (controlables[i]->isAuto())
+                    controlables[i]->doControl();
+        }
+
+
         //printf("Elements alive now: %d\n", vehicles.size());
         
         for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
@@ -487,6 +494,8 @@ void update(int value)
 
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
+
+    srand (time(NULL));
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)

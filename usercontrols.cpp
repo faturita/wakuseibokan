@@ -192,6 +192,8 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'F':controller.registers.thrust+=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
+        case 'j':controlables[controller.controlling-1]->setEnableAI();break;
+        case 'J':controlables[controller.controlling-1]->setDisableAI();break;
         case '0':
         	controller.controlling = 0;
             controller.reset();
@@ -216,11 +218,23 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '~':Camera.control = 0;break;
         case 'S':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
+        case 'm':
+            {
+            Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,2);
+            if (manta != NULL)
+                vehicles.push_back(manta);
+                controlables.push_back(manta);
+            }
+        break;
         case 'h':
             Vehicle *action = (controlables[controller.controlling-1])->fire(world,space);
-            int *idx = new int();
-            *idx = vehicles.push_back(action);
-            dBodySetData( action->getBodyID(), (void*)idx);
+            //int *idx = new int();
+            //*idx = vehicles.push_back(action);
+            //dBodySetData( action->getBodyID(), (void*)idx);
+            if (action != NULL)
+            {
+                vehicles.push_back(action);
+            }
         break;
 	}
 }

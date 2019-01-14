@@ -37,6 +37,45 @@
 #include "imageloader.h"
 #include "terrain/Terrain.h"
 
+
+extern std::vector<BoxIsland*> islands;
+
+
+void placeIsland(int x, int y, int size, const char* modelName, const char *name)
+{
+    char str[256];
+    sprintf (str, name);
+    //drawString(0+x-10,y-20,0,str,0.1f,1.0f,1.0f,1.0f);
+
+    //Image* image = loadBMP("terrain/vulcrum.bmp");
+    Image* image = loadBMP(modelName);
+    GLuint _textureBox = loadTexture(image);
+    delete image;
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureBox);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 0.0f);
+
+    glBegin(GL_QUADS);
+
+    int BOX_SIZE=size;
+
+    //Front face
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, 0);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, 0);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
+
+    glEnd();
+}
+
 void drawMap()
 {
     // This will make things dark.
@@ -61,7 +100,7 @@ void drawMap()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     char str[256];
-    sprintf (str, "Vulcrum");
+    sprintf (str, "Kepler IV Sea");
     // width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f,1.0f,1.0f,1.0f);
 
@@ -69,6 +108,7 @@ void drawMap()
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
 
+        /**
         glLineWidth(2.5);
         glColor3f(1.0, 0.0, 0.0);
         glBegin(GL_LINES);
@@ -82,35 +122,21 @@ void drawMap()
         glVertex3f(690, + 1, 0);
         glEnd();
 
-        drawString(0+790,10,0,str,0.2f,1.0f,1.0f,1.0f);
+        **/
 
-        Image* image = loadBMP("terrain/vulcrum.bmp");
-        GLuint _textureBox = loadTexture(image);
-        delete image;
+        for(int i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
 
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, _textureBox);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glColor3f(1.0f, 1.0f, 1.0f);
+            drawString(600+(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,1.0f,1.0f,1.0f);
+        }
 
-        glBegin(GL_QUADS);
+        for(int i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
 
-        int BOX_SIZE=100;
-        int x=790,y=10;
-
-        //Front face
-        glNormal3f(0.0, 0.0f, 1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, 0);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, 0);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
-
-        glEnd();
+            placeIsland(600+(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
+        }
 
 
 

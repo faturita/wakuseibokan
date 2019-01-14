@@ -1,0 +1,15 @@
+#ifndef WAREHOUSE_H
+#define WAREHOUSE_H
+
+
+#include "Structure.h"
+
+class Warehouse : public Structure
+{
+public:
+    Warehouse();
+    void init();
+    void drawModel(float yRot, float xRot, float x, float y, float z);
+};
+
+#endif // WAREHOUSE_H

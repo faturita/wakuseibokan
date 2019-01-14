@@ -37,6 +37,10 @@ protected:
     struct controlregister myCopy;
 
     int ttl=-1;  //Live for ever.
+
+    bool aienable = false;
+
+    int status;
     
 public:
     bool inert;
@@ -72,6 +76,7 @@ public:
     void virtual doDynamics();
 
     void virtual doControl(Controller);
+    void virtual doControl();
     
     void virtual embody(dBodyID myBodySelf);
     void antigravity(dBodyID myBodySelf);
@@ -94,6 +99,14 @@ public:
 
     virtual int getTtl();
 
+    bool isAuto();
+    void setEnableAI();
+    void setDisableAI();
+
+    virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type);
+
+    int getStatus() const;
+    void setStatus(int value);
 };
 
 #endif /* VEHICLE_H_ */

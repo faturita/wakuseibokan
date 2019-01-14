@@ -192,6 +192,10 @@ private:
     dGeomID islandGeom;
 
     std::vector<Structure*> structures;
+
+    std::string name;
+
+    std::string modelname;
     
 public:
     
@@ -204,6 +208,14 @@ public:
     dGeomID getGeom();
 
     Structure* addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world);
+
+    float getX();
+    float getZ();
+
+    std::string getName();
+    void setName(std::string name);
+
+    std::string getModelName();
 };
 
 

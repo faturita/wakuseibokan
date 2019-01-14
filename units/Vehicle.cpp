@@ -11,13 +11,25 @@
 #include <assert.h>
 #include "../md2model.h"
 
+int Vehicle::getStatus() const
+{
+    return status;
+}
+
+void Vehicle::setStatus(int value)
+{
+    status = value;
+}
+
 Vehicle::Vehicle()
 {
-	for(int i=0;i<12;i++)
-	{
-		R[i]=0;
+    for(int i=0;i<12;i++)
+    {
+        R[i]=0;
 	}
 	R[0]=R[5]=R[10]=1;
+
+    memset(&myCopy,0,sizeof(struct controlregister));
 }
 
 Vehicle::~Vehicle()
@@ -86,6 +98,21 @@ void Vehicle::setLocation(float fPos[3], float R[12])
 	{
         Vehicle::R[i] =  R[i];
 	}
+}
+
+
+bool Vehicle::isAuto()
+{
+    return Vehicle::aienable;
+}
+void Vehicle::setEnableAI()
+{
+    Vehicle::aienable = true;
+}
+
+void Vehicle::setDisableAI()
+{
+    Vehicle::aienable = false;
 }
 
 Vec3f Vehicle::dBodyGetLinearVelVec(dBodyID body)
@@ -241,6 +268,11 @@ void Vehicle::doControl(Controller controller)
     //engine[2] = controller.roll;
 }
 
+void Vehicle::doControl()
+{
+    assert(0 || !"This method is not implemented.");
+}
+
 void Vehicle::setControlRegisters(struct controlregister reg)
 {
     Vehicle::myCopy = reg;
@@ -260,6 +292,11 @@ void Vehicle::antigravity(dBodyID myBodySelf)
 }
 
 Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
+{
+    assert(0 || !"This should not be executed.");
+}
+
+Vehicle* Vehicle::spawn(dWorldID world, dSpaceID space,int type)
 {
     assert(0 || !"This should not be executed.");
 }

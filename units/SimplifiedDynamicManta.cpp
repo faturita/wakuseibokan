@@ -38,13 +38,17 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
     setThrottle(-controller.registers.thrust*2*5);
 
-    if (controller.registers.yaw>0)
-        antigravity = true;
-    else if (controller.registers.yaw==0)
-        antigravity = false;
-
     if (getThrottle()>0)
+    {
         Manta::inert = false;
+        antigravity = false;
+        setStatus(1);
+    }
+
+    if (getThrottle()>60)
+    {
+        setStatus(2);
+    }
 
     // roll
     Manta::aileron = controller.registers.roll;
@@ -180,7 +184,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         dBodySetQuaternion(body,q3);
 
     if (Manta::antigravity)
-        dBodyAddForce(body,0,9.81f,0);
+        dBodyAddForce(body,0,9.81f*(10.0f),0);
 
     //dBodySetRotation(body,R);
 

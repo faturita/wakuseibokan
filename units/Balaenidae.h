@@ -18,6 +18,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     void doControl(Controller controller);
+    void doControl();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     void doDynamics();
@@ -26,6 +27,7 @@ public:
     void doDynamics(dBodyID body);
 
     void drawModel();
+    Vehicle* spawn(dWorldID  world,dSpaceID space,int type);
 };
 
 #endif // BALAENIDAE_H

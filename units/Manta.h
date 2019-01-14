@@ -10,6 +10,7 @@
 
 #include "Vehicle.h"
 
+enum MANTASTATUS {IN_CARRIER, ON_DECK, LANDED, FLYING};
 
 class Manta : public Vehicle
 {

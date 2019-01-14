@@ -1,8 +1,11 @@
 #include "Balaenidae.h"
+#include "SimplifiedDynamicManta.h"
 #include "../ThreeMaxLoader.h"
 #include "../odeutils.h"
 
 extern GLuint _textureMetal;
+
+extern GLuint _textureRoad;
 
 Balaenidae::~Balaenidae()
 {
@@ -61,6 +64,10 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         _model->draw();
+
+        //glTranslatef(-0.4f,0.62f,-0.5f);
+        //drawTheRectangularBox(_textureRoad,8.0f, 1.0f, 1.0f);
+
 
 
         glPopMatrix();
@@ -148,3 +155,29 @@ void Balaenidae::doDynamics(dBodyID body)
     wrapDynamics(body);
 }
 
+void Balaenidae::doControl()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    c.registers.roll = 1;
+    if ((rand() % 100 + 1)<10)
+        c.registers.thrust = 20;
+    else
+        c.registers.thrust = 0;
+
+    doControl(c);
+}
+
+Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
+{
+    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
+    _manta1->init();
+    _manta1->setPos(pos[0],pos[1]+50, pos[2]);
+    _manta1->setForward(forward[0],forward[1],forward[2]);
+    _manta1->embody(world, space);
+    _manta1->setStatus(0);
+
+    return (Vehicle*)_manta1;
+}

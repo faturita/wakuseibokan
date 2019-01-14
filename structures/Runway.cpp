@@ -1,5 +1,7 @@
 #include "Runway.h"
 
+extern GLuint _textureRoad;
+
 Runway::Runway()
 {
 
@@ -32,8 +34,9 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        _model->draw(Structure::texture);
-        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        //_model->draw(Structure::texture);
+        //drawRectangularBox(Structure::width, Structure::height, Structure::length, _textureRoad);
+        drawTheRectangularBox(_textureRoad,Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

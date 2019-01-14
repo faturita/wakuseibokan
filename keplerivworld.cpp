@@ -38,6 +38,8 @@
 #include "structures/Hangar.h"
 #include "structures/Turret.h"
 #include "structures/Warehouse.h"
+#include "structures/Laserturret.h"
+#include "structures/CommandCenter.h"
 
 extern  Controller controller;
 
@@ -114,10 +116,11 @@ bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == 3)
     {
-        if (!vehicle->inert)
+        if (vehicle->getStatus() != 0 && vehicle->getStatus() != 1)
         {
             vehicle->inert = true;
             controller.reset();
+            vehicle->setStatus(0);
             vehicle->doControl(controller);
             vehicle->setThrottle(0.0f);
             messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
@@ -347,18 +350,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.bounce = 0.2;
 
                } else
-               if (  (isAction(v2) ) ||
-                     (isAction(v1) ) )
-               {
-
-                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
-
-                   printf("Manta hit\n");
-               } else
                if (  (isCarrier(v1) && isAction(v2) && hit(v1)) ||
                      (isCarrier(v2) && isAction(v1) && hit(v2)) )
                {
@@ -498,130 +489,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-//
-//  NearCallback is the collision handler callback function.
-//
-//
-void nearCadllback (void *data, dGeomID o1, dGeomID o2)
-{
-    /* exit without doing anything if the two bodies are connected by a joint */
-    dBodyID b1,b2;
-    dContact contact;
-
-    
-    b1 = dGeomGetBody(o1);
-    b2 = dGeomGetBody(o2);
-    if (b1 && b2 && dAreConnected (b1,b2)) return;
-    
-    
-    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
-        Vehicle *vehicle = vehicles[i];
-        
-        if (b1 == vehicle->getBodyID() || b2 == vehicle->getBodyID())
-        {
-            printf ("Vehicle %d collisioned\n", i);
-            //vehicles[0].stop();
-            
-            if (vehicles[i]->getType()==3 && vehicles[i]->getSpeed()>300)
-            {
-                printf("Sorry your plane has crashed. You're dead.\n");
-                exit(2);
-            }
-        }
-    }
-    
-    
-    /**contact.surface.mode |=
-    dContactMotionN |                   // velocity along normal
-    dContactMotion1 |
-    dContactMotion2 | // and along the contact plane
-    dContactFDir1;                      // don't forget to set the direction 1
-    **/
-    
-    //contact.surface.mu = 0.1;
-    //contact.surface.mu2 = 0.1;
-    //contact.surface.bounce = 0.001;
-
-    //contact.surface.mode = dContactBounce ;
-    
-    //contact.surface.mode |=
-    //dContactMotionN;
-    
-
-    
-    if (dCollide (o1,o2,1,&contact.geom,sizeof(dContactGeom))) {
-        dJointID c = dJointCreateContact (world,contactgroup,&contact);
-        dJointAttach (c,b1,b2);
-    }
-
-}
-
-dGeomID gheight;
-
-// Heightfield dimensions
-
-#define HFIELD_WSTEP			15			// Vertex count along edge >= 2
-#define HFIELD_DSTEP			31
-
-#define HFIELD_WIDTH			REAL( 1000.0 )
-#define HFIELD_DEPTH			REAL( 1000.0 )
-
-#define HFIELD_WSAMP			( HFIELD_WIDTH / ( HFIELD_WSTEP-1 ) )
-#define HFIELD_DSAMP			( HFIELD_DEPTH / ( HFIELD_DSTEP-1 ) )
-
-
-// NO SE USA
-dReal heightfield_caldlback( void* pUserData, int x, int z )
-{
-    dReal h = 100;
-    
-    return h;
-}
 
 void initWorldPopulation()
 {
-    //Init lands, fixed objects, and objects
-    BoxVehicle *_boxVehicle1 = new BoxVehicle();
-    _boxVehicle1->init();
-    _boxVehicle1->setPos(+200.0f,40.0f,-3800.0f);
-    
-    
-    // Start modelling BoxVehicles
-    _boxVehicle1->embody(world, space);
-    
-    
-    // Add vehicles
-    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
-    _manta1->init();
-    _manta1->setPos(+0.0f, 25.0f, -4000.0f);
-    _manta1->embody(world, space);
-    
-    
-    Walrus *_walrus2 = new Walrus();
-    _walrus2->init();
-    _walrus2->setPos(10.0f, 10.0f, -3400.0f);
-    _walrus2->embody(world, space);
-    
-
-    Walrus *_walrus3 = new Walrus();
-    _walrus3->init();
-    _walrus3->setPos(0.0f, 10.0f, -3400.0f);
-    
-    _walrus3->embody(world, space);
-    
-    
-//    Buggy *_buggy = new Buggy();
-//    _buggy->init();
-//    _buggy->setPos(1300.0f, 10, 10);
-    
-//    _buggy->embody(world, space);
-
-
-    MultiBodyVehicle *_mb = new MultiBodyVehicle();
-    _mb->init();
-    _mb->setPos(0.0f,100.0f,+2200.0f);
-    _mb->embody(world,space);
-
     Balaenidae *_b = new Balaenidae();
     _b->init();
     _b->setPos(0.0f,50.0f,-2200.0f);
@@ -629,11 +499,6 @@ void initWorldPopulation()
 
     //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
-    vehicles.push_back(_boxVehicle1);
-    vehicles.push_back(_manta1);
-    vehicles.push_back(_walrus2);
-    vehicles.push_back(_walrus3);
-    vehicles.push_back(_mb);
     vehicles.push_back(_b);
 
 
@@ -721,12 +586,19 @@ void initWorldModelling()
 **/
 
     BoxIsland *thermopilae = new BoxIsland();
+    thermopilae->setName("Thermopilae");
     thermopilae->setLocation(0.0f,-1.0,0.0f);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
 
     BoxIsland *nonsquareisland = new BoxIsland();
+    nonsquareisland->setName("Atolon");
     nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
     nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp"); //,1000,10);
+
+    BoxIsland *vulcano = new BoxIsland();
+    vulcano->setName("Vulcano");
+    vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
+    vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
 
 
     /**islands.push_back(baltimore);
@@ -742,12 +614,15 @@ void initWorldModelling()
     **/
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
+    islands.push_back(vulcano);
 
-    structures.push_back(thermopilae->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Structure(),    0.0f,-1000.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Runway()   ,    0.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Warehouse(),-1000.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
 
     structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));

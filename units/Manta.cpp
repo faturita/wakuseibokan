@@ -21,6 +21,7 @@ void Manta::init()
 
     setForward(0,0,1);
 
+    status = 0;
 }
 
 int Manta::getType()

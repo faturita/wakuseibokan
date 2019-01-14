@@ -19,6 +19,7 @@ GLuint _textureLand;
 
 GLuint _textureMetal;
 
+GLuint _textureRoad;
 
 std::vector<GLuint*> textures;
 
@@ -276,6 +277,9 @@ void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side, 
     
 }
 
+
+
+
 /**
  * When you draw the object, you move to height/2 to one side, and then height/2 to the other.
  *
@@ -285,7 +289,6 @@ void drawRectangularBox(float width, float height, float length)
     float x = width/2, y = height/2, z = length/2;
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
-
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
     glColor3f(0.0f, 1.0f, 0.0f);     // Green
     glVertex3f( x, y, -z);
@@ -329,6 +332,84 @@ void drawRectangularBox(float width, float height, float length)
     glVertex3f(x, -y, -z);
     glEnd();  // End of drawing color-cube
     
+}
+
+void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
+{
+    float x=xx/2.0f, y=yy/2.0f, z=zz/2.0f;
+
+    //glLoadIdentity();
+    glPushMatrix();
+    glBegin(GL_QUADS);
+
+    //Top face
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glVertex3f(-x, -y, z);
+    glVertex3f(x, -y,  z);
+    glVertex3f(x, y, z);
+    glVertex3f(-x, y, z);
+
+    //Bottom face
+    glColor3f(1.0f, 0.0f, 1.0f);
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(x, -y, - z);
+    glVertex3f(x, -y,  z);
+    glVertex3f(-x, -y, z);
+
+    //Left face
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 1.0f);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(- x, - y, z);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(-x, y, z);
+    glVertex3f(-x, y, -z);
+
+    //Right face
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(x, -y, -z);
+    glVertex3f(x, y, -z);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(x, y, z);
+    glVertex3f(x, -y, z);
+
+    glEnd();
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glBegin(GL_QUADS);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glNormal3f(0.0, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-x, y, z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, y, -z);
+
+    //Back face
+    glNormal3f(0.0, 0.0f, -1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-x, y, -z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, - z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, -y, -z);
+
+    glEnd();
+    glPopMatrix();
 }
 
 void drawBox(GLuint _textureId, float xx, float yy, float zz)
@@ -442,6 +523,10 @@ void initTextures()
     
     image = loadBMP("terrain/grass.bmp");
     _textureLand = loadTexture(image);
+    delete image;
+
+    image = loadBMP("terrain/road.bmp");
+    _textureRoad = loadTexture(image);
     delete image;
 }
 

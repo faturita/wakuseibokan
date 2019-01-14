@@ -52,7 +52,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
 
 
         // Laser Beam
-        drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
+        //drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
 
         //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();

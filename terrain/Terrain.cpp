@@ -96,6 +96,9 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
     _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
     
+    modelname = model;
+
+    printf("Island: %s\n", model);
     printf("Landmass width: %d\n", _landmass->width());
     printf("Landmass heigth: %d\n",_landmass->length());
     
@@ -123,6 +126,30 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 dGeomID BoxIsland::getGeom()
 {
     return islandGeom;
+}
+
+std::string BoxIsland::getModelName()
+{
+    return modelname;
+}
+
+float BoxIsland::getX()
+{
+    return X;
+}
+float BoxIsland::getZ()
+{
+    return Z;
+}
+
+std::string BoxIsland::getName()
+{
+    return name;
+}
+
+void BoxIsland::setName(std::string newname)
+{
+    BoxIsland::name = newname;
 }
 
 void BoxIsland::setLocation(float x, float y, float z)
