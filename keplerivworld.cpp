@@ -93,11 +93,20 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
 
 
 // SYNC
-bool landed(Vehicle *manta)
+bool landed(Vehicle *manta, Island *island)
 {
-    if (manta && manta->getType() == 3)
+    if (manta && island && manta->getType() == 3)
     {
-        messages.insert(messages.begin(), std::string("Manta has landed on Island."));
+        if (manta->getStatus() != 0)
+        {
+            char str[256];
+            sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
+            messages.insert(messages.begin(), str);
+            manta->setStatus(0);
+            manta->setThrottle(0.0f);
+            controller.reset();
+            manta->doControl(controller);
+        }
     }
     return true;
 }
@@ -220,6 +229,18 @@ bool inline isRunway(dGeomID candidate)
     return false;
 }
 
+Structure* getRunway(dGeomID candidate)
+{
+    for (int i=0; i<structures.size(); i++)
+    {
+        if (candidate == structures[i]->getGeom() && structures[i]->getType()==LANDINGABLE)
+        {
+            return structures[i];
+        }
+    }
+    return NULL;
+}
+
 
 bool inline isIsland(dGeomID candidate)
 {
@@ -298,8 +319,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                }
 
 
-               if ( (isRunway(contact[i].geom.g1) && isManta(v2)) ||
-                    (isRunway(contact[i].geom.g2) && isManta(v1)) )
+               if ( (isRunway(contact[i].geom.g1) && isManta(v2) && landed(v2,getRunway(contact[i].geom.g1)->island)) ||
+                    (isRunway(contact[i].geom.g2) && isManta(v1) && landed(v1,getRunway(contact[i].geom.g2)->island)) )
                {
                    contact[i].surface.mode = dContactBounce |
                    dContactApprox1;

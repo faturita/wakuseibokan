@@ -82,7 +82,6 @@ void Balaenidae::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
     embody(me);
-    //geom = dCreateSphere( space, 2.64f);
     geom = dCreateBox( space, 100.0f, 40, 500.0f);   // scale 50
     dGeomSetBody(geom, me);
 }
@@ -112,7 +111,7 @@ void Balaenidae::doControl(Controller controller)
         honk();
     setThrottle(-controller.registers.thrust*2*5);
 
-    Balaenidae::rudder = controller.registers.roll;
+    Balaenidae::rudder = -controller.registers.roll;
 }
 
 void Balaenidae::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
@@ -172,12 +171,36 @@ void Balaenidae::doControl()
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
 {
+    // @FIXME do it depending on the type of the element to spawn.
     SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
     _manta1->init();
     _manta1->setPos(pos[0],pos[1]+50, pos[2]);
-    _manta1->setForward(forward[0],forward[1],forward[2]);
     _manta1->embody(world, space);
     _manta1->setStatus(0);
+    _manta1->inert = true;
+    alignToMe(_manta1->getBodyID());
 
     return (Vehicle*)_manta1;
+}
+
+void Balaenidae::taxi(Manta *m)
+{
+    m->setPos(pos[0],pos[1]+50, pos[2]);
+}
+
+void Balaenidae::launch(Manta* m)
+{
+    m->inert = false;
+    m->setStatus(2);
+    m->elevator = +12;
+    struct controlregister c;
+    c.thrust = 1500.0f/(-10.0);
+    c.pitch = 12;
+    m->setControlRegisters(c);
+    m->setThrottle(1500.0f);
+    Vec3f p = m->getPos();
+    p[1] += 10;
+    m->setPos(p);
+    dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
+    //dBodySetLinearVel(m->getBodyID(),0.0,0.0,(1.0f)*7000);
 }

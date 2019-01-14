@@ -22,6 +22,9 @@
 #include "usercontrols.h"
 #include "units/Vehicle.h"
 
+#include "units/Balaenidae.h"
+#include "units/Manta.h"
+
 Camera Camera;
 
 extern dWorldID world;
@@ -131,6 +134,22 @@ void processMousePassiveMotion(int x, int y) {
     //processMouseActiveMotion(x,y);
 }
 
+
+void switchControl(int id)
+{
+    if (controller.controlling != 0)
+    {
+        controlables[controller.controlling-1]->setControlRegisters(controller.registers);
+    }
+    controller.controlling = id;
+    //controller.reset();
+    controller.registers = controlables[controller.controlling-1]->getControlRegisters();
+    //spd = vehicles.getThrottle();
+}
+
+
+
+
 bool pp=false;
 
 void handleKeypress(unsigned char key, int x, int y) {
@@ -147,7 +166,29 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME input data should be verified.
                 const char *content = controller.str.substr(8).c_str();
 
-                controller.controlling = atoi(content);
+                switchControl(atoi(content));
+
+            } else
+
+            if (controller.str.find("launch") != std::string::npos)
+            {
+                //const char* content = controller.str.substr(7).c_str();
+
+                Balaenidae *b = (Balaenidae*)controlables[controller.controlling-1];
+
+                for(int i=0;i<controlables.size();i++)
+                {
+                    if (controlables[i]->getType() == 3)
+                    {
+                        Manta *m = (Manta*)controlables[i];
+                        if (m->getStatus() == 0)
+                        {
+                            b->launch(m);
+                            messages.insert(messages.begin(), std::string("Manta has launched."));
+                        }
+                    }
+                }
+
             } else
 
             if (strcmp(controller.str.c_str(),"map")==0)
@@ -200,11 +241,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             Camera.reset();
         break;
         case '1':case '2':case '3': case '4': case '5': case '6':case '7':
-            controlables[controller.controlling-1]->setControlRegisters(controller.registers);
-            controller.controlling = (int)(key-48);
-            //controller.reset();
-            controller.registers = controlables[controller.controlling-1]->getControlRegisters();
-        	//spd = vehicles.getThrottle();
+            switchControl((int)(key-48));
         break;
         case 'i':
             {
@@ -224,6 +261,36 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (manta != NULL)
                 vehicles.push_back(manta);
                 controlables.push_back(manta);
+                messages.insert(messages.begin(), std::string("Manta is ready for launching."));
+            }
+            break;
+        case 'M':
+            {
+                synchronized(vehicles.m_mutex)
+                {
+                    for(int i=0;i<controlables.size();i++)
+                    {
+                        if (controlables[i]->getType() == 3)
+                        {
+                            Manta *m = (Manta*)controlables[i];
+                            if (m->getStatus() == 0)
+                            {
+                                controlables.erase(controlables.begin() + i);
+                            }
+                        }
+                    }
+                    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+                    {
+                        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (vehicles[i]->getType()==3 && vehicles[i]->getStatus()==0)
+                        {
+                            //printf("Eliminating....\n");
+                            dBodyDisable(vehicles[i]->getBodyID());
+                            vehicles.erase(i);
+                            messages.insert(messages.begin(), std::string("Manta is now on bay."));
+                        }
+                    }
+                }
             }
         break;
         case 'h':

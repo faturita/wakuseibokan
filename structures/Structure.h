@@ -6,6 +6,7 @@
 
 #include "../units/Vehicle.h"
 #include "../ThreeMaxLoader.h"
+#include "../terrain/island.h"
 
 class Structure : public Vehicle
 {
@@ -19,7 +20,10 @@ protected:
     float inclination;
 
     GLuint texture;
+
 public:
+    Island *island;
+
     Structure();
     ~Structure();
 
@@ -35,6 +39,7 @@ public:
 
     int getType();
 
+    void onIsland(Island* island);
 
     // Camera
     void doControl(Controller controller);

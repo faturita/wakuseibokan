@@ -188,6 +188,7 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     structure->init();
     structure->setPos(X+x,heightOffset,Z+z);
     structure->embody(world,space);
+    structure->onIsland(this);
 
     // @NOTE: when the structure is destroyed this pointer must be eliminated.
     structures.push_back(structure);

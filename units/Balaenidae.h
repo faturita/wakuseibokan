@@ -2,6 +2,7 @@
 #define BALAENIDAE_H
 
 #include "Vehicle.h"
+#include "Manta.h"
 
 class Balaenidae : public Vehicle
 {
@@ -28,6 +29,9 @@ public:
 
     void drawModel();
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type);
+
+    void launch(Manta* m);
+    void taxi(Manta *m);
 };
 
 #endif // BALAENIDAE_H

@@ -13,6 +13,7 @@
 
 #include "../odeutils.h"
 #include "../openglutils.h"
+#include "island.h"
 #include "../structures/Structure.h"
 
 
@@ -180,7 +181,7 @@ void drawTerrain(Terrain *_landmass, float fscale);
 void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
 
 
-class BoxIsland
+class BoxIsland : public Island
 {
 private:
     Terrain *_landmass;

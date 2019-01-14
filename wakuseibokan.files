@@ -8,6 +8,8 @@ ThreeMaxLoader.h
 actions/Action.h
 actions/Gunshot.cpp
 actions/Gunshot.h
+actions/LaserBeam.cpp
+actions/LaserBeam.h
 actions/actions.h
 anothermain.cpp
 camera.cpp
@@ -60,6 +62,7 @@ terrain/Terrain.cpp
 terrain/Terrain.h
 terrain/imageloader.cpp
 terrain/imageloader.h
+terrain/island.h
 terrain/main.cpp
 terrain/vec3f.cpp
 terrain/vec3f.h

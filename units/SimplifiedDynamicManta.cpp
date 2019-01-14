@@ -38,7 +38,7 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
     setThrottle(-controller.registers.thrust*2*5);
 
-    if (getThrottle()>0)
+    if (getThrottle()>20)
     {
         Manta::inert = false;
         antigravity = false;
@@ -214,7 +214,6 @@ Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
     Gunshot *action = new Gunshot();
     // Need axis conversion.
     action->init();
-
 
 
     Vec3f position = getPos();

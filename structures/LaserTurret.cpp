@@ -1,8 +1,10 @@
 #include "Laserturret.h"
 
+#include "../actions/LaserBeam.h"
+
 LaserTurret::LaserTurret()
 {
-    setEnableAI();
+    //setEnableAI();
 
 }
 
@@ -37,8 +39,8 @@ void LaserTurret::drawModel(float yRot, float xRot, float x, float y, float z)
 
 
         // Laser Beam
-        if (firing)
-            drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
+        //if (firing)
+        //    drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
 
         //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();
@@ -56,11 +58,46 @@ void LaserTurret::drawModel(float yRot, float xRot, float x, float y, float z)
         printf ("model is null\n");
     }
 }
-
 Vehicle* LaserTurret::fire(dWorldID world, dSpaceID space)
 {
-    firing = !firing;
-    return NULL;
+    LaserBeam *action = new LaserBeam();
+    // Need axis conversion.
+    action->init();
+
+
+
+    Vec3f position = getPos();
+    position[1] += 19.0f; // Move upwards to the center of the real rotation.
+    forward = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 20*forward;
+    forward = -orig+position;
+
+    Vec3f Ft = forward*100;
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+
+    action->setPos(position[0],position[1],position[2]);
+    action->embody(world,space);
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
 }
 
 void LaserTurret::doControl()

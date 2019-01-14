@@ -62,6 +62,11 @@ public:
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
 	Vec3f getForward();
+
+    void getR(float retR[12]);
+    void setR(float newR[12]);
+    void alignToMe(dBodyID fBodyID);
+
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void virtual drawModel();
     
@@ -76,6 +81,7 @@ public:
     void virtual doDynamics();
 
     void virtual doControl(Controller);
+    void virtual doControl(struct controlregister);
     void virtual doControl();
     
     void virtual embody(dBodyID myBodySelf);

@@ -39,6 +39,15 @@ Vehicle::~Vehicle()
     //printf("Vehicle Good bye....\n");
 }
 
+void Vehicle::getR(float retR[12])
+{
+    memcpy(retR,R,sizeof(float)*12);
+}
+void Vehicle::setR(float newR[12])
+{
+    memcpy(R,newR,sizeof(float)*12);
+}
+
 void Vehicle::setXRotAngle(float xRotAngle)
 {
 	Vehicle::xRotAngle = xRotAngle;
@@ -273,6 +282,11 @@ void Vehicle::doControl()
     assert(0 || !"This method is not implemented.");
 }
 
+void Vehicle::doControl(struct controlregister)
+{
+    assert(0 || !"This method is not implemented.");
+}
+
 void Vehicle::setControlRegisters(struct controlregister reg)
 {
     Vehicle::myCopy = reg;
@@ -349,3 +363,32 @@ void Vehicle::wrapDynamics(dBodyID body)
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
 }
 
+void Vehicle::alignToMe(dBodyID fBodyID)
+{
+    Vec3f position = getPos();
+
+    //position[1] += 19.0f; // Move upwards to the center of the real rotation.
+
+    forward = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 40*forward;
+    forward = -orig+position;
+
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+    dBodySetRotation(fBodyID,Re);
+
+}

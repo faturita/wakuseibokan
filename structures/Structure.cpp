@@ -2,7 +2,7 @@
 
 Structure::Structure()
 {
-
+    island = NULL;
 }
 
 Structure::~Structure()
@@ -33,6 +33,11 @@ void Structure::init()
     Structure::width=8;
 
     setForward(0,0,1);
+}
+
+void Structure::onIsland(Island *island)
+{
+    Structure::island = island;
 }
 
 void Structure::drawModel()

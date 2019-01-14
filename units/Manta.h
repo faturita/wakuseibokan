@@ -17,8 +17,6 @@ class Manta : public Vehicle
 
     
 public:
-    dGeomID geom;
-
     bool antigravity;
 
 	float rudder;

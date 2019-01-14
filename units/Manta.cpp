@@ -746,8 +746,6 @@ Vehicle* Manta::fire(dWorldID world, dSpaceID space)
     // Need axis conversion.
     action->init();
 
-
-
     Vec3f position = getPos();
     position[1] += 19.0f; // Move upwards to the center of the real rotation.
     forward = getForward();
