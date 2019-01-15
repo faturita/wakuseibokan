@@ -11,7 +11,9 @@
 #include "Vehicle.h"
 
 class Walrus : public Vehicle
-{   
+{
+protected:
+    int number;
 public:
 	void virtual init();
     int  virtual getType();
@@ -27,6 +29,8 @@ public:
     void embody(dBodyID myBodySelf);
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+    int getNumber() const;
+    void setNumber(int value);
 };
 
 #endif /* WALRUS_H_ */

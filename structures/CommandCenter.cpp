@@ -1,5 +1,7 @@
 #include "CommandCenter.h"
 
+extern std::vector<Structure*> structures;
+
 CommandCenter::CommandCenter()
 {
 
@@ -42,4 +44,9 @@ void CommandCenter::drawModel(float yRot, float xRot, float x, float y, float z)
     {
         printf ("model is null\n");
     }
+}
+
+void CommandCenter::tick()
+{
+    island->tick();
 }

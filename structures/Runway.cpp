@@ -1,5 +1,6 @@
 #include "Runway.h"
 
+
 extern GLuint _textureRoad;
 
 Runway::Runway()
@@ -49,4 +50,10 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
 int Runway::getType()
 {
     return LANDINGABLE;
+}
+
+void Runway::taxi(Manta *m)
+{
+    m->setPos(pos[0],pos[1]+10, pos[2]);
+    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+10,pos[2]);
 }

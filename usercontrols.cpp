@@ -25,6 +25,8 @@
 #include "units/Balaenidae.h"
 #include "units/Manta.h"
 
+#include "structures/Runway.h"
+
 Camera Camera;
 
 extern dWorldID world;
@@ -169,7 +171,23 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(atoi(content));
 
             } else
-
+            if (controller.str.find("taxi") != std::string::npos)
+            {
+                Balaenidae *r = (Balaenidae*)controlables[controller.controlling-1];
+                for(int i=0;i<controlables.size();i++)
+                {
+                    if (controlables[i]->getType() == 3)
+                    {
+                        Manta *m = (Manta*)controlables[i];
+                        if (m->getStatus() == 0)
+                        {
+                            r->taxi(m);
+                            messages.insert(messages.begin(), std::string("Manta is ready for launch."));
+                        }
+                    }
+                }
+            }
+            else
             if (controller.str.find("launch") != std::string::npos)
             {
                 //const char* content = controller.str.substr(7).c_str();

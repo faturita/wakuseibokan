@@ -12,9 +12,19 @@
 
 #include "../actions/Gunshot.h"
 
+int Manta::getNumber() const
+{
+    return number;
+}
+
+void Manta::setNumber(int value)
+{
+    number = value;
+}
+
 void Manta::init()
 {
-	//Load the model
+    //Load the model
     _model = MD2Model::loadModel("mantagood.md2");
     if (_model != NULL)
         _model->setAnimation("run");

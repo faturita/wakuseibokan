@@ -217,6 +217,7 @@ public:
     void setName(std::string name);
 
     std::string getModelName();
+    void tick();
 };
 
 

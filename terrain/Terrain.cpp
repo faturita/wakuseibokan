@@ -196,6 +196,14 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     return structure;
 }
 
+void BoxIsland::tick()
+{
+    //structures.push_back(addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    //structures.push_back(addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    //structures.push_back(addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+
+}
+
 void drawTerrain(Terrain *_landmass, float fscale)
 {
     drawTerrain(_landmass, fscale, 0.3f, 0.9f, 0.0f);

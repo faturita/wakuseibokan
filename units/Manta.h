@@ -14,6 +14,8 @@ enum MANTASTATUS {IN_CARRIER, ON_DECK, LANDED, FLYING};
 
 class Manta : public Vehicle
 {
+protected:
+    int number;
 
 public:
     static const int LANDED = 0;
@@ -51,6 +53,8 @@ public:
     void embody(dBodyID myBodySelf);
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+    int getNumber() const;
+    void setNumber(int value);
 };
 
 #endif /* MANTA_H_ */

@@ -210,7 +210,8 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
 
 void Balaenidae::taxi(Manta *m)
 {
-    m->setPos(pos[0],pos[1]+50, pos[2]);
+    m->setPos(pos[0],pos[1]+10, pos[2]);
+    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+10,pos[2]);
 }
 
 void Balaenidae::launch(Manta* m)

@@ -12,6 +12,16 @@
 
 #include "../actions/Gunshot.h"
 
+int Walrus::getNumber() const
+{
+    return number;
+}
+
+void Walrus::setNumber(int value)
+{
+    number = value;
+}
+
 void Walrus::init()
 {
     _model = (Model*)MD2Model::loadModel("walrusgood.md2");

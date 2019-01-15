@@ -28,6 +28,8 @@ public:
     CommandCenter();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
+
+    void tick();
 };
 
 #endif // COMMANDCENTER_H
