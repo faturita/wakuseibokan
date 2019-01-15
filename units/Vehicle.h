@@ -24,6 +24,9 @@ class Vehicle : Observable
 {
 private:
     int ttl=-1;  //Live for ever.
+
+    int health = 1000;
+
 protected:
 	Vec3f pos;
     Model* _model;
@@ -117,6 +120,8 @@ public:
 
     int getStatus() const;
     void setStatus(int value);
+    int getHealth() const;
+    void damage(int d);
 };
 
 #endif /* VEHICLE_H_ */

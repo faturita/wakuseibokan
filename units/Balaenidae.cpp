@@ -1,5 +1,6 @@
 #include "Balaenidae.h"
 #include "SimplifiedDynamicManta.h"
+#include "Walrus.h"
 #include "../ThreeMaxLoader.h"
 #include "../odeutils.h"
 
@@ -196,16 +197,31 @@ void Balaenidae::offshore()
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
 {
-    // @FIXME do it depending on the type of the element to spawn.
-    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
-    _manta1->init();
-    _manta1->setPos(pos[0],pos[1]+50, pos[2]);
-    _manta1->embody(world, space);
-    _manta1->setStatus(0);
-    _manta1->inert = true;
-    alignToMe(_manta1->getBodyID());
+    Vehicle *v;
 
-    return (Vehicle*)_manta1;
+    if (type == MANTA)
+    {
+        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
+        _manta1->init();
+        _manta1->setPos(pos[0],pos[1]+50, pos[2]);
+        _manta1->embody(world, space);
+        _manta1->setStatus(0);
+        _manta1->inert = true;
+        alignToMe(_manta1->getBodyID());
+        v = (Vehicle*)_manta1;
+    } else if (type == WALRUS)
+    {
+        Walrus *_walrus = new Walrus();
+        _walrus->init();
+        _walrus->setNumber(1);
+        _walrus->setPos(pos[0],pos[1],pos[2]-450);
+        _walrus->embody(world,space);
+        _walrus->setStatus(0);
+        alignToMe(_walrus->getBodyID());
+        v = (Vehicle*)_walrus;
+    }
+
+    return v;
 }
 
 void Balaenidae::taxi(Manta *m)
@@ -216,7 +232,7 @@ void Balaenidae::taxi(Manta *m)
 
 void Balaenidae::launch(Manta* m)
 {
-    m->inert = false;
+    m->inert = true;
     m->setStatus(2);
     m->elevator = +12;
     struct controlregister c;
@@ -228,5 +244,7 @@ void Balaenidae::launch(Manta* m)
     p[1] += 10;
     m->setPos(p);
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
+    // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
+
     //dBodySetLinearVel(m->getBodyID(),0.0,0.0,(1.0f)*7000);
 }

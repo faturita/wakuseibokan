@@ -343,6 +343,16 @@ int Vehicle::getTtl()
     return Vehicle::ttl;
 }
 
+int Vehicle::getHealth() const
+{
+    return health;
+}
+
+void Vehicle::damage(int amount)
+{
+    Vehicle::health-=amount;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;

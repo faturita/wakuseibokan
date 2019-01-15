@@ -10,6 +10,8 @@ actions/Gunshot.cpp
 actions/Gunshot.h
 actions/LaserBeam.cpp
 actions/LaserBeam.h
+actions/Missile.cpp
+actions/Missile.h
 actions/actions.h
 anothermain.cpp
 camera.cpp
@@ -76,8 +78,6 @@ units/Buggy.cpp
 units/Buggy.h
 units/Manta.cpp
 units/Manta.h
-units/Missile.cpp
-units/Missile.h
 units/MultiBodyVehicle.cpp
 units/MultiBodyVehicle.h
 units/SimplifiedDynamicManta.cpp

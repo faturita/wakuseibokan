@@ -4,7 +4,7 @@ extern std::vector<Structure*> structures;
 
 CommandCenter::CommandCenter()
 {
-
+    setTtl(CommandCenter::BUILDING_TIME);
 }
 
 
@@ -46,7 +46,28 @@ void CommandCenter::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void CommandCenter::tick()
+void CommandCenter::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
-    island->tick();
+    position = getPos();
+    forward = getForward();
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    forward = forward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
+    position = position - 40*forward + Up;
+    forward = orig-position;
 }
+
+int CommandCenter::getType()
+{
+    return CONTROL;
+}
+
+void CommandCenter::restart()
+{
+    setTtl(CommandCenter::BUILDING_TIME);
+}
+

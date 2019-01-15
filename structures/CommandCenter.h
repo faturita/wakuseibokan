@@ -25,11 +25,17 @@ protected:
     // When the queue is empty the command center does nothing.
     std::queue<Structure*> productionqueue;
 public:
+    static const int BUILDING_TIME = 400;
+
+
     CommandCenter();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
+    void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 
-    void tick();
+    int getType();
+
+    void restart();
 };
 
 #endif // COMMANDCENTER_H

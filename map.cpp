@@ -16,6 +16,7 @@
 
 #include <vector>
 
+#include "container.h"
 #include "ThreeMaxLoader.h"
 
 #include "font/DrawFonts.h"
@@ -37,8 +38,12 @@
 #include "imageloader.h"
 #include "terrain/Terrain.h"
 
+#include "units/Vehicle.h"
+
 
 extern std::vector<BoxIsland*> islands;
+
+extern container<Vehicle*> vehicles;
 
 
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
@@ -152,6 +157,27 @@ void drawMap()
 
             drawString(600-(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,1.0f,1.0f,1.0f);
         }
+
+
+        synchronized(vehicles.m_mutex)
+        {
+            for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+            {
+                if (vehicles[i]->getType() == CARRIER)
+                {
+                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"B",0.1f,1.0f,1.0f,0.0f);
+                } else if (vehicles[i]->getType() == WALRUS)
+                {
+                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
+                } else if (vehicles[i]->getType() == MANTA)
+                {
+                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                }
+            }
+        }
+
+
+
 
         for(int i=0;i<islands.size();i++)
         {

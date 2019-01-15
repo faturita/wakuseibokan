@@ -30,6 +30,7 @@
 #include "units/Buggy.h"
 #include "units/MultiBodyVehicle.h"
 #include "units/Balaenidae.h"
+#include "units/Beluga.h"
 
 #include "terrain/Terrain.h"
 
@@ -108,6 +109,38 @@ bool stranded(Vehicle *carrier, Island *island)
     }
 }
 
+bool departed(Vehicle *walrus)
+{
+    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::ROLLING)
+    {
+        Walrus *w = (Walrus*)walrus;
+
+        w->setStatus(Walrus::SAILING);
+        BoxIsland *island = w->getIsland();
+        w->setIsland(NULL);
+        char str[256];
+        sprintf(str, "Walrus has departed from %s.", island->getName().c_str());
+        messages.insert(messages.begin(), str);
+    }
+    return true;
+}
+
+// SYNC
+bool arrived(Vehicle *walrus, Island *island)
+{
+    if (island && walrus && walrus->getType() == WALRUS && walrus->getStatus() != Walrus::ROLLING)
+    {
+        Walrus *w = (Walrus*)walrus;
+
+        w->setStatus(Walrus::ROLLING);
+        w->setIsland((BoxIsland*)island);
+        char str[256];
+        sprintf(str, "Walrus has arrived to %s.", island->getName().c_str());
+        messages.insert(messages.begin(), str);
+    }
+    return true;
+}
+
 // SYNC
 bool landed(Vehicle *manta, Island *island)
 {
@@ -132,10 +165,12 @@ bool hit(Vehicle *vehicle)
     if (vehicle && vehicle->getType() == 4)
     {
         messages.insert(messages.begin(), std::string("Carrier is under fire!"));
+        vehicle->damage(2);
     }
     if (vehicle && vehicle->getType() == 3)
     {
         messages.insert(messages.begin(), std::string("Manta is under fire!"));
+        vehicle->damage(2);
     }
     return true;
 }
@@ -212,6 +247,11 @@ bool inline isCarrier(dBodyID body)
 bool inline isCarrier(Vehicle* vehicle)
 {
     return isType(vehicle,4);
+}
+
+bool inline isWalrus(Vehicle* vehicle)
+{
+    return isType(vehicle, WALRUS);
 }
 
 bool inline isAction(dBodyID body)
@@ -372,10 +412,10 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
                    //releasecontrol(dGeomGetBody(contact[i].geom.g1));
                } else
-               if ( (isStructure(contact[i].geom.g1) &&  groundcollisions(v2)) ||
-                    (isStructure(contact[i].geom.g2) &&  groundcollisions(v1))  )
+               if ( (isStructure(contact[i].geom.g1) && groundcollisions(v2)) ||
+                    (isStructure(contact[i].geom.g2) && groundcollisions(v1))  )
                {
-                   //printf("Structure Collision\n");
+                   printf("Structure Collision\n");
                } else
 
                if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
@@ -390,6 +430,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
                    if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
                    if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
+                   if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                   if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
                } else
                if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                     ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -433,7 +475,11 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.mu = 0;dInfinity;
                    contact[i].surface.slip1 = 0.1;
                    contact[i].surface.slip2 = 0.1;
-               }
+
+
+                   //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                   //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+                }
             }
 
            contact[i].surface.soft_erp = .5;   // 0 in both will force the surface to be tight.
@@ -563,6 +609,15 @@ void initWorldPopulation()
     _b->setPos(0.0f,50.0f,-2200.0f);
     _b->embody(world,space);
 
+
+    // This is the enemy carrier.
+    /**
+    Beluga *_bel = new Beluga();
+    _bel->init();
+    _bel->setPos(-450 kmf, 50.0f, 300 kmf + -2200.0f);
+    _bel->embody(world,space);
+    **/
+
     //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
     vehicles.push_back(_b);
@@ -632,21 +687,10 @@ void initWorldModelling()
     heightmap->setLocation(-23000.0,1.0,0.0);
     heightmap->buildTerrainModel(space,"terrain/heightmap.bmp"); //,1000,10);
     
-    BoxIsland *island = new BoxIsland();
-    island->setLocation(-23000.0,1.0,1000.0);
-    island->buildTerrainModel(space,"terrain/island.bmp"); //,1000,10);
-    
-    BoxIsland *thermopilae = new BoxIsland();
-    thermopilae->setLocation(6000.0f,1.0,1000.0);
-    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp"); //,1000,10);
-    
-    
 
     
 
-    BoxIsland *atom = new BoxIsland();
-    atom->setLocation(1500.0f,-0.3,+10000.0);
-    atom->buildTerrainModel(space,"terrain/atom.bmp"); //,1000,10);
+    
 **/
 
     BoxIsland *thermopilae = new BoxIsland();
@@ -669,34 +713,33 @@ void initWorldModelling()
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
+    BoxIsland *atom = new BoxIsland();
+    atom->setName("Atom");
+    atom->setLocation( 500 kmf, -1.0, -100 kmf);
+    atom->buildTerrainModel(space,"terrain/atom.bmp");
 
-    /**islands.push_back(baltimore);
-    islands.push_back(runway);
-    islands.push_back(nemesis);
-    islands.push_back(vulcrum);
-    islands.push_back(vulcano);
-    islands.push_back(island);
-    islands.push_back(heightmap);
+    BoxIsland *island = new BoxIsland();
+    island->setName("Island");
+    island->setLocation(-500 kmf, -1.0, 200 kmf);
+    island->buildTerrainModel(space,"terrain/island.bmp");
+
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
+    islands.push_back(vulcano);
+    islands.push_back(nemesis);
     islands.push_back(atom);
-    **/
-    islands.push_back(thermopilae);
-    islands.push_back(nonsquareisland);
-    islands.push_back(vulcano);
+    islands.push_back(island);
 
-    islands.push_back(nemesis);
-
-    /**
     structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
-    **/
-
     structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
+
+
+    /**
 
     structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
@@ -711,6 +754,7 @@ void initWorldModelling()
     structures.push_back(nemesis->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     structures.push_back(nemesis->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
     structures.push_back(nemesis->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    **/
 
     initWorldPopulation();
 

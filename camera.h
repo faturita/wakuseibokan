@@ -17,6 +17,7 @@
 class Camera : Observable
 {
 public:
+    Vec3f fw;
 	Camera();
 	void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	Vec3f getForward();
@@ -38,6 +39,7 @@ public:
     void lookAtFrom(Vec3f pos, Vec3f forward);
     
     void reset();
+
 } ;
 
 

@@ -9,12 +9,19 @@
 #define WALRUS_H_
 
 #include "Vehicle.h"
+#include "../terrain/Terrain.h"
 
 class Walrus : public Vehicle
 {
 protected:
     int number;
+
+    BoxIsland *island;
+
 public:
+    static const int ROLLING = 1;
+    static const int SAILING = 0;
+
 	void virtual init();
     int  virtual getType();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
@@ -31,6 +38,9 @@ public:
     Vehicle* fire(dWorldID world, dSpaceID space);
     int getNumber() const;
     void setNumber(int value);
+
+    BoxIsland *getIsland() const;
+    void setIsland(BoxIsland *value);
 };
 
 #endif /* WALRUS_H_ */

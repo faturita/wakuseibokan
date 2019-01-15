@@ -20,12 +20,16 @@
 
 #include "camera.h"
 #include "usercontrols.h"
-#include "units/Vehicle.h"
 
+#include "terrain/Terrain.h"
+
+#include "units/Vehicle.h"
 #include "units/Balaenidae.h"
 #include "units/Manta.h"
+#include "units/Walrus.h"
 
 #include "structures/Runway.h"
+#include "structures/CommandCenter.h"
 
 Camera Camera;
 
@@ -39,6 +43,8 @@ extern std::vector<std::string> messages;
 extern std::vector<Vehicle*> controlables;
 
 extern container<Vehicle*> vehicles;
+
+extern std::vector<Structure*> structures;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -208,6 +214,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
 
             } else
+            if (controller.str.find("command") != std::string::npos)
+            {
+                Walrus *w = (Walrus*) controlables[controller.controlling-1];
+                // Chek if walrus is on island.
+                BoxIsland *island = w->getIsland();
+                int x = (rand() % 2000 + 1); x -= 1000;
+                int z = (rand() % 2000 + 1); z -= 1000;
+
+                Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
+                structures.push_back(s);
+                controlables.push_back(s);
+            }
 
             if (strcmp(controller.str.c_str(),"map")==0)
                 controller.view = 2;
@@ -275,7 +293,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 't':controller.teletype = true;break;
         case 'm':
             {
-            Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,2);
+            Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,MANTA);
             if (manta != NULL)
                 vehicles.push_back(manta);
                 controlables.push_back(manta);
@@ -306,6 +324,45 @@ void handleKeypress(unsigned char key, int x, int y) {
                             dBodyDisable(vehicles[i]->getBodyID());
                             vehicles.erase(i);
                             messages.insert(messages.begin(), std::string("Manta is now on bay."));
+                        }
+                    }
+                }
+            }
+        break;
+        case 'o':
+            {
+            Vehicle *walrus = (controlables[controller.controlling-1])->spawn(world,space,WALRUS);
+            if (walrus != NULL)
+                vehicles.push_back(walrus);
+                controlables.push_back(walrus);
+                messages.insert(messages.begin(), std::string("Walrus has been deployed."));
+                printf("Position: %d\n", controlables.size());
+            }
+            break;
+        case 'O':
+            {
+                synchronized(vehicles.m_mutex)
+                {
+                    for(int i=0;i<controlables.size();i++)
+                    {
+                        if (controlables[i]->getType() == WALRUS)
+                        {
+                            Walrus *w = (Walrus*)controlables[i];
+                            if (w->getStatus() == Walrus::SAILING)
+                            {
+                                controlables.erase(controlables.begin() + i);
+                            }
+                        }
+                    }
+                    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+                    {
+                        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (vehicles[i]->getType()==WALRUS && vehicles[i]->getStatus()==Walrus::SAILING)
+                        {
+                            //printf("Eliminating....\n");
+                            dBodyDisable(vehicles[i]->getBodyID());
+                            vehicles.erase(i);
+                            messages.insert(messages.begin(), std::string("Walrus is now back on deck."));
                         }
                     }
                 }

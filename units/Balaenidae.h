@@ -7,7 +7,6 @@
 class Balaenidae : public Vehicle
 {
 protected:
-    dGeomID geom;
     float rudder;
     int offshoring = 0;
     Vec3f ap;

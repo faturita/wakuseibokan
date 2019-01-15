@@ -217,7 +217,8 @@ public:
     void setName(std::string name);
 
     std::string getModelName();
-    void tick();
+    Structure* getCommandCenter();
+    std::vector<Structure*> getStructures();
 };
 
 

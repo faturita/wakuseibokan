@@ -29,7 +29,7 @@ class Controller
 public:
     
 	// Device ID to be controller.
-    int controlling=1;
+    int controlling=0;
     
 	// Index to Observable interfaces.
 	int camera;

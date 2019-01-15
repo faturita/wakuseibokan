@@ -196,13 +196,22 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     return structure;
 }
 
-void BoxIsland::tick()
+std::vector<Structure*> BoxIsland::getStructures()
 {
-    //structures.push_back(addStructure(new Runway(),       0.0f,    0.0f,space,world));
-    //structures.push_back(addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
-    //structures.push_back(addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
-
+    return structures;
 }
+
+Structure* BoxIsland::getCommandCenter()
+{
+    for(int i=0;i<structures.size();i++)
+    {
+        Structure *s = structures[i];
+        if (s->getType() == CONTROL)
+            return s;
+    }
+    return NULL;
+}
+
 
 void drawTerrain(Terrain *_landmass, float fscale)
 {

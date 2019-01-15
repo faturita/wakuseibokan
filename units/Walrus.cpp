@@ -22,6 +22,16 @@ void Walrus::setNumber(int value)
     number = value;
 }
 
+BoxIsland *Walrus::getIsland() const
+{
+    return island;
+}
+
+void Walrus::setIsland(BoxIsland *value)
+{
+    island = value;
+}
+
 void Walrus::init()
 {
     _model = (Model*)MD2Model::loadModel("walrusgood.md2");

@@ -51,6 +51,12 @@
 #include "terrain/Terrain.h"
 
 #include "structures/Structure.h"
+#include "structures/Warehouse.h"
+#include "structures/Hangar.h"
+#include "structures/Runway.h"
+#include "structures/Laserturret.h"
+#include "structures/CommandCenter.h"
+#include "structures/Turret.h"
 
 #include "map.h"
 
@@ -144,6 +150,7 @@ void drawHUD()
         drawString(0,-180,1,str,0.2f);
     }
 
+    static int mbrefresher = 1000;
     // Message board
     if (messages.size()>0)
     {
@@ -154,6 +161,12 @@ void drawHUD()
                 drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
             else
                 drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f);
+        }
+
+        if (mbrefresher--<=0)
+        {
+            messages.pop_back();
+            mbrefresher = 1000;
         }
 
     }
@@ -225,16 +238,46 @@ void drawHUD()
         glBegin(GL_LINES);
         glVertex3f(uc+50, Camera.yAngle-10, 0.0);
         glVertex3f(uc+50, + Camera.yAngle-2, 0);
-        glEnd();
-
+        glEnd();        
 
         glBegin(GL_LINES);
         glVertex3f(uc+50, Camera.yAngle+10, 0.0);
         glVertex3f(uc+50, + Camera.yAngle+2, 0);
         glEnd();
 
+        Vec3f f = (Camera.getForward().normalize())*30;
+
+        f = (Camera.fw.normalize())*30;
+
+        int cx=1150, cy=350;
+
+        glBegin(GL_LINES);
+        glVertex3f(cx-50,  +cy+50, 0.0);
+        glVertex3f(cx-50,  +cy-50, 0.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(cx-50,  +cy+50, 0.0);
+        glVertex3f(cx+50,  +cy+50, 0.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(cx+50,  +cy+50, 0.0);
+        glVertex3f(cx+50,  +cy-50, 0.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(cx-50,  +cy-50, 0.0);
+        glVertex3f(cx+50,  +cy-50, 0.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(cx,           +cy, 0.0);
+        glVertex3f(cx-f[0], +cy+f[2], 0.0);
+        glEnd();
+
         
-	} glPopMatrix();
+    } glPopMatrix();
     
     
 	glEnable(GL_DEPTH_TEST);
@@ -265,12 +308,16 @@ void drawScene() {
         Vec3f up2,pos2;
         //Camera.getViewPort(up2,pos2,forward);
 
+        Camera.fw = controlables[ctrling]->getForward();
+
         if (controlables[ctrling]->getType() == 3)
             Camera.yAngle = ((Manta*)controlables[ctrling])->alpha*100;
     } else
     {
         Camera.getViewPort(up,pos,forward);
-        
+
+        Camera.fw = forward;
+
         if (Camera.dx!=0) {
             pos[0]+=(forward[0]);
             pos[1]+=(forward[1]);
@@ -298,51 +345,19 @@ void drawScene() {
     drawFloor(Camera.pos[0],0.0f,Camera.pos[2]);
     glPopAttrib();
     
-    //drawBoxIsland(300,5,300,1000,10);
-    
-    // Draw all terrain islands and so on.
-    //_boxIsland.draw(300,5,300,1000,10);
-    
     // Draw islands.
     for (int i=0; i<islands.size(); i++) {
         (islands[i]->draw());
     }
 
-    
-    // Debug: Until the engine is complete I need these boxes to tell me where I am.
-    drawBox(10,10,1600);
-    drawBox(10,10,1500);
-    drawBox(10,10,1400);
-    drawBox(10,10,1300);
-    drawBox(10,10,1200);
-    drawBox(10,10,1100);
-    drawBox(10,10,1000);
-    drawBox(10,10,900);
-    drawBox(10,10,800);
-    drawBox(10,10,700);
-    drawBox(10,10,600);
-    drawBox(10,10,500);
-    drawBox(10,10,400);
-    drawBox(10,10,300);
-    drawBox(10,20,-80);
-    
-    drawBox(10,10,10);
-    drawBox(-10,-10,-10);
 
-    // Draw island structures.
-    draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
-
-    //draw3DSModel("structures/turretbase.3ds",0.0,20.0,-1000,1,_textureBox);
-
-
+    // Draw Structures on island.
     for(int i=0;i<structures.size();i++)
     {
         // @NOTE Textures are loaded up to this point so they are set into the objects now.
         structures[i]->setTexture(_textureMetal);
         structures[i]->drawModel();
     }
-    //draw3DSModel("structures/runway.3ds",0.0f,5.0,0.0f,10,_textureBox);
-
 
     // Draw vehicles and objects
     synchronized(vehicles.m_mutex)
@@ -442,6 +457,59 @@ void update(int value)
             controlables[controller.controlling-1]->doControl(controller);
         }
 
+        // This should be in the command center.
+        for (int i = 0; i < islands.size(); i++)
+        {
+            BoxIsland *island = islands[i];
+
+            if (island->getStructures().size()<5)
+            {
+                CommandCenter *c = (CommandCenter*)island->getCommandCenter();
+                if (c)
+                {
+                    c->tick();
+                    if (c->getTtl()<=0)
+                    {
+                        // Add a structure (Structures should be rotated also).
+                        int which = (rand() % 30 + 1);
+                        Structure *s;
+
+
+                        switch (which)
+                        {
+                        case 1:case 2:case 3:case 11:case 12:case 13:case 14: case 15:
+                        case 4: s = new LaserTurret();break;
+                        case 5: s = new Structure();break;
+                        case 6: s = new Runway();break;
+                        case 7: s = new Warehouse();break;
+                        default: s = new Turret();break;
+                        }
+                        int x = (rand() % 2000 + 1); x -= 1000;
+                        int z = (rand() % 2000 + 1); z -= 1000;
+
+                        island->addStructure(s,x,z,space,world);
+
+                        structures.push_back(s);
+                        controlables.push_back(s);
+
+                        if (which == 6)
+                        {
+                            Structure *s2 = new Hangar();
+                            x-=550;
+                            island->addStructure(s2,x,z,space,world);
+
+                            structures.push_back(s2);
+                            controlables.push_back(s2);
+                        }
+
+                        c->restart();
+                    }
+
+                }
+            }
+
+        }
+
         // Autocontrol (AI).
         for(int i=0;i<controlables.size();i++)
         {
@@ -470,6 +538,25 @@ void update(int value)
                     vehicles.erase(i);
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
+                } else if (vehicles[i]->getHealth()<=0)
+                {
+                    for(int i=0;i<controlables.size();i++)
+                        if (controlables[i]->getBodyID() == vehicles[i]->getBodyID())
+                            controlables.erase(controlables.begin() + i);
+
+
+                    if (vehicles[i]->getType() == CARRIER)
+                    {
+                        char str[256];
+                        sprintf(str, "Balaenidae Carrier has been destroyed !");
+                        messages.insert(messages.begin(), str);
+                    }
+
+
+                    dBodyDisable(vehicles[i]->getBodyID());
+                    vehicles.erase(i);
+
+                    explosion();
                 }
             }
         }

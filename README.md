@@ -127,3 +127,4 @@ References
 * Langevin Functions: https://journals.sagepub.com/doi/full/10.1177/1081286518811876
 * https://ccrma.stanford.edu/software/stk/download.html
 * https://pleiades.ucsc.edu/hyades/OpenGL_on_OS_X
+* https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
