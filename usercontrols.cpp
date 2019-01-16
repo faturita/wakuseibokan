@@ -225,7 +225,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
                 structures.push_back(s);
                 controlables.push_back(s);
-            }
+            } else
+            if (controller.str.find("list") != std::string::npos)
+            {
+                for(int i=0;i<controlables.size();i++)
+                {
+                    printf("Body ID (%p) Index (%d) %d\n", (void*)controlables[i]->getBodyID(), i, controlables[i]->getType());
+                }
+            } else
 
             if (strcmp(controller.str.c_str(),"map")==0)
                 controller.view = 2;
@@ -233,10 +240,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // Send message to message board
                 messages.insert(messages.begin(),controller.str);
 
-                if (messages.size()>5)
-                    messages.pop_back();
-
             }
+
+            if (messages.size()>5)
+                messages.pop_back();
+
             controller.teletype = false;
             controller.str.clear();
 

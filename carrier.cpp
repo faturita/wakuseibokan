@@ -75,8 +75,6 @@ extern dGeomID sphere[NUM];
 
 extern container<Vehicle*> vehicles;
 
-//extern BoxIsland _boxIsland;
-
 extern std::vector<BoxIsland*> islands;
 
 extern std::vector<Structure*> structures;
@@ -113,7 +111,7 @@ void drawHUD()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	glColor4f(1.0f, 1.0f, 1.0f, 1);
+    glColor4f(1.0f, 1.0f, 1.0f, 1);
 	glDisable(GL_DEPTH_TEST);
 	glRotatef(180.0f,0,0,1);
 	glRotatef(180.0f,0,1,0);
@@ -411,7 +409,7 @@ void initRendering() {
 	//glEnable(GL_CULL_FACE);
     
 	// Blue sky !!!
-	glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
+    //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
     
     // Initialize scene textures.
     initTextures();
@@ -458,6 +456,7 @@ void update(int value)
         }
 
         // This should be in the command center.
+        /**
         for (int i = 0; i < islands.size(); i++)
         {
             BoxIsland *island = islands[i];
@@ -475,15 +474,17 @@ void update(int value)
                         Structure *s;
 
 
-                        switch (which)
-                        {
-                        case 1:case 2:case 3:case 11:case 12:case 13:case 14: case 15:
-                        case 4: s = new LaserTurret();break;
-                        case 5: s = new Structure();break;
-                        case 6: s = new Runway();break;
-                        case 7: s = new Warehouse();break;
-                        default: s = new Turret();break;
-                        }
+                        if (1<=which && which<=5)
+                            s = new LaserTurret();
+                        else if (6<=which && which<=7)
+                            s = new Structure();
+                        else if (8<=which && which<=10)
+                            s = new Runway();
+                        else if (11<=which && which<=13)
+                            s = new Warehouse();
+                        else
+                            s = new Turret();
+
                         int x = (rand() % 2000 + 1); x -= 1000;
                         int z = (rand() % 2000 + 1); z -= 1000;
 
@@ -492,7 +493,7 @@ void update(int value)
                         structures.push_back(s);
                         controlables.push_back(s);
 
-                        if (which == 6)
+                        if (8<=which && which<=10)
                         {
                             Structure *s2 = new Hangar();
                             x-=550;
@@ -508,7 +509,7 @@ void update(int value)
                 }
             }
 
-        }
+        }**/
 
         // Autocontrol (AI).
         for(int i=0;i<controlables.size();i++)

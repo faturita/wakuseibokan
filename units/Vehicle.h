@@ -37,8 +37,8 @@ protected:
     float engine[3];
     float steering;
     
-    dBodyID me;
-    dGeomID geom;
+    dBodyID me=NULL;
+    dGeomID geom=NULL;
 
     struct controlregister myCopy;
 

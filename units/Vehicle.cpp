@@ -30,12 +30,13 @@ Vehicle::Vehicle()
 	R[0]=R[5]=R[10]=1;
 
     memset(&myCopy,0,sizeof(struct controlregister));
+    Vehicle::speed = 0;
 }
 
 Vehicle::~Vehicle()
 {
-    dBodyDestroy(me);
-    dGeomDestroy(geom);
+    if (me) dBodyDestroy(me);
+    if (geom) dGeomDestroy(geom);
     //printf("Vehicle Good bye....\n");
 }
 
