@@ -134,6 +134,13 @@ void drawMap()
             glEnd();
         }
 
+        glLineWidth(2.5);
+        glColor3f(0.0, 1.0, 0.0);
+        glBegin(GL_LINES);
+        glVertex3f(   1200,  500, 0.0);
+        glVertex3f(   1200, -500, 0.0);
+        glEnd();
+
 
         /**
         glLineWidth(2.5);

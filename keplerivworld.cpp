@@ -730,13 +730,13 @@ void initWorldModelling()
     islands.push_back(atom);
     islands.push_back(island);
 
-    structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
+    /**structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
     structures.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
+    structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));**/
 
 
     /**
