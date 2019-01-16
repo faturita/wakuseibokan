@@ -1,7 +1,7 @@
 ODEF=$(shell ode-config --cflags)
 ODEFL=$(shell ode-config --libs)
 CC = g++
-CFLAGS = -w -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
+CFLAGS = -w -g -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
 SRCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) keplerivworld.cpp carrier.cpp

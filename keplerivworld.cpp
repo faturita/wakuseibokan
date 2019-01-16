@@ -53,21 +53,18 @@ dSpaceID space;
 dBodyID body[NUM];
 dJointGroupID contactgroup;
 
-container<Vehicle*> vehicles;
+container<Vehicle*> entities;
 
 std::vector<BoxIsland*> islands;
-std::vector<Structure*> structures;
 
 std::vector<std::string> messages;
-
-std::vector<Vehicle*> controlables;
 
 // SYNC
 Vehicle* gVehicle(dBodyID body)
 {
-    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
     {
-        Vehicle *vehicle = vehicles[i];
+        Vehicle *vehicle = entities[i];
         if (vehicle->getBodyID() == body)
         {
             return vehicle;
@@ -76,11 +73,11 @@ Vehicle* gVehicle(dBodyID body)
     return NULL;
 }
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
+void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure*s2, dGeomID g1, dGeomID g2)
 {
-    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
     {
-        Vehicle *vehicle = vehicles[i];
+        Vehicle *vehicle = entities[i];
         if (vehicle->getBodyID() == b1)
         {
             v1 = vehicle;
@@ -89,6 +86,19 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2)
         {
             v2 = vehicle;
         }
+        if (vehicle->getBodyID()==NULL)
+        {
+            Structure *s= (Structure*)entities[i];
+            if (s->getGeom() == g1)
+            {
+                s1 = s;
+            }
+            if (s->getGeom() == g2)
+            {
+                s2 = s;
+            }
+        }
+
     }
 }
 
@@ -165,14 +175,23 @@ bool hit(Vehicle *vehicle)
     if (vehicle && vehicle->getType() == 4)
     {
         messages.insert(messages.begin(), std::string("Carrier is under fire!"));
-        vehicle->damage(2);
     }
     if (vehicle && vehicle->getType() == 3)
     {
         messages.insert(messages.begin(), std::string("Manta is under fire!"));
-        vehicle->damage(2);
     }
+
+    vehicle->damage(2);
     return true;
+}
+
+bool hit(Structure* structure)
+{
+    if (structure)
+    {
+        messages.insert(messages.begin(), std::string("Island under attack!"));
+    }
+    structure->damage(2);
 }
 
 // SYNC
@@ -195,7 +214,7 @@ bool releasecontrol(Vehicle* vehicle)
 
 void inline releasecontrol(dBodyID body)
 {
-    synchronized(vehicles.m_mutex)
+    synchronized(entities.m_mutex)
     {
         Vehicle* vehicle = gVehicle(body);
         releasecontrol(vehicle);
@@ -221,7 +240,7 @@ bool inline isType(Vehicle *vehicle, int type)
 bool inline isType(dBodyID body, int type)
 {
     bool result = false;
-    synchronized(vehicles.m_mutex)
+    synchronized(entities.m_mutex)
     {
         Vehicle *vehicle = gVehicle(body);
         result = isType(vehicle,type);
@@ -265,40 +284,13 @@ bool inline isAction(Vehicle* vehicle)
 }
 
 
-bool inline isStructure(dGeomID candidate)
+bool inline isRunway(Structure* s)
 {
-    for (int i=0; i<structures.size(); i++)
+    if (s && s->getType()==LANDINGABLE)
     {
-        if (candidate == structures[i]->getGeom())
-        {
-            return true;
-        }
+        return true;
     }
     return false;
-}
-
-bool inline isRunway(dGeomID candidate)
-{
-    for (int i=0; i<structures.size(); i++)
-    {
-        if (candidate == structures[i]->getGeom() && structures[i]->getType()==LANDINGABLE)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-Structure* getRunway(dGeomID candidate)
-{
-    for (int i=0; i<structures.size(); i++)
-    {
-        if (candidate == structures[i]->getGeom() && structures[i]->getType()==LANDINGABLE)
-        {
-            return structures[i];
-        }
-    }
-    return NULL;
 }
 
 Island* getIsland(dGeomID candidate)
@@ -341,7 +333,7 @@ bool inline groundcollisions(Vehicle *vehicle)
 
 void inline groundcollisions(dBodyID body)
 {
-    synchronized(vehicles.m_mutex)
+    synchronized(entities.m_mutex)
     {
         Vehicle *vehicle = gVehicle(body);
         groundcollisions(vehicle);
@@ -375,10 +367,11 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
    if (n > 0) {
        for (i=0; i<n; i++) {
-           synchronized(vehicles.m_mutex)
+           synchronized(entities.m_mutex)
            {
                Vehicle *v1=NULL,*v2=NULL;
-               gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
+               Structure *s1=NULL, *s2=NULL;
+               gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
                if ( (ground == contact[i].geom.g1  &&  groundcollisions(v2)) ||
@@ -387,9 +380,16 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    // Nothing to do here....
                }
 
+               if (isAction(v1) && s2 && hit(s2)) {}
+               if (isAction(v2) && s1 && hit(s1)) {}
 
-               if ( (isRunway(contact[i].geom.g1) && isManta(v2) && landed(v2,getRunway(contact[i].geom.g1)->island)) ||
-                    (isRunway(contact[i].geom.g2) && isManta(v1) && landed(v1,getRunway(contact[i].geom.g2)->island)) )
+               if (s1 || s2)
+               {
+                   printf("Structure collision\n");
+
+               } else
+               if ( (isRunway(s1) && isManta(v2) && landed(v2,s1->island)) ||
+                    (isRunway(s2) && isManta(v1) && landed(v1,s2->island)) )
                {
                    contact[i].surface.mode = dContactBounce |
                    dContactApprox1;
@@ -400,7 +400,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.bounce = 0.2;
 
                } else
-               if ( (isRunway(contact[i].geom.g1) || isRunway(contact[i].geom.g2))  )
+               if ( (isRunway(s1) || isRunway(s2))  )
                {
                    contact[i].surface.mode = dContactBounce |
                    dContactApprox1;
@@ -412,8 +412,23 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
                    //releasecontrol(dGeomGetBody(contact[i].geom.g1));
                } else
-               if ( (isStructure(contact[i].geom.g1) && groundcollisions(v2)) ||
-                    (isStructure(contact[i].geom.g2) && groundcollisions(v1))  )
+               if ( isAction(v1) || isAction(v2))
+               {
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+
+                   if (isAction(v1) && isCarrier(v2) && hit(v2)) {}
+                   if (isAction(v2) && isCarrier(v1) && hit(v1)) {}
+                   if (isAction(v1) && isManta(v2) && hit(v2)) {}
+                   if (isAction(v2) && isManta(v1) && hit(v1)) {}
+                   if (isAction(v1) && s2 && hit(s2)) {}
+                   if (isAction(v2) && s1 && hit(s1)) {}
+               } else
+               if ( (s1 && groundcollisions(v2)) ||
+                    (s2 && groundcollisions(v1))  )
                {
                    //printf("Structure Collision\n");
                } else
@@ -468,6 +483,18 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.slip2 = 0.1;
 
                    printf("Manta hit\n");
+               }  else
+               if (  (s1 && isAction(v2) && hit(s1)) ||
+                     (s2 && isAction(v1) && hit(s2)) )
+               {
+
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                   contact[i].surface.mu = 0;dInfinity;
+                   contact[i].surface.slip1 = 0.1;
+                   contact[i].surface.slip2 = 0.1;
+
+                   printf("Structures hit.\n");
                }  else {
                    contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                    dContactSoftERP | dContactSoftCFM | dContactApprox1;
@@ -494,112 +521,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
    }
 }
 
- void _nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-    int i,n;
-    
-    dBodyID b1,b2;
-    
-    // only collide things with the ground
-    int g1 = (o1 == ground );
-    int g2 = (o2 == ground );
-    if (!(g1 ^ g2))
-    {
-        //printf ("Ground colliding..\n");
-        
-        //return;
-    }
-    
-
-    b1 = dGeomGetBody(o1);
-    b2 = dGeomGetBody(o2);
-    if (b1 && b2 && dAreConnected (b1,b2)) return;
-    
-    const int N = 10;
-    dContact contact[N];
-    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
-    if (n > 0) {
-        for (i=0; i<n; i++) {
-            if ((ground == contact[i].geom.g1) || (ground == contact[i].geom.g2))
-            {
-                groundcollisions(dGeomGetBody(contact[i].geom.g1));
-                groundcollisions(dGeomGetBody(contact[i].geom.g2));
-            }
-
-            if ( (isRunway(contact[i].geom.g1) || isRunway(contact[i].geom.g2))  )
-            {
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-
-                contact[i].surface.mu = 0.99;dInfinity;
-                contact[i].surface.slip1 = 0.9;
-                contact[i].surface.slip2 = 0.9;
-                contact[i].surface.bounce = 0.2;
-
-                //releasecontrol(dGeomGetBody(contact[i].geom.g1));
-            } else
-            if ( (isStructure(contact[i].geom.g1) || isStructure(contact[i].geom.g2))  )
-            {
-                //printf("Structure Collision\n");
-                groundcollisions(dGeomGetBody(contact[i].geom.g1));
-                groundcollisions(dGeomGetBody(contact[i].geom.g2));
-            } else
-
-            if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
-            {
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-
-                contact[i].surface.mu = 0;
-                contact[i].surface.bounce = 0.2;
-                contact[i].surface.slip1 = 0.1;
-                contact[i].surface.slip2 = 0.1;
-            } else
-            if ( ((isManta(dGeomGetBody(contact[i].geom.g1)) && isCarrier(dGeomGetBody(contact[i].geom.g2))) ) ||
-                (isManta(dGeomGetBody(contact[i].geom.g2)) && isCarrier(dGeomGetBody(contact[i].geom.g1))) )
-                {
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-
-                contact[i].surface.mu = dInfinity;
-                contact[i].surface.slip1 = 0;
-                contact[i].surface.slip2 = 0;
-                contact[i].surface.bounce = 0.2;
-
-                releasecontrol(dGeomGetBody(contact[i].geom.g1));
-            } else
-            if (  isAction(dGeomGetBody(contact[i].geom.g1)) || isAction(dGeomGetBody(contact[i].geom.g2)) )
-            {
-
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                contact[i].surface.mu = 0;dInfinity;
-                contact[i].surface.slip1 = 0.1;
-                contact[i].surface.slip2 = 0.1;
-
-
-                //messages.insert(messages.begin(), std::string("Carrier is under fire!"));
-
-            }  else {
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                contact[i].surface.mu = 0;dInfinity;
-                contact[i].surface.slip1 = 0.1;
-                contact[i].surface.slip2 = 0.1;
-            }
-
-
-            contact[i].surface.soft_erp = 0.5;
-            contact[i].surface.soft_cfm = 0.3;
-            
-            
-            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-            dJointAttach (c,
-                          dGeomGetBody(contact[i].geom.g1),
-                          dGeomGetBody(contact[i].geom.g2));
-        }
-    }
-}
 
 
 void initWorldPopulation()
@@ -620,13 +541,7 @@ void initWorldPopulation()
 
     //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
-    vehicles.push_back(_b);
-
-
-    for(int i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
-    {
-        controlables.push_back(vehicles[i]);
-    }
+    entities.push_back(_b);
     
 }
 
@@ -730,42 +645,31 @@ void initWorldModelling()
     islands.push_back(atom);
     islands.push_back(island);
 
-    structures.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
-    structures.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
 
 
-    structures.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
-    structures.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
-    structures.push_back(nonsquareisland->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    entities.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    entities.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    entities.push_back(nonsquareisland->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
 
 
-    structures.push_back(vulcano->addStructure(new Runway(),       0.0f,    0.0f,space,world));
-    structures.push_back(vulcano->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
-    structures.push_back(vulcano->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    entities.push_back(vulcano->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    entities.push_back(vulcano->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    entities.push_back(vulcano->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
 
 
-    structures.push_back(nemesis->addStructure(new Runway(),       0.0f,    0.0f,space,world));
-    structures.push_back(nemesis->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
-    structures.push_back(nemesis->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    entities.push_back(nemesis->addStructure(new Runway(),       0.0f,    0.0f,space,world));
+    entities.push_back(nemesis->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
+    entities.push_back(nemesis->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
 
 
     initWorldPopulation();
-
-    for(int i=0;i<structures.size();i++)
-    {
-        controlables.push_back(structures[i]);
-    }
-
-    for(int i=0;i<controlables.size();i++)
-    {
-        printf("[%d] - Controlables type %d\n",i,controlables[i]->getType());
-    }
-
 }
 
 void endWorldModelling()

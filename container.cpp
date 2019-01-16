@@ -92,6 +92,12 @@ template<class T> void container<T>::prune()
         delete prunning[i];
 }
 
+template<class T> bool container<T>::isValid(size_t index)
+{
+    return (elem[index] != NULL);
+}
+
+
 template<class T> bool container<T>::exists(size_t index)
 {
     size_t i=index;

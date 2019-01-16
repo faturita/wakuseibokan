@@ -46,6 +46,8 @@ protected:
 
     int status;
 
+    GLuint texture;
+
     void setTtl(int ttlvalue);
     
 public:
@@ -122,6 +124,7 @@ public:
     void setStatus(int value);
     int getHealth() const;
     void damage(int d);
+    void setTexture(const GLuint &value);
 };
 
 #endif /* VEHICLE_H_ */

@@ -354,6 +354,11 @@ void Vehicle::damage(int amount)
     Vehicle::health-=amount;
 }
 
+void Vehicle::setTexture(const GLuint &value)
+{
+    texture = value;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;

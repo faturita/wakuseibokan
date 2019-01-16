@@ -43,7 +43,7 @@
 
 extern std::vector<BoxIsland*> islands;
 
-extern container<Vehicle*> vehicles;
+extern container<Vehicle*> entities;
 
 
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
@@ -166,19 +166,19 @@ void drawMap()
         }
 
 
-        synchronized(vehicles.m_mutex)
+        synchronized(entities.m_mutex)
         {
-            for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+            for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
             {
-                if (vehicles[i]->getType() == CARRIER)
+                if (entities[i]->getType() == CARRIER)
                 {
-                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"B",0.1f,1.0f,1.0f,0.0f);
-                } else if (vehicles[i]->getType() == WALRUS)
+                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"B",0.1f,1.0f,1.0f,0.0f);
+                } else if (entities[i]->getType() == WALRUS)
                 {
-                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
-                } else if (vehicles[i]->getType() == MANTA)
+                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
+                } else if (entities[i]->getType() == MANTA)
                 {
-                    drawString(600-vehicles[i]->getPos()[0]/1000-10,vehicles[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
                 }
             }
         }
