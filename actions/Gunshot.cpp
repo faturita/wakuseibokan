@@ -16,7 +16,7 @@ Gunshot::~Gunshot()
 void Gunshot::init()
 {
     Gunshot::height=0.1f;
-    Gunshot::length=0.1f;
+    Gunshot::length=4000.0f;
     Gunshot::width=0.1f;
 
     setForward(0,0,1);

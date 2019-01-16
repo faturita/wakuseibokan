@@ -128,15 +128,17 @@ void drawHUD()
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
     
-    float speed=0;
+    float speed=0, health=0;
     
     if (controller.controlling >0)
+    {
         speed = controlables[controller.controlling-1]->getSpeed();
-    
+        health = controlables[controller.controlling-1]->getHealth();
+    }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.registers.thrust);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f\n", controller.controlling,controller.registers.thrust, health);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -550,7 +552,8 @@ void update(int value)
                     }
 
 
-                    dBodyDisable(entities[i]->getBodyID());
+                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
+                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
                     entities.erase(i);
 
                     explosion();

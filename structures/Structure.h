@@ -25,8 +25,6 @@ public:
     Structure();
     ~Structure();
 
-    dGeomID getGeom();
-
     void init();
     void drawModel();
     void drawModel(float yRot, float xRot, float x, float y, float z);

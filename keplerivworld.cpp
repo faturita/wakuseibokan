@@ -180,6 +180,10 @@ bool hit(Vehicle *vehicle)
     {
         messages.insert(messages.begin(), std::string("Manta is under fire!"));
     }
+    if (vehicle && vehicle->getType() == WALRUS)
+    {
+        messages.insert(messages.begin(), std::string("Walrus is under fire!"));
+    }
 
     vehicle->damage(2);
     return true;
@@ -189,7 +193,9 @@ bool hit(Structure* structure)
 {
     if (structure)
     {
-        messages.insert(messages.begin(), std::string("Island under attack!"));
+        char str[256];
+        sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
+        messages.insert(messages.begin(), str);
     }
     structure->damage(2);
 }
@@ -380,14 +386,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    // Nothing to do here....
                }
 
-               if (isAction(v1) && s2 && hit(s2)) {}
-               if (isAction(v2) && s1 && hit(s1)) {}
-
-               if (s1 || s2)
-               {
-                   printf("Structure collision\n");
-
-               } else
                if ( (isRunway(s1) && isManta(v2) && landed(v2,s1->island)) ||
                     (isRunway(s2) && isManta(v1) && landed(v1,s2->island)) )
                {
@@ -522,6 +520,40 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 }
 
 
+void _nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+   int i,n;
+
+   dBodyID b1,b2;
+
+   // only collide things with the ground
+   int g1 = (o1 == ground );
+   int g2 = (o2 == ground );
+   if (!(g1 ^ g2))
+   {
+       //printf ("Ground colliding..\n");
+
+       //return;
+   }
+
+
+   b1 = dGeomGetBody(o1);
+   b2 = dGeomGetBody(o2);
+   if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+   const int N = 10;
+   dContact contact[N];
+   n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+   if (n > 0) {
+       for (i=0; i<n; i++) {
+           dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+           dJointAttach (c,
+                         dGeomGetBody(contact[i].geom.g1),
+                         dGeomGetBody(contact[i].geom.g2));
+       }
+   }
+}
+
 
 void initWorldPopulation()
 {
@@ -541,7 +573,13 @@ void initWorldPopulation()
 
     //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
+    Walrus *_w = new Walrus();
+    _w->init();
+    _w->setPos(0.0f,0.0f,-1200.0f);
+    _w->embody(world,space);
+
     entities.push_back(_b);
+    entities.push_back(_w);
     
 }
 
@@ -652,8 +690,10 @@ void initWorldModelling()
     entities.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
     entities.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
     entities.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Turret()     ,       -1100.0f, +900.0f,space,world));
 
 
+    /**
     entities.push_back(nonsquareisland->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     entities.push_back(nonsquareisland->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
     entities.push_back(nonsquareisland->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
@@ -667,6 +707,7 @@ void initWorldModelling()
     entities.push_back(nemesis->addStructure(new Runway(),       0.0f,    0.0f,space,world));
     entities.push_back(nemesis->addStructure(new Hangar()   , -550.0f,    0.0f,space,world));
     entities.push_back(nemesis->addStructure(new Turret()   ,  100.0f, -100.0f,space,world));
+    **/
 
 
     initWorldPopulation();

@@ -339,6 +339,11 @@ dBodyID Vehicle::getBodyID()
     return me;
 }
 
+dGeomID Vehicle::getGeom()
+{
+    return geom;
+}
+
 int Vehicle::getTtl()
 {
     return Vehicle::ttl;

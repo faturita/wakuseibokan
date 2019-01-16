@@ -72,11 +72,6 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-dGeomID Structure::getGeom()
-{
-    return geom;
-}
-
 void Structure::embody(dWorldID world, dSpaceID space)
 {
     geom = dCreateBox(space, Structure::width, Structure::height, Structure::length);

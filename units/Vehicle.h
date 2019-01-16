@@ -98,6 +98,7 @@ public:
     void wrapDynamics(dBodyID body);
     
     dBodyID virtual getBodyID();
+    dGeomID virtual getGeom();
 
     void setVector(float* V, Vec3f v);
     void setVector(float *V, dVector3 v);
