@@ -10,7 +10,7 @@ Gunshot::~Gunshot()
     dGeomDestroy(geom);
     dBodyDestroy(me);
 
-    printf("Good bye....\n");
+    assert(0 || !"Destroying bullets from the Gunshot object. This should not happen now.");
 }
 
 void Gunshot::init()
@@ -19,12 +19,24 @@ void Gunshot::init()
     Gunshot::length=4000.0f;
     Gunshot::width=0.1f;
 
+    Gunshot::mass = 1.0f;
+
     setForward(0,0,1);
 }
 
 void Gunshot::drawModel()
 {
     drawModel(0,0,pos[0],pos[1],pos[2]);
+}
+
+void Gunshot::setOrigin(dBodyID origin)
+{
+    Gunshot::origin = origin;
+}
+
+dBodyID Gunshot::getOrigin()
+{
+    return origin;
 }
 
 void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
@@ -79,7 +91,7 @@ void Gunshot::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 1000.0f;
+    float myMass = Gunshot::mass;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m, 1,Gunshot::width, Gunshot::height, Gunshot::length);

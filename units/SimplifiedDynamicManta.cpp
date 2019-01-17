@@ -214,6 +214,7 @@ Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
     Gunshot *action = new Gunshot();
     // Need axis conversion.
     action->init();
+    action->setOrigin(me);
 
 
     Vec3f position = getPos();
@@ -226,7 +227,7 @@ Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
 
     forward = forward.normalize();
     orig = position;
-    position = position + 40*forward;
+    position = position + 60.0f*forward;
     forward = -orig+position;
 
     Vec3f Ft = forward*100;

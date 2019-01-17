@@ -42,6 +42,8 @@
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
 
+#include "actions/Gunshot.h"
+
 extern  Controller controller;
 
 /* dynamics and collision objects */
@@ -169,8 +171,15 @@ bool landed(Vehicle *manta, Island *island)
     }
     return true;
 }
+
 // SYNC
-bool hit(Vehicle *vehicle)
+bool isMineFire(Vehicle* vehicle, Gunshot *g)
+{
+    return (g->getOrigin() == vehicle->getBodyID());
+}
+
+// SYNC
+bool hit(Vehicle *vehicle, Gunshot *g)
 {
     /**   Sending too many messages hurts FPS
     if (vehicle && vehicle->getType() == CARRIER)
@@ -187,7 +196,12 @@ bool hit(Vehicle *vehicle)
     }
     **/
 
-    vehicle->damage(2);
+    // Dont hit me
+    if (g->getOrigin() != vehicle->getBodyID())
+    {
+        vehicle->damage(2);
+        return false;
+    }
     return true;
 }
 
@@ -383,6 +397,20 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
 
                // Bullets
+               if ((isAction(v1) && isWalrus(v2) && isMineFire(v2,(Gunshot*)v1))
+                   ||
+                  (isAction(v2) && isWalrus(v1) && isMineFire(v1,(Gunshot*)v2)))
+               {
+                   // Water buyoncy reaction
+                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                   contact[i].surface.mu = 0.0f;
+                   contact[i].surface.slip1 = 1.0f;
+                   contact[i].surface.slip2 = 1.0f;
+                   contact[i].surface.soft_erp = 1.0f;   // 0 in both will force the surface to be tight.
+                   contact[i].surface.soft_cfm = 1.0f;
+               } else
                if ( isAction(v1) || isAction(v2))
                {
                    contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
@@ -391,12 +419,12 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.slip1 = 0.1f;
                    contact[i].surface.slip2 = 0.1f;
 
-                   if (isAction(v1) && isCarrier(v2) && hit(v2)) {}
-                   if (isAction(v2) && isCarrier(v1) && hit(v1)) {}
-                   if (isAction(v1) && isManta(v2) && hit(v2)) {}
-                   if (isAction(v2) && isManta(v1) && hit(v1)) {}
-                   if (isAction(v1) && isWalrus(v2) && hit(v2)) {}
-                   if (isAction(v2) && isWalrus(v1) && hit(v1)) {}
+                   if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
+                   if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                   if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
+                   if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
+                   if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
+                   if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
                    if (isAction(v1) && s2 && hit(s2)) {}
                    if (isAction(v2) && s1 && hit(s1)) {}
                } else
@@ -436,9 +464,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                     dContactApprox1;
 
                     contact[i].surface.mu = 0;
-                    contact[i].surface.bounce = 0.2;
-                    contact[i].surface.slip1 = 0.1;
-                    contact[i].surface.slip2 = 0.1;
+                    contact[i].surface.bounce = 0.2f;
+                    contact[i].surface.slip1 = 0.1f;
+                    contact[i].surface.slip2 = 0.1f;
 
                     contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
                     contact[i].surface.soft_cfm = 0;
@@ -568,15 +596,15 @@ void initWorldModelling()
     // The parameter needs to be zero.
 	contactgroup = dJointGroupCreate (0);
 	dWorldSetGravity (world,0,-9.81f,0);
-    dWorldSetCFM (world,1e-5);
+    dWorldSetCFM (world,1e-5f);
     
     // Set Damping
-    dWorldSetLinearDamping(world, 0.01);  // 0.00001
-    dWorldSetAngularDamping(world, 0.005);     // 0.005
+    dWorldSetLinearDamping(world, 0.01f);  // 0.00001
+    dWorldSetAngularDamping(world, 0.005f);     // 0.005
     dWorldSetMaxAngularSpeed(world, 200);
     
     // Set and get the depth of the surface layer around all geometry objects. Contacts are allowed to sink into the surface layer up to the given depth before coming to rest. The default value is zero. Increasing this to some small value (e.g. 0.001) can help prevent jittering problems due to contacts being repeatedly made and broken.
-    dWorldSetContactSurfaceLayer (world,0.001);
+    dWorldSetContactSurfaceLayer (world,0.001f);
     
 	ground = dCreatePlane (space,0,1,0,0);
     

@@ -81,7 +81,7 @@ void LaserBeam::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 1000.0f;
+    float myMass = 1.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m, 1,Gunshot::width, Gunshot::height, Gunshot::length);

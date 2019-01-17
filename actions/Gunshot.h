@@ -9,6 +9,11 @@ protected:
     float height;
     float width;
     float length;
+
+    float mass;
+
+    dBodyID origin;
+
 public:
     Gunshot();
     ~Gunshot();
@@ -21,6 +26,9 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+
+    void setOrigin(dBodyID);
+    dBodyID getOrigin();
 
 };
 

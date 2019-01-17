@@ -230,6 +230,7 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
     Gunshot *action = new Gunshot();
     // Need axis conversion.
     action->init();
+    action->setOrigin(me);
 
     Vec3f position = getPos();
     position[1] += 0.0f; // Move upwards to the center of the real rotation.
@@ -238,13 +239,13 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
 
     Vec3f orig;
 
-
     forward = forward.normalize();
     orig = position;
-    position = position + 40*forward;
+    position = position + 60.0f*forward;
     forward = -orig+position;
 
-    Vec3f Ft = forward*100;
+    // Shoot faster to avoid hurting myself (moving myself indeed, hurting is disabled per collision handling).
+    Vec3f Ft = forward*10000.0f;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
