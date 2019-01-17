@@ -5,12 +5,11 @@
  *      Author: faturita
  */
 
-#define dSINGLE
-
 #include "Walrus.h"
 #include "../md2model.h"
 
 #include "../actions/Gunshot.h"
+#include "../sounds/sounds.h"
 
 int Walrus::getNumber() const
 {
@@ -101,8 +100,16 @@ void Walrus::drawModel()
 
 void Walrus::doControl(Controller controller)
 { 
-    
+    static bool didit = false;
+
     setThrottle(-controller.registers.thrust);
+
+    if (getThrottle()>=10 && getThrottle()<=20 and !didit)
+    {
+        didit = true;
+        smallenginestart();
+    } else if (getThrottle()==0)
+        didit = false;
     
     xRotAngle = controller.registers.roll;
     
@@ -181,7 +188,9 @@ void Walrus::doDynamics(dBodyID body)
 	Vec3f vec3fV;
 	vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
 
-	speed = vec3fV.magnitude();
+    speed = vec3fV.magnitude();
+
+    VERIFY(speed, me);
 
 	Vec3f dump;
 	if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)

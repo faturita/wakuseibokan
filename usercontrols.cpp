@@ -21,6 +21,8 @@
 #include "camera.h"
 #include "usercontrols.h"
 
+#include "sounds/sounds.h"
+
 #include "terrain/Terrain.h"
 
 #include "units/Vehicle.h"
@@ -30,6 +32,7 @@
 
 #include "structures/Runway.h"
 #include "structures/CommandCenter.h"
+#include "structures/Turret.h"
 
 Camera Camera;
 
@@ -155,7 +158,6 @@ void switchControl(int id)
     controller.controlling = id;
     //controller.reset();
     controller.registers = controlables[controller.controlling-1]->getControlRegisters();
-    //spd = vehicles.getThrottle();
 }
 
 
@@ -212,6 +214,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         {
                             b->launch(m);
                             messages.insert(messages.begin(), std::string("Manta has launched."));
+                            takeoff();
                         }
                     }
                 }
@@ -281,6 +284,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'Q':controller.registers.thrust = 0.0;break;
         case 'j':controlables[controller.controlling-1]->setEnableAI();break;
         case 'J':controlables[controller.controlling-1]->setDisableAI();break;
+
         case '0':
         	controller.controlling = 0;
             controller.reset();
@@ -299,8 +303,14 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '!':controller.view = 1;break;
         case '@':controller.view = 3;break;
         case '~':Camera.control = 0;break;
-        case 'S':gltWriteTGA("file.tga");break;
+        case '?':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
+        case 'S':
+            {
+            Vehicle *v = controlables[controller.controlling-1];
+            v->stop();
+            break;
+            }
         case 'm':
             {
             Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,MANTA);
@@ -386,6 +396,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (action != NULL)
             {
                 entities.push_back(action);
+                gunshot();
             }
         break;
 	}

@@ -3,6 +3,8 @@
 Structure::Structure()
 {
     island = NULL;
+    azimuth=0;
+    inclination=0;
 }
 
 Structure::~Structure()

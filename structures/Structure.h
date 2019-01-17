@@ -1,10 +1,6 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
-#define COLLISIONABLE 1
-#define LANDINGABLE   2
-#define CONTROL       3
-
 #include "../units/Vehicle.h"
 #include "../ThreeMaxLoader.h"
 #include "../terrain/island.h"

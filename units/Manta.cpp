@@ -5,8 +5,6 @@
  *      Author: faturita
  */
 
-#define dSINGLE
-
 #include "Manta.h"
 #include "../md2model.h"
 

@@ -5,7 +5,6 @@
  *      Author: faturita
  */
 
-#define dSINGLE
 
 #include "Vehicle.h"
 #include <assert.h>
@@ -271,6 +270,17 @@ float Vehicle::getThrottle()
 	return Vehicle::throttle;
 }
 
+void Vehicle::stop()
+{
+    stop(me);
+}
+
+void Vehicle::stop(dBodyID who)
+{
+    dBodySetLinearVel(who,0.0f,0.0f,0.0f);
+    dBodySetAngularVel(who,0.0f,0.0f,0.0f);
+}
+
 void Vehicle::doControl(Controller controller)
 {
     //engine[0] = controller.pitch;
@@ -427,4 +437,21 @@ void Vehicle::alignToMe(dBodyID fBodyID)
 
     dBodySetRotation(fBodyID,Re);
 
+}
+
+/**
+ * Check model consistencies.
+ *
+ * ODE sometimes just blow away.  Try to catch empirically those situations here.
+ * Energy is not infinite and must come from somewhere. So if you can catch the calls to addforce...
+ *
+ * @brief Vehicle::VERIFY
+ * @param speed
+ * @param who
+ */
+void Vehicle::VERIFY(float speed, dBodyID who)
+{
+    if (speed>1000.0f)
+        stop(who);
+    return;
 }

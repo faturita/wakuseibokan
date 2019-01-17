@@ -9,9 +9,6 @@
 #include "MultiBodyVehicle.h"
 
 
-#define dSINGLE
-
-
 
 void MultiBodyVehicle::init()
 {

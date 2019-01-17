@@ -5,42 +5,8 @@
  *      Author: faturita
  */
 
-#define dSINGLE
-
 #include <ode/ode.h>
 #include "odeutils.h"
-
-void firesound(int times)
-{
-    for(int i=0;i<times;i++)
-        printf ("%c", 7);
-    
-}
-
-void enginestart()
-{
-    system("afplay sounds/cruise.m4a &");
-}
-
-void takeoff()
-{
-    system("afplay sounds/takeoff.mp3 &");
-}
-
-void explosion()
-{
-    system("afplay sounds/explosion.mp3 &");
-}
-
-void coast()
-{
-    system("afplay sounds/Coast.m4a &");
-}
-
-void honk()
-{
-    system("afplay sounds/BoatHonk.m4a &");
-}
 
 Vec3f ToVec3f(dReal *val, Vec3f retValue)
 {

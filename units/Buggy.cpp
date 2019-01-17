@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Baufest. All rights reserved.
 //
 
-#define dSINGLE
-
 #include "Buggy.h"
 #include "../md2model.h"
 

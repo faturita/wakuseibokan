@@ -6,8 +6,6 @@
 //  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
-#define dSINGLE
-
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,6 +37,8 @@
 #include "camera.h"
 
 #include "openglutils.h"
+
+#include "sounds/sounds.h"
 
 #include "keplerivworld.h"
 
@@ -446,7 +446,6 @@ void update(int value)
         }
 
         // This should be in the command center.
-        /**
         for (int i = 0; i < islands.size(); i++)
         {
             BoxIsland *island = islands[i];
@@ -456,10 +455,9 @@ void update(int value)
                 CommandCenter *c = (CommandCenter*)island->getCommandCenter();
                 if (c)
                 {
-                    c->tick();
                     if (c->getTtl()<=0)
                     {
-                        // Add a structure (Structures should be rotated also).
+                        // Add a structure (Structures should be randomly rotated also).
                         int which = (rand() % 30 + 1);
                         Structure *s;
 
@@ -480,7 +478,7 @@ void update(int value)
 
                         island->addStructure(s,x,z,space,world);
 
-                        structures.push_back(s);
+                        entities.push_back(s);
                         controlables.push_back(s);
 
                         if (8<=which && which<=10)
@@ -489,7 +487,7 @@ void update(int value)
                             x-=550;
                             island->addStructure(s2,x,z,space,world);
 
-                            structures.push_back(s2);
+                            entities.push_back(s2);
                             controlables.push_back(s2);
                         }
 
@@ -499,7 +497,7 @@ void update(int value)
                 }
             }
 
-        }**/
+        }
 
 
         //printf("Elements alive now: %d\n", vehicles.size());
@@ -535,10 +533,11 @@ void update(int value)
                     {
                         if (controlables[j] == entities[i])
                         {
-                            controlables.erase(controlables.begin() + j);
-
                             if (controller.controlling-1 == j)
                                 controller.controlling = 0;
+
+                            controlables.erase(controlables.begin() + j);
+
                         }
                     }
 

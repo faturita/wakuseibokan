@@ -44,6 +44,9 @@ odeutils.h
 opengltemplate.cpp
 openglutils.cpp
 openglutils.h
+sounds.h
+sounds/sounds.cpp
+sounds/sounds.h
 structures/CommandCenter.cpp
 structures/CommandCenter.h
 structures/Hangar.cpp
@@ -68,6 +71,7 @@ terrain/island.h
 terrain/main.cpp
 terrain/vec3f.cpp
 terrain/vec3f.h
+testbed.cpp
 units/Balaenidae.cpp
 units/Balaenidae.h
 units/Beluga.cpp

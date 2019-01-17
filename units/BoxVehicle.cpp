@@ -6,8 +6,6 @@
 //  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
-#define dSINGLE
-
 #include "BoxVehicle.h"
 
 

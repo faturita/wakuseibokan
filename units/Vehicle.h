@@ -18,7 +18,7 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
-enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5 };
+enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, COLLISIONABLE=6, LANDINGABLE = 7, CONTROL=8 };
 
 class Vehicle : Observable
 {
@@ -85,6 +85,9 @@ public:
 	float virtual getThrottle();
     void virtual upThrottle(float throttle);
 
+    void virtual stop();
+    void virtual stop(dBodyID who);
+
 	void virtual doDynamics(dBodyID);
     void virtual doDynamics();
 
@@ -126,6 +129,8 @@ public:
     int getHealth() const;
     void damage(int d);
     void setTexture(const GLuint &value);
+
+    void VERIFY(float f, dBodyID who);
 };
 
 #endif /* VEHICLE_H_ */

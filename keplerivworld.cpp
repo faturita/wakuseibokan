@@ -20,6 +20,8 @@
 
 #include "odeutils.h"
 
+#include "sounds/sounds.h"
+
 #include "keplerivworld.h"
 
 // Add a new interface to an enbodied object.
@@ -219,7 +221,7 @@ bool hit(Structure* structure)
 // SYNC
 bool releasecontrol(Vehicle* vehicle)
 {
-    if (vehicle && vehicle->getType() == 3)
+    if (vehicle && vehicle->getType() == MANTA)
     {
         if (vehicle->getStatus() != 0 && vehicle->getStatus() != 1)
         {
@@ -228,7 +230,7 @@ bool releasecontrol(Vehicle* vehicle)
             vehicle->setStatus(0);
             vehicle->doControl(controller);
             vehicle->setThrottle(0.0f);
-            messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
+            messages.insert(messages.begin(), std::string("Manta has re landed on Aircraft."));
         }
     }
     return true;
@@ -342,12 +344,13 @@ bool inline groundcollisions(Vehicle *vehicle)
 {
     if (vehicle)
     {
-        if (vehicle->getSpeed()>100 and vehicle->getType() == 3)
+        if (vehicle->getSpeed()>100 and vehicle->getType() == MANTA)
         {
             explosion();
             controller.reset();
             vehicle->doControl(controller);
             vehicle->setThrottle(0.0f);
+            vehicle->damage(200);
         }
     }
     return true;
@@ -455,6 +458,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                    contact[i].surface.slip1 = 0.0f;
                    contact[i].surface.slip2 = 0.0f;
                    contact[i].surface.bounce = 0.2f;
+
                } else
 
                if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
@@ -562,19 +566,21 @@ void initWorldPopulation()
 
     //dBodySetData(_boxVehicle1->getBodyID(),(void*)(new size_t(vehicles.push_back(_boxVehicle1))));
 
+    /**
     Walrus *_w = new Walrus();
     _w->init();
     _w->setPos(0.0f,0.0f,-1200.0f);
     _w->embody(world,space);
+    entities.push_back(_w);
 
     SimplifiedDynamicManta *_m = new SimplifiedDynamicManta();
     _m->init();
     _m->setPos(0.0f,0.0f,-4200.0f);
     _m->embody(world,space);
+    entities.push_back(_m);**/
 
     entities.push_back(_b);
-    entities.push_back(_w);
-    entities.push_back(_m);
+
     
 }
 
@@ -678,6 +684,7 @@ void initWorldModelling()
     islands.push_back(atom);
     islands.push_back(island);
 
+    /**
     entities.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     entities.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));
     entities.push_back(thermopilae->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
@@ -686,6 +693,7 @@ void initWorldModelling()
     entities.push_back(thermopilae->addStructure(new Warehouse()  ,       -1000.0f,    0.0f,space,world));
     entities.push_back(thermopilae->addStructure(new CommandCenter()     ,  400.0f, -500.0f,space,world));
     entities.push_back(thermopilae->addStructure(new Turret()     ,       -1100.0f, +900.0f,space,world));
+    **/
 
 
     /**

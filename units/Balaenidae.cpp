@@ -2,7 +2,7 @@
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
 #include "../ThreeMaxLoader.h"
-#include "../odeutils.h"
+#include "../sounds/sounds.h"
 
 extern GLuint _textureMetal;
 
