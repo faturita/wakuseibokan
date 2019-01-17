@@ -46,7 +46,7 @@ void Walrus::init()
 
 int Walrus::getType()
 {
-    return 2;
+    return WALRUS;
 }
 
 void Walrus::doMaterial()
@@ -223,9 +223,6 @@ void Walrus::doDynamics(dBodyID body)
 
 
 }
-
-
-
 
 
 Vehicle* Walrus::fire(dWorldID world, dSpaceID space)

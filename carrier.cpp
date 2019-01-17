@@ -407,7 +407,6 @@ void initRendering() {
     
 }
 
-
 void handleResize(int w, int h) {
     printf("Handling Resize: %d, %d \n", w, h);
 	glViewport(0, 0, w, h);
@@ -575,7 +574,7 @@ void update(int value)
 	}
     
 	glutPostRedisplay();
-    // @NOTE: update time should be adapted to real FPS.
+    // @NOTE: update time should be adapted to real FPS (lower is faster).
     glutTimerFunc(25, update, 0);
 }
 

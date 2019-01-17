@@ -172,11 +172,12 @@ bool landed(Vehicle *manta, Island *island)
 // SYNC
 bool hit(Vehicle *vehicle)
 {
-    if (vehicle && vehicle->getType() == 4)
+    /**   Sending too many messages hurts FPS
+    if (vehicle && vehicle->getType() == CARRIER)
     {
         messages.insert(messages.begin(), std::string("Carrier is under fire!"));
     }
-    if (vehicle && vehicle->getType() == 3)
+    if (vehicle && vehicle->getType() == MANTA)
     {
         messages.insert(messages.begin(), std::string("Manta is under fire!"));
     }
@@ -184,6 +185,7 @@ bool hit(Vehicle *vehicle)
     {
         messages.insert(messages.begin(), std::string("Walrus is under fire!"));
     }
+    **/
 
     vehicle->damage(2);
     return true;
@@ -193,9 +195,9 @@ bool hit(Structure* structure)
 {
     if (structure)
     {
-        char str[256];
-        sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
-        messages.insert(messages.begin(), str);
+        //char str[256];
+        //sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
+        //messages.insert(messages.begin(), str);
     }
     structure->damage(2);
 }
@@ -346,7 +348,6 @@ void inline groundcollisions(dBodyID body)
     }
 }
 
-
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
    int i,n;
@@ -373,6 +374,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
    if (n > 0) {
        for (i=0; i<n; i++) {
+
            synchronized(entities.m_mutex)
            {
                Vehicle *v1=NULL,*v2=NULL;
@@ -380,136 +382,96 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
-               if ( (ground == contact[i].geom.g1  &&  groundcollisions(v2)) ||
-                    (ground == contact[i].geom.g2  &&  groundcollisions(v1)) )
-               {
-                   // Nothing to do here....
-               }
-
-               if ( (isRunway(s1) && isManta(v2) && landed(v2,s1->island)) ||
-                    (isRunway(s2) && isManta(v1) && landed(v1,s2->island)) )
-               {
-                   contact[i].surface.mode = dContactBounce |
-                   dContactApprox1;
-
-                   contact[i].surface.mu = 0.99;dInfinity;
-                   contact[i].surface.slip1 = 0.9;
-                   contact[i].surface.slip2 = 0.9;
-                   contact[i].surface.bounce = 0.2;
-
-               } else
-               if ( (isRunway(s1) || isRunway(s2))  )
-               {
-                   contact[i].surface.mode = dContactBounce |
-                   dContactApprox1;
-
-                   contact[i].surface.mu = 0.99;dInfinity;
-                   contact[i].surface.slip1 = 0.9;
-                   contact[i].surface.slip2 = 0.9;
-                   contact[i].surface.bounce = 0.2;
-
-                   //releasecontrol(dGeomGetBody(contact[i].geom.g1));
-               } else
+               // Bullets
                if ( isAction(v1) || isAction(v2))
                {
                    contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                    dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
+                   contact[i].surface.mu = 0;
+                   contact[i].surface.slip1 = 0.1f;
+                   contact[i].surface.slip2 = 0.1f;
 
                    if (isAction(v1) && isCarrier(v2) && hit(v2)) {}
                    if (isAction(v2) && isCarrier(v1) && hit(v1)) {}
                    if (isAction(v1) && isManta(v2) && hit(v2)) {}
                    if (isAction(v2) && isManta(v1) && hit(v1)) {}
+                   if (isAction(v1) && isWalrus(v2) && hit(v2)) {}
+                   if (isAction(v2) && isWalrus(v1) && hit(v1)) {}
                    if (isAction(v1) && s2 && hit(s2)) {}
                    if (isAction(v2) && s1 && hit(s1)) {}
                } else
-               if ( (s1 && groundcollisions(v2)) ||
-                    (s2 && groundcollisions(v1))  )
-               {
-                   //printf("Structure Collision\n");
-               } else
 
-               if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+
+               if ( (isRunway(s1) && isManta(v2) && landed(v2,s1->island)) ||
+                    (isRunway(s2) && isManta(v1) && landed(v1,s2->island)) )
                {
+                   // Manta landing on Runways.
                    contact[i].surface.mode = dContactBounce |
                    dContactApprox1;
 
-                   contact[i].surface.mu = 0;
-                   contact[i].surface.bounce = 0.2;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
-
-                   if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
-                   if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
-                   if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
-                   if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+                   contact[i].surface.mu = 0.99f;
+                   contact[i].surface.slip1 = 0.9f;
+                   contact[i].surface.slip2 = 0.9f;
+                   contact[i].surface.bounce = 0.2f;
                } else
+
+
                if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                     ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
                    {
+                   // Manta landing on Carrier
                    contact[i].surface.mode = dContactBounce |
                    dContactApprox1;
 
                    contact[i].surface.mu = dInfinity;
-                   contact[i].surface.slip1 = 0;
-                   contact[i].surface.slip2 = 0;
-                   contact[i].surface.bounce = 0.2;
+                   contact[i].surface.slip1 = 0.0f;
+                   contact[i].surface.slip2 = 0.0f;
+                   contact[i].surface.bounce = 0.2f;
+               } else
+
+               if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+               {
+                    // Island reaction
+                    contact[i].surface.mode = dContactBounce |
+                    dContactApprox1;
+
+                    contact[i].surface.mu = 0;
+                    contact[i].surface.bounce = 0.2;
+                    contact[i].surface.slip1 = 0.1;
+                    contact[i].surface.slip2 = 0.1;
+
+                    contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                    contact[i].surface.soft_cfm = 0;
+
+
+                    // Carrier stranded and Walrus arrived on island.
+                    if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
+                    if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
+                    if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                    if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
 
                } else
-               if (  (isCarrier(v1) && isAction(v2) && hit(v1)) ||
-                     (isCarrier(v2) && isAction(v1) && hit(v2)) )
-               {
+               if (ground == contact[i].geom.g1 || ground == contact[i].geom.g2 ) {
 
-                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
+                    // Water buyoncy reaction
+                    contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                    dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
-                   printf("Carrier hit\n");
-               } else
-               if (  (isManta(v1) && isAction(v2) && hit(v1)) ||
-                     (isManta(v2) && isAction(v1) && hit(v2)) )
-               {
+                    contact[i].surface.mu = 0.0f;
+                    contact[i].surface.slip1 = 0.1f;
+                    contact[i].surface.slip2 = 0.1f;
+                    contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+                    contact[i].surface.soft_cfm = .3f;
 
-                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
+                    // Walrus reaching shore.
+                    //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                    //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
 
-                   printf("Manta hit\n");
-               }  else
-               if (  (s1 && isAction(v2) && hit(s1)) ||
-                     (s2 && isAction(v1) && hit(s2)) )
-               {
-
-                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
-
-                   printf("Structures hit.\n");
-               }  else {
-                   contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                   dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-                   contact[i].surface.mu = 0;dInfinity;
-                   contact[i].surface.slip1 = 0.1;
-                   contact[i].surface.slip2 = 0.1;
-
-
-                   //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
-                   //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
-                }
-            }
-
-           contact[i].surface.soft_erp = .5;   // 0 in both will force the surface to be tight.
-           contact[i].surface.soft_cfm = .3;
-
+               } else {
+                    // Structure clashing (default behaviour is perfect for this!).
+               }
+           }
 
            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
            dJointAttach (c,
@@ -518,42 +480,41 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
        }
    }
 }
-
 
 void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
-   int i,n;
+    int i,n;
 
-   dBodyID b1,b2;
+    dBodyID b1,b2;
 
-   // only collide things with the ground
-   int g1 = (o1 == ground );
-   int g2 = (o2 == ground );
-   if (!(g1 ^ g2))
-   {
-       //printf ("Ground colliding..\n");
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
 
-       //return;
-   }
+        //return;
+    }
 
 
-   b1 = dGeomGetBody(o1);
-   b2 = dGeomGetBody(o2);
-   if (b1 && b2 && dAreConnected (b1,b2)) return;
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
 
-   const int N = 10;
-   dContact contact[N];
-   n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
-   if (n > 0) {
-       for (i=0; i<n; i++) {
-           dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-           dJointAttach (c,
-                         dGeomGetBody(contact[i].geom.g1),
-                         dGeomGetBody(contact[i].geom.g2));
-       }
-   }
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
+
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
 }
-
 
 void initWorldPopulation()
 {
@@ -578,8 +539,14 @@ void initWorldPopulation()
     _w->setPos(0.0f,0.0f,-1200.0f);
     _w->embody(world,space);
 
+    SimplifiedDynamicManta *_m = new SimplifiedDynamicManta();
+    _m->init();
+    _m->setPos(0.0f,0.0f,-4200.0f);
+    _m->embody(world,space);
+
     entities.push_back(_b);
     entities.push_back(_w);
+    entities.push_back(_m);
     
 }
 
