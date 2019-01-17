@@ -12,7 +12,6 @@
 class Structure : public Vehicle
 {
 protected:
-    dGeomID geom;
     float height;
     float width;
     float length;
@@ -20,15 +19,11 @@ protected:
     float azimuth;
     float inclination;
 
-    GLuint texture;
-
 public:
     Island *island;
 
     Structure();
     ~Structure();
-
-    dGeomID getGeom();
 
     void init();
     void drawModel();
@@ -37,6 +32,9 @@ public:
     void embody(dWorldID world, dSpaceID space);
 
     void embody(dBodyID myBodySelf);
+
+    void  doDynamics(dBodyID);
+    void  doDynamics();
 
     int getType();
 

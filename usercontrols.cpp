@@ -42,9 +42,7 @@ extern std::vector<std::string> messages;
 
 extern std::vector<Vehicle*> controlables;
 
-extern container<Vehicle*> vehicles;
-
-extern std::vector<Structure*> structures;
+extern container<Vehicle*> entities;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -145,6 +143,11 @@ void processMousePassiveMotion(int x, int y) {
 
 void switchControl(int id)
 {
+    if (id>controlables.size())
+    {
+        controller.controlling = 0;
+        return;
+    }
     if (controller.controlling != 0)
     {
         controlables[controller.controlling-1]->setControlRegisters(controller.registers);
@@ -223,7 +226,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 int z = (rand() % 2000 + 1); z -= 1000;
 
                 Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
-                structures.push_back(s);
+                entities.push_back(s);
                 controlables.push_back(s);
             } else
             if (controller.str.find("list") != std::string::npos)
@@ -269,7 +272,6 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'c':controller.registers.yaw+=1.0f;break;
         case 'v':controller.registers.precesion-=1.0f;break;
         case 'b':controller.registers.precesion+=1.0f;break;
-        case '9':controller.registers.thrust+=20.0f;break;
         case 'p':controller.pause = !controller.pause;break;
         case 'r':controller.registers.thrust-=0.05;break;
         case 'R':controller.registers.thrust-=10.00;break;
@@ -284,7 +286,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.reset();
             Camera.reset();
         break;
-        case '1':case '2':case '3': case '4': case '5': case '6':case '7':
+        case '1':case '2':case '3': case '4': case '5': case '6':case '7':case '8':case '9':
             switchControl((int)(key-48));
         break;
         case 'i':
@@ -303,14 +305,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
             Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,MANTA);
             if (manta != NULL)
-                vehicles.push_back(manta);
+                entities.push_back(manta);
                 controlables.push_back(manta);
                 messages.insert(messages.begin(), std::string("Manta is ready for launching."));
             }
             break;
         case 'M':
             {
-                synchronized(vehicles.m_mutex)
+                synchronized(entities.m_mutex)
                 {
                     for(int i=0;i<controlables.size();i++)
                     {
@@ -323,14 +325,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                             }
                         }
                     }
-                    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+                    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (vehicles[i]->getType()==3 && vehicles[i]->getStatus()==0)
+                        if (entities[i]->getType()==3 && entities[i]->getStatus()==0)
                         {
                             //printf("Eliminating....\n");
-                            dBodyDisable(vehicles[i]->getBodyID());
-                            vehicles.erase(i);
+                            dBodyDisable(entities[i]->getBodyID());
+                            entities.erase(i);
                             messages.insert(messages.begin(), std::string("Manta is now on bay."));
                         }
                     }
@@ -341,7 +343,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
             Vehicle *walrus = (controlables[controller.controlling-1])->spawn(world,space,WALRUS);
             if (walrus != NULL)
-                vehicles.push_back(walrus);
+                entities.push_back(walrus);
                 controlables.push_back(walrus);
                 messages.insert(messages.begin(), std::string("Walrus has been deployed."));
                 printf("Position: %d\n", controlables.size());
@@ -349,7 +351,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             break;
         case 'O':
             {
-                synchronized(vehicles.m_mutex)
+                synchronized(entities.m_mutex)
                 {
                     for(int i=0;i<controlables.size();i++)
                     {
@@ -362,14 +364,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                             }
                         }
                     }
-                    for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+                    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (vehicles[i]->getType()==WALRUS && vehicles[i]->getStatus()==Walrus::SAILING)
+                        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
                         {
                             //printf("Eliminating....\n");
-                            dBodyDisable(vehicles[i]->getBodyID());
-                            vehicles.erase(i);
+                            dBodyDisable(entities[i]->getBodyID());
+                            entities.erase(i);
                             messages.insert(messages.begin(), std::string("Walrus is now back on deck."));
                         }
                     }
@@ -383,7 +385,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             //dBodySetData( action->getBodyID(), (void*)idx);
             if (action != NULL)
             {
-                vehicles.push_back(action);
+                entities.push_back(action);
             }
         break;
 	}

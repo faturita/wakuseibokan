@@ -11,14 +11,17 @@ Structure::~Structure()
             delete _model;
 }
 
-void Structure::setTexture(GLuint texture)
-{
-    Structure::texture = texture;
-}
-
 int Structure::getType()
 {
     return COLLISIONABLE;
+}
+
+void  Structure::doDynamics(dBodyID) {
+    // Nothing to do
+}
+void  Structure::doDynamics()
+{
+    doDynamics(getBodyID());
 }
 
 void Structure::init()
@@ -67,11 +70,6 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
     {
         printf ("model is null\n");
     }
-}
-
-dGeomID Structure::getGeom()
-{
-    return geom;
 }
 
 void Structure::embody(dWorldID world, dSpaceID space)

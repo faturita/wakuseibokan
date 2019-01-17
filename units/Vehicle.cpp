@@ -339,6 +339,11 @@ dBodyID Vehicle::getBodyID()
     return me;
 }
 
+dGeomID Vehicle::getGeom()
+{
+    return geom;
+}
+
 int Vehicle::getTtl()
 {
     return Vehicle::ttl;
@@ -352,6 +357,11 @@ int Vehicle::getHealth() const
 void Vehicle::damage(int amount)
 {
     Vehicle::health-=amount;
+}
+
+void Vehicle::setTexture(const GLuint &value)
+{
+    texture = value;
 }
 
 void Vehicle::setTtl(int ttlvalue)

@@ -50,6 +50,8 @@ public:
 
     void unlock();
 
+    bool isValid(size_t index);
+
 };
 
 // This is a nasty solution to allow the linking of the template... Have a better one? Do it.

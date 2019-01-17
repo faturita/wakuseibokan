@@ -73,21 +73,18 @@ extern dJointID joint[NUM-1];
 extern dJointGroupID contactgroup;
 extern dGeomID sphere[NUM];
 
-extern container<Vehicle*> vehicles;
+extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
-extern std::vector<Structure*> structures;
-
-extern std::vector<Vehicle*> controlables;
-
 extern std::vector<std::string> messages;
-
 
 // @FIXME Change
 extern GLuint _textureBox;
 extern GLuint _textureMetal;
 
+
+std::vector<Vehicle*> controlables;
 
 void disclaimer()
 {
@@ -131,15 +128,17 @@ void drawHUD()
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
     
-    float speed=0;
+    float speed=0, health=0;
     
     if (controller.controlling >0)
+    {
         speed = controlables[controller.controlling-1]->getSpeed();
-    
+        health = controlables[controller.controlling-1]->getHealth();
+    }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f\n", controller.controlling,controller.registers.thrust);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f\n", controller.controlling,controller.registers.thrust, health);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -348,21 +347,13 @@ void drawScene() {
         (islands[i]->draw());
     }
 
-
-    // Draw Structures on island.
-    for(int i=0;i<structures.size();i++)
-    {
-        // @NOTE Textures are loaded up to this point so they are set into the objects now.
-        structures[i]->setTexture(_textureMetal);
-        structures[i]->drawModel();
-    }
-
     // Draw vehicles and objects
-    synchronized(vehicles.m_mutex)
+    synchronized(entities.m_mutex)
     {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
         {
-            (vehicles[i]->drawModel());
+            (entities[i]->setTexture(_textureMetal));
+            (entities[i]->drawModel());
         }
     }
     
@@ -415,7 +406,6 @@ void initRendering() {
     initTextures();
     
 }
-
 
 void handleResize(int w, int h) {
     printf("Handling Resize: %d, %d \n", w, h);
@@ -511,42 +501,49 @@ void update(int value)
 
         }**/
 
-        // Autocontrol (AI).
-        for(int i=0;i<controlables.size();i++)
-        {
-            if (controlables[i]->isAuto())
-                    controlables[i]->doControl();
-        }
-
 
         //printf("Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i)) {
-            vehicles[i]->doDynamics();
-            vehicles[i]->tick();
+        for(size_t i=entities.first();entities.exists(i);i=entities.next(i)) {
+
+            // Autocontrol (AI)
+            if (entities[i]->isAuto())
+            {
+                entities[i]->doControl();
+            }
+
+            entities[i]->doDynamics();
+            entities[i]->tick();
         }
 
 
-        synchronized(vehicles.m_mutex)
+        synchronized(entities.m_mutex)
         {
-            for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+            for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
             {
                 //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                if (vehicles[i]->getType()==5 && vehicles[i]->getTtl()==0)
+                if (entities[i]->getType()==5 && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");
-                    dBodyDisable(vehicles[i]->getBodyID());
-                    vehicles.erase(i);
+                    dBodyDisable(entities[i]->getBodyID());
+                    entities.erase(i);
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
-                } else if (vehicles[i]->getHealth()<=0)
+                } else if (entities[i]->getHealth()<=0)
                 {
-                    for(int i=0;i<controlables.size();i++)
-                        if (controlables[i]->getBodyID() == vehicles[i]->getBodyID())
-                            controlables.erase(controlables.begin() + i);
+                    for(int j=0;j<controlables.size();j++)
+                    {
+                        if (controlables[j] == entities[i])
+                        {
+                            controlables.erase(controlables.begin() + j);
+
+                            if (controller.controlling-1 == j)
+                                controller.controlling = 0;
+                        }
+                    }
 
 
-                    if (vehicles[i]->getType() == CARRIER)
+                    if (entities[i]->getType() == CARRIER)
                     {
                         char str[256];
                         sprintf(str, "Balaenidae Carrier has been destroyed !");
@@ -554,8 +551,9 @@ void update(int value)
                     }
 
 
-                    dBodyDisable(vehicles[i]->getBodyID());
-                    vehicles.erase(i);
+                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
+                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
+                    entities.erase(i);
 
                     explosion();
                 }
@@ -576,7 +574,7 @@ void update(int value)
 	}
     
 	glutPostRedisplay();
-    // @NOTE: update time should be adapted to real FPS.
+    // @NOTE: update time should be adapted to real FPS (lower is faster).
     glutTimerFunc(25, update, 0);
 }
 
@@ -621,24 +619,15 @@ int main(int argc, char** argv) {
     printf("ODE Configuration: %s\n", conf);
 
     // Draw vehicles and objects
-    printf("Size %d\n", vehicles.size());
-    synchronized(vehicles.m_mutex)
+    printf("Size %d\n", entities.size());
+    synchronized(entities.m_mutex)
     {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
+        for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
         {
-            printf("Index (%d) %d - %d\n", i, vehicles[i]->getType(), vehicles[i]->getTtl());
+            controlables.push_back(entities[i]);
+            printf("Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
         }
-    }
 
-    //vehicles.erase(4);
-
-    printf("Size %d\n", vehicles.size());
-    synchronized(vehicles.m_mutex)
-    {
-        for(size_t i=vehicles.first();vehicles.exists(i);i=vehicles.next(i))
-        {
-            printf("Body ID (%p) Index (%d) %d - %d\n", (void*)vehicles[i]->getBodyID(), i, vehicles[i]->getType(), vehicles[i]->getTtl());
-        }
     }
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());

@@ -46,6 +46,8 @@ protected:
 
     int status;
 
+    GLuint texture;
+
     void setTtl(int ttlvalue);
     
 public:
@@ -96,6 +98,7 @@ public:
     void wrapDynamics(dBodyID body);
     
     dBodyID virtual getBodyID();
+    dGeomID virtual getGeom();
 
     void setVector(float* V, Vec3f v);
     void setVector(float *V, dVector3 v);
@@ -122,6 +125,7 @@ public:
     void setStatus(int value);
     int getHealth() const;
     void damage(int d);
+    void setTexture(const GLuint &value);
 };
 
 #endif /* VEHICLE_H_ */
