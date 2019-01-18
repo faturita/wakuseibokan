@@ -357,7 +357,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     size_t id = entities.push_back(walrus);
                     messages.insert(messages.begin(), std::string("Walrus has been deployed."));
-                    printf("Id: %d\n",id );
                 }
             }
             break;

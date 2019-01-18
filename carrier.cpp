@@ -560,7 +560,7 @@ void update(int value)
     
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
-    glutTimerFunc(25, update, 0);
+    glutTimerFunc(1, update, 0);
 }
 
 

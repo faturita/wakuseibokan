@@ -392,6 +392,97 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
    if (n > 0) {
        for (i=0; i<n; i++) {
 
+           if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+           {
+                // Island reaction
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+
+
+                // Carrier stranded and Walrus arrived on island.
+                //if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
+                //if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
+                //if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                //if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+
+           } else
+           if (ground == contact[i].geom.g1 || ground == contact[i].geom.g2 ) {
+
+                // Water buyoncy reaction
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                contact[i].surface.mu = 0.0f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+                contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = .3f;
+
+                // Walrus reaching shore.
+                //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+
+           } else {
+                // Structure clashing (default behaviour is perfect for this!).
+
+               // Water buyoncy reaction
+               contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+               dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+               contact[i].surface.mu = 0.0f;
+               contact[i].surface.slip1 = 0.1f;
+               contact[i].surface.slip2 = 0.1f;
+               contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+               contact[i].surface.soft_cfm = .3f;
+           }
+
+
+
+           dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+           dJointAttach (c,
+                         dGeomGetBody(contact[i].geom.g1),
+                         dGeomGetBody(contact[i].geom.g2));
+       }
+   }
+}
+
+
+void nearCadllback (void *data, dGeomID o1, dGeomID o2)
+{
+   int i,n;
+
+   dBodyID b1,b2;
+
+   // only collide things with the ground
+   int g1 = (o1 == ground );
+   int g2 = (o2 == ground );
+   if (!(g1 ^ g2))
+   {
+       //printf ("Ground colliding..\n");
+
+       //return;
+   }
+
+
+   b1 = dGeomGetBody(o1);
+   b2 = dGeomGetBody(o2);
+   if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+   const int N = 10;
+   dContact contact[N];
+   n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+   if (n > 0) {
+       for (i=0; i<n; i++) {
+
            synchronized(entities.m_mutex)
            {
                Vehicle *v1=NULL,*v2=NULL;
@@ -554,6 +645,7 @@ void initWorldPopulation()
     _b->init();
     _b->setPos(0.0f,50.0f,-2200.0f);
     _b->embody(world,space);
+    _b->stop();
 
 
     // This is the enemy carrier.
@@ -683,9 +775,6 @@ void initWorldModelling()
     islands.push_back(nemesis);
     islands.push_back(atom);
     islands.push_back(island);
-
-    entities.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
-    entities.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
 
     /**
     entities.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));

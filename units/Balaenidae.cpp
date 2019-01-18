@@ -217,6 +217,8 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
         _walrus->setPos(pos[0],pos[1],pos[2]-450);
         _walrus->embody(world,space);
         _walrus->setStatus(0);
+        _walrus->stop();
+
         alignToMe(_walrus->getBodyID());
         v = (Vehicle*)_walrus;
     }
