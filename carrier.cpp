@@ -83,9 +83,6 @@ extern std::vector<std::string> messages;
 extern GLuint _textureBox;
 extern GLuint _textureMetal;
 
-
-std::vector<Vehicle*> controlables;
-
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -130,10 +127,10 @@ void drawHUD()
     
     float speed=0, health=0;
     
-    if (controller.controlling >0)
+    if (controller.controlling != CONTROLLING_NONE)
     {
-        speed = controlables[controller.controlling-1]->getSpeed();
-        health = controlables[controller.controlling-1]->getHealth();
+        speed = entities[controller.controlling]->getSpeed();
+        health = entities[controller.controlling]->getHealth();
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
@@ -297,18 +294,18 @@ void drawScene() {
     
     int ctrling = 0;
     
-    if (controller.controlling >0 )
+    if (controller.controlling != CONTROLLING_NONE )
     {
-        ctrling = controller.controlling-1;
-        controlables[ctrling]->getViewPort(up,pos,forward);
+        ctrling = controller.controlling;
+        entities[ctrling]->getViewPort(up,pos,forward);
         
         Vec3f up2,pos2;
         //Camera.getViewPort(up2,pos2,forward);
 
-        Camera.fw = controlables[ctrling]->getForward();
+        Camera.fw = entities[ctrling]->getForward();
 
-        if (controlables[ctrling]->getType() == 3)
-            Camera.yAngle = ((Manta*)controlables[ctrling])->alpha*100;
+        if (entities[ctrling]->getType() == MANTA)
+            Camera.yAngle = ((Manta*)entities[ctrling])->alpha*100;
     } else
     {
         Camera.getViewPort(up,pos,forward);
@@ -440,9 +437,9 @@ void update(int value)
     if (!controller.pause)
 	{
         
-        if (controller.controlling>0)
+        if (controller.controlling != CONTROLLING_NONE)
         {
-            controlables[controller.controlling-1]->doControl(controller);
+            entities[controller.controlling]->doControl(controller);
         }
 
         // This should be in the command center.
@@ -479,7 +476,6 @@ void update(int value)
                         island->addStructure(s,x,z,space,world);
 
                         entities.push_back(s);
-                        controlables.push_back(s);
 
                         if (8<=which && which<=10)
                         {
@@ -488,7 +484,6 @@ void update(int value)
                             island->addStructure(s2,x,z,space,world);
 
                             entities.push_back(s2);
-                            controlables.push_back(s2);
                         }
 
                         c->restart();
@@ -529,17 +524,8 @@ void update(int value)
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
                 {
-                    for(int j=0;j<controlables.size();j++)
-                    {
-                        if (controlables[j] == entities[i])
-                        {
-                            if (controller.controlling-1 == j)
-                                controller.controlling = 0;
-
-                            controlables.erase(controlables.begin() + j);
-
-                        }
-                    }
+                    if (controller.controlling == i)
+                        controller.controlling = CONTROLLING_NONE;
 
 
                     if (entities[i]->getType() == CARRIER)
@@ -623,7 +609,6 @@ int main(int argc, char** argv) {
     {
         for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
         {
-            controlables.push_back(entities[i]);
             printf("Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
         }
 
