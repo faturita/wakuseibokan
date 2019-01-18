@@ -684,6 +684,9 @@ void initWorldModelling()
     islands.push_back(atom);
     islands.push_back(island);
 
+    entities.push_back(thermopilae->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
+    entities.push_back(thermopilae->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
+
     /**
     entities.push_back(thermopilae->addStructure(new Turret()     ,         100.0f, -100.0f,space,world));
     entities.push_back(thermopilae->addStructure(new LaserTurret(),        -100.0f,  100.0f,space,world));

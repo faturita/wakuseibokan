@@ -142,18 +142,27 @@ void processMousePassiveMotion(int x, int y) {
 }
 
 
-void switchControl(size_t id)
+void switchControl(int controlposition)
 {
-    if (entities.isValid(id))
+    if (controlposition > entities.size())
     {
         controller.controlling = CONTROLLING_NONE;
         return;
     }
+    size_t id = entities.indexAt(controlposition);
+
+    if (!entities.isValid(id))
+    {
+        controller.controlling = CONTROLLING_NONE;
+        return;
+    }
+
     if (controller.controlling != CONTROLLING_NONE)
     {
         entities[controller.controlling]->setControlRegisters(controller.registers);
     }
-    controller.controlling = id-1;
+
+    controller.controlling = id;
     //controller.reset();
     controller.registers = entities[controller.controlling]->getControlRegisters();
 }
@@ -176,7 +185,7 @@ void list()
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
     {
-        printf("Body ID (%p) Index (%d) %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType());
+        printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
     }
 }
 
