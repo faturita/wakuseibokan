@@ -90,6 +90,8 @@ class MD2Model : public Model {
 		//Loads an MD2Model from the specified file.  Returns NULL if there was
 		//an error loading it.
         static MD2Model* loadModel(const char* filename);
+
+        void virtual setTexture(GLuint texture);
 };
 
 

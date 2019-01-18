@@ -341,7 +341,7 @@ MD2Model* MD2Model::loadModel(const char* filename) {
     md2model::readInt(input);                      //The number of bytes per frame
     int numTextures = md2model::readInt(input);    //The number of textures
 	if (numTextures != 1) {
-		printf ("There are more than one texture %d\n", numTextures);
+        //printf ("There are more than one texture %d\n", numTextures);
 		//return NULL;
 	}
     int numVertices = md2model::readInt(input);    //The number of vertices
@@ -364,17 +364,17 @@ MD2Model* MD2Model::loadModel(const char* filename) {
 	input.read(buffer, 64);
 	if (strlen(buffer) < 5 ||
 		strcmp(buffer + strlen(buffer) - 4, ".bmp") != 0) {
-		printf ("Texture is no a bmp file.\n");
+        //printf ("Texture is no a bmp file.\n");
 		//return NULL;
 	}
 
     // @FIXME: It should be incorporated to the texture model of the engine.
-	strcpy ( buffer, "vtr.bmp");
-	Image* image = loadBMP(buffer);
-    GLuint textureId = md2model::loadTexture(image);
-	delete image;
+    //strcpy ( buffer, "vtr.bmp");
+    //Image* image = loadBMP(buffer);
+    //GLuint textureId = md2model::loadTexture(image);
+    //delete image;
 	MD2Model* model = new MD2Model();
-	model->textureId = textureId;
+    //model->textureId = textureId;
 	
 	//Load the texture coordinates
 	input.seekg(texCoordOffset, ios_base::beg);
@@ -476,15 +476,20 @@ void MD2Model::advance(float dt) {
     //printf ("Time: %f\n", time);
 }
 
+void MD2Model::setTexture(GLuint texture)
+{
+    textureId = texture;
+}
 void MD2Model::draw(GLuint texture)
 {
     assert( 0 || !"Should not be executed.");
 }
 void MD2Model::draw() {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glEnable(GL_TEXTURE_2D);
+    //glBindTexture(GL_TEXTURE_2D, textureId);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
 	
 	//Figure out the two frames between which we are interpolating
 	int frameIndex1 = (int)(time * (endFrame - startFrame + 1)) + startFrame;
@@ -513,7 +518,7 @@ void MD2Model::draw() {
 	glBegin(GL_TRIANGLES);
 	for(int i = 0; i < numTriangles; i++) {
 		MD2Triangle* triangle = triangles + i;
-                glColor3f(i/((float)numTriangles),i/((float)numTriangles), i/((float)numTriangles));
+        glColor3f(i/((float)numTriangles),i/((float)numTriangles), i/((float)numTriangles));
 		for(int j = 0; j < 3; j++) {
 			MD2Vertex* v1 = frame1->vertices + triangle->vertices[j];
 			MD2Vertex* v2 = frame2->vertices + triangle->vertices[j];
@@ -524,11 +529,13 @@ void MD2Model::draw() {
 			}
 			glNormal3f(normal[0], normal[1], normal[2]);
 			
+            //@FIXME The model has no tex coordinates so it wont work here.
 			MD2TexCoord* texCoord = texCoords + triangle->texCoords[j];
 			glTexCoord2f(texCoord->texCoordX, texCoord->texCoordY);
 			glVertex3f(pos[0], pos[1], pos[2]);
 		}
 	}
+    //glDisable(GL_TEXTURE_2D);
 	glEnd();
 }
 

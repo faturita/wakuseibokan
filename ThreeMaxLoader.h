@@ -69,7 +69,7 @@ typedef struct {
          void setFilename(const char* p_filename);
          void setLocation(float x,float y,float z);
          void setScale(float scalex,float scaley, float scalez);
-         void setTexture(GLuint texture);
+         void virtual setTexture(GLuint texture);
          void setObject(obj_type object);
 
          //Switches to the given animation

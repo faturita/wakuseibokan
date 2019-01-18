@@ -35,7 +35,9 @@ void Walrus::init()
 {
     _model = (Model*)MD2Model::loadModel("walrusgood.md2");
     if (_model != NULL)
+    {
         _model->setAnimation("run");
+    }
     else
     	printf ("Model has been initialized");
 
@@ -83,6 +85,7 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //doMaterial();
 
+        _model->setTexture(texture);
         _model->draw();
 
         glPopMatrix();
