@@ -4,11 +4,12 @@ CC = g++
 CFLAGS = -w -g -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
-SRCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp keplerivworld.cpp carrier.cpp
+SRCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp testbox.cpp carrier.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 
-TESTSRC = opengltemplate.cpp openglutils.cpp imageloader.cpp
+
+TESTSRCS = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 

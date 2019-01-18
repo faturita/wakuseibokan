@@ -145,6 +145,7 @@ void Balaenidae::doDynamics()
 
 void Balaenidae::doDynamics(dBodyID body)
 {
+    /**
     Vec3f Ft;
 
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
@@ -170,6 +171,8 @@ void Balaenidae::doDynamics(dBodyID body)
     // Buyoncy
     //if (pos[1]<0.0f)
     //    dBodyAddRelForce(me,0.0,9.81*20050.0f,0.0);
+
+    **/
 
     wrapDynamics(body);
 }
