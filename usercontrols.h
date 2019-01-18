@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+#define CONTROLLING_NONE -1
+
 struct controlregister
 {
     // R+,F-
@@ -29,7 +31,7 @@ class Controller
 public:
     
 	// Device ID to be controller.
-    int controlling=0;
+    size_t controlling=CONTROLLING_NONE;
     
 	// Index to Observable interfaces.
 	int camera;

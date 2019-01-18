@@ -72,6 +72,38 @@ template<class T> T container<T>::operator[](size_t index)
     return t;
 }
 
+template <class T> size_t container<T>::indexAt(int position)
+{
+    size_t i=0;
+    int count=0;
+    for(i=0;i<MAX;i++)
+    {
+        if (elem[i] != NULL)
+            count++;
+
+        if (count == position)
+            break;
+    }
+
+    return i;
+}
+
+template <class T> int container<T>::indexOf(size_t element)
+{
+    size_t i=0;
+    int count=0;
+    for(i=0;i<MAX;i++)
+    {
+        if (elem[i] != NULL)
+            count++;
+
+        if (i == element)
+            return count;
+    }
+
+    return 0;
+}
+
 template<class T> size_t container<T>::size()
 {
     size_t i=0;

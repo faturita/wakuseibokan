@@ -43,8 +43,6 @@ Controller controller;
 
 extern std::vector<std::string> messages;
 
-extern std::vector<Vehicle*> controlables;
-
 extern container<Vehicle*> entities;
 
 // Mouse offset for camera zoom in and out.
@@ -144,21 +142,53 @@ void processMousePassiveMotion(int x, int y) {
 }
 
 
-void switchControl(int id)
+void switchControl(int controlposition)
 {
-    if (id>controlables.size())
+    if (controlposition > entities.size())
     {
-        controller.controlling = 0;
+        controller.controlling = CONTROLLING_NONE;
         return;
     }
-    if (controller.controlling != 0)
+    size_t id = entities.indexAt(controlposition);
+
+    if (!entities.isValid(id))
     {
-        controlables[controller.controlling-1]->setControlRegisters(controller.registers);
+        controller.controlling = CONTROLLING_NONE;
+        return;
     }
+
+    if (controller.controlling != CONTROLLING_NONE)
+    {
+        entities[controller.controlling]->setControlRegisters(controller.registers);
+    }
+
     controller.controlling = id;
     //controller.reset();
-    controller.registers = controlables[controller.controlling-1]->getControlRegisters();
+    controller.registers = entities[controller.controlling]->getControlRegisters();
 }
+
+
+Manta* findManta(int status)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getStatus() == status)
+        {
+            return (Manta*)v;
+        }
+    }
+    return NULL;
+}
+
+void list()
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
+    }
+}
+
 
 
 
@@ -184,18 +214,12 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("taxi") != std::string::npos)
             {
-                Balaenidae *r = (Balaenidae*)controlables[controller.controlling-1];
-                for(int i=0;i<controlables.size();i++)
+                Balaenidae *r = (Balaenidae*)entities[controller.controlling];
+                Manta *m = findManta(3);
+                if (m)
                 {
-                    if (controlables[i]->getType() == 3)
-                    {
-                        Manta *m = (Manta*)controlables[i];
-                        if (m->getStatus() == 0)
-                        {
-                            r->taxi(m);
-                            messages.insert(messages.begin(), std::string("Manta is ready for launch."));
-                        }
-                    }
+                    r->taxi(m);
+                    messages.insert(messages.begin(), std::string("Manta is ready for launch."));
                 }
             }
             else
@@ -203,26 +227,19 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 //const char* content = controller.str.substr(7).c_str();
 
-                Balaenidae *b = (Balaenidae*)controlables[controller.controlling-1];
-
-                for(int i=0;i<controlables.size();i++)
+                Balaenidae *b = (Balaenidae*)entities[controller.controlling];
+                Manta *m = findManta(0);
+                if (m)
                 {
-                    if (controlables[i]->getType() == 3)
-                    {
-                        Manta *m = (Manta*)controlables[i];
-                        if (m->getStatus() == 0)
-                        {
-                            b->launch(m);
-                            messages.insert(messages.begin(), std::string("Manta has launched."));
-                            takeoff();
-                        }
-                    }
+                    b->launch(m);
+                    messages.insert(messages.begin(), std::string("Manta has departed."));
+                    takeoff();
                 }
 
             } else
             if (controller.str.find("command") != std::string::npos)
             {
-                Walrus *w = (Walrus*) controlables[controller.controlling-1];
+                Walrus *w = (Walrus*) entities[controller.controlling];
                 // Chek if walrus is on island.
                 BoxIsland *island = w->getIsland();
                 int x = (rand() % 2000 + 1); x -= 1000;
@@ -230,14 +247,10 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
                 entities.push_back(s);
-                controlables.push_back(s);
             } else
             if (controller.str.find("list") != std::string::npos)
             {
-                for(int i=0;i<controlables.size();i++)
-                {
-                    printf("Body ID (%p) Index (%d) %d\n", (void*)controlables[i]->getBodyID(), i, controlables[i]->getType());
-                }
+                list();
             } else
 
             if (strcmp(controller.str.c_str(),"map")==0)
@@ -282,11 +295,11 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'F':controller.registers.thrust+=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
-        case 'j':controlables[controller.controlling-1]->setEnableAI();break;
-        case 'J':controlables[controller.controlling-1]->setDisableAI();break;
+        case 'j':entities[controller.controlling]->setEnableAI();break;
+        case 'J':entities[controller.controlling]->setDisableAI();break;
 
         case '0':
-        	controller.controlling = 0;
+            controller.controlling = CONTROLLING_NONE;
             controller.reset();
             Camera.reset();
         break;
@@ -307,38 +320,26 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 't':controller.teletype = true;break;
         case 'S':
             {
-            Vehicle *v = controlables[controller.controlling-1];
+            Vehicle *v = entities[controller.controlling];
             v->stop();
             break;
             }
         case 'm':
             {
-            Vehicle *manta = (controlables[controller.controlling-1])->spawn(world,space,MANTA);
+            Vehicle *manta = (entities[controller.controlling])->spawn(world,space,MANTA);
             if (manta != NULL)
                 entities.push_back(manta);
-                controlables.push_back(manta);
-                messages.insert(messages.begin(), std::string("Manta is ready for launching."));
+                messages.insert(messages.begin(), std::string("Manta is ready to takeoff."));
             }
             break;
         case 'M':
             {
                 synchronized(entities.m_mutex)
                 {
-                    for(int i=0;i<controlables.size();i++)
-                    {
-                        if (controlables[i]->getType() == 3)
-                        {
-                            Manta *m = (Manta*)controlables[i];
-                            if (m->getStatus() == 0)
-                            {
-                                controlables.erase(controlables.begin() + i);
-                            }
-                        }
-                    }
                     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (entities[i]->getType()==3 && entities[i]->getStatus()==0)
+                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==0)
                         {
                             //printf("Eliminating....\n");
                             dBodyDisable(entities[i]->getBodyID());
@@ -351,29 +352,19 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case 'o':
             {
-            Vehicle *walrus = (controlables[controller.controlling-1])->spawn(world,space,WALRUS);
-            if (walrus != NULL)
-                entities.push_back(walrus);
-                controlables.push_back(walrus);
-                messages.insert(messages.begin(), std::string("Walrus has been deployed."));
-                printf("Position: %d\n", controlables.size());
+                Vehicle *walrus = (entities[controller.controlling])->spawn(world,space,WALRUS);
+                if (walrus != NULL)
+                {
+                    size_t id = entities.push_back(walrus);
+                    messages.insert(messages.begin(), std::string("Walrus has been deployed."));
+                    printf("Id: %d\n",id );
+                }
             }
             break;
         case 'O':
             {
                 synchronized(entities.m_mutex)
                 {
-                    for(int i=0;i<controlables.size();i++)
-                    {
-                        if (controlables[i]->getType() == WALRUS)
-                        {
-                            Walrus *w = (Walrus*)controlables[i];
-                            if (w->getStatus() == Walrus::SAILING)
-                            {
-                                controlables.erase(controlables.begin() + i);
-                            }
-                        }
-                    }
                     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
@@ -389,7 +380,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
         break;
         case 'h':
-            Vehicle *action = (controlables[controller.controlling-1])->fire(world,space);
+            Vehicle *action = (entities[controller.controlling])->fire(world,space);
             //int *idx = new int();
             //*idx = vehicles.push_back(action);
             //dBodySetData( action->getBodyID(), (void*)idx);

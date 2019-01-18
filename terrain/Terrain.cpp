@@ -182,7 +182,7 @@ void BoxIsland::draw()
 Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world)
 {
     // This should be half the height of the structure. @FIXME
-    float heightOffset = 5.0+_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+    float heightOffset = 40.0+_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
     structure->init();
     structure->setPos(X+x,heightOffset,Z+z);
     structure->embody(world,space);
