@@ -10,7 +10,7 @@
 
 #include "Vehicle.h"
 
-enum MANTASTATUS {IN_CARRIER, ON_DECK, LANDED, FLYING};
+enum MANTASTATUS {IN_CARRIER, ON_DECK, LANDED, TAKINGOFF,FLYING};
 
 class Manta : public Vehicle
 {
@@ -18,8 +18,6 @@ protected:
     int number;
 
 public:
-    static const int LANDED = 0;
-
     bool antigravity;
 
 	float rudder;

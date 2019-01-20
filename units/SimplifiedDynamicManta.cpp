@@ -38,16 +38,17 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
     setThrottle(-controller.registers.thrust*2*5);
 
-    if (getThrottle()>20)
+    if (getThrottle()>200 && inert)
     {
         Manta::inert = false;
         antigravity = false;
-        setStatus(1);
+        setStatus(TAKINGOFF);
     }
 
-    if (getThrottle()>60)
+    if (getThrottle()>600)
     {
-        setStatus(2);
+        setStatus(FLYING);
+        // @NOTE: Eventually remove island...
     }
 
     // roll

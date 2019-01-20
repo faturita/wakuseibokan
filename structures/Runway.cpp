@@ -16,8 +16,8 @@ void Runway::init()
         _model->setAnimation("run");
 
     Structure::height=2;
-    Structure::length=20;
-    Structure::width=1000;
+    Structure::length=1000;
+    Structure::width=20;
 
     setForward(0,0,1);
 }

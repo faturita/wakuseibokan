@@ -99,7 +99,7 @@ Vehicle* gVehicle(dBodyID body)
     return NULL;
 }
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure*s2, dGeomID g1, dGeomID g2)
+void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
     {
@@ -112,17 +112,13 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1
         {
             v2 = vehicle;
         }
-        if (vehicle->getBodyID()==NULL)
+        if (vehicle->getGeom() == g1 && vehicle->getType() > COLLISIONABLE)
         {
-            Structure *s= (Structure*)entities[i];
-            if (s->getGeom() == g1)
-            {
-                s1 = s;
-            }
-            if (s->getGeom() == g2)
-            {
-                s2 = s;
-            }
+            s1 = (Structure*)vehicle;
+        }
+        if (vehicle->getGeom() == g2 && vehicle->getType() > COLLISIONABLE)
+        {
+            s2 = (Structure*)vehicle;
         }
 
     }
@@ -180,17 +176,22 @@ bool arrived(Vehicle *walrus, Island *island)
 // SYNC
 bool landed(Vehicle *manta, Island *island)
 {
-    if (manta && island && manta->getType() == 3)
+    if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() != 0)
+        if (manta->getStatus() == FLYING)
         {
             char str[256];
             sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
             messages.insert(messages.begin(), str);
-            manta->setStatus(Manta::LANDED);
-            manta->setThrottle(0.0f);
+
             controller.reset();
-            manta->doControl(controller);
+            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)manta;
+            struct controlregister c;
+            c.thrust = 0.0f;
+            c.pitch = 0.0f;
+            s->setControlRegisters(c);
+            s->setThrottle(0.0f);
+            s->setStatus(LANDED);
         }
     }
     return true;
@@ -245,14 +246,19 @@ bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == MANTA)
     {
-        if (vehicle->getStatus() != 0 && vehicle->getStatus() != 1)
+        if (vehicle->getStatus() != ON_DECK && vehicle->getStatus() != TAKINGOFF)
         {
-            vehicle->inert = true;
             controller.reset();
-            vehicle->setStatus(0);
-            vehicle->doControl(controller);
-            vehicle->setThrottle(0.0f);
-            messages.insert(messages.begin(), std::string("Manta has re landed on Aircraft."));
+
+            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
+            struct controlregister c;
+            c.thrust = 0.0f;
+            c.pitch = 0.0f;
+            s->setControlRegisters(c);
+            s->setThrottle(0.0f);
+            s->setStatus(ON_DECK);
+            s->inert = true;
+            messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
         }
     }
     return true;
@@ -339,6 +345,18 @@ bool inline isRunway(Structure* s)
     return false;
 }
 
+bool inline isRunway(dGeomID candidate)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *vehicle = entities[i];
+        if (vehicle && vehicle->getGeom() == candidate && vehicle->getType()==LANDINGABLE)
+        {
+            return true;
+        }
+    }
+}
+
 Island* getIsland(dGeomID candidate)
 {
     for (int j=0;j<islands.size();j++)
@@ -366,13 +384,16 @@ bool inline groundcollisions(Vehicle *vehicle)
 {
     if (vehicle)
     {
-        if (vehicle->getSpeed()>100 and vehicle->getType() == MANTA)
+        if (vehicle->getSpeed()>70 and vehicle->getType() == MANTA)
         {
             explosion();
-            controller.reset();
-            vehicle->doControl(controller);
-            vehicle->setThrottle(0.0f);
-            vehicle->damage(200);
+            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
+            struct controlregister c;
+            c.thrust = 0.0f;
+            c.pitch = 0.0f;
+            s->setControlRegisters(c);
+            s->setThrottle(0.0f);
+            s->damage(1);
         }
     }
     return true;
@@ -399,7 +420,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     int g2 = (o2 == ground );
     if (!(g1 ^ g2))
     {
-        printf ("Ground colliding..\n");
+        //printf ("Ground colliding..\n");
 
         //return;
     }
@@ -420,6 +441,34 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
+            if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
+                 ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
+                {
+                // Manta landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+            } else
+            if  (isRunway(s1) || isRunway(s2))
+            {
+                // Manta landing on Runways.
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+
+                contact[i].surface.mu = 0.99f;
+                contact[i].surface.slip1 = 0.9f;
+                contact[i].surface.slip2 = 0.9f;
+                contact[i].surface.bounce = 0.2f;
+
+                if ( isRunway(s1) && isManta(v2) && landed(v2, s1->island)) {}
+                if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
+
+            } else
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
             {
                  // Island reaction
@@ -471,6 +520,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
                 contact[i].surface.soft_cfm = .3f;
                 **/
+                if (v1 && isManta(v1) && groundcollisions(v1)) {}
+                if (v2 && isManta(v2) && groundcollisions(v2)) {}
             }
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
@@ -543,7 +594,7 @@ void test2()
     _manta1->embody(world, space);
     _manta1->setStatus(0);
     _manta1->inert = true;
-    _manta1->setStatus(2);
+    _manta1->setStatus(FLYING);
     _manta1->elevator = +12;
     struct controlregister c;
     c.thrust = 1500.0f/(-10.0);
@@ -552,6 +603,16 @@ void test2()
     _manta1->setThrottle(1500.0f);
 
     entities.push_back(_manta1);
+}
+
+void test3()
+{
+    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
+}
+void test4()
+{
+    entities.push_back(islands[0]->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
 }
 
 
@@ -596,12 +657,12 @@ void checktest1(unsigned long timer)
 }
 void checktest2(unsigned long timer)
 {
-    if (timer>2500)
+    if (timer==2500)
     {
         Vehicle *_b = entities[1];
         _b->stop();
     }
-    if (timer>4500)
+    if (timer==4500)
     {
         Vehicle *_b = entities[1];
         Vec3f val = _b->getPos();
@@ -639,6 +700,110 @@ void checktest2(unsigned long timer)
     }
 }
 
+
+void checktest3(unsigned long timer)
+{
+    if (timer==620)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = -4;
+        struct controlregister c;
+        c.thrust = 400.0f/(-10.0);
+        c.pitch = -4;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+    }
+    if (timer==1000)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+
+        if (_manta1->getHealth()==1000)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(-1);
+        }
+    }
+}
+
+void checktest4(unsigned long  timer)
+{
+    if (timer==720)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = -4;
+        struct controlregister c;
+        c.thrust = 400.0f/(-10.0);
+        c.pitch = -4;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->setStatus(FLYING);
+    }
+    if (timer==1000)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+
+        if (_manta1->getStatus()!=LANDED)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(-1);
+        }
+    }
+}
+
+
+void checktest5(unsigned long  timer)
+{
+    if (timer==240)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = -4;
+        struct controlregister c;
+        c.thrust = 400.0f/(-10.0);
+        c.pitch = -4;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->setStatus(FLYING);
+    }
+    if (timer==265)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = -4;
+        struct controlregister c;
+        c.thrust = 0.0f/(-10.0);
+        c.pitch = 0;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(0.0f);
+        _manta1->stop();
+        _manta1->setStatus(FLYING);
+    }
+    if (timer==1000)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+
+        if (_manta1->getStatus()!=ON_DECK)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(-1);
+        }
+    }
+
+}
+
 void initWorldModelling()
 {
     /* create world */
@@ -671,6 +836,9 @@ void initWorldModelling()
 
     test1();
     test2();
+    test3();
+    test4();
+
 }
 
 void update(int value);
@@ -695,5 +863,9 @@ void worldStep(int value)
 
     //checktest1(timer);
     //checktest2(timer);
+    //checktest3(timer);
+
+    //checktest4(timer);
+    //checktest5(timer);
 
 }
