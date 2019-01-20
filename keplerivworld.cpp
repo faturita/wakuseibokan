@@ -10,8 +10,6 @@
 
 #define dSINGLE
 
-#define kmf *1000.0f
-
 #include <vector>
 #include <mutex>
 #include <unordered_map>

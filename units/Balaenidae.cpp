@@ -145,7 +145,6 @@ void Balaenidae::doDynamics()
 
 void Balaenidae::doDynamics(dBodyID body)
 {
-    /**
     Vec3f Ft;
 
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
@@ -172,7 +171,31 @@ void Balaenidae::doDynamics(dBodyID body)
     //if (pos[1]<0.0f)
     //    dBodyAddRelForce(me,0.0,9.81*20050.0f,0.0);
 
-    **/
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    dVector3 O;
+    dBodyGetRelPointPos( body, 0,0,0, O);
+
+    dVector3 F;
+    dBodyGetRelPointPos( body, 0,0,1, F);
+
+    F[0] = (F[0]-O[0]);
+    F[1] = (F[1]-O[1]);
+    F[2] = (F[2]-O[2]);
+
+    Vec3f vec3fF;
+    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    speed = vec3fV.magnitude();
+
+    VERIFY(speed, me);
+
+    vec3fV = vec3fV * 0.02f;
+
+    dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
 
     wrapDynamics(body);
 }

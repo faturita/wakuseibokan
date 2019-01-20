@@ -20,6 +20,8 @@ carrier.cpp
 carrier.h
 container.cpp
 container.h
+engine.cpp
+engine.h
 font/DrawFonts.cpp
 font/DrawFonts.h
 imageloader.cpp

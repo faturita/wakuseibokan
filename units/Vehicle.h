@@ -28,7 +28,7 @@ private:
     int health = 1000;
 
 protected:
-	Vec3f pos;
+    Vec3f pos;
     Model* _model;
 	float speed;
 	float R[12];
@@ -44,7 +44,7 @@ protected:
 
     bool aienable = false;
 
-    int status;
+    int status=0;
 
     GLuint texture;
 

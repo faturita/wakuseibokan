@@ -22,12 +22,13 @@
 #define RADIdUS (0.1732f)	/* sphere radius */
 #define RADIUS (1.0f)
 
+#define kmf *1000.0f
 
 void nearCallback (void *data, dGeomID o1, dGeomID o2);
 void _nearCallback (void *data, dGeomID o1, dGeomID o2);
 
 void initWorldModelling();
-
+void worldStep(int value);
 void endWorldModelling();
 
 // **********************************************************************

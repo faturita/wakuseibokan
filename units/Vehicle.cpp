@@ -30,6 +30,16 @@ Vehicle::Vehicle()
 
     memset(&myCopy,0,sizeof(struct controlregister));
     Vehicle::speed = 0;
+
+    pos = Vec3f(0.0f,0.0f,0.0f);
+
+    _model = NULL;
+    speed = 0.0f;
+
+    forward = Vec3f(0.0f,0.0f,1.0f);
+    throttle=0.0f;
+
+    steering=0.0f;
 }
 
 Vehicle::~Vehicle()

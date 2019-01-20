@@ -560,7 +560,7 @@ void update(int value)
     
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
-    glutTimerFunc(1, update, 0);
+    glutTimerFunc(1, worldStep, 0);
 }
 
 
@@ -569,7 +569,9 @@ void update(int value)
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-    srand (time(NULL));
+    //srand (time(NULL));
+
+    srand(0);
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)
@@ -638,7 +640,7 @@ int main(int argc, char** argv) {
 	glutEntryFunc(processMouseEntry);
     
 	// this is the first time to call to update.
-	glutTimerFunc(25, update, 0);  
+    glutTimerFunc(1, worldStep, 0);
     
 	// main loop, hang here.
 	glutMainLoop();
