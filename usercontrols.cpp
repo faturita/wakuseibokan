@@ -295,8 +295,8 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'F':controller.registers.thrust+=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
-        case 'j':entities[controller.controlling]->setEnableAI();break;
-        case 'J':entities[controller.controlling]->setDisableAI();break;
+        case 'j':entities[controller.controlling]->enableAuto();break;
+        case 'J':entities[controller.controlling]->disableAuto();break;
 
         case '0':
             controller.controlling = CONTROLLING_NONE;

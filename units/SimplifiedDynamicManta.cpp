@@ -28,20 +28,37 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
     Manta::param[1] = 2;
 }
 
+void SimplifiedDynamicManta::doControl()
+{
+    doControl(myCopy);
+}
+
 void SimplifiedDynamicManta::doControl(Controller controller)
+{
+    doControl(controller.registers);
+
+    for(int i=0;i<10;i++)
+    {
+        if (controller.param[i]!=0)
+            Manta::param[i] = controller.param[i];
+    }
+}
+
+
+void SimplifiedDynamicManta::doControl(struct controlregister regs)
 {
     //engine[0] = -controller.roll;
     //engine[1] = controller.yaw;
     //engine[2] = -controller.pitch;
     //steering = -controller.precesion;
 
-    setThrottle(-controller.registers.thrust*2*5);
+    setThrottle(-regs.thrust*2*5);
 
     if (getThrottle()>200 && inert)
     {
         Manta::inert = false;
         antigravity = false;
-        setStatus(TAKINGOFF);
+        setStatus(Manta::TACKINGOFF);
     }
 
     if (getThrottle()>600)
@@ -51,20 +68,14 @@ void SimplifiedDynamicManta::doControl(Controller controller)
     }
 
     // roll
-    Manta::aileron = controller.registers.roll;
+    Manta::aileron = regs.roll;
 
     // pitch
-    Manta::elevator = controller.registers.pitch;
+    Manta::elevator = regs.pitch;
 
     //Manta::rudder = controller.precesion*0.1;
 
-    Manta::rudder = controller.registers.precesion;
-
-    for(int i=0;i<10;i++)
-    {
-        if (controller.param[i]!=0)
-            Manta::param[i] = controller.param[i];
-    }
+    Manta::rudder = regs.precesion;
 
 }
 
@@ -242,8 +253,8 @@ Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
 
-    action->setPos(position[0],position[1],position[2]);
     action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 

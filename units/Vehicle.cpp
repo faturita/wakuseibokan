@@ -80,6 +80,7 @@ void Vehicle::setPos(const Vec3f &newpos)
 	pos[1] = newpos[1];
 	pos[2] = newpos[2];
 
+    assert( me != NULL || !"Setting position without setting the body!");
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 void Vehicle::setPos(float x, float y, float z)
@@ -88,6 +89,7 @@ void Vehicle::setPos(float x, float y, float z)
 	pos[1] = y;
 	pos[2] = z;
 
+    assert( me != NULL || !"Setting position without setting the body!");
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 Vec3f Vehicle::getPos()
@@ -128,12 +130,12 @@ bool Vehicle::isAuto()
 {
     return Vehicle::aienable;
 }
-void Vehicle::setEnableAI()
+void Vehicle::enableAuto()
 {
     Vehicle::aienable = true;
 }
 
-void Vehicle::setDisableAI()
+void Vehicle::disableAuto()
 {
     Vehicle::aienable = false;
 }

@@ -106,14 +106,20 @@ void Balaenidae::embody(dBodyID myBodySelf)
 
 }
 
+void Balaenidae::doControl(struct controlregister regs)
+{
+    if (getThrottle()==0 and regs.thrust != 0)
+        honk();
+    setThrottle(-regs.thrust*2*5);
+
+    Balaenidae::rudder = -regs.roll;
+}
+
 void Balaenidae::doControl(Controller controller)
 {
-    if (getThrottle()==0 and controller.registers.thrust != 0)
-        honk();
-    setThrottle(-controller.registers.thrust*2*5);
-
-    Balaenidae::rudder = -controller.registers.roll;
+    doControl(controller.registers);
 }
+
 
 void Balaenidae::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
@@ -229,8 +235,9 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
     {
         SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
         _manta1->init();
-        _manta1->setPos(pos[0],pos[1]+50, pos[2]);
+        _manta1->setNumber(1);
         _manta1->embody(world, space);
+        _manta1->setPos(pos[0],pos[1]+50, pos[2]);
         _manta1->setStatus(0);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
@@ -240,8 +247,8 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
         Walrus *_walrus = new Walrus();
         _walrus->init();
         _walrus->setNumber(1);
-        _walrus->setPos(pos[0],pos[1],pos[2]-450);
         _walrus->embody(world,space);
+        _walrus->setPos(pos[0],pos[1],pos[2]-450);
         _walrus->setStatus(0);
         _walrus->stop();
 

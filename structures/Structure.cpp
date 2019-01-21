@@ -18,6 +18,23 @@ int Structure::getType()
     return COLLISIONABLE;
 }
 
+void Structure::setPos(const Vec3f &newpos)
+{
+    pos[0] = newpos[0];
+    pos[1] = newpos[1];
+    pos[2] = newpos[2];
+
+    dGeomSetPosition(geom, pos[0], pos[1], pos[2]);
+}
+void Structure::setPos(float x, float y, float z)
+{
+    pos[0] = x;
+    pos[1] = y;
+    pos[2] = z;
+
+    dGeomSetPosition(geom, pos[0], pos[1], pos[2]);
+}
+
 void  Structure::doDynamics(dBodyID) {
     // Nothing to do
 }

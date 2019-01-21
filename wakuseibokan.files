@@ -73,6 +73,7 @@ terrain/island.h
 terrain/main.cpp
 terrain/vec3f.cpp
 terrain/vec3f.h
+testall.cpp
 testbed.cpp
 testbox.cpp
 units/Balaenidae.cpp

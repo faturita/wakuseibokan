@@ -29,6 +29,9 @@ public:
 
     void embody(dBodyID myBodySelf);
 
+    void virtual setPos(const Vec3f &newpos);
+    void virtual setPos(float x, float y, float z);
+
     void  doDynamics(dBodyID);
     void  doDynamics();
 

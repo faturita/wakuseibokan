@@ -74,6 +74,8 @@ extern  Controller controller;
 
 static dGeomID platform, ground;
 
+unsigned long timer=0;
+
 dWorldID world;
 dSpaceID space;
 dBodyID body[NUM];
@@ -148,7 +150,7 @@ bool departed(Vehicle *walrus)
     {
         Walrus *w = (Walrus*)walrus;
 
-        w->setStatus(Walrus::SAILING);
+        w->setStatus(Walrus::OFFSHORING);
         BoxIsland *island = w->getIsland();
         w->setIsland(NULL);
         char str[256];
@@ -161,11 +163,11 @@ bool departed(Vehicle *walrus)
 // SYNC
 bool arrived(Vehicle *walrus, Island *island)
 {
-    if (island && walrus && walrus->getType() == WALRUS && walrus->getStatus() != Walrus::ROLLING)
+    if (island && walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::SAILING)
     {
         Walrus *w = (Walrus*)walrus;
 
-        w->setStatus(Walrus::ROLLING);
+        w->setStatus(Walrus::INSHORING);
         w->setIsland((BoxIsland*)island);
         char str[256];
         sprintf(str, "Walrus has arrived to %s.", island->getName().c_str());
@@ -179,7 +181,7 @@ bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() == FLYING)
+        if (manta->getStatus() == Manta::FLYING)
         {
             char str[256];
             sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
@@ -192,7 +194,7 @@ bool landed(Vehicle *manta, Island *island)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(LANDED);
+            s->setStatus(Manta::LANDED);
         }
     }
     return true;
@@ -247,7 +249,7 @@ bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == MANTA)
     {
-        if (vehicle->getStatus() != ON_DECK && vehicle->getStatus() != TAKINGOFF)
+        if (vehicle->getStatus() != Manta::ON_DECK && vehicle->getStatus() != Manta::TACKINGOFF)
         {
             controller.reset();
 
@@ -257,7 +259,7 @@ bool releasecontrol(Vehicle* vehicle)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(ON_DECK);
+            s->setStatus(Manta::ON_DECK);
             s->inert = true;
             messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
         }
@@ -380,6 +382,21 @@ bool inline isIsland(dGeomID candidate)
     return false;
 }
 
+
+// @FIXME Check the island !
+CommandCenter* findCommandCenter()
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == CONTROL)
+        {
+            return (CommandCenter*)v;
+        }
+    }
+    return NULL;
+}
+
 // SYNC
 bool inline groundcollisions(Vehicle *vehicle)
 {
@@ -394,7 +411,7 @@ bool inline groundcollisions(Vehicle *vehicle)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->damage(500);
+            s->damage(1);
         }
     }
     return true;
@@ -506,8 +523,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.soft_cfm = .3f;
 
                  // Walrus reaching shore.
-                 //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
-                 //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+                 if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                 if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
 
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
@@ -582,8 +599,8 @@ void test1()
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae();
     _b->init();
-    _b->setPos(0.0f,20.5f,-4000.0f);
     _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
     entities.push_back(_b);
@@ -598,7 +615,7 @@ void test2()
     _manta1->embody(world, space);
     _manta1->setStatus(0);
     _manta1->inert = true;
-    _manta1->setStatus(FLYING);
+    _manta1->setStatus(Manta::FLYING);
     _manta1->elevator = +12;
     struct controlregister c;
     c.thrust = 1500.0f/(-10.0);
@@ -638,6 +655,45 @@ void test7()
     Camera.setPos(pos);
 }
 
+void test8()
+{
+    Walrus *_walrus = new Walrus();
+
+    _walrus->init();
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->embody(world, space);
+    _walrus->setStatus(Walrus::SAILING);
+    struct controlregister c;
+    c.thrust = 200.0f;
+    c.roll = 0;
+    _walrus->setControlRegisters(c);
+    _walrus->setThrottle(200.0f);
+
+    entities.push_back(_walrus);
+}
+
+void test9()
+{
+    Walrus *_walrus = new Walrus();
+    _walrus->init();
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->embody(world, space);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+}
+
+void test10()
+{
+    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS);
+    if (walrus != NULL)
+    {
+        size_t id = entities.push_back(walrus);
+        messages.insert(messages.begin(), std::string("Walrus has been deployed."));
+    }
+}
+
 
 void checktest1(unsigned long timer)
 {
@@ -674,7 +730,7 @@ void checktest1(unsigned long timer)
         } else {
             printf("Test passed OK!\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 }
@@ -744,7 +800,7 @@ void checktest3(unsigned long timer)
         } else {
             printf("Test succedded\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 }
@@ -760,13 +816,13 @@ void checktest4(unsigned long  timer)
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
-        _manta1->setStatus(FLYING);
+        _manta1->setStatus(Manta::FLYING);
     }
     if (timer==1000)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
 
-        if (_manta1->getStatus()!=LANDED)
+        if (_manta1->getStatus()!=Manta::LANDED)
         {
             printf("Test failed.\n");
             endWorldModelling();
@@ -774,7 +830,7 @@ void checktest4(unsigned long  timer)
         } else {
             printf("Test succedded\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 }
@@ -791,7 +847,7 @@ void checktest5(unsigned long  timer)
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
-        _manta1->setStatus(FLYING);
+        _manta1->setStatus(Manta::FLYING);
     }
     if (timer==265)
     {
@@ -803,13 +859,13 @@ void checktest5(unsigned long  timer)
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(0.0f);
         _manta1->stop();
-        _manta1->setStatus(FLYING);
+        _manta1->setStatus(Manta::FLYING);
     }
     if (timer==1000)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
 
-        if (_manta1->getStatus()!=ON_DECK)
+        if (_manta1->getStatus()!=Manta::ON_DECK)
         {
             printf("Test failed.\n");
             endWorldModelling();
@@ -817,7 +873,7 @@ void checktest5(unsigned long  timer)
         } else {
             printf("Test succedded\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 
@@ -877,7 +933,7 @@ void checktest6(unsigned long timer)
         } else {
             printf("Test passed OK!\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 }
@@ -895,7 +951,7 @@ void checktest7(unsigned long  timer)
         c.pitch = 0;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(350.0f);
-        _manta1->setStatus(FLYING);
+        _manta1->setStatus(Manta::FLYING);
     }
     if (timer==900)
     {
@@ -909,9 +965,185 @@ void checktest7(unsigned long  timer)
         } else {
             printf("Test succedded\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
+
+}
+
+
+void checktest8(unsigned long  timer)
+{
+    static bool isWalrusInIsland = false;
+    static bool didWalrusLeftIsland = false;
+
+    if (timer>100)
+    {
+        Walrus *_walrus = (Walrus*)entities[1];
+
+        if (_walrus->getIsland() != NULL)
+        {
+            isWalrusInIsland = true;
+        }
+
+        if (_walrus->getStatus() == Walrus::OFFSHORING)
+        {
+            didWalrusLeftIsland = true;
+        }
+    }
+
+    if (timer>=3500)
+    {
+        Walrus *_walrus = (Walrus*)entities[1];
+
+        if (!isWalrusInIsland)
+        {
+            printf("Test failed: Walrus has not associated island.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (!didWalrusLeftIsland) {
+            printf("Test failed: Walrus never left the island.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
+
+
+void checktest9(unsigned long timer)
+{
+    if (timer>500)
+    {
+        Vehicle *_b = entities[1];
+        Vec3f posVector = _b->getPos()-Vec3f(200.0f,1.32f,-6000.0f);
+
+        dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
+        Vec3f vec3fV;
+        vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+
+        dReal *av = (dReal *)dBodyGetAngularVel(_b->getBodyID());
+        Vec3f vav;
+        vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
+
+        if (posVector.magnitude()>100)
+        {
+            printf("Test failed: Walrus is not in their expected position.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (vav.magnitude()>10)
+        {
+            printf("Test failed: Walrus is still moving.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (vec3fV.magnitude()>5)
+        {
+            printf("Test failed: Walrus is still circling.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+}
+
+void checktest10(unsigned long timer)
+{
+    static unsigned long timerstep = 0;
+    Walrus *_walrus = (Walrus*)entities[1];
+
+    static int stateMachine = 0;
+
+    if (timer == 100)
+    {
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 0.0f;
+        c.roll = 20.0f;
+        _walrus->setControlRegisters(c);
+    }
+
+
+    if (timer == 275)
+    {
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 0.0f;
+        c.roll = 0.0f;
+        _walrus->setControlRegisters(c);
+        _walrus->stop();
+    }
+
+    if (timer == 300)
+    {
+
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 200.0f;
+        c.roll = -1;
+        _walrus->setControlRegisters(c);
+        _walrus->setThrottle(200.0f);
+    }
+
+    if (stateMachine == 0 && _walrus->getStatus()==Walrus::ROLLING)
+    {
+        timerstep = timer;
+        stateMachine = 1;
+    }
+
+    if (stateMachine == 1 && timerstep>0 && timer == (timerstep + 50))
+    {
+        struct controlregister c;
+        c.thrust = 0.0f;
+        c.roll = 0;
+        _walrus->setControlRegisters(c);
+        _walrus->setThrottle(0.0f);
+        _walrus->stop();
+
+        timerstep = timer;
+        stateMachine = 2;
+    }
+
+    if (stateMachine == 2 && timerstep>0 && timer == (timerstep + 150))
+    {
+        BoxIsland *island = _walrus->getIsland();
+        int x = (rand() % 2000 + 1); x -= 1000;
+        int z = (rand() % 2000 + 1); z -= 1000;
+
+        Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
+        entities.push_back(s);
+
+        timerstep = timer;
+        stateMachine = 3;
+    }
+
+    if (stateMachine == 3 && timerstep>0 && timer == (timerstep + 100))
+    {
+        CommandCenter *c = findCommandCenter();
+
+        if (!c)
+        {
+            printf("Test failed: CommandCenter was not built on the island.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+
 
 }
 
@@ -956,6 +1188,10 @@ void initWorldModelling(int testcase)
     case 5:initIslands();test1();test2();break;// Manta landing on aircraft
     case 6:initIslands();test1();test6();break;// Carrier stranded on island
     case 7:test1();test2();test7();break; //Manta crashing on water.
+    case 8:initIslands();test1();test8();break; // Walrus reaching island.
+    case 9:test1();test9();break; // Walrus stability.
+    case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
+    case 11:initIslands();test1();test10();break;
     default:break;
     }
 
@@ -964,19 +1200,6 @@ void initWorldModelling(int testcase)
 }
 
 void update(int value);
-
-void endWorldModelling()
-{
-    dJointGroupDestroy (contactgroup);
-    dSpaceDestroy (space);
-    dWorldDestroy (world);
-    dCloseODE();
-
-    printf("God knows his rules and he has determined that this world must be terminated.\n");
-    printf("The World has been terminated.\n");
-}
-
-unsigned long timer=0;
 
 void worldStep(int value)
 {
@@ -992,7 +1215,23 @@ void worldStep(int value)
     case 5:checktest5(timer);break;
     case 6:checktest6(timer);break;
     case 7:checktest7(timer);break;
+    case 8:checktest8(timer);break;
+    case 9:checktest9(timer);break;
+    case 10:checktest10(timer);break;
+    default: break;
     }
 
-
 }
+
+void endWorldModelling()
+{
+    dJointGroupDestroy (contactgroup);
+    dSpaceDestroy (space);
+    dWorldDestroy (world);
+    dCloseODE();
+
+    printf("God knows his rules and he has determined that this world must be terminated.\n");
+    printf("The World has been terminated.\n");
+}
+
+

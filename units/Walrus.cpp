@@ -101,11 +101,22 @@ void Walrus::drawModel()
 	drawModel(0,0,pos[0],pos[1]+1.0,pos[2]);
 }
 
+void Walrus::doControl()
+{
+    doControl(myCopy);
+}
+
 void Walrus::doControl(Controller controller)
-{ 
+{
+    doControl(controller.registers);
+
+}
+
+void Walrus::doControl(struct controlregister conts)
+{
     static bool didit = false;
 
-    setThrottle(-controller.registers.thrust);
+    setThrottle(conts.thrust);
 
     if (getThrottle()>=10 && getThrottle()<=20 and !didit)
     {
@@ -114,7 +125,7 @@ void Walrus::doControl(Controller controller)
     } else if (getThrottle()==0)
         didit = false;
     
-    xRotAngle = controller.registers.roll;
+    xRotAngle = conts.roll;
     
 }
 
@@ -194,6 +205,11 @@ void Walrus::doDynamics(dBodyID body)
     speed = vec3fV.magnitude();
 
     VERIFY(speed, me);
+
+    if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
+        setStatus(Walrus::SAILING);
+    else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
+        setStatus(Walrus::ROLLING);
 
 	Vec3f dump;
 	if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
@@ -276,5 +292,13 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
 
     // I can set power or something here.
     return (Vehicle*)action;
+}
+
+void Walrus::setStatus(int status)
+{
+    if (status == Walrus::OFFSHORING || status == Walrus::INSHORING)
+        setTtl(500);
+
+    Vehicle::status = status;
 }
 

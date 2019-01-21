@@ -91,8 +91,8 @@ Vehicle* LaserTurret::fire(dWorldID world, dSpaceID space)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
 
-    action->setPos(position[0],position[1],position[2]);
     action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 

@@ -19,6 +19,8 @@ protected:
     BoxIsland *island;
 
 public:
+    static const int INSHORING = 3;
+    static const int OFFSHORING = 2;
     static const int ROLLING = 1;
     static const int SAILING = 0;
 
@@ -30,7 +32,10 @@ public:
 	void doMaterial();
 	void virtual doDynamics(dBodyID);
     void doDynamics();
+
     void doControl(Controller controller);
+    void doControl();
+    void doControl(struct controlregister cons);
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
@@ -41,6 +46,8 @@ public:
 
     BoxIsland *getIsland() const;
     void setIsland(BoxIsland *value);
+
+    void virtual setStatus(int status);
 };
 
 #endif /* WALRUS_H_ */

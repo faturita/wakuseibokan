@@ -184,8 +184,8 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     // This should be half the height of the structure. @FIXME
     float heightOffset = 5.0+_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
     structure->init();
-    structure->setPos(X+x,heightOffset,Z+z);
     structure->embody(world,space);
+    structure->setPos(X+x,heightOffset,Z+z);
     structure->onIsland(this);
 
     // @NOTE: when the structure is destroyed this pointer must be eliminated.

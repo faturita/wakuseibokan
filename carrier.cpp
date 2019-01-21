@@ -439,7 +439,8 @@ void update(int value)
         
         if (controller.controlling != CONTROLLING_NONE)
         {
-            entities[controller.controlling]->doControl(controller);
+            if (!entities[controller.controlling]->isAuto())
+                entities[controller.controlling]->doControl(controller);
         }
 
         // This should be in the command center.
@@ -552,7 +553,7 @@ void update(int value)
         dWorldStep (world,0.05);
         
 
-        //dWorldQuickStep()
+        //dWorldQuickStep(world,0.05);
 
 		/* remove all contact joints */
 		dJointGroupEmpty (contactgroup);

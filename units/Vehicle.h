@@ -64,8 +64,8 @@ public:
 	float getSpeed();
 	void setXRotAngle(float xRotAngle);
 	void setYRotAngle(float yRotAngle);
-	void setPos(const Vec3f &newpos);
-	void setPos(float x, float y, float z);
+    void virtual setPos(const Vec3f &newpos);
+    void virtual setPos(float x, float y, float z);
 	Vec3f getPos();
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
@@ -119,8 +119,8 @@ public:
     void tick();
 
     bool isAuto();
-    void setEnableAI();
-    void setDisableAI();
+    void enableAuto();
+    void disableAuto();
 
     virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type);
 
