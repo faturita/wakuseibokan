@@ -598,10 +598,10 @@ int main(int argc, char** argv) {
     printf ("OpenGL version supported: %s\n", version);
 
     // Initialize ODE, create islands, structures and populate the world.
-    if (argc>1 && strcmp(argv[1],"-test"))
-        initWorldModelling();
+    if (argc>1 && strcmp(argv[1],"-test")==0)
+        initWorldModelling(atoi(argv[2]));
     else
-        initWorldModelling();
+        initWorldModelling(-1);
 
     const char *conf = dGetConfiguration ();
 

@@ -79,12 +79,16 @@ void Vehicle::setPos(const Vec3f &newpos)
 	pos[0] = newpos[0];
 	pos[1] = newpos[1];
 	pos[2] = newpos[2];
+
+    if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 void Vehicle::setPos(float x, float y, float z)
 {
 	pos[0] = x;
 	pos[1] = y;
 	pos[2] = z;
+
+    if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 Vec3f Vehicle::getPos()
 {

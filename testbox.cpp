@@ -66,6 +66,7 @@
 
 #include "map.h"
 
+extern  Camera Camera;
 
 extern  Controller controller;
 
@@ -393,7 +394,7 @@ bool inline groundcollisions(Vehicle *vehicle)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->damage(1);
+            s->damage(500);
         }
     }
     return true;
@@ -508,6 +509,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  //if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
                  //if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
 
+                 if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
+                 if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
+
             } else {
                 /**
                 // Water buyoncy reaction
@@ -616,19 +620,38 @@ void test4()
 }
 
 
+
+void test6()
+{
+    Vec3f pos(0.0f,10.0f,-4400.0f);
+    Camera.setPos(pos);
+
+    Balaenidae *b = (Balaenidae*)entities[0];
+
+    b->setPos(0.0f,20.5f,-3000.0f);
+
+}
+
+void test7()
+{
+    Vec3f pos(0.0f,10.0f,-3700.0f);
+    Camera.setPos(pos);
+}
+
+
 void checktest1(unsigned long timer)
 {
     if (timer>500)
     {
         Vehicle *_b = entities[0];
-        Vec3f val = _b->getPos();
+        Vec3f val = _b->getPos()-Vec3f(0.0f,20.5f,-4000.0f);
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
         Vec3f vec3fV;
         vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
 
 
-        dReal *av = (dReal *)dBodyGetLinearVel(_b->getBodyID());
+        dReal *av = (dReal *)dBodyGetAngularVel(_b->getBodyID());
         Vec3f vav;
         vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
 
@@ -637,7 +660,7 @@ void checktest1(unsigned long timer)
             printf("Test failed.\n");
             endWorldModelling();
             exit(-1);
-        } else if (vav.magnitude()>5)
+        } else if (vav.magnitude()>10)
         {
             printf("Test failed.\n");
             endWorldModelling();
@@ -657,12 +680,17 @@ void checktest1(unsigned long timer)
 }
 void checktest2(unsigned long timer)
 {
-    if (timer==2500)
+    if (timer==850)
     {
-        Vehicle *_b = entities[1];
-        _b->stop();
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = -4;
+        struct controlregister c;
+        c.thrust = 0.0f/(-10.0);
+        c.pitch = -4;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(0.0f);
     }
-    if (timer==4500)
+    if (timer==1200)
     {
         Vehicle *_b = entities[1];
         Vec3f val = _b->getPos();
@@ -672,30 +700,21 @@ void checktest2(unsigned long timer)
         vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
 
 
-        dReal *av = (dReal *)dBodyGetLinearVel(_b->getBodyID());
-        Vec3f vav;
-        vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
-
-        if (val.magnitude()>100)
+        if (val[1]<4.0f)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
-        } else if (vav.magnitude()>5)
-        {
-            printf("Test failed.\n");
+            printf("Test failed: Height bellow expected.\n");
             endWorldModelling();
             exit(-1);
         } else if (vec3fV.magnitude()>5)
         {
-            printf("Test failed.\n");
+            printf("Test failed: Object is moving.\n");
             endWorldModelling();
             exit(-1);
 
         } else {
             printf("Test passed OK!\n");
             endWorldModelling();
-            exit(-1);
+            exit(1);
         }
     }
 }
@@ -804,7 +823,101 @@ void checktest5(unsigned long  timer)
 
 }
 
-void initWorldModelling()
+void checktest6(unsigned long timer)
+{
+    static bool isOffshoring = false;
+
+    if (timer==100)
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+        struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
+        c.thrust = 10000.0f;
+        c.pitch = 0;
+        c.roll = 10;
+        b->stop();
+        b->setControlRegisters(c);
+        b->setThrottle(1000.0f);
+    }
+    if (timer >100 )
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+
+        if (b->getStatus()==Balaenidae::OFFSHORING)
+        {
+            isOffshoring = true;
+        }
+    }
+    if (timer==3800)
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+
+        Vehicle *_b = entities[0];
+        Vec3f val = _b->getPos();
+
+        dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
+        Vec3f vec3fV;
+        vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+
+        dReal *av = (dReal *)dBodyGetLinearVel(_b->getBodyID());
+        Vec3f vav;
+        vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
+
+        if (!isOffshoring){
+            printf("Test failed: Carrier never offshored.\n");
+            endWorldModelling();
+            exit(-1);
+        }
+        if (b->getStatus() != Balaenidae::SAILING || vav.magnitude()>100)
+        {
+            printf("Test failed: Carrier is still moving.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(-1);
+        }
+    }
+}
+
+
+void checktest7(unsigned long  timer)
+{
+
+    if (timer==380)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        _manta1->elevator = +14;
+        struct controlregister c;
+        c.thrust = 3500.0f/(-10.0);
+        c.pitch = 0;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(350.0f);
+        _manta1->setStatus(FLYING);
+    }
+    if (timer==900)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+
+        if (_manta1->getHealth()==1000)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(-1);
+        }
+    }
+
+}
+
+static int testing=-1;
+
+void initWorldModelling(int testcase)
 {
     /* create world */
     dRandSetSeed(1);
@@ -832,12 +945,21 @@ void initWorldModelling()
 
     ground = dCreatePlane (space,0,1,0,0);
 
-    initIslands();
 
-    test1();
-    test2();
-    test3();
-    test4();
+
+    switch(testcase)
+    {
+    case 1:initIslands();test1();break;// Carrier stability
+    case 2:initIslands();test1();test2();break;// Manta landing on island.
+    case 3:initIslands();test1();test2();test3();break;// Manta crashing on structure
+    case 4:initIslands();test1();test2();test3();test4();break;// Manta landing on runway
+    case 5:initIslands();test1();test2();break;// Manta landing on aircraft
+    case 6:initIslands();test1();test6();break;// Carrier stranded on island
+    case 7:test1();test2();test7();break; //Manta crashing on water.
+    default:break;
+    }
+
+    testing = testcase;
 
 }
 
@@ -861,11 +983,16 @@ void worldStep(int value)
     timer++;
     update(value);
 
-    //checktest1(timer);
-    //checktest2(timer);
-    //checktest3(timer);
+    switch(testing)
+    {
+    case 1:checktest1(timer);break;
+    case 2:checktest2(timer);break;
+    case 3:checktest3(timer);break;
+    case 4:checktest4(timer);break;
+    case 5:checktest5(timer);break;
+    case 6:checktest6(timer);break;
+    case 7:checktest7(timer);break;
+    }
 
-    //checktest4(timer);
-    //checktest5(timer);
 
 }

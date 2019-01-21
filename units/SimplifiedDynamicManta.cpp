@@ -35,7 +35,6 @@ void SimplifiedDynamicManta::doControl(Controller controller)
     //engine[2] = -controller.pitch;
     //steering = -controller.precesion;
 
-
     setThrottle(-controller.registers.thrust*2*5);
 
     if (getThrottle()>200 && inert)
