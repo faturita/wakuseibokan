@@ -1,6 +1,6 @@
 Excited warfare on the seas of a Kepler IV.
 
-The time has come to conquer Kepler IV.
+The time has come to conquer Kepler IV.   Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU). 
 
 ![Manta taking off](screenshot1.png)
 
@@ -84,8 +84,7 @@ echo "Installation complete."
 
 Next steps
 ----------
-* Adding Structures.
-* Improving viewport for Camera.
+* Resolve issues: the open architecture based on ODE generates too many glitches in the game.  In such a way, the game has too many degrees of freedom that needs to be constrained.
 
 
 Issues and missing stuff
@@ -104,7 +103,7 @@ Issues and missing stuff
 * 3DS Engine has been incorporated so I can now use 3DS models!!!!
 * Walrus mechanics works but can be improved, and the texture of the Walrus is broken again.
     * Walrus control, although it works, can be improved also.
-* OpenAL is not working very well on Mac Sierra and it is hard to find good samples.
+* New library for sound-support.
     * I am using TEMPORARILY system calls and afplay.
 * Manta
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
