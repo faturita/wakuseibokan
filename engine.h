@@ -36,11 +36,13 @@
 
 #include "actions/Gunshot.h"
 
+enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
+
 // SYNC
 Vehicle* gVehicle(dBodyID body);
 
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure*s2, dGeomID g1, dGeomID g2);
+void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
 
 // SYNC
@@ -73,52 +75,56 @@ bool hit(Structure* structure);
 bool releasecontrol(Vehicle* vehicle);
 
 
-void inline releasecontrol(dBodyID body);
+void  releasecontrol(dBodyID body);
 
 
 // SYNC
-bool inline isType(Vehicle *vehicle, int type);
+bool  isType(Vehicle *vehicle, int type);
 
 
 
-bool inline isType(dBodyID body, int type);
+bool  isType(dBodyID body, int type);
 
 
-bool inline isManta(dBodyID body);
+bool  isManta(dBodyID body);
 
 
-bool inline isManta(Vehicle* vehicle);
+bool  isManta(Vehicle* vehicle);
 
 
-bool inline isCarrier(dBodyID body);
+bool  isCarrier(dBodyID body);
 
 
-bool inline isCarrier(Vehicle* vehicle);
+bool  isCarrier(Vehicle* vehicle);
 
 
-bool inline isWalrus(Vehicle* vehicle);
+bool  isWalrus(Vehicle* vehicle);
 
 
-bool inline isAction(dBodyID body);
+bool  isAction(dBodyID body);
 
 
-bool inline isAction(Vehicle* vehicle);
+bool  isAction(Vehicle* vehicle);
 
 
 
-bool inline isRunway(Structure* s);
+bool  isRunway(Structure* s);
 
 
 Island* getIsland(dGeomID candidate);
 
 
-bool inline isIsland(dGeomID candidate);
+bool  isIsland(dGeomID candidate);
 
 
 // SYNC
-bool inline groundcollisions(Vehicle *vehicle);
+bool  groundcollisions(Vehicle *vehicle);
 
-void inline groundcollisions(dBodyID body);
+void  groundcollisions(dBodyID body);
+
+CommandCenter* findCommandCenter();
+Manta* findManta(int status);
+void list();
 
 
 #endif // ENGINE_H

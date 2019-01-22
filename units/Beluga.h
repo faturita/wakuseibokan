@@ -6,7 +6,7 @@
 class Beluga : public Balaenidae
 {
 public:
-    Beluga();
+    Beluga(int faction);
 };
 
 #endif // BELUGA_H

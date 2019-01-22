@@ -1,6 +1,6 @@
 #include "Beluga.h"
 
-Beluga::Beluga()
+Beluga::Beluga(int faction) : Balaenidae(faction)
 {
 
 }

@@ -37,9 +37,14 @@
 #include "camera.h"
 
 #include "openglutils.h"
+#include "odeutils.h"
+
+#include "imageloader.h"
+#include "terrain/Terrain.h"
 
 #include "sounds/sounds.h"
 
+#include "engine.h"
 #include "keplerivworld.h"
 
 #include "units/Vehicle.h"
@@ -50,11 +55,6 @@
 #include "units/SimplifiedDynamicManta.h"
 
 #include "actions/Gunshot.h"
-
-#include "odeutils.h"
-
-#include "imageloader.h"
-#include "terrain/Terrain.h"
 
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
@@ -88,344 +88,6 @@ std::vector<BoxIsland*> islands;
 std::vector<std::string> messages;
 
 
-// SYNC
-Vehicle* gVehicle(dBodyID body)
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == body)
-        {
-            return vehicle;
-        }
-    }
-    return NULL;
-}
-
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == b1)
-        {
-            v1 = vehicle;
-        }
-        if (vehicle->getBodyID() == b2)
-        {
-            v2 = vehicle;
-        }
-        if (vehicle->getGeom() == g1 && vehicle->getType() > COLLISIONABLE)
-        {
-            s1 = (Structure*)vehicle;
-        }
-        if (vehicle->getGeom() == g2 && vehicle->getType() > COLLISIONABLE)
-        {
-            s2 = (Structure*)vehicle;
-        }
-
-    }
-}
-
-// SYNC
-bool stranded(Vehicle *carrier, Island *island)
-{
-    if (island && carrier && carrier->getType() == 4 && carrier->getStatus() != Balaenidae::OFFSHORING)
-    {
-        Balaenidae *b = (Balaenidae*)carrier;
-
-        b->offshore();
-        controller.reset();
-        b->doControl(controller);
-        b->setStatus(Balaenidae::OFFSHORING);
-        char str[256];
-        sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
-    }
-}
-
-bool departed(Vehicle *walrus)
-{
-    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::ROLLING)
-    {
-        Walrus *w = (Walrus*)walrus;
-
-        w->setStatus(Walrus::OFFSHORING);
-        BoxIsland *island = w->getIsland();
-        w->setIsland(NULL);
-        char str[256];
-        sprintf(str, "Walrus has departed from %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
-    }
-    return true;
-}
-
-// SYNC
-bool arrived(Vehicle *walrus, Island *island)
-{
-    if (island && walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::SAILING)
-    {
-        Walrus *w = (Walrus*)walrus;
-
-        w->setStatus(Walrus::INSHORING);
-        w->setIsland((BoxIsland*)island);
-        char str[256];
-        sprintf(str, "Walrus has arrived to %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
-    }
-    return true;
-}
-
-// SYNC
-bool landed(Vehicle *manta, Island *island)
-{
-    if (manta && island && manta->getType() == MANTA)
-    {
-        if (manta->getStatus() == Manta::FLYING)
-        {
-            char str[256];
-            sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
-            messages.insert(messages.begin(), str);
-
-            controller.reset();
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)manta;
-            struct controlregister c;
-            c.thrust = 0.0f;
-            c.pitch = 0.0f;
-            s->setControlRegisters(c);
-            s->setThrottle(0.0f);
-            s->setStatus(Manta::LANDED);
-        }
-    }
-    return true;
-}
-
-// SYNC
-bool isMineFire(Vehicle* vehicle, Gunshot *g)
-{
-    return (g->getOrigin() == vehicle->getBodyID());
-}
-
-// SYNC
-bool hit(Vehicle *vehicle, Gunshot *g)
-{
-    /**   Sending too many messages hurts FPS
-    if (vehicle && vehicle->getType() == CARRIER)
-    {
-        messages.insert(messages.begin(), std::string("Carrier is under fire!"));
-    }
-    if (vehicle && vehicle->getType() == MANTA)
-    {
-        messages.insert(messages.begin(), std::string("Manta is under fire!"));
-    }
-    if (vehicle && vehicle->getType() == WALRUS)
-    {
-        messages.insert(messages.begin(), std::string("Walrus is under fire!"));
-    }
-    **/
-
-    // Dont hit me
-    if (g->getOrigin() != vehicle->getBodyID())
-    {
-        vehicle->damage(2);
-        return false;
-    }
-    return true;
-}
-
-bool hit(Structure* structure)
-{
-    if (structure)
-    {
-        //char str[256];
-        //sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
-        //messages.insert(messages.begin(), str);
-    }
-    structure->damage(2);
-}
-
-// SYNC
-bool releasecontrol(Vehicle* vehicle)
-{
-    if (vehicle && vehicle->getType() == MANTA)
-    {
-        if (vehicle->getStatus() != Manta::ON_DECK && vehicle->getStatus() != Manta::TACKINGOFF)
-        {
-            controller.reset();
-
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
-            struct controlregister c;
-            c.thrust = 0.0f;
-            c.pitch = 0.0f;
-            s->setControlRegisters(c);
-            s->setThrottle(0.0f);
-            s->setStatus(Manta::ON_DECK);
-            s->inert = true;
-            messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
-        }
-    }
-    return true;
-}
-
-void inline releasecontrol(dBodyID body)
-{
-    synchronized(entities.m_mutex)
-    {
-        Vehicle* vehicle = gVehicle(body);
-        releasecontrol(vehicle);
-    }
-}
-
-
-// SYNC
-bool inline isType(Vehicle *vehicle, int type)
-{
-    bool result = false;
-    if (vehicle)
-    {
-        if (vehicle->getType() == type)
-        {
-            result = true;
-        }
-    }
-    return result;
-}
-
-
-bool inline isType(dBodyID body, int type)
-{
-    bool result = false;
-    synchronized(entities.m_mutex)
-    {
-        Vehicle *vehicle = gVehicle(body);
-        result = isType(vehicle,type);
-    }
-    return result;
-}
-
-bool inline isManta(dBodyID body)
-{
-    return isType(body,3);
-}
-
-bool inline isManta(Vehicle* vehicle)
-{
-    return isType(vehicle,3);
-}
-
-bool inline isCarrier(dBodyID body)
-{
-    return isType(body, 4);
-}
-
-bool inline isCarrier(Vehicle* vehicle)
-{
-    return isType(vehicle,4);
-}
-
-bool inline isWalrus(Vehicle* vehicle)
-{
-    return isType(vehicle, WALRUS);
-}
-
-bool inline isAction(dBodyID body)
-{
-    return isType(body, 5);
-}
-
-bool inline isAction(Vehicle* vehicle)
-{
-    return isType(vehicle, 5);
-}
-
-
-bool inline isRunway(Structure* s)
-{
-    if (s && s->getType()==LANDINGABLE)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool inline isRunway(dGeomID candidate)
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle && vehicle->getGeom() == candidate && vehicle->getType()==LANDINGABLE)
-        {
-            return true;
-        }
-    }
-}
-
-Island* getIsland(dGeomID candidate)
-{
-    for (int j=0;j<islands.size();j++)
-    {
-        if (candidate == islands[j]->getGeom())
-            return islands[j];
-    }
-    return NULL;
-}
-
-bool inline isIsland(dGeomID candidate)
-{
-    for (int j=0;j<islands.size();j++)
-    {
-        if (candidate == islands[j]->getGeom())
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-// @FIXME Check the island !
-CommandCenter* findCommandCenter()
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        Vehicle *v=entities[i];
-        if (v->getType() == CONTROL)
-        {
-            return (CommandCenter*)v;
-        }
-    }
-    return NULL;
-}
-
-// SYNC
-bool inline groundcollisions(Vehicle *vehicle)
-{
-    if (vehicle)
-    {
-        if (vehicle->getSpeed()>70 and vehicle->getType() == MANTA)
-        {
-            explosion();
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
-            struct controlregister c;
-            c.thrust = 0.0f;
-            c.pitch = 0.0f;
-            s->setControlRegisters(c);
-            s->setThrottle(0.0f);
-            s->damage(1);
-        }
-    }
-    return true;
-}
-
-void inline groundcollisions(dBodyID body)
-{
-    synchronized(entities.m_mutex)
-    {
-        Vehicle *vehicle = gVehicle(body);
-        groundcollisions(vehicle);
-    }
-}
-
 
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -448,6 +110,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
 
+    if (b1 && isAction(b1) && b2 && isType(b2,WALRUS) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
+    if (b2 && isAction(b2) && b1 && isType(b1,WALRUS) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+
     const int N = 10;
     dContact contact[N];
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
@@ -459,6 +124,38 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
+            // Bullets
+            if ((isAction(v1) && isWalrus(v2) && isMineFire(v2,(Gunshot*)v1))
+                ||
+               (isAction(v2) && isWalrus(v1) && isMineFire(v1,(Gunshot*)v2)))
+            {
+                // Water buyoncy reaction
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                contact[i].surface.mu = 0.0f;
+                contact[i].surface.slip1 = 1.0f;
+                contact[i].surface.slip2 = 1.0f;
+                contact[i].surface.soft_erp = 1.0f;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 1.0f;
+            } else
+            if ( isAction(v1) || isAction(v2))
+            {
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mu = 0;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && s2 && hit(s2)) {}
+                if (isAction(v2) && s1 && hit(s1)) {}
+            } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
                 {
@@ -611,8 +308,8 @@ void test2()
     SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
 
     _manta1->init();
-    _manta1->setPos(0.0f,20.5f,-6000.0f);
     _manta1->embody(world, space);
+    _manta1->setPos(0.0f,20.5f,-6000.0f);
     _manta1->setStatus(0);
     _manta1->inert = true;
     _manta1->setStatus(Manta::FLYING);
@@ -660,8 +357,8 @@ void test8()
     Walrus *_walrus = new Walrus();
 
     _walrus->init();
-    _walrus->setPos(200.0f,1.32f,-6000.0f);
     _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
     _walrus->setStatus(Walrus::SAILING);
     struct controlregister c;
     c.thrust = 200.0f;
@@ -676,8 +373,8 @@ void test9()
 {
     Walrus *_walrus = new Walrus();
     _walrus->init();
-    _walrus->setPos(200.0f,1.32f,-6000.0f);
     _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
@@ -1149,6 +846,10 @@ void checktest10(unsigned long timer)
 
 static int testing=-1;
 
+void initWorldModelling()
+{
+    initWorldModelling(-1);
+}
 void initWorldModelling(int testcase)
 {
     /* create world */
@@ -1191,8 +892,8 @@ void initWorldModelling(int testcase)
     case 8:initIslands();test1();test8();break; // Walrus reaching island.
     case 9:test1();test9();break; // Walrus stability.
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
-    case 11:initIslands();test1();test10();break;
-    default:break;
+    case 11:initIslands();test1();test10();break; //
+    default:initIslands();test1();break;
     }
 
     testing = testcase;

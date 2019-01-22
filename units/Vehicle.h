@@ -27,6 +27,8 @@ private:
 
     int health = 1000;
 
+    int faction=-1;
+
 protected:
     Vec3f pos;
     Model* _model;
@@ -49,6 +51,8 @@ protected:
     GLuint texture;
 
     void setTtl(int ttlvalue);
+
+    void setFaction(int newfaction);
     
 public:
     bool inert;
@@ -131,6 +135,8 @@ public:
     void setTexture(const GLuint &value);
 
     void VERIFY(float f, dBodyID who);
+
+    int getFaction();
 };
 
 #endif /* VEHICLE_H_ */

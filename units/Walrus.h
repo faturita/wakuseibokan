@@ -13,6 +13,11 @@
 
 class Walrus : public Vehicle
 {
+private:
+    float height;
+    float width;
+    float length;
+
 protected:
     int number;
 

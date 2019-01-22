@@ -420,6 +420,13 @@ void Vehicle::wrapDynamics(dBodyID body)
     const dReal *dBodyPosition = dBodyGetPosition(body);
     const dReal *dBodyRotation = dBodyGetRotation(body);
 
+    Vec3f newpos(dBodyPosition[0], dBodyPosition[1], dBodyPosition[2]);
+
+    if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
+    {
+        assert(!"System is unstable.");
+    }
+    VERIFY(speed,body);
 
     setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     setLocation((float *)dBodyPosition, (float *)dBodyRotation);
@@ -455,6 +462,16 @@ void Vehicle::alignToMe(dBodyID fBodyID)
 
 }
 
+void Vehicle::setFaction(int newfaction)
+{
+    faction = newfaction;
+}
+
+int Vehicle::getFaction()
+{
+    return faction;
+}
+
 /**
  * Check model consistencies.
  *
@@ -469,5 +486,8 @@ void Vehicle::VERIFY(float speed, dBodyID who)
 {
     if (speed>1000.0f)
         stop(who);
+
+
+
     return;
 }

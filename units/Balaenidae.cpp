@@ -13,9 +13,10 @@ Balaenidae::~Balaenidae()
     delete _model;
 }
 
-Balaenidae::Balaenidae()
+Balaenidae::Balaenidae(int newfaction)
 {
-
+    // Choose your own side.
+    setFaction(newfaction);
 }
 
 void Balaenidae::init()
@@ -263,6 +264,7 @@ void Balaenidae::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
     dBodySetPosition(m->getBodyID(),pos[0],pos[1]+10,pos[2]);
+    m->setStatus(Manta::ON_DECK);
 }
 
 void Balaenidae::launch(Manta* m)

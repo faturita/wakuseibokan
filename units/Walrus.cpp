@@ -43,6 +43,10 @@ void Walrus::init()
 
     setForward(0,0,1);
 
+    Walrus::height=4.0f;
+    Walrus::width=5.0f;
+    Walrus::length=10.0f;
+
 }
 
 int Walrus::getType()
@@ -84,8 +88,10 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         //doMaterial();
+        drawRectangularBox(width, height, length);
 
         _model->setTexture(texture);
+        glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 
         glPopMatrix();
@@ -154,7 +160,7 @@ void Walrus::embody(dWorldID world, dSpaceID space)
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
     //geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
-    geom = dCreateBox( space, 4.0f, 2.64f, 7.0f);
+    geom = dCreateBox( space, width, height, length);
     //geom = dCreateBox (space,10.0f,2.0f,30.0f);
     dGeomSetBody(geom, me);
 }
@@ -164,11 +170,9 @@ void Walrus::embody(dBodyID myBodySelf)
     dMass m;
     
     float myMass = 20.0f;
-    float radius = 2.64f;
-    float length = 7.0f;
     
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,4.0f, 2.64f, 7.0f);
+    dMassSetBox(&m,1,width,height,length);
     //dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
@@ -236,20 +240,7 @@ void Walrus::doDynamics(dBodyID body)
 	dBodyAddRelForce (body,0, 0,getThrottle());
 	dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
 
-	// This should be after the world step
-	/// stuff
-    dVector3 result;
-
-    dBodyVectorToWorld(body, 0,0,1,result);
-    setForward(result[0],result[1],result[2]);
-
-	const dReal *dBodyPosition = dBodyGetPosition(body);
-	const dReal *dBodyRotation = dBodyGetRotation(body);
-
-	setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
-	setLocation((float *)dBodyPosition, (float *)dBodyRotation);
-
-
+    wrapDynamics(body);
 }
 
 
@@ -261,7 +252,7 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
     action->setOrigin(me);
 
     Vec3f position = getPos();
-    position[1] += 0.0f; // Move upwards to the center of the real rotation.
+    position[1] += .5f; // Move upwards to the center of the real rotation.
     forward = getForward();
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
@@ -285,8 +276,8 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
 
-    action->setPos(position[0],position[1],position[2]);
     action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 

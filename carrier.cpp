@@ -537,6 +537,7 @@ void update(int value)
                     }
 
 
+                    // Disable bodies and geoms.  The update will take care of the object later to delete it.
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
                     entities.erase(i);
@@ -602,7 +603,7 @@ int main(int argc, char** argv) {
     if (argc>1 && strcmp(argv[1],"-test")==0)
         initWorldModelling(atoi(argv[2]));
     else
-        initWorldModelling(-1);
+        initWorldModelling();
 
     const char *conf = dGetConfiguration ();
 

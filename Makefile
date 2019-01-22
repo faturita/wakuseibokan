@@ -4,10 +4,14 @@ CC = g++
 CFLAGS = -w -g -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
-SRCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp testbox.cpp carrier.cpp
-OBJS = $(SRCS:.cpp=.o)
+SCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp engine.cpp 
+SRCS = $(SCS) keplerivworld.cpp testbox.cpp carrier.cpp
 
+TSRCS = $(SCS) testbox.cpp carrier.cpp
+TOBJS = $(TSRCS:.cpp=.o)
 
+SSRC = $(SCS) keplerivworld.cpp carrier.cpp 
+OBJS = $(SSRC:.cpp=.o)
 
 TESTSRCS = opengltemplate.cpp openglutils.cpp imageloader.cpp
 
@@ -21,11 +25,15 @@ endif
 
 all: $(PROG)
 
+testall:
+	g++ testall.cpp -otestall
+
 OdeWorld:
 	$(CC) $(CFLAGS) -o OdeWorld OdeWorld.cpp $(LIBS)
 
-test:
-	$(CC) $(CFLAGS) -o test $(TESTSRC) $(LIBS)
+test:		$(TOBJS)
+	@echo "Building test version (testbox)"
+	$(CC) $(CFLAGS) $(LIBS) -o $@ $^
 
 $(PROG):	$(OBJS)
 	@echo "Object files are $(OBJS)"
@@ -41,3 +49,6 @@ clean:
 	rm -f $(PROG)
 	rm -f OdeWorld
 	rm -f $(OBJS)
+	rm -f testall
+	rm -f test
+

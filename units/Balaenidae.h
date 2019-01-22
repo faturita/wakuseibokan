@@ -16,7 +16,7 @@ public:
     static const int SAILING = 0;
 
     ~Balaenidae();
-    Balaenidae();
+    Balaenidae(int newfaction);
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void init();
     int getType();

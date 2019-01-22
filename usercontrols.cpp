@@ -19,11 +19,13 @@
 #include "container.h"
 
 #include "camera.h"
-#include "usercontrols.h"
 
 #include "sounds/sounds.h"
-
 #include "terrain/Terrain.h"
+
+#include "engine.h"
+
+#include "usercontrols.h"
 
 #include "units/Vehicle.h"
 #include "units/Balaenidae.h"
@@ -157,6 +159,13 @@ void switchControl(int controlposition)
         return;
     }
 
+    // Check if it is controllable ?
+    int type=entities[id]->getType();
+    if (type == ACTION)
+    {
+        return;
+    }
+
     if (controller.controlling != CONTROLLING_NONE)
     {
         entities[controller.controlling]->setControlRegisters(controller.registers);
@@ -168,31 +177,6 @@ void switchControl(int controlposition)
 }
 
 
-Manta* findManta(int status)
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        Vehicle *v=entities[i];
-        if (v->getType() == MANTA && v->getStatus() == status)
-        {
-            return (Manta*)v;
-        }
-    }
-    return NULL;
-}
-
-void list()
-{
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
-    {
-        printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
-    }
-}
-
-
-
-
-
 bool pp=false;
 
 void handleKeypress(unsigned char key, int x, int y) {
@@ -201,7 +185,6 @@ void handleKeypress(unsigned char key, int x, int y) {
         if (key == 13)
         {
             // Analyze commands.
-
             size_t n = controller.str.find("control");
 
             if (n != std::string::npos)
@@ -215,7 +198,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("taxi") != std::string::npos)
             {
                 Balaenidae *r = (Balaenidae*)entities[controller.controlling];
-                Manta *m = findManta(3);
+                Manta *m = findManta(Manta::LANDED);
                 if (m)
                 {
                     r->taxi(m);
@@ -228,7 +211,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 //const char* content = controller.str.substr(7).c_str();
 
                 Balaenidae *b = (Balaenidae*)entities[controller.controlling];
-                Manta *m = findManta(0);
+                Manta *m = findManta(Manta::ON_DECK);
                 if (m)
                 {
                     b->launch(m);
