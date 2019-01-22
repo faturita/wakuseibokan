@@ -121,6 +121,9 @@ References
 ----------
 * Normalize error: https://github.com/resibots/robdyn/issues/3
 * ODE http://ode.org/wiki/index.php?title=Main_Page
+* ODE http://www.ode.org/ode-0.5-userguide.html
+* ODE http://opende.sourceforge.net/docs/index.html
+* ODE Manual http://ode.org/wiki/index.php?title=Manual
 * OpenGL Textures: https://learnopengl.com/Getting-started/Textures
 * OpenGL Demura Blog: http://demura.net/english
 * Langevin Functions: https://journals.sagepub.com/doi/full/10.1177/1081286518811876
