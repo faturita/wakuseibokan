@@ -11,6 +11,8 @@
 #include "../actions/Gunshot.h"
 #include "../sounds/sounds.h"
 
+#include "../engine.h"
+
 int Walrus::getNumber() const
 {
     return number;
@@ -33,7 +35,12 @@ void Walrus::setIsland(BoxIsland *value)
 
 void Walrus::init()
 {
-    _model = (Model*)MD2Model::loadModel("walrusgood.md2");
+    if (getFaction()==GREEN_FACTION)
+        _model = (Model*)MD2Model::loadModel("walrusgood.md2");
+    else {
+        _model = (Model*)MD2Model::loadModel("walrus.md2");
+    }
+
     if (_model != NULL)
     {
         _model->setAnimation("run");
@@ -80,7 +87,7 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f, R);
         
-        drawArrow();
+        //drawArrow();
 
        	glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
         //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
@@ -88,11 +95,15 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         //doMaterial();
-        drawRectangularBox(width, height, length);
+        //drawRectangularBox(width, height, length);
 
         _model->setTexture(texture);
         glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
+
+        glRotatef(90.0f,0.0f,1.0f,0.0f);
+        glScalef(0.4f,0.4f,0.4f);
+        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,texture);
 
         glPopMatrix();
     }

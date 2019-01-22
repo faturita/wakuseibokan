@@ -294,7 +294,7 @@ void inline initIslands()
 void test1()
 {
     // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae();
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
     _b->setPos(0.0f,20.5f,-4000.0f);
@@ -389,6 +389,18 @@ void test10()
         size_t id = entities.push_back(walrus);
         messages.insert(messages.begin(), std::string("Walrus has been deployed."));
     }
+}
+
+void test11()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(-400 kmf,20.5f,-400 kmf);
+    _b->stop();
+
+    entities.push_back(_b);
 }
 
 
@@ -844,6 +856,47 @@ void checktest10(unsigned long timer)
 
 }
 
+
+void checktest11(unsigned long timer)
+{
+    if (timer>1500)
+    {
+        Vehicle *_b = entities[0];
+        Vec3f val = _b->getPos()-Vec3f(-400 kmf,20.5f,-400 kmf);
+
+        dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
+        Vec3f vec3fV;
+        vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+
+        dReal *av = (dReal *)dBodyGetAngularVel(_b->getBodyID());
+        Vec3f vav;
+        vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
+
+        if (val.magnitude()>100)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (vav.magnitude()>10)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (vec3fV.magnitude()>5)
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -892,7 +945,7 @@ void initWorldModelling(int testcase)
     case 8:initIslands();test1();test8();break; // Walrus reaching island.
     case 9:test1();test9();break; // Walrus stability.
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
-    case 11:initIslands();test1();test10();break; //
+    case 11:initIslands();test11();break; // Carrier stability far away.
     default:initIslands();test1();break;
     }
 
@@ -919,6 +972,7 @@ void worldStep(int value)
     case 8:checktest8(timer);break;
     case 9:checktest9(timer);break;
     case 10:checktest10(timer);break;
+    case 11:checktest11(timer);break;
     default: break;
     }
 
