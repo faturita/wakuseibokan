@@ -334,7 +334,7 @@ bool  groundcollisions(Vehicle *vehicle)
     {
         if (vehicle->getSpeed()>70 and vehicle->getType() == MANTA)
         {
-            explosion();
+            //explosion();
             SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
             struct controlregister c;
             c.thrust = 0.0f;

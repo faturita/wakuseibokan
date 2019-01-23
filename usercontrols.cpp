@@ -133,13 +133,16 @@ void processMousePassiveMotion(int x, int y) {
 
         // setting the angle to be relative to the mouse
         // position inside the window
-   /**     if (x < 0)
-            _angle = 0.0;
-        else if (x > 400)
-            _angle = 180.0;
-        else
-            _angle = 180.0 * ((float) x)/400;
-   **/ //}
+    //if (_xoffset ==0 ) _xoffset = x;
+
+    //if (_yoffset == 0 ) _yoffset = y;
+
+    //if (buttonState == 1)
+    {
+    //    Camera.xAngle += ( (x-_xoffset) * 0.005);
+
+    //    Camera.yAngle += ( (y - _yoffset ) * 0.005) ;
+    }
     //processMouseActiveMotion(x,y);
 }
 
@@ -345,6 +348,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             break;
         case 'O':
             {
+                // @FIXME: Find the walrus that is actually closer to the dock bay.
                 synchronized(entities.m_mutex)
                 {
                     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))

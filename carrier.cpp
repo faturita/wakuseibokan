@@ -516,7 +516,7 @@ void update(int value)
             for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
             {
                 //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                if (entities[i]->getType()==5 && entities[i]->getTtl()==0)
+                if (entities[i]->getType()==ACTION && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");
                     dBodyDisable(entities[i]->getBodyID());

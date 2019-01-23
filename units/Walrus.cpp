@@ -13,6 +13,11 @@
 
 #include "../engine.h"
 
+Walrus::Walrus(int newfaction)
+{
+    setFaction(newfaction);
+}
+
 int Walrus::getNumber() const
 {
     return number;

@@ -484,8 +484,8 @@ int Vehicle::getFaction()
  */
 void Vehicle::VERIFY(float speed, dBodyID who)
 {
-    if (speed>1000.0f && getType()!= ACTION)
-        stop(who);
+    //if (speed>1000.0f && getType()!= ACTION)
+    //    stop(who);
 
 
 

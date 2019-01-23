@@ -10,6 +10,7 @@ protected:
     float rudder;
     int offshoring = 0;
     Vec3f ap;
+
 public:
 
     static const int OFFSHORING = 1;

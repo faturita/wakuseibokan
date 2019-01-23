@@ -234,23 +234,26 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
 
     if (type == MANTA)
     {
-        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
+        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
         _manta1->init();
         _manta1->setNumber(1);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+50, pos[2]);
-        _manta1->setStatus(0);
+        _manta1->setStatus(Manta::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;
     } else if (type == WALRUS)
     {
-        Walrus *_walrus = new Walrus();
+        Walrus *_walrus = new Walrus(getFaction());
         _walrus->init();
         _walrus->setNumber(1);
         _walrus->embody(world,space);
-        _walrus->setPos(pos[0],pos[1],pos[2]-450);
-        _walrus->setStatus(0);
+        Vec3f p;
+        p = p.normalize();
+        p = getForward()*450;
+        _walrus->setPos(pos[0]-p[0],pos[1]-p[1],pos[2]-p[2]);
+        _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
 
         alignToMe(_walrus->getBodyID());

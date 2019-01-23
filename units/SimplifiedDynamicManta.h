@@ -6,6 +6,7 @@
 class SimplifiedDynamicManta : public Manta
 {
 public:
+    SimplifiedDynamicManta(int newfaction);
     float angularPos[3] = {0,0,0};
     void doDynamics(dBodyID body);
     void doControl(Controller controller);

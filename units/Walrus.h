@@ -24,6 +24,7 @@ protected:
     BoxIsland *island;
 
 public:
+    Walrus(int faction);
     static const int INSHORING = 3;
     static const int OFFSHORING = 2;
     static const int ROLLING = 1;

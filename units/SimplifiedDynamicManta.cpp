@@ -2,6 +2,11 @@
 
 #include "../actions/Gunshot.h"
 
+SimplifiedDynamicManta::SimplifiedDynamicManta(int newfaction)
+{
+    setFaction(newfaction);
+}
+
 void SimplifiedDynamicManta::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
@@ -64,7 +69,7 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
     if (getThrottle()>600)
     {
         setStatus(FLYING);
-        // @NOTE: Eventually remove island...
+        // @NOTE: Eventually remove island after you takeoff.
     }
 
     // roll
