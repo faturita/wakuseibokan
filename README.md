@@ -110,6 +110,12 @@ Issues and missing stuff
     * I implemented a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.
 
+Blender
+-------
+
+* Shift+Ctrl+Alt+C -> origin to geometry
+* N: dimensions
+
 Sounds
 ------
 
