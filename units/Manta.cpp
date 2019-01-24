@@ -63,7 +63,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
-        //_model->draw();
+        _model->draw();
 
         glPopMatrix();
     }
@@ -150,7 +150,7 @@ void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 	forward = forward.normalize();
 	orig = position;
-    Up[0]=Up[2]=0;Up[1]=1;// poner en 4 si queres que este un toque arriba desde atras.
+    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
     position = position - 20*forward + Up;
 	forward = orig-position;
 }

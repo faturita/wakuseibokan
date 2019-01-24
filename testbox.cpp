@@ -305,7 +305,7 @@ void test1()
 
 void test2()
 {
-    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta();
+    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(GREEN_FACTION);
 
     _manta1->init();
     _manta1->embody(world, space);
@@ -354,7 +354,7 @@ void test7()
 
 void test8()
 {
-    Walrus *_walrus = new Walrus();
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
 
     _walrus->init();
     _walrus->embody(world, space);
@@ -371,7 +371,7 @@ void test8()
 
 void test9()
 {
-    Walrus *_walrus = new Walrus();
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
