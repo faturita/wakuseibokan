@@ -403,6 +403,21 @@ void test11()
     entities.push_back(_b);
 }
 
+void test12()
+{
+    entities.push_back(islands[0]->addStructure(new Turret()     ,         1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret()     ,        -1550.0f,    0.0f,space,world));
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+}
+
 
 void checktest1(unsigned long timer)
 {
@@ -837,7 +852,7 @@ void checktest10(unsigned long timer)
 
     if (stateMachine == 3 && timerstep>0 && timer == (timerstep + 100))
     {
-        CommandCenter *c = findCommandCenter();
+        CommandCenter *c = findCommandCenter(islands[0]);
 
         if (!c)
         {
@@ -946,6 +961,7 @@ void initWorldModelling(int testcase)
     case 9:test1();test9();break; // Walrus stability.
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
     case 11:initIslands();test11();break; // Carrier stability far away.
+    case 12:initIslands();test1();test12();break; // Bullets
     default:initIslands();test1();break;
     }
 

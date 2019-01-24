@@ -314,14 +314,16 @@ bool  isIsland(dGeomID candidate)
 
 
 // @FIXME Check the island !
-CommandCenter* findCommandCenter()
+CommandCenter* findCommandCenter(Island *island)
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == CONTROL)
         {
-            return (CommandCenter*)v;
+            Structure *s = (Structure*)v;
+            if (s->island == island)
+                return (CommandCenter*)s;
         }
     }
     return NULL;

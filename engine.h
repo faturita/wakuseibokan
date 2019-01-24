@@ -122,7 +122,7 @@ bool  groundcollisions(Vehicle *vehicle);
 
 void  groundcollisions(dBodyID body);
 
-CommandCenter* findCommandCenter();
+CommandCenter* findCommandCenter(Island *island);
 Manta* findManta(int status);
 void list();
 

@@ -50,6 +50,8 @@
 #include "imageloader.h"
 #include "terrain/Terrain.h"
 
+#include "engine.h"
+
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
 #include "structures/Hangar.h"
@@ -450,7 +452,7 @@ void update(int value)
 
             if (island->getStructures().size()<5)
             {
-                CommandCenter *c = (CommandCenter*)island->getCommandCenter();
+                CommandCenter *c = findCommandCenter(island);
                 if (c)
                 {
                     if (c->getTtl()<=0)
