@@ -38,11 +38,11 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1
         {
             v2 = vehicle;
         }
-        if (vehicle->getGeom() == g1 && vehicle->getType() > COLLISIONABLE)
+        if (vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
         {
             s1 = (Structure*)vehicle;
         }
-        if (vehicle->getGeom() == g2 && vehicle->getType() > COLLISIONABLE)
+        if (vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
         {
             s2 = (Structure*)vehicle;
         }
