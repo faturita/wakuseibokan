@@ -312,10 +312,15 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
         case 'm':
             {
-            Vehicle *manta = (entities[controller.controlling])->spawn(world,space,MANTA);
-            if (manta != NULL)
-                entities.push_back(manta);
-                messages.insert(messages.begin(), std::string("Manta is ready to takeoff."));
+            if (entities[controller.controlling]->getType()==CARRIER)
+            {
+                Vehicle *manta = (entities[controller.controlling])->spawn(world,space,MANTA);
+                if (manta != NULL)
+                {
+                    entities.push_back(manta);
+                    messages.insert(messages.begin(), std::string("Manta is ready to takeoff."));
+                }
+            }
             }
             break;
         case 'M':
