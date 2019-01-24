@@ -424,7 +424,7 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
     {
-        assert(!"System is unstable.");
+        //assert(!"System is unstable.");
     }
     VERIFY(speed,body);
 

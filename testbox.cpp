@@ -110,8 +110,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
 
-    if (b1 && isAction(b1) && b2 && isType(b2,WALRUS) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
-    if (b2 && isAction(b2) && b1 && isType(b1,WALRUS) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+    //if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || isType(b2,MANTA)) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
+    //if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || isType(b1,MANTA)) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
 
     const int N = 10;
     dContact contact[N];
@@ -253,31 +253,37 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 void inline initIslands()
 {
     BoxIsland *thermopilae = new BoxIsland();
+    thermopilae->structures = &entities;
     thermopilae->setName("Thermopilae");
     thermopilae->setLocation(0.0f,-1.0,0.0f);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     BoxIsland *nonsquareisland = new BoxIsland();
+    nonsquareisland->structures = &entities;
     nonsquareisland->setName("Atolon");
     nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
     nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
     BoxIsland *vulcano = new BoxIsland();
+    vulcano->structures = &entities;
     vulcano->setName("Vulcano");
     vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
     vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
 
     BoxIsland *nemesis = new BoxIsland();
+    nemesis->structures = &entities;
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
     BoxIsland *atom = new BoxIsland();
+    atom->structures = &entities;
     atom->setName("Atom");
     atom->setLocation( 500 kmf, -1.0, -100 kmf);
     atom->buildTerrainModel(space,"terrain/atom.bmp");
 
     BoxIsland *island = new BoxIsland();
+    island->structures = &entities;
     island->setName("Island");
     island->setLocation(-500 kmf, -1.0, 200 kmf);
     island->buildTerrainModel(space,"terrain/island.bmp");
@@ -401,6 +407,22 @@ void test11()
     _b->stop();
 
     entities.push_back(_b);
+}
+
+void test12()
+{
+    entities.push_back(islands[0]->addStructure(new Turret()     ,        1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret()     ,       -1550.0f,    0.0f,space,world));
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setStatus(Walrus::ROLLING);
+    _walrus->setPos(200.0f,1.32f,0.0f);
+    _walrus->setIsland(islands[0]);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
 }
 
 
@@ -946,6 +968,7 @@ void initWorldModelling(int testcase)
     case 9:test1();test9();break; // Walrus stability.
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
     case 11:initIslands();test11();break; // Carrier stability far away.
+    case 12:initIslands();test1();test12();break; // Turret and Walrus shooting.
     default:initIslands();test1();break;
     }
 

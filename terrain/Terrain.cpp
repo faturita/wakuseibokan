@@ -188,24 +188,40 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     structure->setPos(X+x,heightOffset,Z+z);
     structure->onIsland(this);
 
-    // @NOTE: when the structure is destroyed this pointer must be eliminated.
-    structures.push_back(structure);
-
     return structure;
 }
 
 std::vector<Structure*> BoxIsland::getStructures()
 {
-    return structures;
+    std::vector<Structure*> structuresv;
+    for(size_t i=structures->first();structures->exists(i);i=structures->next(i))
+    {
+        Vehicle *v = (*structures)[i];
+        if (v->getType() >= COLLISIONABLE)
+        {
+            Structure *s = (Structure*)v;
+            if (s->island == this)
+            {
+                structuresv.push_back((Structure*)v);
+            }
+        }
+    }
+    return structuresv;
 }
 
 Structure* BoxIsland::getCommandCenter()
 {
-    for(int i=0;i<structures.size();i++)
+    for(size_t i=structures->first();structures->exists(i);i=structures->next(i))
     {
-        Structure *s = structures[i];
-        if (s->getType() == CONTROL)
-            return s;
+        Vehicle *v = (*structures)[i];
+        if (v->getType() >= COLLISIONABLE)
+        {
+            Structure *s = (Structure*)v;
+            if (s->island == this && s->getType() == CONTROL)
+            {
+                return s;
+            }
+        }
     }
     return NULL;
 }

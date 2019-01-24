@@ -16,6 +16,8 @@
 #include "island.h"
 #include "../structures/Structure.h"
 
+#include "../container.h"
+
 
 #define HFIELD_WSTEP			60			// Vertex count along edge >= 2
 #define HFIELD_DSTEP			60
@@ -192,14 +194,13 @@ private:
 
     dGeomID islandGeom;
 
-    std::vector<Structure*> structures;
-
     std::string name;
 
     std::string modelname;
     
 public:
     
+    container<Vehicle*> *structures;
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
     
     //void draw(float x, float y, float z, float side, float height);
