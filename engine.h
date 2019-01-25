@@ -41,6 +41,8 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
 // SYNC
 Vehicle* gVehicle(dBodyID body);
 
+// SYNC
+Vehicle* gVehicle(dGeomID geom);
 
 void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
@@ -70,6 +72,9 @@ bool hit(Vehicle *vehicle, Gunshot *g);
 
 bool hit(Structure* structure);
 
+// SYNC
+bool rayHit(Vehicle *vehicle, LaserRay *l);
+
 
 // SYNC
 bool releasecontrol(Vehicle* vehicle);
@@ -81,7 +86,7 @@ void  releasecontrol(dBodyID body);
 // SYNC
 bool  isType(Vehicle *vehicle, int type);
 
-
+bool isType(dBodyID body, int types[], int length);
 
 bool  isType(dBodyID body, int type);
 
@@ -106,7 +111,7 @@ bool  isAction(dBodyID body);
 
 bool  isAction(Vehicle* vehicle);
 
-
+bool isRay(dGeomID o);
 
 bool  isRunway(Structure* s);
 

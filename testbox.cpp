@@ -72,13 +72,12 @@ extern  Controller controller;
 
 /* dynamics and collision objects */
 
-static dGeomID platform, ground;
+static dGeomID ground;
 
 unsigned long timer=0;
 
 dWorldID world;
 dSpaceID space;
-dBodyID body[NUM];
 dJointGroupID contactgroup;
 
 container<Vehicle*> entities;
@@ -86,8 +85,6 @@ container<Vehicle*> entities;
 std::vector<BoxIsland*> islands;
 
 std::vector<std::string> messages;
-
-
 
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -112,6 +109,11 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
     if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
     if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+
+    int val[]={CARRIER,WALRUS,MANTA};
+
+    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
+    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
 
     const int N = 10;
     dContact contact[N];
@@ -416,6 +418,20 @@ void test12()
     _walrus->stop();
 
     entities.push_back(_walrus);
+}
+
+void test13()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,+4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    entities.push_back(islands[0]->addStructure(new LaserTurret()     ,             0.0f,      0.0f,space,world));
 }
 
 
@@ -912,6 +928,50 @@ void checktest11(unsigned long timer)
     }
 }
 
+void checktest13(unsigned long timer)
+{
+    if (timer==500)
+    {
+        //dMatrix3 R;
+        //ray = dCreateRay(space,4000.0f);
+        //dGeomSetPosition(ray,1000.0f,20.5f,-4000.0f);   // 0 20 -4000
+        //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
+        //dGeomSetRotation (ray,R);
+
+        LaserTurret *l=(LaserTurret*)entities[1];
+        l->inclination = 0.5;
+        Vehicle *action = (l)->fire(world,space);
+        //int *idx = new int();
+        //*idx = vehicles.push_back(action);
+        //dBodySetData( action->getBodyID(), (void*)idx);
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+    if (timer == 700)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: The laser did nothing to the Carrier.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -962,6 +1022,7 @@ void initWorldModelling(int testcase)
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
     case 11:initIslands();test11();break; // Carrier stability far away.
     case 12:initIslands();test1();test12();break; // Bullets
+    case 13:initIslands();test13();break;
     default:initIslands();test1();break;
     }
 
@@ -989,6 +1050,7 @@ void worldStep(int value)
     case 9:checktest9(timer);break;
     case 10:checktest10(timer);break;
     case 11:checktest11(timer);break;
+    case 13:checktest13(timer);break;
     default: break;
     }
 

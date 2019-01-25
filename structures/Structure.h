@@ -12,10 +12,11 @@ protected:
     float width;
     float length;
 
-    float azimuth;
-    float inclination;
+
 
 public:
+    float azimuth; // @FIXME
+    float inclination;
     Island *island;
 
     Structure();

@@ -25,6 +25,19 @@ Vehicle* gVehicle(dBodyID body)
     return NULL;
 }
 
+Vehicle* gVehicle(dGeomID geom)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *vehicle = entities[i];
+        if (vehicle->getGeom() == geom)
+        {
+            return vehicle;
+        }
+    }
+    return NULL;
+}
+
 void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
@@ -130,6 +143,15 @@ bool isMineFire(Vehicle* vehicle, Gunshot *g)
 }
 
 // SYNC
+bool rayHit(Vehicle *vehicle, LaserRay *l)
+{
+    vehicle->damage(2);
+    return true;
+}
+
+
+
+// SYNC
 bool hit(Vehicle *vehicle, Gunshot *g)
 {
     /**   Sending too many messages hurts FPS
@@ -233,6 +255,22 @@ bool  isType(dBodyID body, int type)
     return result;
 }
 
+
+bool isType(dBodyID body, int types[], int length)
+{
+    bool result = false;
+    synchronized(entities.m_mutex)
+    {
+        Vehicle *vehicle = gVehicle(body);
+
+        for(int s=0;s<length;s++)
+            if (isType(vehicle,types[s])) result=true;
+    }
+    return result;
+
+}
+
+
 bool  isManta(dBodyID body)
 {
     return isType(body,3);
@@ -268,6 +306,19 @@ bool  isAction(Vehicle* vehicle)
     return isType(vehicle, 5);
 }
 
+// SYNC
+bool isRay(dGeomID o)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getGeom() == o && v->getType()==RAY)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool  isRunway(Structure* s)
 {
