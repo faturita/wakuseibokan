@@ -228,7 +228,7 @@ void Balaenidae::offshore()
     Balaenidae::ap = getForward();
 }
 
-Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
+Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 {
     Vehicle *v;
 
@@ -236,7 +236,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
     {
         SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
         _manta1->init();
-        _manta1->setNumber(1);
+        _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+50, pos[2]);
         _manta1->setStatus(Manta::ON_DECK);
@@ -247,7 +247,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type)
     {
         Walrus *_walrus = new Walrus(getFaction());
         _walrus->init();
-        _walrus->setNumber(1);
+        _walrus->setNumber(number);
         _walrus->embody(world,space);
         Vec3f p;
         p = p.normalize();

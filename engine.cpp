@@ -422,6 +422,33 @@ Manta* findManta(int status)
     return NULL;
 }
 
+int findNextNumber(int type)
+{
+    int numbers[256];
+    memset(numbers,0,sizeof(int)*256);
+
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (type == MANTA && v->getType() == type)
+        {
+            Manta *m = (Manta*)v;
+            numbers[m->getNumber()] = 1;
+        }
+        if (type == WALRUS && v->getType() == type)
+        {
+            Walrus *m = (Walrus*)v;
+            numbers[m->getNumber()] = 1;
+        }
+    }
+    for(int i=0;i<256;i++)
+    {
+        if (numbers[i]==0)
+            return i;
+    }
+    assert(!"No more available numbers !!!!!");
+}
+
 void list()
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))

@@ -131,5 +131,7 @@ CommandCenter* findCommandCenter(Island *island);
 Manta* findManta(int status);
 void list();
 
+int findNextNumber(int type);
+
 
 #endif // ENGINE_H

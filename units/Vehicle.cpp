@@ -337,7 +337,7 @@ Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
     assert(0 || !"This should not be executed.");
 }
 
-Vehicle* Vehicle::spawn(dWorldID world, dSpaceID space,int type)
+Vehicle* Vehicle::spawn(dWorldID world, dSpaceID space,int type, int number)
 {
     assert(0 || !"This should not be executed.");
 }

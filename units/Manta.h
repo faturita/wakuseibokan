@@ -13,7 +13,7 @@
 class Manta : public Vehicle
 {
 protected:
-    int number;
+    int number=0;
 
 public:
     static const int IN_CARRIER = 0;
@@ -22,7 +22,7 @@ public:
     static const int TACKINGOFF = 3;
     static const int FLYING = 4;
 
-    bool antigravity;
+    bool antigravity=false;
 
 	float rudder;
 	float elevator;

@@ -55,7 +55,7 @@ protected:
     void setFaction(int newfaction);
     
 public:
-    bool inert;
+    bool inert=false;
 	float xRotAngle;
 	float yRotAngle;
 	Vehicle();
@@ -126,7 +126,7 @@ public:
     void enableAuto();
     void disableAuto();
 
-    virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type);
+    virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type, int number);
 
     int getStatus() const;
     void setStatus(int value);

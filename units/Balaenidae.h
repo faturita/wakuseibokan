@@ -38,7 +38,7 @@ public:
 
     void offshore();
 
-    Vehicle* spawn(dWorldID  world,dSpaceID space,int type);
+    Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 
     void launch(Manta* m);
     void taxi(Manta *m);

@@ -147,6 +147,36 @@ void processMousePassiveMotion(int x, int y) {
 }
 
 
+
+
+void spawnManta(Vehicle *spawner)
+{
+    int mantaNumber = findNextNumber(MANTA);
+    Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
+    if (manta != NULL)
+    {
+        entities.push_back(manta);
+        char msg[256];
+        sprintf(msg, "Manta %2d is ready to takeoff.",mantaNumber+1);
+        messages.insert(messages.begin(), std::string(msg));
+    }
+}
+
+void spawnWalrus(Vehicle *spawner)
+{
+    int walrusNumber = findNextNumber(WALRUS);
+    Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
+    if (walrus != NULL)
+    {
+        entities.push_back(walrus);
+        char msg[256];
+        sprintf(msg, "Walrus %2d has been deployed.",walrusNumber+1);
+        messages.insert(messages.begin(), std::string(msg));
+    }
+}
+
+
+
 void switchControl(int controlposition)
 {
     if (controlposition > entities.size())
@@ -205,7 +235,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (m)
                 {
                     r->taxi(m);
-                    messages.insert(messages.begin(), std::string("Manta is ready for launch."));
+                    char msg[256];
+                    sprintf(msg,"Manta %2d is ready for launch.",m->getNumber()+1);
+                    messages.insert(messages.begin(), std::string(msg));
                 }
             }
             else
@@ -218,7 +250,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (m)
                 {
                     b->launch(m);
-                    messages.insert(messages.begin(), std::string("Manta has departed."));
+                    char msg[256];
+                    sprintf(msg, "Manta %2d has been launched.", m->getNumber()+1);
+                    messages.insert(messages.begin(), std::string(msg));
                     takeoff();
                 }
 
@@ -314,12 +348,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
             if (entities[controller.controlling]->getType()==CARRIER)
             {
-                Vehicle *manta = (entities[controller.controlling])->spawn(world,space,MANTA);
-                if (manta != NULL)
-                {
-                    entities.push_back(manta);
-                    messages.insert(messages.begin(), std::string("Manta is ready to takeoff."));
-                }
+                spawnManta(entities[controller.controlling]);
             }
             }
             break;
@@ -343,12 +372,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case 'o':
             {
-                Vehicle *walrus = (entities[controller.controlling])->spawn(world,space,WALRUS);
-                if (walrus != NULL)
-                {
-                    size_t id = entities.push_back(walrus);
-                    messages.insert(messages.begin(), std::string("Walrus has been deployed."));
-                }
+                spawnWalrus(entities[controller.controlling]);
             }
             break;
         case 'O':
