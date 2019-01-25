@@ -18,7 +18,7 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
-enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, COLLISIONABLE=6, LANDINGABLE = 7, CONTROL=8 };
+enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, RAY=1,COLLISIONABLE=7, LANDINGABLE = 8, CONTROL=9 };
 
 class Vehicle : Observable
 {

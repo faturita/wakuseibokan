@@ -10,6 +10,8 @@ actions/Gunshot.cpp
 actions/Gunshot.h
 actions/LaserBeam.cpp
 actions/LaserBeam.h
+actions/LaserRay.cpp
+actions/LaserRay.h
 actions/Missile.cpp
 actions/Missile.h
 actions/actions.h
