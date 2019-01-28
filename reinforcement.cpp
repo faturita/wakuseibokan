@@ -1,5 +1,66 @@
+/**
+ *
+ * Reinforcement Learning and Dynamic Programming
+ *
+ * [NPC Decision Making Learning with Randomness]
+ * [Sutton,Barto, Reinforcement Learning]
+ *
+ * This is the Maze:
+ *
+ * |     ||     ||     ||     ||     ||  >  |
+ * |     ||  X  ||  X  ||     ||     ||     |
+ * |     ||  X  ||  X  ||     ||  D  ||     |
+ * |     ||     ||     ||  M  ||     ||     |
+ *
+ * D is Danger, M is the guy and > is where the exit is located.
+ * X are places where the character cannot go.
+ *
+ ***/
+
+
 #include "carrier.h"
 
+
+#define NORTH 1
+#define SOUTH 3
+#define EAST 0
+#define WEST 2
+
+#define LEFT 2
+#define RIGHT 0
+
+#define DOWN 3
+#define UP 1
+
+/**
+ * @brief Get the correct value of the V-value function considering the maze shape. Walls are bounced.
+ * @param V
+ * @param oj
+ * @param oi
+ * @param j
+ * @param i
+ * @return
+ */
+float get(float V[4][6],int oj, int oi,int j, int i)
+{
+    // These are the usual maze boundaries.
+    if (j<=0)
+        j=0;
+    if (i<=0)
+        i=0;
+    if (j>3)
+        j=3;
+    if (i>5)
+        i=5;
+
+    // These are the places where the isle is located.
+    if (j==1 && i==1) {j=oj;i=oi;}
+    if (j==1 && i==2) {j=oj;i=oi;}
+    if (j==2 && i==1) {j=oj;i=oi;}
+    if (j==2 && i==2) {j=oj;i=oi;}
+
+    return V[j][i];
+}
 
 void showV(float V[4][6])
 {
@@ -109,6 +170,7 @@ int main(int argc, char*argv[])
     }
 
 
+
                            Pss[0][1][3][1][1] = 1000000;Pss[0][2][3][1][2] = 1000000;
     Pss[1][0][0][1][1] = 10000;                                             ;Pss[1][3][2][1][2] = 1000000;
     Pss[2][0][0][2][1] = 10000;                                             ;Pss[2][3][2][2][2] = 1000000;
@@ -116,7 +178,7 @@ int main(int argc, char*argv[])
 
     memcpy(V,R,sizeof(float)*4*6);
 
-    for(int k=0;k<2;k++)
+    for(int k=0;k<200;k++)
     {
     memcpy(Vs,V,sizeof(float)*4*6);
     for(int j=0;j<4;j++)
@@ -134,49 +196,28 @@ int main(int argc, char*argv[])
             float U[4];
             memset(U,0,sizeof(float)*4);
 
-            for(int a=0;a<4;a++)
-            {
-                U[a] = 0;
+            U[DOWN] =  (  0.5*get(V,j,i,j+1,i) + 0.25*get(V,j,i,j,i-1) + 0.25*get(V,j,i,j,i+1));
+            U[UP]   =  (  0.5*get(V,j,i,j-1,i) + 0.25*get(V,j,i,j,i-1) + 0.25*get(V,j,i,j,i+1));
+            U[LEFT] =  (  0.5*get(V,j,i,j,i-1) + 0.25*get(V,j,i,j-1,i) + 0.25*get(V,j,i,j+1,i));
+            U[RIGHT]=  (  0.5*get(V,j,i,j,i+1) + 0.25*get(V,j,i,j-1,i) + 0.25*get(V,j,i,j+1,i));
 
-                if (a==0 || a==1 || a==2)
-                {
-                if (j-1>=0) U[a] += (  Pss[j][i][a][j-1][i]*V[j-1][i] );
-                else U[a] += (  Pss[j][i][a][j][i]*V[j][i] );
-                printf("%d,%d: %10.8f\n",j,i,U[a]);
-                }
-
-                if (a==0 || a==2 || a==3)
-                {
-                if (j+1< 4) U[a] += (  Pss[j][i][a][j+1][i]*V[j+1][i] );
-                else U[a] += (  Pss[j][i][a][j][i]*V[j][i] );
-                printf("%d,%d: %10.8f\n",j,i,U[a]);
-                }
-
-                if (a==1 || a==2 || a==3)
-                {
-                if (i-1>=0) U[a] += (  Pss[j][i][a][j][i-1]*V[j][i-1] );
-                else U[a] += (  Pss[j][i][a][j][i]*V[j][i] );
-                printf("%d,%d: %10.8f\n",j,i,U[a]);
-                }
-
-                if (a==0 || a==1 || a==3)
-                {
-                if (i+1< 6) U[a] += (  Pss[j][i][a][j][i+1]*V[j][i+1] );
-                else U[a] += (  Pss[j][i][a][j][i]*V[j][i] );
-                printf("%d,%d: %10.8f\n",j,i,U[a]);
-                }
-            }
+            if (j==0) U[NORTH] = 1000000;
+            if (i==0) U[LEFT] = 1000000;
+            if (j==3) U[DOWN] = 1000000;
+            if (i==5) U[RIGHT] = 1000000;
 
 
-            if (j==0) U[1] = 1000000;
-            if (i==0) U[2] = 1000000;
-            if (j==3) U[3] = 1000000;
-            if (i==5) U[0] = 1000000;
+            if (j==1 && i==3) U[LEFT] = 100000;
+            if (j==2 && i==3) U[LEFT] = 100000;
 
-            /**
-            if (j==2 && i==3) U[2] = 100000;
-**/
+            if (j==1 && i==0) U[RIGHT] = 100000;
+            if (j==2 && i==0) U[RIGHT] = 100000;
 
+            if (j==0 && i==1) U[SOUTH] = 100000;
+            if (j==0 && i==2) U[SOUTH] = 100000;
+
+            if (j==3 && i==1) U[NORTH] = 100000;
+            if (j==3 && i==2) U[NORTH] = 100000;
 
             // Choose the smallest U
             float Us=U[0];
@@ -190,7 +231,7 @@ int main(int argc, char*argv[])
                 }
             }
 
-            // Set the cell's value to the smallest action plust the cell cost.
+            // Set the cell's value to the smallest action plus the original cell cost.
             Vs[j][i] = Us + R[j][i];
 
             printf("%d,%d: %10.8f\n",j,i, Vs[j][i]);
@@ -205,6 +246,7 @@ int main(int argc, char*argv[])
     showV(V);
     }
 
+    printf("----------------------------------------\n");showV(V);
 
     return 1;
 
