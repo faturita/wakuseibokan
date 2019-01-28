@@ -238,7 +238,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);
-        _manta1->setPos(pos[0],pos[1]+50, pos[2]);
+        _manta1->setPos(pos[0],pos[1]+250, pos[2]);
         _manta1->setStatus(Manta::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());

@@ -48,6 +48,7 @@ odeutils.h
 opengltemplate.cpp
 openglutils.cpp
 openglutils.h
+reinforcement.cpp
 sounds.h
 sounds/sounds.cpp
 sounds/sounds.h

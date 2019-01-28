@@ -385,7 +385,7 @@ void test9()
 
 void test10()
 {
-    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS);
+    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
     if (walrus != NULL)
     {
         size_t id = entities.push_back(walrus);

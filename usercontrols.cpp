@@ -346,9 +346,12 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
         case 'm':
             {
-            if (entities[controller.controlling]->getType()==CARRIER)
+            synchronized(entities.m_mutex)
             {
-                spawnManta(entities[controller.controlling]);
+                if (entities[controller.controlling]->getType()==CARRIER)
+                {
+                    spawnManta(entities[controller.controlling]);
+                }
             }
             }
             break;
@@ -359,7 +362,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==0)
+                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
                         {
                             //printf("Eliminating....\n");
                             dBodyDisable(entities[i]->getBodyID());
