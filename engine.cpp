@@ -66,7 +66,7 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1
 // SYNC
 bool stranded(Vehicle *carrier, Island *island)
 {
-    if (island && carrier && carrier->getType() == 4 && carrier->getStatus() != Balaenidae::OFFSHORING)
+    if (island && carrier && carrier->getType() == CARRIER && carrier->getStatus() != Balaenidae::OFFSHORING)
     {
         Balaenidae *b = (Balaenidae*)carrier;
 

@@ -68,8 +68,6 @@ std::vector<BoxIsland*> islands;
 std::vector<std::string> messages;
 
 
-
-
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
@@ -236,41 +234,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-void _nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-    int i,n;
-
-    dBodyID b1,b2;
-
-    // only collide things with the ground
-    int g1 = (o1 == ground );
-    int g2 = (o2 == ground );
-    if (!(g1 ^ g2))
-    {
-        //printf ("Ground colliding..\n");
-
-        //return;
-    }
-
-
-    b1 = dGeomGetBody(o1);
-    b2 = dGeomGetBody(o2);
-    if (b1 && b2 && dAreConnected (b1,b2)) return;
-
-    const int N = 10;
-    dContact contact[N];
-    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
-    if (n > 0) {
-        for (i=0; i<n; i++) {
-
-            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-            dJointAttach (c,
-                          dGeomGetBody(contact[i].geom.g1),
-                          dGeomGetBody(contact[i].geom.g2));
-        }
-    }
-}
-
 void inline initIslands()
 {
     BoxIsland *thermopilae = new BoxIsland();
@@ -309,6 +272,42 @@ void inline initIslands()
     islands.push_back(nemesis);
     islands.push_back(atom);
     islands.push_back(island);
+}
+
+
+void _nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+    int i,n;
+
+    dBodyID b1,b2;
+
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
+
+        //return;
+    }
+
+
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
+
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
 }
 
 void initWorldPopulation()

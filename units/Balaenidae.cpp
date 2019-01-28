@@ -169,7 +169,10 @@ void Balaenidae::doDynamics(dBodyID body)
         Vec3f ap = Balaenidae::ap;
 
         setThrottle(0.0);
-        dBodyAddRelForce(body,ap[0],ap[1],-ap[2]*10000);
+
+        Vec3f V = ap*(-10000);
+
+        dBodyAddRelForce(body,V[0],V[1],V[2]);
         offshoring--;
     }
 
@@ -225,7 +228,8 @@ void Balaenidae::doControl()
 void Balaenidae::offshore()
 {
     Balaenidae::offshoring = 100;
-    Balaenidae::ap = getForward();
+    Balaenidae::ap = dBodyGetLinearVelInBody(me);
+    Balaenidae::ap = Balaenidae::ap.normalize();
 }
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
