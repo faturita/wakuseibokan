@@ -236,9 +236,14 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
 void inline initIslands()
 {
+    BoxIsland *statera = new BoxIsland();
+    statera->setName("Statera");
+    statera->setLocation(0.0f,-1.0,0.0f);
+    statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
     BoxIsland *thermopilae = new BoxIsland();
     thermopilae->setName("Thermopilae");
-    thermopilae->setLocation(0.0f,-1.0,0.0f);
+    thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     BoxIsland *nonsquareisland = new BoxIsland();
@@ -363,6 +368,7 @@ void inline initIslands()
     islands.push_back(sentinel);
     islands.push_back(midway);
     islands.push_back(enewetak);
+    islands.push_back(statera);
 
 }
 
@@ -408,7 +414,7 @@ void initWorldPopulation()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setPos(580 kmf,20.5f,-350 kmf -4000.0f);
     _b->stop();
 
     entities.push_back(_b);

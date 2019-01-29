@@ -90,6 +90,43 @@ void Camera::setPos(Vec3f newpos)
 
 //float xxx=0.0f, yyy=30.0f, zzz=-70.0f;
 
+void numericallySafeLookAtFrom(float posx,float posy, float posz, float lookAtX, float lookAtY, float lookAtZ, float upX, float upY, float upZ)
+{
+    Vec3f f;
+
+    //f[0] = lookAtX - posx;
+    //f[1] = lookAtY - posy;
+    //f[2] = lookAtZ - posz;
+
+    f[0] = 0;lookAtX;
+    f[1] = 0;lookAtY;
+    f[2] = 1;lookAtZ;
+
+    f = f.normalize();
+
+    Vec3f up;
+
+    up[0] = upX;
+    up[1] = upY;
+    up[2] = upZ;
+
+    up = up.normalize();
+
+    Vec3f s = f.cross(up);
+    Vec3f u = s.cross(f);
+
+    float M[] = {
+        s[0],u[0],-f[0],0,
+        s[1],u[1],-f[1],0,
+        s[2],u[2],-f[2],0,
+        0   ,   0,    0,1
+    };
+
+    glMultMatrixf(M);
+    glTranslatef(-posx,-posy,-posz);
+
+}
+
 void Camera::lookAtFrom(Vec3f up, Vec3f poss, Vec3f forward)
 {
 
@@ -106,17 +143,19 @@ void Camera::lookAtFrom(Vec3f up, Vec3f poss, Vec3f forward)
     float yyy=poss[1];
     float zzz=poss[2];//-20.0f;
 
+    forward = forward * 100000;
 
-    gluLookAt(
+    //gluLookAt()
+    numericallySafeLookAtFrom(
         //Position
         xxx,
         yyy,
         zzz,
 
         //View 'direction'
-        xxx+forward[0],
-        yyy+forward[1],
-        zzz+forward[2],
+        forward[0],
+        forward[1],
+        forward[2],
 
         //Upward vector
         up[0], up[1], up[2]);

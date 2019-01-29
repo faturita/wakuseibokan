@@ -214,12 +214,14 @@ void  Vehicle::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 	Vec3f orig;
 
-
 	forward = forward.normalize();
+
 	orig = position;
 	Up[0]=Up[2]=0;Up[1]=4;
-	position = position - 20*forward + Up;
+    position = position - 200000*forward ;//+ Up;
 	forward = orig-position;
+
+    position = orig - 20*(forward.normalize()) + Up;
 }
 
 void Vehicle::drawModel(float yRot, float xRot, float x, float y, float z)
