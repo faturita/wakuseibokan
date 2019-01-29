@@ -256,6 +256,16 @@ void inline initIslands()
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
+    BoxIsland *hera = new BoxIsland();
+    hera->setName("Hera");
+    hera->setLocation(-200 kmf, -1.0, 200 kmf);
+    hera->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hestia = new BoxIsland();
+    hestia->setName("Hestia");
+    hestia->setLocation(-250 kmf, -1.0, 250 kmf);
+    hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
+
     BoxIsland *atom = new BoxIsland();
     atom->setName("Atom");
     atom->setLocation( 500 kmf, -1.0, -100 kmf);
@@ -266,12 +276,94 @@ void inline initIslands()
     island->setLocation(-500 kmf, -1.0, 200 kmf);
     island->buildTerrainModel(space,"terrain/island.bmp");
 
+    BoxIsland *baltimore = new BoxIsland();
+    baltimore->setName("Baltimore");
+    baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
+
+    BoxIsland *fulcrum = new BoxIsland();
+    fulcrum->setName("Fulcrum");
+    fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
+    fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+
+    BoxIsland *vulcrum = new BoxIsland();
+    vulcrum->setName("Vulcrum");
+    vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
+    vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+    BoxIsland *lunae = new BoxIsland();
+    lunae->setName("Lunae");
+    lunae->setLocation(490 kmf, -1.0, 320 kmf);
+    lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *mururoa = new BoxIsland();
+    mururoa->setName("Mururoa");
+    mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
+    mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *bikini = new BoxIsland();
+    bikini->setName("Bikini");
+    bikini->setLocation(-150 kmf, -1.0, -235 kmf);
+    bikini->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *parentum = new BoxIsland();
+    parentum->setName("Parentum");
+    parentum->setLocation(-150 kmf, -1.0, 435 kmf);
+    parentum->buildTerrainModel(space,"terrain/parentum.bmp");
+
+    BoxIsland *goku = new BoxIsland();
+    goku->setName("SonGoku");
+    goku->setLocation(-200 kmf, -1.0, -435 kmf);
+    goku->buildTerrainModel(space,"terrain/goku.bmp");
+
+    BoxIsland *gaijin = new BoxIsland();
+    gaijin->setName("Gaijin-shima");
+    gaijin->setLocation(150 kmf, -1.0, -339 kmf);
+    gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    BoxIsland *tristan = new BoxIsland();
+    tristan->setName("Tristan da Cunha");
+    tristan->setLocation(250 kmf, -1.0, 10 kmf);
+    tristan->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    BoxIsland *sentinel = new BoxIsland();
+    sentinel->setName("North Sentinel");
+    sentinel->setLocation(150 kmf, -1.0, 390 kmf);
+    sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *midway = new BoxIsland();
+    midway->setName("Midway");
+    midway->setLocation(-150 kmf, -1.0, -290 kmf);
+    midway->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *enewetak = new BoxIsland();
+    enewetak->setName("Enewetak");
+    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
+    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     islands.push_back(vulcano);
     islands.push_back(nemesis);
+    islands.push_back(hestia);
+    islands.push_back(hera);
     islands.push_back(atom);
     islands.push_back(island);
+    islands.push_back(baltimore);
+    islands.push_back(fulcrum);
+    islands.push_back(vulcrum);
+    islands.push_back(lunae);
+    islands.push_back(mururoa);
+    islands.push_back(bikini);
+    islands.push_back(parentum);
+    islands.push_back(goku);
+    islands.push_back(gaijin);
+    islands.push_back(tristan);
+    islands.push_back(sentinel);
+    islands.push_back(midway);
+    islands.push_back(enewetak);
+
 }
 
 
