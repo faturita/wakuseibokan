@@ -90,6 +90,66 @@ void Camera::setPos(Vec3f newpos)
 
 //float xxx=0.0f, yyy=30.0f, zzz=-70.0f;
 
+void CrossProd(double x1, double y1, double z1, double x2, double y2, double z2, double res[3])
+{
+    res[0] = y1*z2 - y2*z1;
+    res[1] = x2*z1 - x1*z2;
+    res[2] = x1*y2 - x2*y1;
+}
+
+void numerciallySafeLookAtFromd(double eyeX, double eyeY, double eyeZ, double lookAtX, double lookAtY, double lookAtZ, double upX, double upY, double upZ)
+{
+    double f[3];
+
+    f[0] = lookAtX;
+    f[1] = lookAtY;
+    f[2] = lookAtZ;
+
+
+/**
+    eyeX += lookAtX*5;
+    eyeY += lookAtY*5;
+    eyeZ += lookAtZ*5;
+***/
+
+    double fMag, upMag;
+
+    fMag = sqrt(f[0]*f[0]+f[1]*f[1]+f[2]*f[2]);
+    upMag = sqrt(upX*upX + upY*upY + upZ*upZ);
+
+    if (fMag != 0)
+    {
+        f[0] /= fMag;
+        f[1] /= fMag;
+        f[2] /= fMag;
+    }
+
+    if (upMag != 0)
+    {
+        upX /= upMag;
+        upY /= upMag;
+        upZ /= upMag;
+    }
+
+    double s[3], u[3];
+
+    CrossProd(f[0], f[1], f[2], upX, upY, upZ, s);
+    CrossProd(s[0], s[1], s[2], f[0], f[1], f[2], u);
+
+    double M[]=
+    {
+    s[0], u[0], -f[0], 0,
+    s[1], u[1], -f[1], 0,
+    s[2], u[2], -f[2], 0,
+    0, 0, 0, 1
+    };
+
+    glMultMatrixd(M);
+    glTranslated (-eyeX, -eyeY, -eyeZ);
+
+
+}
+
 void numericallySafeLookAtFrom(float posx,float posy, float posz, float lookAtX, float lookAtY, float lookAtZ, float upX, float upY, float upZ)
 {
     Vec3f f;
@@ -98,9 +158,9 @@ void numericallySafeLookAtFrom(float posx,float posy, float posz, float lookAtX,
     //f[1] = lookAtY - posy;
     //f[2] = lookAtZ - posz;
 
-    f[0] = 0;lookAtX;
-    f[1] = 0;lookAtY;
-    f[2] = 1;lookAtZ;
+    f[0] = lookAtX;
+    f[1] = lookAtY;
+    f[2] = lookAtZ;
 
     f = f.normalize();
 
@@ -143,22 +203,20 @@ void Camera::lookAtFrom(Vec3f up, Vec3f poss, Vec3f forward)
     float yyy=poss[1];
     float zzz=poss[2];//-20.0f;
 
-    forward = forward * 100000;
-
     //gluLookAt()
-    numericallySafeLookAtFrom(
+    numerciallySafeLookAtFromd(
         //Position
-        xxx,
-        yyy,
-        zzz,
+        (double)xxx,
+        (double)yyy,
+        (double)zzz,
 
         //View 'direction'
-        forward[0],
-        forward[1],
-        forward[2],
+        (double)forward[0],
+        (double)forward[1],
+        (double)forward[2],
 
         //Upward vector
-        up[0], up[1], up[2]);
+        (double)up[0], (double)up[1], (double)up[2]);
 
     //xxx+=(forward[0]);
     //yyy+=(forward[1]);

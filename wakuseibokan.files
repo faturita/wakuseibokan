@@ -35,6 +35,8 @@ maincarrierbackup.cpp
 mainworkingstd.cpp
 map.cpp
 map.h
+math/vec3d.cpp
+math/vec3d.h
 math/vec3f.cpp
 math/vec3f.h
 math/yamathutil.cpp

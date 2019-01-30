@@ -215,13 +215,13 @@ void  Vehicle::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 	Vec3f orig;
 
 	forward = forward.normalize();
-
 	orig = position;
-	Up[0]=Up[2]=0;Up[1]=4;
-    position = position - 200000*forward ;//+ Up;
+
+    Up[0]=Up[2]=0;Up[1]=4;
+
+    position = position - 20*forward + Up;
 	forward = orig-position;
 
-    position = orig - 20*(forward.normalize()) + Up;
 }
 
 void Vehicle::drawModel(float yRot, float xRot, float x, float y, float z)
@@ -407,6 +407,13 @@ struct controlregister Vehicle::getControlRegisters()
     return myCopy;
 }
 
+/**
+ * @brief This function performs the magic between ODE and OpenGL.  It updates the linear speed of the object and set its forward direction
+ * in World coordinates (object orientation).  It obtains the position and rotation of the object from ODE and sets their own internal position
+ * vector and the roation matrix (R).  The function "draw" get those and use them to draw the model in OpenGL.
+ *
+ * @param body
+ */
 void Vehicle::wrapDynamics(dBodyID body)
 {
     Vec3f linearVel = dBodyGetLinearVelVec(body);
