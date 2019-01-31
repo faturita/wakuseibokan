@@ -10,7 +10,7 @@ public:
 
     float zoom;
 
-    Turret();
+    Turret(int faction);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
 

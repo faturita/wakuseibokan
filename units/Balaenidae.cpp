@@ -242,7 +242,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);
-        _manta1->setPos(pos[0],pos[1]+250, pos[2]);
+        _manta1->setPos(pos[0],pos[1]+28, pos[2]);
         _manta1->setStatus(Manta::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
@@ -270,8 +270,9 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 void Balaenidae::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
-    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+10,pos[2]);
+    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+28,pos[2]);
     m->setStatus(Manta::ON_DECK);
+    alignToMe(m->getBodyID());
 }
 
 void Balaenidae::launch(Manta* m)
@@ -290,5 +291,8 @@ void Balaenidae::launch(Manta* m)
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
-    //dBodySetLinearVel(m->getBodyID(),0.0,0.0,(1.0f)*7000);
+    Vec3f f;
+    f = m->getForward();
+    f = f*500;
+    dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
 }

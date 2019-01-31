@@ -3,9 +3,9 @@
 
 extern GLuint _textureRoad;
 
-Runway::Runway()
+Runway::Runway(int faction)
 {
-
+    setFaction(faction);
 }
 
 void Runway::init()

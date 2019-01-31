@@ -136,3 +136,4 @@ References
 * https://ccrma.stanford.edu/software/stk/download.html
 * https://pleiades.ucsc.edu/hyades/OpenGL_on_OS_X
 * https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
+* https://forums.khronos.org/showthread.php/4991-The-Solution-for-gluLookAt()-Function!!!!

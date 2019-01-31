@@ -38,6 +38,8 @@
 
 enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
 
+#define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
+
 // SYNC
 Vehicle* gVehicle(dBodyID body);
 
@@ -132,6 +134,8 @@ Manta* findManta(int status);
 void list();
 
 int findNextNumber(int type);
+
+void buildAndRepair(dSpaceID space, dWorldID world);
 
 
 #endif // ENGINE_H

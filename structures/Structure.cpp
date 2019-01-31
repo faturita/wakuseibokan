@@ -7,6 +7,12 @@ Structure::Structure()
     inclination=0;
 }
 
+Structure::Structure(int faction)
+{
+    Structure();
+    setFaction(faction);
+}
+
 Structure::~Structure()
 {
     if (_model != NULL)

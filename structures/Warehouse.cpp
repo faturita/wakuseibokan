@@ -1,8 +1,8 @@
 #include "Warehouse.h"
 
-Warehouse::Warehouse()
+Warehouse::Warehouse(int faction)
 {
-
+    setFaction(faction);
 }
 
 

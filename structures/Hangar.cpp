@@ -1,8 +1,8 @@
 #include "Hangar.h"
 
-Hangar::Hangar()
+Hangar::Hangar(int faction)
 {
-
+    setFaction(faction);
 }
 
 void Hangar::init()
