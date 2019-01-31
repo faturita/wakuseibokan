@@ -28,7 +28,7 @@ public:
     static const int BUILDING_TIME = 400;
 
 
-    CommandCenter();
+    CommandCenter(int faction);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);

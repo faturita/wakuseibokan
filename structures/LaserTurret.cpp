@@ -3,7 +3,7 @@
 #include "../actions/LaserBeam.h"
 #include "../actions/LaserRay.h"
 
-LaserTurret::LaserTurret()
+LaserTurret::LaserTurret(int faction) : Turret(faction)
 {
 
 }

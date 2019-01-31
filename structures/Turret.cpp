@@ -1,10 +1,10 @@
 #include "Turret.h"
 #include "../actions/Gunshot.h"
 
-Turret::Turret()
+Turret::Turret(int faction)
 {
     Turret::zoom = 20.0f;
-
+    setFaction(faction);
 }
 
 void Turret::init()

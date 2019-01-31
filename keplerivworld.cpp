@@ -408,7 +408,7 @@ void initWorldPopulation()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
     _b->stop();
 
     entities.push_back(_b);

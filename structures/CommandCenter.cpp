@@ -2,9 +2,10 @@
 
 extern std::vector<Structure*> structures;
 
-CommandCenter::CommandCenter()
+CommandCenter::CommandCenter(int faction)
 {
     setTtl(CommandCenter::BUILDING_TIME);
+    setFaction(faction);
 }
 
 

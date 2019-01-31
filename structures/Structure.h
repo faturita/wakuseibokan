@@ -20,6 +20,7 @@ public:
     Island *island;
 
     Structure();
+    Structure(int faction);
     ~Structure();
 
     void init();

@@ -13,7 +13,7 @@ protected:
     LaserRay *ls=NULL;
 
 public:
-    LaserTurret();
+    LaserTurret(int faction);
     Vehicle* fire(dWorldID world, dSpaceID space);
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void doControl();

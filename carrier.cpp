@@ -445,57 +445,8 @@ void update(int value)
                 entities[controller.controlling]->doControl(controller);
         }
 
-        // This should be in the command center.
-        for (int i = 0; i < islands.size(); i++)
-        {
-            BoxIsland *island = islands[i];
-
-            if (island->getStructures().size()<5)
-            {
-                CommandCenter *c = findCommandCenter(island);
-                if (c)
-                {
-                    if (c->getTtl()<=0)
-                    {
-                        // Add a structure (Structures should be randomly rotated also).
-                        int which = (rand() % 30 + 1);
-                        Structure *s;
-
-
-                        if (1<=which && which<=5)
-                            s = new LaserTurret();
-                        else if (6<=which && which<=7)
-                            s = new Structure();
-                        else if (8<=which && which<=10)
-                            s = new Runway();
-                        else if (11<=which && which<=13)
-                            s = new Warehouse();
-                        else
-                            s = new Turret();
-
-                        int x = (rand() % 2000 + 1); x -= 1000;
-                        int z = (rand() % 2000 + 1); z -= 1000;
-
-                        island->addStructure(s,x,z,space,world);
-
-                        entities.push_back(s);
-
-                        if (8<=which && which<=10)
-                        {
-                            Structure *s2 = new Hangar();
-                            x-=550;
-                            island->addStructure(s2,x,z,space,world);
-
-                            entities.push_back(s2);
-                        }
-
-                        c->restart();
-                    }
-
-                }
-            }
-
-        }
+        // Build island structures, international water structures and repair carriers.
+        buildAndRepair(space,world);
 
 
         //printf("Elements alive now: %d\n", vehicles.size());

@@ -86,140 +86,143 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
 {
-    Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
-    setVector((float *)&(Manta::V),linearVelInBody);
-
-    Vec3f linearVel = dBodyGetLinearVelVec(body);
-
-    // Get speed, alpha and beta.
-    speed = linearVel.magnitude();
-
-    // Wind Frame angles.
-    Manta::alpha = Manta::beta = 0;
-
-
-    if (linearVel[2]!=0 && speed > 2)
-    {
-        alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
-        beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
-    }
-
-    //if (alpha>=PI/2) alpha = PI/2;
-    //if (alpha<=-PI/2) alpha = -PI/2;
-
-    //if (beta>=PI/2) beta = PI/2;
-    //if (beta<=-PI/2) beta = -PI/2;
-
-    // Airflow parameters.
-    float density = 0.1f;   // Air density
-    float Sl = 0.9;   // Wing surface [m2]
-    float b = 0.01;   // Wing span [m]
-
-    // Airplane control coefficients
-    float Cd, CL, Cm, Cl, Cy, Cn;
-
-
-    const float caileron=0.2f;
-
-
-
-    if (speed == 0)
-    {
-        Cd = CL = 0;
-
-    }
-    else
-    {
-        // Drag
-        Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-        // Lift (The independent parameter determines the lift of the airplane)
-        CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-    }
-
-    // Yaw
-    Cy = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-    // Rolling
-    Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-    Cl = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-    Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-    //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
-
-    float q = density * speed * speed / 2.0f;
-
-    float La;
-    float Ma;
-    float Na;
-
-    Vec3f Fa;
-
-    float Lt;
-    float Mt;
-    float Nt;
-
-    Vec3f Ft;
-
-    Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
-
-    Lt=Mt=Nt=0;
-
-    float D = Cd * q * Sl;
-    float L = CL * q * Sl;
-
-    // Drag from Structure
-    Fa[2] = 0;
-
-    // Lateral Force on Structure
-    Fa[0] = (- (Cy * q * Sl))*0;
-
-    // Lift on Structure
-    Fa[1] = (+ (+L));
-
-    dMatrix3 R,R2;
-    dRSetIdentity(R);
-    dRFromEulerAngles (R, Manta::elevator*0.005,0,
-                      -Manta::aileron*0.01);
-
-    angularPos[0] -= (Manta::rudder*0.01);
-    angularPos[0] -= (Manta::aileron*0.001);
-
-    dQuaternion q1,q2,q3;
-    dQfromR(q1,R);
-    dRFromAxisAndAngle(R2,0,1,0,angularPos[0]);
-
-    dQfromR(q2,R2);
-
-    dQMultiply0(q3,q2,q1);
-
-
     if (!Vehicle::inert)
-        dBodySetQuaternion(body,q3);
+    {
+        Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
+        setVector((float *)&(Manta::V),linearVelInBody);
 
-    if (Manta::antigravity)
-        dBodyAddForce(body,0,9.81f*(10.0f),0);
+        Vec3f linearVel = dBodyGetLinearVelVec(body);
 
-    //dBodySetRotation(body,R);
+        // Get speed, alpha and beta.
+        speed = linearVel.magnitude();
 
-    // Linear Movement.
+        // Wind Frame angles.
+        Manta::alpha = Manta::beta = 0;
 
-    // Check alpha and beta limits before calculating the forces.
-    Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
-    dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
-    dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+        if (linearVel[2]!=0 && speed > 2)
+        {
+            alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
+            beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
+        }
 
-    // Adding drag which is OPPOSED to linear movment
-    Vec3f dragging = linearVel.normalize();
-    dragging = linearVel*(-(abs(D*0.01)));
+        //if (alpha>=PI/2) alpha = PI/2;
+        //if (alpha<=-PI/2) alpha = -PI/2;
 
-    dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
+        //if (beta>=PI/2) beta = PI/2;
+        //if (beta<=-PI/2) beta = -PI/2;
 
-    //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+        // Airflow parameters.
+        float density = 0.1f;   // Air density
+        float Sl = 0.9;   // Wing surface [m2]
+        float b = 0.01;   // Wing span [m]
 
+        // Airplane control coefficients
+        float Cd, CL, Cm, Cl, Cy, Cn;
+
+
+        const float caileron=0.2f;
+
+
+
+        if (speed == 0)
+        {
+            Cd = CL = 0;
+
+        }
+        else
+        {
+            // Drag
+            Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+            // Lift (The independent parameter determines the lift of the airplane)
+            CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+        }
+
+        // Yaw
+        Cy = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+        // Rolling
+        Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+        Cl = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+        Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+        //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
+
+        float q = density * speed * speed / 2.0f;
+
+        float La;
+        float Ma;
+        float Na;
+
+        Vec3f Fa;
+
+        float Lt;
+        float Mt;
+        float Nt;
+
+        Vec3f Ft;
+
+        Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
+
+        Lt=Mt=Nt=0;
+
+        float D = Cd * q * Sl;
+        float L = CL * q * Sl;
+
+        // Drag from Structure
+        Fa[2] = 0;
+
+        // Lateral Force on Structure
+        Fa[0] = (- (Cy * q * Sl))*0;
+
+        // Lift on Structure
+        Fa[1] = (+ (+L));
+
+        dMatrix3 R,R2;
+        dRSetIdentity(R);
+        dRFromEulerAngles (R, Manta::elevator*0.005,0,
+                          -Manta::aileron*0.01);
+
+        angularPos[0] -= (Manta::rudder*0.01);
+        angularPos[0] -= (Manta::aileron*0.001);
+
+        dQuaternion q1,q2,q3;
+        dQfromR(q1,R);
+        dRFromAxisAndAngle(R2,0,1,0,angularPos[0]);
+
+        dQfromR(q2,R2);
+
+        dQMultiply0(q3,q2,q1);
+
+
+        if (!Vehicle::inert)
+            dBodySetQuaternion(body,q3);
+
+        if (Manta::antigravity)
+            dBodyAddForce(body,0,9.81f*(10.0f),0);
+
+        //dBodySetRotation(body,R);
+
+        // Linear Movement.
+
+        // Check alpha and beta limits before calculating the forces.
+        Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
+
+        dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+
+        // Adding drag which is OPPOSED to linear movment
+        Vec3f dragging = linearVel.normalize();
+        dragging = linearVel*(-(abs(D*0.01)));
+
+        dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
+
+        //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+
+    }
     wrapDynamics(body);
 
 }

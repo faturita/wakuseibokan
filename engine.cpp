@@ -456,3 +456,57 @@ void list()
         printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
     }
 }
+
+void buildAndRepair(dSpaceID space, dWorldID world)
+{
+    for (int i = 0; i < islands.size(); i++)
+    {
+        BoxIsland *island = islands[i];
+
+        if (island->getStructures().size()<8)
+        {
+            CommandCenter *c = findCommandCenter(island);
+            if (c)
+            {
+                if (c->getTtl()<=0)
+                {
+                    // Add a structure (Structures should be randomly rotated also).
+                    int which = (rand() % 30 + 1);
+                    Structure *s;
+
+
+                    if (1<=which && which<=5)
+                        s = new LaserTurret(c->getFaction());
+                    else if (6<=which && which<=7)
+                        s = new Structure(c->getFaction());
+                    else if (8<=which && which<=10)
+                        s = new Runway(c->getFaction());
+                    else if (11<=which && which<=13)
+                        s = new Warehouse(c->getFaction());
+                    else
+                        s = new Turret(c->getFaction());
+
+                    int x = (rand() % 2000 + 1); x -= 1000;
+                    int z = (rand() % 2000 + 1); z -= 1000;
+
+                    island->addStructure(s,x,z,space,world);
+
+                    entities.push_back(s);
+
+                    if (8<=which && which<=10)
+                    {
+                        Structure *s2 = new Hangar(c->getFaction());
+                        z-=550;
+                        island->addStructure(s2,x,z,space,world);
+
+                        entities.push_back(s2);
+                    }
+
+                    c->restart();
+                }
+
+            }
+        }
+
+    }
+}

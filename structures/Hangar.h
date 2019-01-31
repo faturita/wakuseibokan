@@ -6,7 +6,7 @@
 class Hangar : public Structure
 {
 public:
-    Hangar();
+    Hangar(int faction);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
 };

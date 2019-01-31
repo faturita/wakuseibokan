@@ -331,8 +331,8 @@ void test3()
 }
 void test4()
 {
-    entities.push_back(islands[0]->addStructure(new Runway()     ,           0.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Hangar()     ,        -550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,        -550.0f,    0.0f,space,world));
 }
 
 
@@ -407,8 +407,8 @@ void test11()
 
 void test12()
 {
-    entities.push_back(islands[0]->addStructure(new Turret()     ,         1550.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Turret()     ,        -1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,space,world));
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
     _walrus->init();
@@ -431,7 +431,7 @@ void test13()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new LaserTurret()     ,             0.0f,      0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,space,world));
 }
 
 
@@ -859,7 +859,7 @@ void checktest10(unsigned long timer)
         int x = (rand() % 2000 + 1); x -= 1000;
         int z = (rand() % 2000 + 1); z -= 1000;
 
-        Structure *s = island->addStructure(new CommandCenter(),x,z,space,world);
+        Structure *s = island->addStructure(new CommandCenter(GREEN_FACTION),x,z,space,world);
         entities.push_back(s);
 
         timerstep = timer;
