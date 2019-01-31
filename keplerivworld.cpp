@@ -236,9 +236,14 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
 void inline initIslands()
 {
+    BoxIsland *statera = new BoxIsland();
+    statera->setName("Statera");
+    statera->setLocation(0.0f,-1.0,0.0f);
+    statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
     BoxIsland *thermopilae = new BoxIsland();
     thermopilae->setName("Thermopilae");
-    thermopilae->setLocation(0.0f,-1.0,0.0f);
+    thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     BoxIsland *nonsquareisland = new BoxIsland();
@@ -363,9 +368,9 @@ void inline initIslands()
     islands.push_back(sentinel);
     islands.push_back(midway);
     islands.push_back(enewetak);
+    islands.push_back(statera);
 
 }
-
 
 void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
