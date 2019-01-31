@@ -32,7 +32,7 @@ void Hangar::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+        //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
 
         _model->draw(Structure::texture);

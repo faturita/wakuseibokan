@@ -52,11 +52,6 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
 void SimplifiedDynamicManta::doControl(struct controlregister regs)
 {
-    //engine[0] = -controller.roll;
-    //engine[1] = controller.yaw;
-    //engine[2] = -controller.pitch;
-    //steering = -controller.precesion;
-
     setThrottle(-regs.thrust*2*5);
 
     if (getThrottle()>200 && inert)
@@ -211,14 +206,14 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         // Check alpha and beta limits before calculating the forces.
         Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
-        dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+        //dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
         dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
         // Adding drag which is OPPOSED to linear movment
         Vec3f dragging = linearVel.normalize();
         dragging = linearVel*(-(abs(D*0.01)));
 
-        dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
+        //dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
 
         //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
 

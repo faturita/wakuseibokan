@@ -137,5 +137,11 @@ int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
 
+void spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
+
+void spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
+
+void launchManta(Vehicle *v);
+
 
 #endif // ENGINE_H

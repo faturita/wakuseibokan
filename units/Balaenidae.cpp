@@ -278,7 +278,7 @@ void Balaenidae::taxi(Manta *m)
 void Balaenidae::launch(Manta* m)
 {
     m->inert = true;
-    m->setStatus(2);
+    m->setStatus(Manta::FLYING);
     m->elevator = +12;
     struct controlregister c;
     c.thrust = 1500.0f/(-10.0);
@@ -286,7 +286,7 @@ void Balaenidae::launch(Manta* m)
     m->setControlRegisters(c);
     m->setThrottle(1500.0f);
     Vec3f p = m->getPos();
-    p[1] += 10;
+    p[1] += 20;
     m->setPos(p);
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).

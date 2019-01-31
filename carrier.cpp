@@ -443,6 +443,9 @@ void update(int value)
         {
             if (!entities[controller.controlling]->isAuto())
                 entities[controller.controlling]->doControl(controller);
+            else {
+                controller.registers = entities[controller.controlling]->getControlRegisters();
+            }
         }
 
         // Build island structures, international water structures and repair carriers.
