@@ -168,7 +168,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         float L = CL * q * Sl;
 
         // Drag from Structure
-        Fa[2] = 0;
+        Fa[2] = D;
 
         // Lateral Force on Structure
         Fa[0] = (- (Cy * q * Sl))*0;
@@ -207,15 +207,23 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
         //dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
-        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+
+        D = Ft[2] - abs(Fa[2]);
+
+        dBodyAddRelForce(body,0.0f,Fa[1],0.0f);
+        dBodyAddRelForce(body,Ft[0],Ft[1],D);
 
         // Adding drag which is OPPOSED to linear movment
-        Vec3f dragging = linearVel.normalize();
+        Vec3f dragging;
         dragging = linearVel*(-(abs(D*0.01)));
+
+
+        dragging = -linearVel*10;
 
         //dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
 
-        //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+
+        printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, Fa[0],Fa[1],D);
 
     }
     wrapDynamics(body);

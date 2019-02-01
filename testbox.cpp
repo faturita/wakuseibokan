@@ -1068,7 +1068,7 @@ void checktest14(unsigned long timer)
             if (distance<10000.0f)
             {
                 c.thrust = -40.0f;
-                midpointpitch = 48;
+                midpointpitch = 49;
             }
 
 
