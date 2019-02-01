@@ -1027,12 +1027,16 @@ void checktest14(unsigned long timer)
 
         Vec3f Po = _manta1->getPos();
 
-        Vec3f Pf(100000.0f, 0.0f, 100000.0f);
+        float height = Po[1];
+
+        Po[1] = 0.0f;
+
+        Vec3f Pf(-100000.0f, 0.0f, -100000.0f);
 
         Vec3f T = Pf - Po;
 
 
-        if (T.magnitude()>10)
+        if (T.magnitude()>200)
         {
             float distance = T.magnitude();
 
@@ -1041,27 +1045,56 @@ void checktest14(unsigned long timer)
             F = F.normalize();
             T = T.normalize();
 
-            T = T - F;
+
+            float e = acos(  T.dot(F) );
+
+            float signn = T.cross(F) [1];
 
 
-            float e = -atan2( T[0],  T[2]);
-
-
-            printf("T: %10.6f %10.5f\n", distance, e);
+            printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
 
 
             struct controlregister c = _manta1->getControlRegisters();
 
-            if (abs(e)>=0.01f)
-                c.roll = 1.0 * (e>0?-1:+1) ;
+            if (abs(e)>=0.2f)
+                c.roll = 1.0 * (signn>0?+1:-1) ;
             else {
                 c.roll = 0.0f;
+            }
+
+            float eh = height-500.0f;
+            float midpointpitch = 13;
+
+            if (distance<10000.0f)
+            {
+                c.thrust = -40.0f;
+                midpointpitch = 48;
+            }
+
+
+            if ((abs(eh))>10.0f)
+            {
+                c.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+            } else {
+                c.pitch = midpointpitch;
             }
 
             _manta1->setControlRegisters(c);
         } else
         {
             printf("Manta arrived to destination...\n");
+            SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[3];
+            _manta1->elevator = -4;
+            struct controlregister c;
+            c.thrust = 0.0f/(-10.0);
+            c.pitch = -4;
+            _manta1->setControlRegisters(c);
+            _manta1->setThrottle(0.0f);
+            _manta1->stop();
+
+            char str[256];
+            sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
+            messages.insert(messages.begin(), str);
         }
 
 
