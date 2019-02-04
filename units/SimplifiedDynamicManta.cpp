@@ -79,6 +79,120 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
 
 }
 
+void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn)
+{
+    const float caileron=0.2f;
+
+    if (speed == 0)
+    {
+        Cd = CL = 0;
+
+    }
+    else
+    {
+        // Drag
+        Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+        // Lift (The independent parameter determines the lift of the airplane)
+        CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+    }
+
+    // Yaw
+    Cy = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+    // Rolling
+    Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
+    Cl = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+    Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
+
+    printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\t", Cd, CL, Cy, Cm, Cl,Cn);
+}
+
+void SimplifiedDynamicManta::rotateBody(dBodyID body)
+{
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, Manta::elevator*0.005,0,
+                      -Manta::aileron*0.01);
+
+    angularPos[0] -= (Manta::rudder*0.01);
+    angularPos[0] -= (Manta::aileron*0.001);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,angularPos[0]);
+
+    dQfromR(q2,R2);
+
+    dQMultiply0(q3,q2,q1);
+
+
+    if (!Vehicle::inert)
+        dBodySetQuaternion(body,q3);
+}
+
+void SimplifiedDynamicManta::doDynamics(dBodyID body)
+{
+    if (!Vehicle::inert)
+    {
+        Vec3f linearVelInBody = dBodyGetLinearVelInBody(body);
+        setVector((float *)&(Manta::V),linearVelInBody);
+
+        Vec3f linearVel = dBodyGetLinearVelVec(body);
+
+        // Get speed, alpha and beta.
+        speed = linearVel.magnitude();
+
+        // Wind Frame angles.
+        Manta::alpha = Manta::beta = 0;
+
+
+        if (linearVel[2]!=0 && speed > 2)
+        {
+            alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
+            beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
+        }
+
+        rotateBody(body);
+
+        if (Manta::antigravity)
+            dBodyAddForce(body,0,9.81f*(10.0f),0);
+
+        // Airflow parameters.
+        float density = 0.1f;   // Air density
+        float Sl = 0.9;   // Wing surface [m2]
+        float b = 0.01;   // Wing span [m]
+
+        float Cd = 0.01, CL = 0.01;
+
+        float q = density * speed * speed / 2.0f;
+        float D = Cd * q * Sl;
+        float L = CL * q * Sl;
+
+        Vec3f Fa(0.0f, L, -D);
+        Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
+
+
+        Vec3f Ft;
+        Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
+
+        Ft[0] = Ft[0] + forcesOnBody[0];
+        Ft[1] = Ft[1] + forcesOnBody[1];
+        Ft[2] = Ft[2] + forcesOnBody[2];
+
+        dBodyAddRelForce(body, Ft[0],Ft[1],Ft[2]);
+
+        printf("%8.4f\t%8.4f\t%6.4f\n",speed, alpha, beta);
+    }
+
+    wrapDynamics(body);
+
+}
+
+
+/**
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
 {
     if (!Vehicle::inert)
@@ -115,36 +229,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         // Airplane control coefficients
         float Cd, CL, Cm, Cl, Cy, Cn;
 
-
-        const float caileron=0.2f;
-
-
-
-        if (speed == 0)
-        {
-            Cd = CL = 0;
-
-        }
-        else
-        {
-            // Drag
-            Cd = 0.9f    + 0.5f * alpha   + 0.3* ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-            // Lift (The independent parameter determines the lift of the airplane)
-            CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-        }
-
-        // Yaw
-        Cy = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-        // Rolling
-        Cm = 0.0000f + 0.005f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
-
-        Cl = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-        Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
-
-        //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\n", Cd, CL, Cy, Cm, Cl,Cn);
+        flyingCoefficients(Cd, CL, Cm, Cl, Cy, Cn);
 
         float q = density * speed * speed / 2.0f;
 
@@ -168,13 +253,13 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         float L = CL * q * Sl;
 
         // Drag from Structure
-        Fa[2] = 0;
+        Fa[2] = -abs(D);
 
         // Lateral Force on Structure
         Fa[0] = (- (Cy * q * Sl))*0;
 
         // Lift on Structure
-        Fa[1] = (+ (+L));
+        Fa[1] = (+ (+abs(L)));
 
         dMatrix3 R,R2;
         dRSetIdentity(R);
@@ -206,7 +291,19 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         // Check alpha and beta limits before calculating the forces.
         Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
-        //dBodyAddRelForce(body,forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+        Ft[0] = Ft[0] + Fa[0];
+        Ft[1] = Ft[1] + Fa[1];
+        Ft[2] = Ft[2] + Fa[2];
+
+        if (isnan(Ft[0])) Ft[0]=0;
+        if (isnan(Ft[1])) Ft[1]=0;
+        if (isnan(Ft[2])) Ft[2]=0;
+
+        if (abs(Ft[0])>100000) Ft[0]=(Ft[0]>0?1:-1)*100000;
+        if (abs(Ft[1])>100000) Ft[1]=(Ft[1]>0?1:-1)*100000;
+        if (abs(Ft[2])>100000) Ft[2]=(Ft[2]>0?1:-1)*100000;
+
+
         dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
         // Adding drag which is OPPOSED to linear movment
@@ -215,12 +312,13 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         //dBodyAddForce(body,dragging[0],dragging[1],dragging[2]);
 
-        //printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha, beta, Cm, forcesOnBody[0],forcesOnBody[1],forcesOnBody[2]);
+        printf ("%5.2f/%2.4+f/%2.4+f/Cm=%5.2f/F=(%5.2f,%5.2f,%5.2f)\n", speed,alpha*180/PI, beta*180/PI, Cm, Ft[0],Ft[1],Ft[2]);
 
     }
     wrapDynamics(body);
 
 }
+**/
 
 
 Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)

@@ -221,24 +221,27 @@ void drawHUD()
         glVertex3f(uc+100-w, lc-100, 0);
         glEnd();
 
+
+        // Center cross
+
         glBegin(GL_LINES);
-        glVertex3f(uc+50-10, Camera.yAngle, 0.0);
-        glVertex3f(uc+50-2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle-10, Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle-2, + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100-50+10, Camera.yAngle, 0.0);
-        glVertex3f(uc+100-50+2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle+2, Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle+10, + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50, Camera.yAngle-10, 0.0);
-        glVertex3f(uc+50, + Camera.yAngle-2, 0);
+        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle-10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle-2, 0);
         glEnd();        
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50, Camera.yAngle+10, 0.0);
-        glVertex3f(uc+50, + Camera.yAngle+2, 0);
+        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle+10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle+2, 0);
         glEnd();
 
         Vec3f f = (Camera.getForward().normalize())*30;
@@ -307,7 +310,10 @@ void drawScene() {
         Camera.fw = entities[ctrling]->getForward();
 
         if (entities[ctrling]->getType() == MANTA)
+        {
             Camera.yAngle = ((Manta*)entities[ctrling])->alpha*100;
+            Camera.xAngle = ((Manta*)entities[ctrling])->beta*100;
+        }
     } else
     {
         Camera.getViewPort(up,pos,forward);

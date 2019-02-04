@@ -17,6 +17,8 @@ public:
 
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+    void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);
+    void rotateBody(dBodyID);
 };
 
 #endif // SIMPLIFIEDMANTA_H
