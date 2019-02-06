@@ -318,7 +318,7 @@ void test2()
     _manta1->setStatus(Manta::FLYING);
     _manta1->elevator = +12;
     struct controlregister c;
-    c.thrust = 1500.0f/(-10.0);
+    c.thrust = 1500.0f/(10.0);
     c.pitch = 12;
     _manta1->setControlRegisters(c);
     _manta1->setThrottle(1500.0f);
@@ -448,8 +448,8 @@ void test14()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,space,world));
+    entities.push_back(islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
+    entities.push_back(islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,space,world));
 }
 
 
@@ -499,7 +499,7 @@ void checktest2(unsigned long timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
         struct controlregister c;
-        c.thrust = 0.0f/(-10.0);
+        c.thrust = 0.0f/(10.0);
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(0.0f);
@@ -541,7 +541,7 @@ void checktest3(unsigned long timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
         struct controlregister c;
-        c.thrust = 400.0f/(-10.0);
+        c.thrust = 400.0f/(10.0);
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
@@ -570,7 +570,7 @@ void checktest4(unsigned long  timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
         struct controlregister c;
-        c.thrust = 400.0f/(-10.0);
+        c.thrust = 400.0f/(10.0);
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
@@ -601,7 +601,7 @@ void checktest5(unsigned long  timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
         struct controlregister c;
-        c.thrust = 400.0f/(-10.0);
+        c.thrust = 400.0f/(10.0);
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
@@ -612,7 +612,7 @@ void checktest5(unsigned long  timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
         struct controlregister c;
-        c.thrust = 0.0f/(-10.0);
+        c.thrust = 0.0f/(10.0);
         c.pitch = 0;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(0.0f);
@@ -705,7 +705,7 @@ void checktest7(unsigned long  timer)
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = +14;
         struct controlregister c;
-        c.thrust = 3500.0f/(-10.0);
+        c.thrust = 3500.0f/(10.0);
         c.pitch = 0;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(350.0f);
@@ -992,6 +992,8 @@ void checktest13(unsigned long timer)
 
 void checktest14(unsigned long timer)
 {
+    static bool reached = false;
+
     if (timer == 100)
     {
         spawnManta(space,world,entities[0]);
@@ -1011,12 +1013,12 @@ void checktest14(unsigned long timer)
         _manta1->inert = false;
         _manta1->enableAuto();
         _manta1->setStatus(Manta::FLYING);
-        _manta1->elevator = +19;
+        _manta1->elevator = +5;
         struct controlregister c;
-        c.thrust = 1500.0f/(-10.0);
-        c.pitch = 19;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
         _manta1->setControlRegisters(c);
-        _manta1->setThrottle(1500.0f);
+        _manta1->setThrottle(400.0f);
     }
 
     if (timer > 501)
@@ -1031,12 +1033,14 @@ void checktest14(unsigned long timer)
 
         Po[1] = 0.0f;
 
-        Vec3f Pf(-100000.0f, 0.0f, -100000.0f);
+        Vec3f Pf(-500 kmf, 0.0f, 200 kmf);
 
         Vec3f T = Pf - Po;
 
+        float eh, midpointpitch;
 
-        if (T.magnitude()>200)
+
+        if (!reached && T.magnitude()>200)
         {
             float distance = T.magnitude();
 
@@ -1056,19 +1060,28 @@ void checktest14(unsigned long timer)
 
             struct controlregister c = _manta1->getControlRegisters();
 
+            if (abs(e)>=0.5f)
+            {
+                c.roll = 3.0 * (signn>0?+1:-1) ;
+            } else
+            if (abs(e)>=0.4f)
+            {
+                c.roll = 2.0 * (signn>0?+1:-1) ;
+            } else
             if (abs(e)>=0.2f)
                 c.roll = 1.0 * (signn>0?+1:-1) ;
             else {
                 c.roll = 0.0f;
             }
 
-            float eh = height-500.0f;
-            float midpointpitch = 13;
+            eh = height-500.0f;
+            midpointpitch = -15;
+            c.thrust = 150.0f;
 
             if (distance<10000.0f)
             {
-                c.thrust = -40.0f;
-                midpointpitch = 49;
+                c.thrust = 30.0f;
+                midpointpitch = 17;
             }
 
 
@@ -1084,17 +1097,32 @@ void checktest14(unsigned long timer)
         {
             printf("Manta arrived to destination...\n");
             SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[3];
-            _manta1->elevator = -4;
+            _manta1->elevator = 36;
             struct controlregister c;
-            c.thrust = 0.0f/(-10.0);
-            c.pitch = -4;
-            _manta1->setControlRegisters(c);
-            _manta1->setThrottle(0.0f);
-            _manta1->stop();
+            c.thrust = 300.0f/(10.0);
+            midpointpitch = 36;
+            eh=height-500.0f;
 
-            char str[256];
-            sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
-            messages.insert(messages.begin(), str);
+            c.roll = -13;
+
+            if ((abs(eh))>10.0f)
+            {
+                c.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+            } else {
+                c.pitch = midpointpitch;
+            }
+
+            _manta1->setControlRegisters(c);
+            _manta1->setThrottle(30.0f);
+            //_manta1->stop();
+
+            if (!reached)
+            {
+                char str[256];
+                sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
+                messages.insert(messages.begin(), str);
+                reached = true;
+            }
         }
 
 
@@ -1103,6 +1131,7 @@ void checktest14(unsigned long timer)
 
 
 }
+
 
 static int testing=-1;
 

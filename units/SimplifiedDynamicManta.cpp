@@ -52,7 +52,10 @@ void SimplifiedDynamicManta::doControl(Controller controller)
 
 void SimplifiedDynamicManta::doControl(struct controlregister regs)
 {
-    setThrottle(-regs.thrust*2*5);
+    if (regs.thrust>150.0f)
+        regs.thrust=150.0f;
+
+    setThrottle(regs.thrust*10.0f);  // Use the mass of Manta
 
     if (getThrottle()>200 && inert)
     {
@@ -131,6 +134,8 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
+
+
 }
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
@@ -167,11 +172,18 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         float Cd = 0.01, CL = 0.01;
 
+
+        Cd = 0.9f    + 0.5f * alpha + 0.9*beta;
+        CL = 0.1f + 0.8f * alpha + 0.03 * ih + 0.002 * elevator + 0.2*flaps + 0.02*spoiler;
+
         float q = density * speed * speed / 2.0f;
         float D = Cd * q * Sl;
         float L = CL * q * Sl;
 
-        Vec3f Fa(0.0f, L, -D);
+
+        if (D>1) D=0.9;
+
+        Vec3f Fa(0.0f, L, -(D*speed));
         Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
 
@@ -184,7 +196,8 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         dBodyAddRelForce(body, Ft[0],Ft[1],Ft[2]);
 
-        printf("%8.4f\t%8.4f\t%6.4f\n",speed, alpha, beta);
+        //printf("%8.4f\t%8.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI);
+        //std::cout << Ft << std::endl;
     }
 
     wrapDynamics(body);

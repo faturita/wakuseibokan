@@ -275,10 +275,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'v':controller.registers.precesion-=1.0f;break;
         case 'b':controller.registers.precesion+=1.0f;break;
         case 'p':controller.pause = !controller.pause;break;
-        case 'r':controller.registers.thrust-=0.05;break;
-        case 'R':controller.registers.thrust-=10.00;break;
-        case 'f':controller.registers.thrust+=0.05;break;
-        case 'F':controller.registers.thrust+=10.00;break;
+        case 'r':controller.registers.thrust+=0.05;break;
+        case 'R':controller.registers.thrust+=10.00;break;
+        case 'f':controller.registers.thrust-=0.05;break;
+        case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
         case 'j':entities[controller.controlling]->enableAuto();break;

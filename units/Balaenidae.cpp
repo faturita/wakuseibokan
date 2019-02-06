@@ -281,10 +281,10 @@ void Balaenidae::launch(Manta* m)
     m->setStatus(Manta::FLYING);
     m->elevator = +12;
     struct controlregister c;
-    c.thrust = 1500.0f/(-10.0);
+    c.thrust = 600.0f/(10.0);
     c.pitch = 12;
     m->setControlRegisters(c);
-    m->setThrottle(1500.0f);
+    m->setThrottle(600.0f);
     Vec3f p = m->getPos();
     p[1] += 20;
     m->setPos(p);
@@ -293,6 +293,6 @@ void Balaenidae::launch(Manta* m)
 
     Vec3f f;
     f = m->getForward();
-    f = f*500;
+    f = f*200;
     dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
 }
