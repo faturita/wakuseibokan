@@ -136,6 +136,7 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
         dBodySetQuaternion(body,q3);
 
 
+
 }
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
@@ -159,6 +160,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
             alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
             beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
         }
+
 
         rotateBody(body);
 
