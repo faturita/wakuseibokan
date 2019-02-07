@@ -63,6 +63,8 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
+        glColor3f(1.0,1.0f,1.0f);
+        _model->setTexture(texture);
         _model->draw();
 
         glPopMatrix();

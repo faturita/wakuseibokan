@@ -293,6 +293,7 @@ void Balaenidae::launch(Manta* m)
 
     Vec3f f;
     f = m->getForward();
+    f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
     f = f*200;
     dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
 }

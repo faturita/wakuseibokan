@@ -172,7 +172,11 @@ bool hit(Vehicle *vehicle, Gunshot *g)
     // Dont hit me
     if (g->getOrigin() != vehicle->getBodyID())
     {
-        vehicle->damage(2);
+        if (vehicle->getType() == MANTA)
+        {
+            vehicle->damage(50);
+        } else
+            vehicle->damage(2);
         return false;
     }
     return true;
