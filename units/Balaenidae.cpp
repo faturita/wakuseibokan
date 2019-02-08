@@ -291,6 +291,8 @@ void Balaenidae::launch(Manta* m)
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
+    ((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
+
     Vec3f f;
     f = m->getForward();
     f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
