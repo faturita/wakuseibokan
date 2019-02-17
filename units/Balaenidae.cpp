@@ -238,7 +238,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
     if (type == MANTA)
     {
-        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
+        Manta *_manta1 = new Manta(getFaction());
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);
@@ -291,7 +291,7 @@ void Balaenidae::launch(Manta* m)
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
-    ((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
+    //((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
 
     Vec3f f;
     f = m->getForward();

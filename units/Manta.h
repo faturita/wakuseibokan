@@ -16,6 +16,7 @@ protected:
     int number=0;
 
 public:
+    Manta(int newfaction);
     static const int IN_CARRIER = 0;
     static const int ON_DECK = 1;
     static const int LANDED = 2;
@@ -45,9 +46,15 @@ public:
 	void virtual drawModel();
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
-    void wrapDynamics(dBodyID body);
     void doDynamics();
+    void doControl();
+
+
     void doControl(Controller controller);
+
+
+    void doControl(struct controlregister regs);
+
     
     void airspeddrarestoration();
     

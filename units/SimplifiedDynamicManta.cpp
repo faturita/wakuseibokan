@@ -2,9 +2,9 @@
 
 #include "../actions/Gunshot.h"
 
-SimplifiedDynamicManta::SimplifiedDynamicManta(int newfaction)
+SimplifiedDynamicManta::SimplifiedDynamicManta(int newfaction) : Manta(newfaction)
 {
-    setFaction(newfaction);
+
 }
 
 void SimplifiedDynamicManta::embody(dWorldID world, dSpaceID space)
