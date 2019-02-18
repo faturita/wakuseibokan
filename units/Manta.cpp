@@ -238,20 +238,33 @@ void Manta::doDynamics(dBodyID body)
 
     // Wind Frame angles.
     Manta::alpha = Manta::beta = 0;
+    float gamma = 0;
 
 
     if (linearVel[2]!=0 && speed > 2)
     {
         alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
         beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
+
+        Vec3f side(1.0f,0.0f,0.0f);
+
+        dVector3 result;
+        dBodyVectorToWorld(body, 1,0,0,result);
+
+        Vec3f sideinWorld;
+        sideinWorld[0] = result[0];
+        sideinWorld[1] = result[1];
+        sideinWorld[2] = result[2];
+
+        gamma = -atan2( sideinWorld[1], 1);
     }
 
-    dBodyAddForce(body,0.0,9.81f*(10.0f),0);
+    //dBodyAddForce(body,0.0,9.81f*(10.0f),0);
 
     float L=0;
     float D=0;
 
-    L=0.01 * speed;
+    L=0.3 * speed;
     D=0.01 * speed;
 
 
@@ -261,11 +274,17 @@ void Manta::doDynamics(dBodyID body)
 
     Mn = -elevator*0.01;
 
-    Ml = -rudder*0.1;
+    Ml = -rudder*0.1  - aileron*0.1;
+    Ml = -rudder*0.1  + gamma*0.5;
 
-    Md = -aileron*0.1;
+    Md = aileron*0.1 + gamma*0.5;
 
-    dBodyAddRelForce(body, 0.0f, L, getThrottle() - D);
+    airspeddrarestoration();
+
+    if (L>(9.81*10.0)) L = 9.81f * 10.0f;
+
+    dBodyAddRelForce(body, 0.0f, 0.0f, getThrottle() - D);
+    dBodyAddForce(body, 0.0f, L,0.0f );
     dBodyAddRelTorque(body, Mn, 0.0f, Md);
     dBodyAddTorque(body, 0.0f, Ml, 0.0f);
 

@@ -238,7 +238,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
     if (type == MANTA)
     {
-        Manta *_manta1 = new Manta(getFaction());
+        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);
