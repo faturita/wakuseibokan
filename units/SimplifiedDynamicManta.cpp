@@ -129,12 +129,12 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     dQfromR(q2,R2);
 
+
     dQMultiply0(q3,q2,q1);
 
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
-
 
 
 }
@@ -154,11 +154,25 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         // Wind Frame angles.
         Manta::alpha = Manta::beta = 0;
 
+        float gamma = 0;
+
 
         if (linearVel[2]!=0 && speed > 2)
         {
             alpha = -atan2( linearVelInBody[1], linearVelInBody[2] );//atan( VV[1] / VV[2]);
             beta = -atan2( linearVelInBody[0],  linearVelInBody[2]);
+
+            Vec3f side(1.0f,0.0f,0.0f);
+
+            dVector3 result;
+            dBodyVectorToWorld(body, 1,0,0,result);
+
+            Vec3f sideinWorld;
+            sideinWorld[0] = result[0];
+            sideinWorld[1] = result[1];
+            sideinWorld[2] = result[2];
+
+            gamma = -atan2( sideinWorld[1], 1);
         }
 
 
@@ -188,6 +202,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Vec3f Fa(0.0f, L, -(D*speed));
         Vec3f forcesOnBody = Fa.rotateOnX(alpha).rotateOnY(beta);
 
+        float Ml = -rudder*0.1  + gamma*0.1;
 
         Vec3f Ft;
         Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
@@ -197,6 +212,8 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Ft[2] = Ft[2] + forcesOnBody[2];
 
         dBodyAddRelForce(body, Ft[0],Ft[1],Ft[2]);
+
+        dBodyAddTorque(body, 0.0f, Ml, 0.0f);
 
         //printf("%8.4f\t%8.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI);
         //std::cout << Ft << std::endl;
