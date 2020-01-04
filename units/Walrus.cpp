@@ -231,23 +231,25 @@ void Walrus::doDynamics(dBodyID body)
     else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
         setStatus(Walrus::ROLLING);
 
-	Vec3f dump;
-	if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
-	{
-		dump = - ((vec3fV.cross(vec3fF).magnitude())/(vec3fV.magnitude()*vec3fF.magnitude())*10.0f) * vec3fV - 0.001 * vec3fV;
-	}
+    // This algorithm is generating too many seg faults with ODE library.
+    //Vec3f dump;
+    //if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
+    //{
+    //	dump = - ((vec3fV.cross(vec3fF).magnitude())/(vec3fV.magnitude()*vec3fF.magnitude())*10.0f) * vec3fV - 0.001 * vec3fV;
+    //}
 
-	if (!isnan(dump[0]) && !isnan(dump[1]) && !isnan(dump[2]))
-	{
-		dBodyAddForce(body, dump[0], dump[1], dump[2]);
-	}
+    //if (!isnan(dump[0]) && !isnan(dump[1]) && !isnan(dump[2]))
+    //{
+        //dBodyAddForce(body, dump[0], dump[1], dump[2]);
+    //}
 
 
 	//dBodyAddForce(body[i],damping[0]*-dumpMedia[i][0],damping[1]*-dumpMedia[i][0],damping[2]*-dumpMedia[i][0]);
 
-	dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
+    //dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
 
-	dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
+    //dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
+
 
     //if ((speed)>1.0 && speed < 1.3)
         //enginestart();

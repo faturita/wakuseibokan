@@ -224,6 +224,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 **/
                 if (v1 && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && isManta(v2) && groundcollisions(v2)) {}
+
             }
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);

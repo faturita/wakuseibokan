@@ -452,6 +452,18 @@ void test14()
     entities.push_back(islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,space,world));
 }
 
+void test15()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-9000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+}
+
 
 void checktest1(unsigned long timer)
 {
@@ -504,7 +516,7 @@ void checktest2(unsigned long timer)
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(0.0f);
     }
-    if (timer==1200)
+    if (timer==1600)
     {
         Vehicle *_b = entities[1];
         Vec3f val = _b->getPos();
@@ -1132,6 +1144,27 @@ void checktest14(unsigned long timer)
 
 }
 
+void checktest15(unsigned long timer)
+{
+    if (timer==200)
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+        spawnWalrus(space,world,b);
+    }
+    if (timer==400)
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+        spawnWalrus(space,world,b);
+    }
+
+    if (timer>700)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+}
+
 
 static int testing=-1;
 
@@ -1185,6 +1218,7 @@ void initWorldModelling(int testcase)
     case 12:initIslands();test1();test12();break; // Bullets
     case 13:initIslands();test13();break;
     case 14:initIslands();;test14();break;  // Spawn Manta from Carrier, launch it and land back on Carrier, and dock.
+    case 15:initIslands();test15();break;
     default:initIslands();test1();break;
     }
 
@@ -1201,7 +1235,7 @@ void worldStep(int value)
 
     switch(testing)
     {
-    case 1:checktest1(timer);break;
+    case 1:checktest1(timer);break; // Check system stability with islands and carrier.
     case 2:checktest2(timer);break;
     case 3:checktest3(timer);break;
     case 4:checktest4(timer);break;
@@ -1214,6 +1248,7 @@ void worldStep(int value)
     case 11:checktest11(timer);break;
     case 13:checktest13(timer);break;
     case 14:checktest14(timer);break;
+    case 15:checktest15(timer);break;
     default: break;
     }
 
