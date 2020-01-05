@@ -244,7 +244,7 @@ void Walrus::doDynamics(dBodyID body)
     //}
 
 
-	//dBodyAddForce(body[i],damping[0]*-dumpMedia[i][0],damping[1]*-dumpMedia[i][0],damping[2]*-dumpMedia[i][0]);
+    //dBodyAddForce(body[i],damping[0]*-dumpMedia[i][0],damping[1]*-dumpMedia[i][0],damping[2]*-dumpMedia[i][0]);
 
     //dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
 

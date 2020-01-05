@@ -428,7 +428,7 @@ void Vehicle::wrapDynamics(dBodyID body)
     if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
     {
         //assert(!"System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 +1),pos[1],pos[2]+(rand() % 10 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
         stop();
         dBodyAddRelForce (body,0, 0,0);
         dBodyAddRelTorque( body, 0, 0,0 );
@@ -439,7 +439,7 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     if (isnan(dBodyPosition[0]) || isnan(dBodyPosition[1] || isnan(dBodyPosition[2])))
     {
-        setPos(pos[0]+(rand() % 10 +1),pos[1],pos[2]+(rand() % 10 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
         stop();
         dBodyAddRelForce (body,0, 0,0);
         dBodyAddRelTorque( body, 0, 0,0 );

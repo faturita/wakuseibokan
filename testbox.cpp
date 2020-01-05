@@ -318,10 +318,10 @@ void test2()
     _manta1->setStatus(Manta::FLYING);
     _manta1->elevator = +12;
     struct controlregister c;
-    c.thrust = 1500.0f/(10.0);
+    c.thrust = 1000.0f/(10.0);
     c.pitch = 12;
     _manta1->setControlRegisters(c);
-    _manta1->setThrottle(1500.0f);
+    _manta1->setThrottle(1000.0f);
 
     entities.push_back(_manta1);
 }
@@ -506,7 +506,7 @@ void checktest1(unsigned long timer)
 }
 void checktest2(unsigned long timer)
 {
-    if (timer==850)
+    if (timer==550)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -515,6 +515,7 @@ void checktest2(unsigned long timer)
         c.pitch = -4;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(0.0f);
+        _manta1->inert = true;
     }
     if (timer==1600)
     {
