@@ -9,12 +9,16 @@
 
 #include <stdarg.h>
 #include <math.h>
+#include <string.h>
 
 #include <GLUT/glut.h>
 
 #include <ode/ode.h>
 
 #include <vector>
+
+#include <iostream>
+#include <unordered_map>
 
 #include "container.h"
 #include "ThreeMaxLoader.h"
@@ -40,10 +44,17 @@
 
 #include "units/Vehicle.h"
 
+#include "map.h"
+
 
 extern std::vector<BoxIsland*> islands;
 
 extern container<Vehicle*> entities;
+
+std::unordered_map<const char *, GLuint> maptextures;
+
+int mapzoom=1;
+int cx=1200/2,cy=800/2;
 
 
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
@@ -52,10 +63,20 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
     sprintf (str, name);
     //drawString(0+x-10,y-20,0,str,0.1f,1.0f,1.0f,1.0f);
 
+    // FIXME: Textures should be loaded only once at the beginning.  There may be a leak here.
     //Image* image = loadBMP("terrain/vulcrum.bmp");
-    Image* image = loadBMP(modelName);
-    GLuint _textureBox = loadTexture(image);
-    delete image;
+
+
+    GLuint _textureBox;
+
+    if (maptextures.find(modelName) == maptextures.end())
+    {
+        Image* image = loadBMP(modelName);
+        _textureBox = loadTexture(image);
+        delete image;
+    } else {
+        _textureBox = maptextures[modelName];
+    }
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, _textureBox);
@@ -81,6 +102,27 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
     glEnd();
 }
 
+void zoommapin()
+{
+    mapzoom++;
+}
+
+void zoommapout()
+{
+    mapzoom--;
+}
+
+void centermap(int ccx, int ccy)
+{
+    int xsize = 1200/mapzoom;
+    int ysize = 800/mapzoom;
+
+    // @FIXME: This should be adapted according to the screen resolution.
+    cx = (int)(ccx*(xsize)/1500.0)+cx-xsize/2;
+    cy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
+}
+
+
 void drawMap()
 {
     // This will make things dark.
@@ -89,7 +131,18 @@ void drawMap()
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0, 1200, 800, 0, -1, 1);
+
+    int xsize = 1200/mapzoom;
+    int ysize = 800/mapzoom;
+
+    if (mapzoom==1)
+    {
+        cx = 1200/2;
+        cy = 800/2;
+    }
+
+
+    glOrtho(cx-xsize/2, cx+xsize/2, cy+ysize/2, cy-ysize/2, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();

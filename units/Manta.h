@@ -16,6 +16,7 @@ protected:
     int number=0;
 
 public:
+    Manta(int newfaction);
     static const int IN_CARRIER = 0;
     static const int ON_DECK = 1;
     static const int LANDED = 2;
@@ -24,20 +25,20 @@ public:
 
     bool antigravity=false;
 
-	float rudder;
-	float elevator;
-    float aileron;
-    float flaps;
-    float spoiler;
-    float ih;
+    float rudder=0;
+    float elevator=0;
+    float aileron=0;
+    float flaps=0;
+    float spoiler=0;
+    float ih=0;
 
     float param[10];
-    float alpha;
-    float beta;
+    float alpha=0;
+    float beta=0;
 
-	float S[3];
-	float V[3];
-    float addd;
+    float S[3] = {0.0f, 0.0f, 0.0f};
+    float V[3] = {0.0f, 0.0f, 0.0f};
+    float addd=0;
 	void virtual init();
     int  virtual getType();
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
@@ -45,9 +46,15 @@ public:
 	void virtual drawModel();
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
-    void wrapDynamics(dBodyID body);
     void doDynamics();
+    void doControl();
+
+
     void doControl(Controller controller);
+
+
+    void doControl(struct controlregister regs);
+
     
     void airspeddrarestoration();
     

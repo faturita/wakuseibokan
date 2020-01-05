@@ -111,7 +111,7 @@ void Balaenidae::doControl(struct controlregister regs)
 {
     if (getThrottle()==0 and regs.thrust != 0)
         honk();
-    setThrottle(-regs.thrust*2*5);
+    setThrottle(regs.thrust*2*5);
 
     Balaenidae::rudder = -regs.roll;
 }
@@ -256,9 +256,10 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = p.normalize();
         p = getForward()*450;
-        _walrus->setPos(pos[0]-p[0],pos[1]-p[1],pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+40,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
+        dBodyAddRelForce(me,10.0f,0.0f,0.0f);
 
         alignToMe(_walrus->getBodyID());
         v = (Vehicle*)_walrus;
@@ -278,21 +279,24 @@ void Balaenidae::taxi(Manta *m)
 void Balaenidae::launch(Manta* m)
 {
     m->inert = true;
-    m->setStatus(2);
+    m->setStatus(Manta::FLYING);
     m->elevator = +12;
     struct controlregister c;
-    c.thrust = 1500.0f/(-10.0);
+    c.thrust = 600.0f/(10.0);
     c.pitch = 12;
     m->setControlRegisters(c);
-    m->setThrottle(1500.0f);
+    m->setThrottle(600.0f);
     Vec3f p = m->getPos();
-    p[1] += 10;
+    p[1] += 20;
     m->setPos(p);
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
+    //((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
+
     Vec3f f;
     f = m->getForward();
-    f = f*500;
+    f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
+    f = f*200;
     dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
 }

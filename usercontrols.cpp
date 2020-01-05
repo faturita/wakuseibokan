@@ -26,6 +26,7 @@
 #include "engine.h"
 
 #include "usercontrols.h"
+#include "map.h"
 
 #include "units/Vehicle.h"
 #include "units/Balaenidae.h"
@@ -75,10 +76,14 @@ void processMouse(int button, int state, int x, int y) {
         if (GLUT_RIGHT_BUTTON == button)
         {
         	//buttonState = 0;
+            zoommapout();
         }
         // set the color to pure red for the left button
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
+            printf("Mouse down %d,%d\n",x,y);
+            centermap(x,y);
+            zoommapin();
         }
         // set the color to pure green for the middle button
         else if (button == GLUT_MIDDLE_BUTTON) {
@@ -147,36 +152,6 @@ void processMousePassiveMotion(int x, int y) {
 }
 
 
-
-
-void spawnManta(Vehicle *spawner)
-{
-    int mantaNumber = findNextNumber(MANTA);
-    Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
-    if (manta != NULL)
-    {
-        entities.push_back(manta);
-        char msg[256];
-        sprintf(msg, "Manta %2d is ready to takeoff.",mantaNumber+1);
-        messages.insert(messages.begin(), std::string(msg));
-    }
-}
-
-void spawnWalrus(Vehicle *spawner)
-{
-    int walrusNumber = findNextNumber(WALRUS);
-    Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
-    if (walrus != NULL)
-    {
-        entities.push_back(walrus);
-        char msg[256];
-        sprintf(msg, "Walrus %2d has been deployed.",walrusNumber+1);
-        messages.insert(messages.begin(), std::string(msg));
-    }
-}
-
-
-
 void switchControl(int controlposition)
 {
     if (controlposition > entities.size())
@@ -201,7 +176,8 @@ void switchControl(int controlposition)
 
     if (controller.controlling != CONTROLLING_NONE)
     {
-        entities[controller.controlling]->setControlRegisters(controller.registers);
+        if (!entities[controller.controlling]->isAuto())
+            entities[controller.controlling]->setControlRegisters(controller.registers);
     }
 
     controller.controlling = id;
@@ -245,16 +221,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 //const char* content = controller.str.substr(7).c_str();
 
-                Balaenidae *b = (Balaenidae*)entities[controller.controlling];
-                Manta *m = findManta(Manta::ON_DECK);
-                if (m)
-                {
-                    b->launch(m);
-                    char msg[256];
-                    sprintf(msg, "Manta %2d has been launched.", m->getNumber()+1);
-                    messages.insert(messages.begin(), std::string(msg));
-                    takeoff();
-                }
+                launchManta(entities[controller.controlling]);
 
             } else
             if (controller.str.find("command") != std::string::npos)
@@ -313,10 +280,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'v':controller.registers.precesion-=1.0f;break;
         case 'b':controller.registers.precesion+=1.0f;break;
         case 'p':controller.pause = !controller.pause;break;
-        case 'r':controller.registers.thrust-=0.05;break;
-        case 'R':controller.registers.thrust-=10.00;break;
-        case 'f':controller.registers.thrust+=0.05;break;
-        case 'F':controller.registers.thrust+=10.00;break;
+        case 'r':controller.registers.thrust+=0.05;break;
+        case 'R':controller.registers.thrust+=10.00;break;
+        case 'f':controller.registers.thrust-=0.05;break;
+        case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
         case 'j':entities[controller.controlling]->enableAuto();break;
@@ -354,7 +321,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (entities[controller.controlling]->getType()==CARRIER)
                 {
-                    spawnManta(entities[controller.controlling]);
+                    spawnManta(space,world,entities[controller.controlling]);
                 }
             }
             }
@@ -379,7 +346,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case 'o':
             {
-                spawnWalrus(entities[controller.controlling]);
+                spawnWalrus(space,world,entities[controller.controlling]);
             }
             break;
         case 'O':

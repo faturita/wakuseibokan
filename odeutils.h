@@ -13,6 +13,8 @@
 #include "math/vec3f.h"
 #include "math/yamathutil.h"
 
+#define SGN(x) (x>=0?+1:-1)
+
 Vec3f ToVec3f(dReal *val, Vec3f retValue);
 
 Vec3f dBodyVectorToWorldVec3f(dBodyID body,dReal x,dReal y, dReal z,Vec3f vForward);

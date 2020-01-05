@@ -167,6 +167,14 @@ void drawHUD()
 
     }
 
+    Vec3f f = (Camera.getForward().normalize())*30;
+
+    f = (Camera.fw.normalize())*30;
+
+    // FIXME translate bearing to compass bearing.  N-0 NW 360 going down counterclockwise  Normalize bearing for everything.
+    sprintf (str, "%5.2f", atan2(f[2], f[0])*180.0/PI);
+    drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
+
     
     // Displays the target mark at the center. The position of the center cross depends on camera angles.
     glMatrixMode(GL_MODELVIEW);
@@ -221,29 +229,30 @@ void drawHUD()
         glVertex3f(uc+100-w, lc-100, 0);
         glEnd();
 
+
+        // Center cross
+
         glBegin(GL_LINES);
-        glVertex3f(uc+50-10, Camera.yAngle, 0.0);
-        glVertex3f(uc+50-2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle-10, Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle-2, + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+100-50+10, Camera.yAngle, 0.0);
-        glVertex3f(uc+100-50+2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle+2, Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle+10, + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50, Camera.yAngle-10, 0.0);
-        glVertex3f(uc+50, + Camera.yAngle-2, 0);
+        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle-10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle-2, 0);
         glEnd();        
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50, Camera.yAngle+10, 0.0);
-        glVertex3f(uc+50, + Camera.yAngle+2, 0);
+        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle+10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle+2, 0);
         glEnd();
 
-        Vec3f f = (Camera.getForward().normalize())*30;
-
-        f = (Camera.fw.normalize())*30;
+        // Bearing arrow
 
         int cx=1150, cy=350;
 
@@ -307,7 +316,10 @@ void drawScene() {
         Camera.fw = entities[ctrling]->getForward();
 
         if (entities[ctrling]->getType() == MANTA)
+        {
             Camera.yAngle = ((Manta*)entities[ctrling])->alpha*100;
+            Camera.xAngle = ((Manta*)entities[ctrling])->beta*100;
+        }
     } else
     {
         Camera.getViewPort(up,pos,forward);
@@ -443,6 +455,9 @@ void update(int value)
         {
             if (!entities[controller.controlling]->isAuto())
                 entities[controller.controlling]->doControl(controller);
+            else {
+                controller.registers = entities[controller.controlling]->getControlRegisters();
+            }
         }
 
         // Build island structures, international water structures and repair carriers.
