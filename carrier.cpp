@@ -167,6 +167,14 @@ void drawHUD()
 
     }
 
+    Vec3f f = (Camera.getForward().normalize())*30;
+
+    f = (Camera.fw.normalize())*30;
+
+    // FIXME translate bearing to compass bearing.  N-0 NW 360 going down counterclockwise  Normalize bearing for everything.
+    sprintf (str, "%5.2f", atan2(f[2], f[0])*180.0/PI);
+    drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
+
     
     // Displays the target mark at the center. The position of the center cross depends on camera angles.
     glMatrixMode(GL_MODELVIEW);
@@ -244,9 +252,7 @@ void drawHUD()
         glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle+2, 0);
         glEnd();
 
-        Vec3f f = (Camera.getForward().normalize())*30;
-
-        f = (Camera.fw.normalize())*30;
+        // Bearing arrow
 
         int cx=1150, cy=350;
 

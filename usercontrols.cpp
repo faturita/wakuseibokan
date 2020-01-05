@@ -26,6 +26,7 @@
 #include "engine.h"
 
 #include "usercontrols.h"
+#include "map.h"
 
 #include "units/Vehicle.h"
 #include "units/Balaenidae.h"
@@ -75,10 +76,14 @@ void processMouse(int button, int state, int x, int y) {
         if (GLUT_RIGHT_BUTTON == button)
         {
         	//buttonState = 0;
+            zoommapout();
         }
         // set the color to pure red for the left button
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
+            printf("Mouse down %d,%d\n",x,y);
+            centermap(x,y);
+            zoommapin();
         }
         // set the color to pure green for the middle button
         else if (button == GLUT_MIDDLE_BUTTON) {
