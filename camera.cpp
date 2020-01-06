@@ -149,5 +149,19 @@ void Camera::lookAtFrom(Vec3f pos, Vec3f forward)
     lookAtFrom(up,pos,forward);
 }
 
+float Camera::getBearing()
+{
+    Vec3f f = (getForward().normalize())*30;
+
+    f = (fw.normalize())*30;
+
+    float val = atan2(f[2], f[0])*180.0/PI;
+
+    if (val>=90) val -= 90;
+    else val += 270;
+
+    return val;
+}
+
 
 

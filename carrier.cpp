@@ -171,8 +171,7 @@ void drawHUD()
 
     f = (Camera.fw.normalize())*30;
 
-    // FIXME translate bearing to compass bearing.  N-0 NW 360 going down counterclockwise  Normalize bearing for everything.
-    sprintf (str, "%5.2f", atan2(f[2], f[0])*180.0/PI);
+    sprintf (str, "%5.2f", Camera.getBearing());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
 
     
