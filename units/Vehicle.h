@@ -134,7 +134,7 @@ public:
     void damage(int d);
     void setTexture(const GLuint &value);
 
-    void VERIFY(float f, dBodyID who);
+    bool VERIFY(Vec3f newpos, dBodyID who);
 
     int getFaction();
 };

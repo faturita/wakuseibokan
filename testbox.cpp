@@ -373,6 +373,48 @@ void test8()
     entities.push_back(_walrus);
 }
 
+void checktest8(unsigned long  timer)
+{
+    static bool isWalrusInIsland = false;
+    static bool didWalrusLeftIsland = false;
+
+    if (timer>100)
+    {
+        Walrus *_walrus = (Walrus*)entities[1];
+
+        if (_walrus->getIsland() != NULL)
+        {
+            isWalrusInIsland = true;
+        }
+
+        if (_walrus->getStatus() == Walrus::OFFSHORING)
+        {
+            didWalrusLeftIsland = true;
+        }
+    }
+
+    if (timer>=3500)
+    {
+        Walrus *_walrus = (Walrus*)entities[1];
+
+        if (!isWalrusInIsland)
+        {
+            printf("Test failed: Walrus has not associated island.\n");
+            endWorldModelling();
+            exit(-1);
+        } else if (!didWalrusLeftIsland) {
+            printf("Test failed: Walrus never left the island.\n");
+            endWorldModelling();
+            exit(-1);
+        } else {
+            printf("Test succedded\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
 void test9()
 {
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -741,50 +783,6 @@ void checktest7(unsigned long  timer)
     }
 
 }
-
-
-void checktest8(unsigned long  timer)
-{
-    static bool isWalrusInIsland = false;
-    static bool didWalrusLeftIsland = false;
-
-    if (timer>100)
-    {
-        Walrus *_walrus = (Walrus*)entities[1];
-
-        if (_walrus->getIsland() != NULL)
-        {
-            isWalrusInIsland = true;
-        }
-
-        if (_walrus->getStatus() == Walrus::OFFSHORING)
-        {
-            didWalrusLeftIsland = true;
-        }
-    }
-
-    if (timer>=3500)
-    {
-        Walrus *_walrus = (Walrus*)entities[1];
-
-        if (!isWalrusInIsland)
-        {
-            printf("Test failed: Walrus has not associated island.\n");
-            endWorldModelling();
-            exit(-1);
-        } else if (!didWalrusLeftIsland) {
-            printf("Test failed: Walrus never left the island.\n");
-            endWorldModelling();
-            exit(-1);
-        } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
-        }
-    }
-
-}
-
 
 
 void checktest9(unsigned long timer)

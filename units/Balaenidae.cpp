@@ -201,8 +201,6 @@ void Balaenidae::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
-    VERIFY(speed, me);
-
     vec3fV = vec3fV * 0.02f;
 
     dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);

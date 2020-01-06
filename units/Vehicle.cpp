@@ -425,26 +425,7 @@ void Vehicle::wrapDynamics(dBodyID body)
     if (getType()==WALRUS)
         printf("%p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
-    if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
-    {
-        //assert(!"System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
-        stop();
-        dBodyAddRelForce (body,0, 0,0);
-        dBodyAddRelTorque( body, 0, 0,0 );
-        return;
-    }
-    VERIFY(speed,body);
-
-
-    if (isnan(dBodyPosition[0]) || isnan(dBodyPosition[1] || isnan(dBodyPosition[2])))
-    {
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
-        stop();
-        dBodyAddRelForce (body,0, 0,0);
-        dBodyAddRelTorque( body, 0, 0,0 );
-    } else {
-
+    if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
     }
@@ -500,12 +481,51 @@ int Vehicle::getFaction()
  * @param speed
  * @param who
  */
-void Vehicle::VERIFY(float speed, dBodyID who)
+bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
 {
     //if (speed>1000.0f && getType()!= ACTION)
     //    stop(who);
+    if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
+    {
+        //assert(!"System is unstable.");   // This does not work with bullets.
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        stop();
+        dBodyAddRelForce (who,0, 0,0);
+        dBodyAddRelTorque( who, 0, 0,0 );
+        return false;
+    }
+
+    Vec3f angularVel = dBodyGetAngularVelInBody(who);
+    float angspeed = angularVel.magnitude();
+
+    if (speed>1000.0f && getType()!= ACTION)
+    {
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        stop();
+        dBodyAddRelForce (who,0, 0,0);
+        dBodyAddRelTorque( who, 0, 0,0 );
+        return false;
+    }
+
+    if (angspeed>1000.0f && getType() != ACTION)
+    {
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        stop();
+        dBodyAddRelForce (who,0, 0,0);
+        dBodyAddRelTorque( who, 0, 0,0 );
+        return false;
+    }
 
 
+    if (isnan(newpos[0]) || isnan(newpos[1] || isnan(newpos[2])))
+    {
+        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        stop();
+        dBodyAddRelForce (who,0, 0,0);
+        dBodyAddRelTorque( who, 0, 0,0 );
+        return false;
+    }
 
-    return;
+
+    return true;
 }

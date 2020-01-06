@@ -224,8 +224,6 @@ void Walrus::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
-    VERIFY(speed, me);
-
     if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
         setStatus(Walrus::SAILING);
     else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
