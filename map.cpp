@@ -51,7 +51,7 @@ extern std::vector<BoxIsland*> islands;
 
 extern container<Vehicle*> entities;
 
-std::unordered_map<const char *, GLuint> maptextures;
+std::unordered_map<std::string, GLuint> maptextures;
 
 int mapzoom=1;
 int cx=1200/2,cy=800/2;
@@ -60,22 +60,20 @@ int cx=1200/2,cy=800/2;
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
 {
     char str[256];
-    sprintf (str, name);
-    //drawString(0+x-10,y-20,0,str,0.1f,1.0f,1.0f,1.0f);
-
-    // FIXME: Textures should be loaded only once at the beginning.  There may be a leak here.
-    //Image* image = loadBMP("terrain/vulcrum.bmp");
-
 
     GLuint _textureBox;
 
-    if (maptextures.find(modelName) == maptextures.end())
+    if (maptextures.find(std::string(modelName)) == maptextures.end())
     {
         Image* image = loadBMP(modelName);
         _textureBox = loadTexture(image);
         delete image;
+
+        maptextures[std::string(modelName)]=_textureBox;
+
+        printf("Texture loaded...\n");
     } else {
-        _textureBox = maptextures[modelName];
+        _textureBox = maptextures[std::string(modelName)];
     }
 
     glEnable(GL_TEXTURE_2D);

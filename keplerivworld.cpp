@@ -68,6 +68,17 @@ std::vector<BoxIsland*> islands;
 std::vector<std::string> messages;
 
 
+/**
+ * Collision detection function.
+ *
+ * This is one of the most important pieces of code of this program.  It handles too many things.
+ *
+ *
+ * @brief nearCallback
+ * @param data
+ * @param o1
+ * @param o2
+ */
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;

@@ -498,7 +498,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     Vec3f angularVel = dBodyGetAngularVelInBody(who);
     float angspeed = angularVel.magnitude();
 
-    if (speed>1000.0f && getType()!= ACTION)
+    if ((speed>1000.0f || isnan(speed)) && getType()!= ACTION)
     {
         setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
         stop();

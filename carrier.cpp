@@ -121,7 +121,7 @@ void drawHUD()
     
     sprintf (str, "fps %4.2f  Cam: (%5.2f\t,%5.2f\t,%5.2f\t)\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2]);
 	// width, height, 0 0 upper left
-	drawString(0,-30,1,str,0.2f);
+    drawString(0,-30,1,str,0.2f);
     
 	//glPrint(1,10,10,"HUD");
     
@@ -170,6 +170,7 @@ void drawHUD()
     Vec3f f = (Camera.getForward().normalize())*30;
 
     f = (Camera.fw.normalize())*30;
+
 
     sprintf (str, "%5.2f", Camera.getBearing());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
