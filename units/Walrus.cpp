@@ -252,20 +252,24 @@ void Walrus::doDynamics(dBodyID body)
     //if ((speed)>1.0 && speed < 1.3)
         //enginestart();
 
-	// Walrus
-	dBodyAddRelForce (body,0, 0,getThrottle());
 
-    if (getStatus() == Walrus::SAILING)
+    if (VERIFY(pos,me) && !Vehicle::inert)
     {
-        dBodyAddForce(body, v[0]*(-0.01), 0, v[2]*(-0.01));
-    }
+        // Walrus
+        dBodyAddRelForce (body,0, 0,getThrottle());
 
-    if (getStatus() == Walrus::SAILING && speed > 5.0f)
-        dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
+        if (getStatus() == Walrus::SAILING)
+        {
+            dBodyAddForce(body, v[0]*(-0.01), 0, v[2]*(-0.01));
+        }
 
-    if (getStatus() == Walrus::ROLLING)
-    {
-        dBodyAddRelTorque(body, 0, -xRotAngle*0.7, 0);
+        else if (getStatus() == Walrus::SAILING && speed > 5.0f)
+            dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
+
+        else if (getStatus() == Walrus::ROLLING)
+        {
+            dBodyAddRelTorque(body, 0, -xRotAngle*0.7, 0);
+        }
     }
 
     wrapDynamics(body);

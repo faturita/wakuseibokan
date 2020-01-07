@@ -43,6 +43,9 @@
 #include "terrain/Terrain.h"
 
 #include "units/Vehicle.h"
+#include "structures/CommandCenter.h"
+
+#include "engine.h"
 
 #include "map.h"
 
@@ -102,16 +105,19 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 
 void zoommapin()
 {
-    mapzoom++;
+    if (mapzoom < 5)
+        mapzoom++;
 }
 
 void zoommapout()
 {
-    mapzoom--;
+    if (mapzoom>=1)
+        mapzoom--;
 }
 
 void centermap(int ccx, int ccy)
 {
+    // @FIXME: Parametrize all the resolution values.
     int xsize = 1200/mapzoom;
     int ysize = 800/mapzoom;
 
@@ -124,7 +130,6 @@ void centermap(int ccx, int ccy)
 void drawMap()
 {
     // This will make things dark.
-
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -213,7 +218,25 @@ void drawMap()
         {
             BoxIsland *b = islands[i];
 
-            drawString(600-(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,1.0f,1.0f,1.0f);
+            Structure *d = b->getCommandCenter();
+
+            // The color in the map defines the faction.
+            Vec3f color(1.0f,1.0f,1.0f);
+
+            if (d)
+            {
+                CommandCenter *cd = (CommandCenter*)d;
+
+                if (cd->getFaction()==GREEN_FACTION)
+                {
+                    color[0]=0.0f;color[1]=1.0f;color[2]=0;
+                } else {
+                    color[0]=0.0f;color[1]=0.0f;color[2]=1.0;
+                }
+
+            }
+
+            drawString(600-(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,color[0],color[1],color[2]);
         }
 
 
@@ -240,7 +263,6 @@ void drawMap()
         for(int i=0;i<islands.size();i++)
         {
             BoxIsland *b = islands[i];
-
             placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
         }
 

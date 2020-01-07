@@ -422,13 +422,21 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     Vec3f newpos(dBodyPosition[0], dBodyPosition[1], dBodyPosition[2]);
 
+    /**
     if (getType()==WALRUS)
-        printf("%p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        printf("Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
-    if (VERIFY(newpos, body)) {
+    if (getType()==MANTA)
+        printf("Manta    %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+
+    if (getType()==CARRIER)
+        printf("Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+    **/
+
+    //if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
-    }
+    //}
 }
 
 void Vehicle::alignToMe(dBodyID fBodyID)
@@ -488,7 +496,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
     {
         //assert(!"System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1),0,pos[2]+(rand() % 10 -5 +1));
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );
@@ -500,16 +508,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
 
     if ((speed>1000.0f || isnan(speed)) && getType()!= ACTION)
     {
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
-        stop();
-        dBodyAddRelForce (who,0, 0,0);
-        dBodyAddRelTorque( who, 0, 0,0 );
-        return false;
-    }
-
-    if (angspeed>1000.0f && getType() != ACTION)
-    {
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1),0,pos[2]+(rand() % 10 -5 +1));
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );
@@ -517,9 +516,9 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     }
 
 
-    if (isnan(newpos[0]) || isnan(newpos[1] || isnan(newpos[2])))
+    if ((isnan(newpos[0]) || isnan(newpos[1] || isnan(newpos[2]))))
     {
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1] + (rand() % 10 -5 +1),pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1),0,pos[2]+(rand() % 10 -5 +1));
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );

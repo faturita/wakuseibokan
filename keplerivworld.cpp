@@ -221,18 +221,12 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
 
-            } else {
-                /**
-                // Water buyoncy reaction
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                 if (v1 && isWalrus(v1)) { v1->inert = true;}
+                 if (v2 && isWalrus(v2)) { v2->inert = true;}
 
-                contact[i].surface.mu = 0.0f;
-                contact[i].surface.slip1 = 0.1f;
-                contact[i].surface.slip2 = 0.1f;
-                contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
-                contact[i].surface.soft_cfm = .3f;
-                **/
+            } else {
+                // Object against object collision.
+
                 if (v1 && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && isManta(v2) && groundcollisions(v2)) {}
 

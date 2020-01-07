@@ -35,7 +35,7 @@ protected:
 	float speed;
 	float R[12];
 	Vec3f forward;
-	float throttle;
+    float throttle=0;
     float engine[3];
     float steering;
     
@@ -56,8 +56,8 @@ protected:
     
 public:
     bool inert=false;
-	float xRotAngle;
-	float yRotAngle;
+    float xRotAngle=0;
+    float yRotAngle=0;
 	Vehicle();
     ~Vehicle();
     

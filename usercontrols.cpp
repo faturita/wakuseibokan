@@ -199,7 +199,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (n != std::string::npos)
             {
                 // @FIXME input data should be verified.
-                const char *content = controller.str.substr(8).c_str();
+                const char *content = controller.str.substr(7).c_str();
+
+                printf("Controlling %s\n", content);
 
                 switchControl(atoi(content));
 
@@ -272,7 +274,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 32 :Camera.dx=0.00001; controller.registers.thrust = 0;break;
         case '^':pp = !(pp);break;
         case 'a':case 'k':controller.registers.roll-=1.0f;break;
+        case 'A':case 'K':controller.registers.roll-=50.0f;break;
         case 'd':case 'l':controller.registers.roll+=1.0f;break;
+        case 'D':case 'L':controller.registers.roll+=50.0f;break;
+        case '`':controller.registers.roll=0;break;
         case 'w':controller.registers.pitch-=1.0f;break;
         case 's':controller.registers.pitch+=1.0f;break;
         case 'z':controller.registers.yaw-=1.0f;break;

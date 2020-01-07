@@ -577,7 +577,7 @@ void drawFloor(float x, float y, float z)
 
 void drawSky (float posX, float posY, float posZ)
 {
-	float sky_scale=10.0f;
+    float sky_scale=10.0f;
 	float sky_height=10.0f;
     glDisable (GL_LIGHTING);
     
@@ -638,6 +638,7 @@ void drawSky (float posX, float posY, float posZ)
     
     glDepthFunc (GL_LESS);
     glDepthRange (0,1);
+
 }
 
 

@@ -337,7 +337,6 @@ void test4()
 }
 
 
-
 void test6()
 {
     Vec3f pos(0.0f,10.0f,-4400.0f);

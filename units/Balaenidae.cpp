@@ -257,6 +257,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+40,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
+        _walrus->inert = true;
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
 
         alignToMe(_walrus->getBodyID());
