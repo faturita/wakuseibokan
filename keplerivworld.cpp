@@ -221,8 +221,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
 
-                 if (v1 && isWalrus(v1)) { v1->inert = true;}
-                 if (v2 && isWalrus(v2)) { v2->inert = true;}
+                 if (v1 && isWalrus(v1)) { v1->inert = false;}
+                 if (v2 && isWalrus(v2)) { v2->inert = false;}
 
             } else {
                 // Object against object collision.

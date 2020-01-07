@@ -27,6 +27,8 @@
 
 #include <iostream>
 
+#define kmf *1000.0f
+
 class Vec3f {
 	private:
 		float v[3];

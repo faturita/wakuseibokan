@@ -67,7 +67,7 @@ void processMouseEntry(int state) {
 void processMouse(int button, int state, int x, int y) {
 
 
-    //int specialKey = glutGetModifiers();
+    int specialKey = glutGetModifiers();
     // if both a mouse button, and the ALT key, are pressed  then
     if ((state == GLUT_DOWN)) {
 
@@ -82,8 +82,21 @@ void processMouse(int button, int state, int x, int y) {
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
             printf("Mouse down %d,%d\n",x,y);
-            centermap(x,y);
-            zoommapin();
+            if (controller.view == 2)
+            {
+                if (specialKey == GLUT_ACTIVE_SHIFT)
+                {
+                    Vec3f target = setLocationOnMap(x,y);
+                    entities[controller.controlling]->setDestination(target);
+
+                    printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
+
+
+                } else {
+                    centermap(x,y);
+                    zoommapin();
+                }
+            }
         }
         // set the color to pure green for the middle button
         else if (button == GLUT_MIDDLE_BUTTON) {
@@ -309,7 +322,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             std::cout << "Value:" << std::endl; std::cin >> controller.param[param] ;
             }
         break;
-        case '!':controller.view = 1;break;
+        case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;
         case '@':controller.view = 3;break;
         case '~':Camera.control = 0;break;
         case '?':gltWriteTGA("file.tga");break;
