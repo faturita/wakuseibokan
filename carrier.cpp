@@ -358,6 +358,8 @@ void drawScene() {
         (islands[i]->draw());
     }
 
+    //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+
     // Draw vehicles and objects
     synchronized(entities.m_mutex)
     {

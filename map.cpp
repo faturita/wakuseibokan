@@ -59,6 +59,44 @@ std::unordered_map<std::string, GLuint> maptextures;
 int mapzoom=1;
 int cx=1200/2,cy=800/2;
 
+void placeMark(int x, int y, int size, const char* modelName)
+{
+    GLuint _textureBox;
+
+    if (maptextures.find(std::string(modelName)) == maptextures.end())
+    {
+        Image* image = loadBMP(modelName);
+        _textureBox = loadTexture(image);
+        delete image;
+
+        maptextures[std::string(modelName)]=_textureBox;
+
+        printf("Texture loaded...\n");
+    } else {
+        _textureBox = maptextures[std::string(modelName)];
+    }
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureBox);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 0.0f);
+
+    glBegin(GL_QUADS);
+
+    //Front face
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-size / 2 + x, -size / 2 + y, 0);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(size / 2 + x, -size / 2 + y, 0);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(size / 2 + x, size / 2 + y, 0);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-size / 2 + x, size / 2 + y, 0);
+
+    glEnd();
+}
 
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
 {
@@ -122,7 +160,7 @@ void centermap(int ccx, int ccy)
     int ysize = 800/mapzoom;
 
     // @FIXME: This should be adapted according to the screen resolution.
-    cx = (int)(ccx*(xsize)/1500.0)+cx-xsize/2;
+    cx = (int)(ccx*(xsize)/1450.0)+cx-xsize/2;
     cy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
 }
 
@@ -133,7 +171,7 @@ Vec3f setLocationOnMap(int ccx, int ccy)
     int ysize = 800/mapzoom;
 
     // @FIXME: This should be adapted according to the screen resolution.
-    ccx = (int)(ccx*(xsize)/1500.0)+cx-xsize/2;
+    ccx = (int)(ccx*(xsize)/1450.0)+cx-xsize/2;
     ccy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
 
     // Map coordinates in kmf are centered at (0,0) which is the center of the screen.  Positive is upwards, left.
@@ -178,7 +216,6 @@ void drawMap()
 
 
 
-
     glClearColor(0.0f,0.0f,0.0f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -191,7 +228,8 @@ void drawMap()
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
 
-
+        // Let's draw the typical grid of naval cartmaking.  It is 12x8. Each square is 100 kmf squared.
+        // (+,0,0),(0,0,+) is upwards-right.  The screen is (+,0),(0,+) downward-right.
         for(int i=0;i<10;i++)
         {
             glLineWidth(2.5);
@@ -236,6 +274,7 @@ void drawMap()
 
         **/
 
+        // Let's show all the islands.  Green and Blue faction.
         for(int i=0;i<islands.size();i++)
         {
             BoxIsland *b = islands[i];
@@ -262,6 +301,7 @@ void drawMap()
         }
 
 
+        // Now show all the available units.
         synchronized(entities.m_mutex)
         {
             for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
@@ -280,7 +320,15 @@ void drawMap()
         }
 
 
+        // @FIXME: This sould be a list of targets and icons to show on the map.
+        Balaenidae *_b = (Balaenidae*)entities[0];
 
+        Vec3f target = _b->getDestination();
+
+        if (target.magnitude()>=1)
+        {
+            placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/carriertarget.bmp");
+        }
 
         for(int i=0;i<islands.size();i++)
         {

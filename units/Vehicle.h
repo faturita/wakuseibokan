@@ -123,6 +123,7 @@ public:
 
     float getBearing();
     void setDestination(Vec3f target);
+    Vec3f getDestination() const;
 
     virtual Vehicle* fire(dWorldID world, dSpaceID space);
 

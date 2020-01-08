@@ -499,6 +499,11 @@ void Vehicle::setDestination(Vec3f dest)
     reached = false;
 }
 
+Vec3f Vehicle::getDestination() const
+{
+    return Vehicle::destination;
+}
+
 /**
  * Check model consistencies.
  *

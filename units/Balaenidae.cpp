@@ -28,7 +28,7 @@ void Balaenidae::init()
     if (_model != NULL)
         _model->setAnimation("run");
 
-    setForward(0,0,1);    
+    setForward(0,0,1);
 
 }
 
