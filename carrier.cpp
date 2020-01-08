@@ -358,6 +358,8 @@ void drawScene() {
         (islands[i]->draw());
     }
 
+    //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+
     // Draw vehicles and objects
     synchronized(entities.m_mutex)
     {
@@ -450,7 +452,10 @@ void update(int value)
     }
     if (!controller.pause)
 	{
-        
+        // Auto Control: The controller can be controlled by the user or by the AI
+        // Each object is responsible for generating their own controlregisters as if it were a user playing
+        // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
+        // to control each object as if it were exactly the user (with doControl() in the loop ahead).
         if (controller.controlling != CONTROLLING_NONE)
         {
             if (!entities[controller.controlling]->isAuto())

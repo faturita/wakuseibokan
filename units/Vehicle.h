@@ -38,6 +38,10 @@ protected:
     float throttle=0;
     float engine[3];
     float steering;
+    Vec3f destination;
+
+    // @FIXME: This is super ugly.
+    bool reached=false;
     
     dBodyID me=NULL;
     dGeomID geom=NULL;
@@ -116,6 +120,10 @@ public:
 
     struct controlregister getControlRegisters();
     void setControlRegisters(struct controlregister);
+
+    float getBearing();
+    void setDestination(Vec3f target);
+    Vec3f getDestination() const;
 
     virtual Vehicle* fire(dWorldID world, dSpaceID space);
 

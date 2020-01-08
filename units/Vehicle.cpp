@@ -40,6 +40,8 @@ Vehicle::Vehicle()
     throttle=0.0f;
 
     steering=0.0f;
+
+    destination = Vec3f(0.0f, 0.0f, 0.0f);
 }
 
 Vehicle::~Vehicle()
@@ -332,6 +334,18 @@ void Vehicle::antigravity(dBodyID myBodySelf)
     dBodyAddForce(myBodySelf, 0,9.81f,0);
 }
 
+float Vehicle::getBearing()
+{
+    Vec3f f = (getForward().normalize())*30;
+
+    float val = atan2(f[2], f[0])*180.0/PI;
+
+    if (val>=90) val -= 90;
+    else val += 270;
+
+    return val;
+}
+
 Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
 {
     assert(0 || !"This should not be executed.");
@@ -477,6 +491,17 @@ void Vehicle::setFaction(int newfaction)
 int Vehicle::getFaction()
 {
     return faction;
+}
+
+void Vehicle::setDestination(Vec3f dest)
+{
+    Vehicle::destination = dest;
+    reached = false;
+}
+
+Vec3f Vehicle::getDestination() const
+{
+    return Vehicle::destination;
 }
 
 /**

@@ -1,3 +1,5 @@
+# 太陽系外惑星航空母艦
+
 Excited warfare on the seas of a Kepler IV.
 
 The time has come to conquer Kepler IV.   Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU). 
@@ -137,3 +139,5 @@ References
 * https://pleiades.ucsc.edu/hyades/OpenGL_on_OS_X
 * https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
 * https://forums.khronos.org/showthread.php/4991-The-Solution-for-gluLookAt()-Function!!!!
+* www.videotutorialsrock.com
+* https://learnopengl.com/Advanced-OpenGL

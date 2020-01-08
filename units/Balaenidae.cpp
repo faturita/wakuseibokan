@@ -8,6 +8,8 @@ extern GLuint _textureMetal;
 
 extern GLuint _textureRoad;
 
+extern std::vector<std::string> messages;
+
 Balaenidae::~Balaenidae()
 {
     delete _model;
@@ -26,7 +28,7 @@ void Balaenidae::init()
     if (_model != NULL)
         _model->setAnimation("run");
 
-    setForward(0,0,1);    
+    setForward(0,0,1);
 
 }
 
@@ -107,6 +109,89 @@ void Balaenidae::embody(dBodyID myBodySelf)
 
 }
 
+void Balaenidae::doControl()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf(145 kmf, -1.0f, 89 kmf - 3.5 kmf);
+
+    Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float eh, midpointpitch;
+
+
+    if (!reached && T.magnitude()>500)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+        c.registers.thrust = 1500.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 800.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 150.0f;
+        }
+
+    } else {
+        if (!reached)
+        {
+            char str[256];
+            sprintf(str, "Balaenidae has arrived to destination.");
+            messages.insert(messages.begin(), str);
+            reached = true;
+            c.registers.thrust = 0.0f;
+            c.registers.roll = 0.0f;
+        }
+    }
+
+    doControl(c);
+}
+
+void Balaenidae::doControl(Controller controller)
+{
+    doControl(controller.registers);
+}
+
 void Balaenidae::doControl(struct controlregister regs)
 {
     if (getThrottle()==0 and regs.thrust != 0)
@@ -115,12 +200,6 @@ void Balaenidae::doControl(struct controlregister regs)
 
     Balaenidae::rudder = -regs.roll;
 }
-
-void Balaenidae::doControl(Controller controller)
-{
-    doControl(controller.registers);
-}
-
 
 void Balaenidae::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
@@ -177,10 +256,6 @@ void Balaenidae::doDynamics(dBodyID body)
     }
 
 
-    // Buyoncy
-    //if (pos[1]<0.0f)
-    //    dBodyAddRelForce(me,0.0,9.81*20050.0f,0.0);
-
     dReal *v = (dReal *)dBodyGetLinearVel(body);
 
     dVector3 O;
@@ -206,21 +281,6 @@ void Balaenidae::doDynamics(dBodyID body)
     dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
 
     wrapDynamics(body);
-}
-
-void Balaenidae::doControl()
-{
-    Controller c;
-
-    c.registers = myCopy;
-
-    c.registers.roll = 1;
-    if ((rand() % 100 + 1)<10)
-        c.registers.thrust = 20;
-    else
-        c.registers.thrust = 0;
-
-    doControl(c);
 }
 
 void Balaenidae::offshore()
