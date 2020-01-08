@@ -234,9 +234,7 @@ void Balaenidae::doDynamics(dBodyID body)
     Vec3f Ft;
 
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
-    dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
-    dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
     if (offshoring == 1) {
         offshoring=0;
@@ -278,7 +276,16 @@ void Balaenidae::doDynamics(dBodyID body)
 
     vec3fV = vec3fV * 0.02f;
 
-    dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
+
+    if (VERIFY(pos, body))
+    {
+        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+
+        dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
+
+        dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
+    }
+
 
     wrapDynamics(body);
 }

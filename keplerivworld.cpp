@@ -424,6 +424,16 @@ void initWorldPopulation()
     _b->stop();
 
     entities.push_back(_b);
+
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
 }
 
 void initWorldModelling(int testcase)
