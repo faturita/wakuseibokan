@@ -455,6 +455,26 @@ void update(int value)
     }
     if (!controller.pause)
 	{
+
+        /**
+        static int status=0;
+
+        int action=0;
+
+        switch (status) {
+        case 0: //find nearest island.
+            Vehicle *b = findCarrier(BLUE_FACTION);
+
+
+            BoxIsland *is = findNearestIsland(b->getPos());
+
+            b->setDestination(is->getPos());
+
+        }
+    **/
+
+
+
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister

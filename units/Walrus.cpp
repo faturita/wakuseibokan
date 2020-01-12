@@ -125,7 +125,85 @@ void Walrus::drawModel()
 
 void Walrus::doControl()
 {
-    doControl(myCopy);
+    Controller c;
+
+    c.registers = myCopy;
+
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf(145 kmf, -1.0f, 89 kmf - 3.5 kmf);
+
+    Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float eh, midpointpitch;
+
+
+    if (!reached && T.magnitude()>500)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to avoid them)
+
+        c.registers.thrust = 150.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 80.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 15.0f;
+        }
+
+
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else {
+        if (!reached)
+        {
+            char str[256];
+            sprintf(str, "Balaenidae has arrived to destination.");
+            //messages.insert(messages.begin(), str);
+            reached = true;
+            c.registers.thrust = 0.0f;
+            c.registers.roll = 0.0f;
+        }
+    }
+
+    doControl(c);
 }
 
 void Walrus::doControl(Controller controller)

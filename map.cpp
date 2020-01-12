@@ -54,6 +54,8 @@ extern std::vector<BoxIsland*> islands;
 
 extern container<Vehicle*> entities;
 
+extern  Controller controller;
+
 std::unordered_map<std::string, GLuint> maptextures;
 
 int mapzoom=1;
@@ -345,13 +347,16 @@ void drawMap()
 
 
         // @FIXME: This sould be a list of targets and icons to show on the map.
-        Balaenidae *_b = (Balaenidae*)entities[0];
-
-        Vec3f target = _b->getDestination();
-
-        if (target.magnitude()>=1)
+        if (controller.controlling != CONTROLLING_NONE)
         {
-            placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/carriertarget.bmp");
+            Vehicle *_b = entities[controller.controlling];
+
+            Vec3f target = _b->getDestination();
+
+            if (target.magnitude()>=1)
+            {
+                placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/target.bmp");
+            }
         }
 
         for(int i=0;i<islands.size();i++)
@@ -359,13 +364,6 @@ void drawMap()
             BoxIsland *b = islands[i];
 
             placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
-        }
-
-        // for each island x,y get a circle of the island size.
-        for(int i=0;i<islands.size();i++)
-        {
-            BoxIsland *b = islands[i];
-
         }
 
 

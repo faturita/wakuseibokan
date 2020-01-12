@@ -87,6 +87,7 @@ void processMouse(int button, int state, int x, int y) {
                 if (specialKey == GLUT_ACTIVE_SHIFT)
                 {
                     Vec3f target = setLocationOnMap(x,y);
+                    //@FIXME
                     entities[controller.controlling]->setDestination(target);
 
                     printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
