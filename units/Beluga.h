@@ -10,6 +10,8 @@ public:
 
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void init();
+    void embody(dWorldID world, dSpaceID space);
+    void embody(dBodyID myBodySelf);
 };
 
 #endif // BELUGA_H

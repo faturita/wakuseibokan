@@ -18,11 +18,11 @@ public:
 
     ~Balaenidae();
     Balaenidae(int newfaction);
-    void drawModel(float yRot, float xRot, float x, float y, float z);
+    void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void init();
     int getType();
-    void embody(dWorldID world, dSpaceID space);
-    void embody(dBodyID myBodySelf);
+    void virtual embody(dWorldID world, dSpaceID space);
+    void virtual embody(dBodyID myBodySelf);
 
     void doControl(Controller controller);
     void doControl(struct controlregister regs);
