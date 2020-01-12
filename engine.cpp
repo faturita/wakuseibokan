@@ -74,6 +74,7 @@ bool stranded(Vehicle *carrier, Island *island)
         controller.reset();
         b->doControl(controller);
         b->setStatus(Balaenidae::OFFSHORING);
+        b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
         char str[256];
         sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
         messages.insert(messages.begin(), str);

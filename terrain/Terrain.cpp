@@ -140,6 +140,11 @@ float BoxIsland::getZ()
     return Z;
 }
 
+Vec3f BoxIsland::getPos()
+{
+    return Vec3f(getX(), 0.0, getZ());
+}
+
 std::string BoxIsland::getName()
 {
     return name;

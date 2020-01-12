@@ -9,6 +9,7 @@ extern GLuint _textureMetal;
 extern GLuint _textureRoad;
 
 extern std::vector<std::string> messages;
+extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
 {
@@ -139,12 +140,55 @@ void Balaenidae::doControl()
         T = T.normalize();
 
 
+        // Potential fields from the islands (to avoid them)
+
+        int nearesti = 0;
+        float closest = 0;
+        for(int i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+            Vec3f l(b->getX(),0.0f,b->getZ());
+
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
+        c.registers.thrust = 1500.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 800.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 150.0f;
+        }
+
+        if (closest > 1800 && closest < 4000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            Vec3f d = Po-l;
+
+            d = d.normalize();
+
+            T = T+d;
+            T = T.normalize();
+
+            c.registers.thrust = 45.0f;
+        }
+
+
+
         float e = acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+        printf("T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -160,17 +204,6 @@ void Balaenidae::doControl()
             c.registers.roll = 0.0f;
         }
 
-        c.registers.thrust = 1500.0f;
-
-        if (distance<10000.0f)
-        {
-            c.registers.thrust = 800.0f;
-        }
-
-        if (distance<2000.0f)
-        {
-            c.registers.thrust = 150.0f;
-        }
 
     } else {
         if (!reached)

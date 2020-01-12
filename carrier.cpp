@@ -369,6 +369,9 @@ void drawScene() {
             (entities[i]->drawModel());
         }
     }
+
+
+
     
     // GO with the HUD
     switch (controller.view)
