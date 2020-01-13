@@ -96,8 +96,6 @@ void Balaenidae::embody(dBodyID myBodySelf)
     dMass m;
 
     float myMass = 250.0f;
-    float radius = 2.64f;
-    float length = 7.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     //dMassSetBox(&m,1,1.0f, 4, 5.0f);
@@ -214,6 +212,7 @@ void Balaenidae::doControl()
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
+            disableAuto();
         }
     }
 
@@ -354,7 +353,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = p.normalize();
         p = getForward()*450;
-        _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+40,pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0]-140,pos[1]-p[1]+40,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
         _walrus->inert = true;

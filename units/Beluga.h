@@ -12,6 +12,8 @@ public:
     void init();
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
+
+    void doControl();
 };
 
 #endif // BELUGA_H

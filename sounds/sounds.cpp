@@ -42,7 +42,17 @@ void honk()
     system("afplay sounds/BoatHonk.m4a &");
 }
 
+void soaring()
+{
+    system("afplay sounds/soaring.m4a &");
+}
+
 void gunshot()
 {
     system("afplay sounds/Gunshot.m4a &");
+}
+
+void intro()
+{
+    system("afplay sounds/intro.mp3 &");
 }

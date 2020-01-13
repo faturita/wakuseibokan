@@ -427,6 +427,45 @@ Manta* findManta(int status)
     return NULL;
 }
 
+Walrus* findWalrus(int faction)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            return (Walrus*)v;
+        }
+    }
+    return NULL;
+}
+
+Walrus* findWalrus(int status, int faction)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction && v->getStatus() == status)
+        {
+            return (Walrus*)v;
+        }
+    }
+    return NULL;
+}
+
+Vehicle* findCarrier(int faction)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == CARRIER && v->getFaction() == faction)
+        {
+            return v;
+        }
+    }
+    return NULL;
+}
+
 int findNextNumber(int type)
 {
     int numbers[256];
@@ -452,6 +491,52 @@ int findNextNumber(int type)
             return i;
     }
     assert(!"No more available numbers !!!!!");
+}
+
+
+BoxIsland* findNearestEmptyIsland(Vec3f Po)
+{
+    int nearesti = 0;
+    float closest = 0;
+    for(int i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if (!d)
+        {
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
+
+    }
+
+    return islands[nearesti];
+}
+
+
+BoxIsland* findNearestIsland(Vec3f Po)
+{
+    int nearesti = 0;
+    float closest = 0;
+    for(int i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        if ((l-Po).magnitude()<closest || closest ==0) {
+            closest = (l-Po).magnitude();
+            nearesti = i;
+        }
+    }
+
+    return islands[nearesti];
+
 }
 
 void list()
@@ -516,7 +601,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
     }
 }
 
-void spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
+Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
 {
     int mantaNumber = findNextNumber(MANTA);
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
@@ -527,9 +612,10 @@ void spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
         sprintf(msg, "Manta %2d is ready to takeoff.",mantaNumber+1);
         messages.insert(messages.begin(), std::string(msg));
     }
+    return (Manta*)manta;
 }
 
-void spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
+Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
 {
     int walrusNumber = findNextNumber(WALRUS);
     Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
@@ -540,6 +626,7 @@ void spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
         sprintf(msg, "Walrus %2d has been deployed.",walrusNumber+1);
         messages.insert(messages.begin(), std::string(msg));
     }
+    return (Walrus*)walrus;
 }
 
 void launchManta(Vehicle *v)
@@ -557,4 +644,131 @@ void launchManta(Vehicle *v)
             takeoff();
         }
     }
+}
+
+void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
+{
+    int x = (rand() % 2000 + 1); x -= 1000;
+    int z = (rand() % 2000 + 1); z -= 1000;
+
+    Structure *s = island->addStructure(new CommandCenter(faction),x,z,space,world);
+    entities.push_back(s);
+
+    char msg[256];
+    sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
+    messages.insert(messages.begin(), std::string(msg));
+}
+
+void playFaction(int faction, dSpaceID space, dWorldID world)
+{
+    static int statuses[2] = {0,0};
+
+    int status = statuses[faction-1];
+
+    int action=-1;
+
+    switch (status) {
+    case 0: //find nearest island.
+    {
+        Vehicle *b = findCarrier(faction);
+
+
+        BoxIsland *is = findNearestEmptyIsland(b->getPos());
+
+        Vec3f vector = (b->getPos()) - (is->getPos());
+
+        vector = vector.normalize();
+
+        b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
+        b->enableAuto();
+        status = 1;
+
+        break;
+    }
+    case 1:
+    {
+        Vehicle *b = findCarrier(faction);
+        BoxIsland *is = findNearestEmptyIsland(b->getPos());
+
+        if (!b->isAuto())
+        {
+            printf("Carries has arrived to destination.\n");
+
+            Walrus* w = spawnWalrus(space,world,b);
+            w->setDestination(is->getPos());
+            w->enableAuto();
+            status = 2;
+
+        }
+        break;
+    }
+    case 2:
+    {
+        // Need to check if walrus arrived to island.
+        Walrus *w = findWalrus(faction);
+
+        if (w)
+        {
+            BoxIsland *is = findNearestEmptyIsland(w->getPos());
+
+            if (!w->isAuto())
+            {
+                captureIsland(is,w->getFaction(),space, world);
+                status=3;
+            }
+        }
+
+        break;
+    }
+    case 3:
+    {
+        Vehicle *b = findCarrier(faction);
+        // @FIXME I should find the one that actually went to the island.
+        Walrus *w = findWalrus(faction);
+
+        if (w)
+        {
+            w->setDestination(b->getPos()+Vec3f(0.0f,0.0f,-50.0f));
+            w->enableAuto();
+            status = 4;
+        }
+        break;
+    }
+    case 4:
+    {
+        Walrus *w = findWalrus(faction);
+
+        if (w && !(w->isAuto()))
+        {
+            // @FIXME: Find the walrus that is actually closer to the dock bay. REPEATED CODE DELETE
+            synchronized(entities.m_mutex)
+            {
+                for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+                {
+                    //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                    if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
+                    {
+                        //printf("Eliminating....\n");
+                        if (controller.controlling == i)
+                        {
+                            controller.controlling = CONTROLLING_NONE;
+                        }
+                        dBodyDisable(entities[i]->getBodyID());
+                        entities.erase(i);
+                        messages.insert(messages.begin(), std::string("Walrus is now back on deck."));
+                    }
+                }
+            }
+            status=0;
+        }
+
+        break;
+    }
+    default:
+        break;
+
+    }
+
+    statuses[faction-1] = status;
+
 }

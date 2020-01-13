@@ -26,7 +26,7 @@ public:
 
     void doControl(Controller controller);
     void doControl(struct controlregister regs);
-    void doControl();
+    void virtual doControl();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     void doDynamics();

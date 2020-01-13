@@ -153,20 +153,26 @@ void Walrus::doControl()
         T = T.normalize();
 
 
-        // Potential fields from the islands (to avoid them)
+        // Potential fields from the islands (to slow down Walrus)
 
-        c.registers.thrust = 150.0f;
+        c.registers.thrust = 400.0f;
 
         if (distance<10000.0f)
         {
-            c.registers.thrust = 80.0f;
+            c.registers.thrust = 200.0f;
         }
 
         if (distance<2000.0f)
         {
-            c.registers.thrust = 15.0f;
+            c.registers.thrust = 100.0f;
         }
 
+        BoxIsland *b = findNearestIsland(Po);
+        float closest = (b->getPos() - Po).magnitude();
+        if (closest > 1800 && closest < 1900)
+        {
+            c.registers.thrust = 15.0f;
+        }
 
 
         float e = acos(  T.dot(F) );
@@ -174,7 +180,7 @@ void Walrus::doControl()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+        printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -195,11 +201,13 @@ void Walrus::doControl()
         if (!reached)
         {
             char str[256];
-            sprintf(str, "Balaenidae has arrived to destination.");
+            sprintf(str, "Walrus has arrived to destination.");
             //messages.insert(messages.begin(), str);
+            printf("Walrus has reached its destination.\n");
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
+            disableAuto();
         }
     }
 
