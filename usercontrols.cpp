@@ -87,6 +87,7 @@ void processMouse(int button, int state, int x, int y) {
                 if (specialKey == GLUT_ACTIVE_SHIFT)
                 {
                     Vec3f target = setLocationOnMap(x,y);
+                    //@FIXME
                     entities[controller.controlling]->setDestination(target);
 
                     printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
@@ -244,15 +245,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 Walrus *w = (Walrus*) entities[controller.controlling];
                 // Chek if walrus is on island.
                 BoxIsland *island = w->getIsland();
-                int x = (rand() % 2000 + 1); x -= 1000;
-                int z = (rand() % 2000 + 1); z -= 1000;
 
-                Structure *s = island->addStructure(new CommandCenter(w->getFaction()),x,z,space,world);
-                entities.push_back(s);
+                captureIsland(island,w->getFaction(),space, world);
 
-                char msg[256];
-                sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(w->getFaction()));
-                messages.insert(messages.begin(), std::string(msg));
             } else
             if (controller.str.find("list") != std::string::npos)
             {

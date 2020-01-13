@@ -9,6 +9,7 @@ extern GLuint _textureMetal;
 extern GLuint _textureRoad;
 
 extern std::vector<std::string> messages;
+extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
 {
@@ -95,8 +96,6 @@ void Balaenidae::embody(dBodyID myBodySelf)
     dMass m;
 
     float myMass = 250.0f;
-    float radius = 2.64f;
-    float length = 7.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     //dMassSetBox(&m,1,1.0f, 4, 5.0f);
@@ -139,12 +138,55 @@ void Balaenidae::doControl()
         T = T.normalize();
 
 
+        // Potential fields from the islands (to avoid them)
+
+        int nearesti = 0;
+        float closest = 0;
+        for(int i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+            Vec3f l(b->getX(),0.0f,b->getZ());
+
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
+        c.registers.thrust = 1500.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 800.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 150.0f;
+        }
+
+        if (closest > 1800 && closest < 4000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            Vec3f d = Po-l;
+
+            d = d.normalize();
+
+            T = T+d;
+            T = T.normalize();
+
+            c.registers.thrust = 45.0f;
+        }
+
+
+
         float e = acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+        printf("T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -160,17 +202,6 @@ void Balaenidae::doControl()
             c.registers.roll = 0.0f;
         }
 
-        c.registers.thrust = 1500.0f;
-
-        if (distance<10000.0f)
-        {
-            c.registers.thrust = 800.0f;
-        }
-
-        if (distance<2000.0f)
-        {
-            c.registers.thrust = 150.0f;
-        }
 
     } else {
         if (!reached)
@@ -181,6 +212,7 @@ void Balaenidae::doControl()
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
+            disableAuto();
         }
     }
 
@@ -234,9 +266,7 @@ void Balaenidae::doDynamics(dBodyID body)
     Vec3f Ft;
 
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
-    dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
-    dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
     if (offshoring == 1) {
         offshoring=0;
@@ -278,7 +308,16 @@ void Balaenidae::doDynamics(dBodyID body)
 
     vec3fV = vec3fV * 0.02f;
 
-    dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
+
+    if (VERIFY(pos, body))
+    {
+        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+
+        dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
+
+        dBodyAddRelForce(body,vec3fV[0],vec3fV[1],vec3fV[2]);
+    }
+
 
     wrapDynamics(body);
 }
@@ -314,7 +353,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = p.normalize();
         p = getForward()*450;
-        _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+40,pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0]-140,pos[1]-p[1]+40,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
         _walrus->inert = true;

@@ -85,6 +85,9 @@ extern std::vector<std::string> messages;
 extern GLuint _textureBox;
 extern GLuint _textureMetal;
 
+float fps=0;
+extern unsigned long timer;
+
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -117,9 +120,9 @@ void drawHUD()
     
     if (isnan(Camera.pos[0])) exit(1);
     
-    float fps = getFPS();
+    fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%5.2f\t,%5.2f\t,%5.2f\t)\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2]);
+    sprintf (str, "fps %4.2f  Cam: (%5.2f\t,%5.2f\t,%5.2f\t)  TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2], timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -369,6 +372,9 @@ void drawScene() {
             (entities[i]->drawModel());
         }
     }
+
+
+
     
     // GO with the HUD
     switch (controller.view)
@@ -452,6 +458,10 @@ void update(int value)
     }
     if (!controller.pause)
 	{
+
+        playFaction(BLUE_FACTION,space,world);
+        playFaction(GREEN_FACTION, space, world);
+
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
@@ -600,6 +610,8 @@ int main(int argc, char** argv) {
     
     //Initialize all the models and structures.
     initRendering();
+
+    //intro();
     
 	// OpenGL callback functions.
 	glutDisplayFunc(drawScene);

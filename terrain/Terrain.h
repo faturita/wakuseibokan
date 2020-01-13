@@ -212,6 +212,7 @@ public:
 
     float getX();
     float getZ();
+    Vec3f getPos();
 
     std::string getName();
     void setName(std::string name);

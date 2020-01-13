@@ -8,5 +8,9 @@ void explosion();
 void honk();
 void gunshot();
 void smallenginestart();
+void soaring();
+
+void intro();
+
 
 #endif // SOUNDS_H

@@ -131,17 +131,28 @@ void  groundcollisions(dBodyID body);
 
 CommandCenter* findCommandCenter(Island *island);
 Manta* findManta(int status);
+Walrus* findWalrus(int status, int faction);
+Walrus* findWalrus(int faction);
 void list();
 
 int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
 
-void spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
+Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 
-void spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
+Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 
 void launchManta(Vehicle *v);
+
+BoxIsland* findNearestIsland(Vec3f Po);
+BoxIsland* findNearestEmptyIsland(Vec3f Po);
+
+Vehicle* findCarrier(int faction);
+
+void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
+
+void playFaction(int faction, dSpaceID space, dWorldID world);
 
 
 #endif // ENGINE_H

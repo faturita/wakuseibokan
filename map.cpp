@@ -54,6 +54,8 @@ extern std::vector<BoxIsland*> islands;
 
 extern container<Vehicle*> entities;
 
+extern  Controller controller;
+
 std::unordered_map<std::string, GLuint> maptextures;
 
 int mapzoom=1;
@@ -137,6 +139,7 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
     glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, 0);
+
 
     glEnd();
 }
@@ -274,6 +277,29 @@ void drawMap()
 
         **/
 
+
+        for(int i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+
+            {//        600-(b->getX()/1000)-10,(b->getZ()/1000)-20
+            int cx= 600-(b->getX()/1000);
+            int cy=0+(b->getZ()/1000);
+            float r =20;
+                glLineWidth(2.0f);
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glBegin(GL_LINE_LOOP);
+                glNormal3f(0.0, 0.0f, 1.0f);
+                for (int ii = 0; ii < 100; ii++)   {
+                    float theta = 2.0f * 3.1415926f * float(ii) / float(100);//get the current angle
+                    float x = r * cosf(theta);//calculate the x component
+                    float y = r * sinf(theta);//calculate the y component
+                    glVertex3f(x + cx, y + cy, 0.0f);//output vertex
+                }
+                glEnd();
+            }
+        }
+
         // Let's show all the islands.  Green and Blue faction.
         for(int i=0;i<islands.size();i++)
         {
@@ -321,20 +347,25 @@ void drawMap()
 
 
         // @FIXME: This sould be a list of targets and icons to show on the map.
-        Balaenidae *_b = (Balaenidae*)entities[0];
-
-        Vec3f target = _b->getDestination();
-
-        if (target.magnitude()>=1)
+        if (controller.controlling != CONTROLLING_NONE)
         {
-            placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/carriertarget.bmp");
+            Vehicle *_b = entities[controller.controlling];
+
+            Vec3f target = _b->getDestination();
+
+            if (target.magnitude()>=1)
+            {
+                placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/target.bmp");
+            }
         }
 
         for(int i=0;i<islands.size();i++)
         {
             BoxIsland *b = islands[i];
+
             placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
         }
+
 
 
 
