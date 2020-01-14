@@ -12,8 +12,8 @@ jobs:
     - name: configure
       run: make clean
     - name: make
-      run: ./waku
-    - name: make test
-      run: ./test -test 1
-    - name: make testall
-      run: ./testall
+      run: make
+    - name: test
+      run: make test
+    - name: testall
+      run: make testall
