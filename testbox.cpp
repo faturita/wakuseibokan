@@ -1240,6 +1240,322 @@ void checktest15(unsigned long timer)
 }
 
 
+void checktest16(unsigned long timer)
+{
+    if (timer==100)
+    {
+        Turret *l=(Turret*)entities[1];
+        l->enableAuto();
+        l->inclination = 0.23f; // Pushing down the turret.
+        l->azimuth = 90.0f;   // Moving around the turret.
+        struct controlregister c;
+        c.pitch = 0.0;
+        l->setControlRegisters(c);
+
+        // Extra
+        controller.controlling = 2;
+    }
+    if (timer==500)
+    {
+        //dMatrix3 R;
+        //ray = dCreateRay(space,4000.0f);
+        //dGeomSetPosition(ray,1000.0f,20.5f,-4000.0f);   // 0 20 -4000
+        //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
+        //dGeomSetRotation (ray,R);
+
+        LaserTurret *l=(LaserTurret*)entities[1];
+        Vehicle *action = (l)->fire(world,space);
+        //int *idx = new int();
+        //*idx = vehicles.push_back(action);
+        //dBodySetData( action->getBodyID(), (void*)idx);
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+    if (timer == 700)
+    {
+        LaserTurret *_b = (LaserTurret*)entities[2];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: The laser turret on the island has not been hit.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+void checktest17(unsigned long timer)
+{
+    Turret *l=(Turret*)entities[1];
+
+    Vehicle *_b = entities[0];
+
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+
+    Vec3f pos=_b->getPos();
+    Vec3f tur = l->getPos();
+
+    Vec3f aim = pos-tur;
+
+    aim = aim.normalize();
+
+
+    float azimuth = atan2(aim[2], aim[0])*180.0/PI;
+
+    if (azimuth>=90) azimuth -= 90;
+    else azimuth += 270;
+
+
+    float incl = atan2(aim[1], aim[0]) * 180.0/PI;
+
+    if (azimuth < 180.0f)
+        incl += 180.0;
+
+    printf ("Incl:%10.5f    Bg: %10.5f\n", incl, azimuth);
+
+    if (timer==500)   // You should wait until the carrier stops moving.  This is a very interesting unexpected (but realistic) result.
+    {
+        // @NOTE The real test should be performed controlling the parameters to control the turret instead of the internal parameters of the turret.
+        // I mean, this is not a real turret that should have mass and inertia.  This is straightforward aiming.
+        l->enableAuto();
+        l->inclination = incl;
+        l->azimuth = azimuth;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l->setControlRegisters(c);
+
+        // Extra
+        controller.controlling = 0;   // Shift screen to carrier.
+    }
+    if (timer==700)
+    {
+        //dMatrix3 R;
+        //ray = dCreateRay(space,4000.0f);
+        //dGeomSetPosition(ray,1000.0f,20.5f,-4000.0f);   // 0 20 -4000
+        //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
+        //dGeomSetRotation (ray,R);
+
+        Vehicle *action = (l)->fire(world,space);
+        //int *idx = new int();
+        //*idx = vehicles.push_back(action);
+        //dBodySetData( action->getBodyID(), (void*)idx);
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+    if (timer == 900)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: Carrier has not been hit. Either aiming or fire was wrong..\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+
+
+}
+
+void checktest18(unsigned long timer)
+{
+    Turret *l=(Turret*)entities[2];
+
+    Vehicle *_b = entities[0];
+
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+
+    Vec3f pos=_b->getPos();
+    Vec3f tur = l->getPos();
+
+    Vec3f aim = pos-tur;
+
+    aim = aim.normalize();
+
+
+    float azimuth = atan2(aim[2], aim[0])*180.0/PI;
+
+    if (azimuth>=90) azimuth -= 90;
+    else azimuth += 270;
+
+
+    float incl = atan2(aim[1], aim[0]) * 180.0/PI;
+
+    if (azimuth < 180.0f)
+        incl += 180.0;
+
+    printf ("Incl:%10.5f    Bg: %10.5f\n", incl, azimuth);
+
+    if (timer==500)   // You should wait until the carrier stops moving.  This is a very interesting unexpected (but realistic) result.
+    {
+        // @NOTE The real test should be performed controlling the parameters to control the turret instead of the internal parameters of the turret.
+        // I mean, this is not a real turret that should have mass and inertia.  This is straightforward aiming.
+        l->enableAuto();
+        l->inclination = incl;
+        l->azimuth = azimuth;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l->setControlRegisters(c);
+
+        // Extra
+        controller.controlling = 0;   // Shift screen to carrier.
+    }
+    if (timer==700)
+    {
+        //dMatrix3 R;
+        //ray = dCreateRay(space,4000.0f);
+        //dGeomSetPosition(ray,1000.0f,20.5f,-4000.0f);   // 0 20 -4000
+        //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
+        //dGeomSetRotation (ray,R);
+
+        Vehicle *action = (l)->fire(world,space);
+        //int *idx = new int();
+        //*idx = vehicles.push_back(action);
+        //dBodySetData( action->getBodyID(), (void*)idx);
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+    if (timer == 900)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: Carrier has not been hit. Either aiming or fire was wrong..\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+
+}
+
+void checktest19(unsigned long timer)
+{
+    Turret *l1=(Turret*)entities[1];
+    Turret *l2=(Turret*)entities[2];
+
+    Vehicle *b=NULL;
+    if (entities.exists(0))
+        b = entities[0];
+    else
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+    float azimuth1, inclination1;
+    float azimuth2, inclination2;
+
+    azimuth1 = getAzimuth((b->getPos())-(l1->getPos()));
+    inclination1 = getInclination((b->getPos())-(l1->getPos()));
+
+    azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
+    inclination2 = getInclination((b->getPos())-(l2->getPos()));
+
+    printf ("1:Incl:%10.5f    Bg: %10.5f\tIncl:%10.5f    Bg: %10.5f\n", inclination1, azimuth1, inclination2, azimuth2);
+
+    if (timer>500 && (timer % 100 == 0))
+    {
+
+        l1->enableAuto();
+        l1->inclination = inclination1;
+        l1->azimuth = azimuth1;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l1->setControlRegisters(c);
+
+        Vehicle *action = (l1)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+
+    if (timer>600 && (timer % 54 == 0))
+    {
+        l2->enableAuto();
+        l2->inclination = inclination2;
+        l2->azimuth = azimuth2;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l2->setControlRegisters(c);
+
+
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+    }
+
+
+    if (timer == 3000)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: Carrier has not been hit. Either aiming or fire was wrong..\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+
+
+
+
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -1289,10 +1605,14 @@ void initWorldModelling(int testcase)
     case 9:test1();test9();break; // Walrus stability.
     case 10:initIslands();test1();test10();break; // Walrus arrive to island and build the command center.
     case 11:initIslands();test11();break; // Carrier stability far away.
-    case 12:initIslands();test1();test12();break; // Bullets
-    case 13:initIslands();test13();break;
+    case 12:initIslands();test1();test12();break; // Turret firing to Carrier.  Gunshot stability.
+    case 13:initIslands();test13();break;   // Laser firing and hitting carrier.
     case 14:initIslands();;test14();break;  // Spawn Manta from Carrier, launch it and land back on Carrier, and dock.
     case 15:initIslands();test15();break;
+    case 16:initIslands();test1();test12();break;   // Turret firing to the other Turret.
+    case 17:initIslands();test1();test12();break;   // Turret automatically aiming at Carrier.
+    case 18:initIslands();test1();test12();break;
+    case 19:initIslands();test1();test12();break;
     default:initIslands();test1();break;
     }
 
@@ -1324,6 +1644,10 @@ void worldStep(int value)
     case 13:checktest13(timer);break;
     case 14:checktest14(timer);break;
     case 15:checktest15(timer);break;
+    case 16:checktest16(timer);break;
+    case 17:checktest17(timer);break;
+    case 18:checktest18(timer);break;
+    case 19:checktest19(timer);break;
     default: break;
     }
 

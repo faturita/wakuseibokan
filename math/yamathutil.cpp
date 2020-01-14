@@ -52,10 +52,19 @@ void Normalize(float v[3][3], float out[3])
 }
 
 
-Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float yAngle, float xAngle)
+/**
+ * @brief toVectorInFixedSystem
+ * @param dx
+ * @param dy
+ * @param dz
+ * @param azimuth           In degrees.
+ * @param inclination       In degrees.
+ * @return
+ */
+Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float azimuth, float inclination)
 {
-    float xRot = xAngle * PI / 180.0f;
-    float yRot = yAngle  * PI / 180.0f;
+    float xRot = inclination * PI / 180.0f;
+    float yRot = azimuth  * PI / 180.0f;
 
     float x = (float)( dx*cos(yRot) + dy*sin(xRot)*sin(yRot) - dz*cos(xRot)*sin(yRot) );
     float y = (float)(              + dy*cos(xRot)           + dz*sin(xRot)           );
@@ -65,4 +74,39 @@ Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float yAngle, float xAn
 
     return vec3f;
 }
+
+/**
+ * @brief getAzimuth This is the inverse operation of the one above.  Given a vector, it returns the azimuth of the given vector.
+ * @param aim
+ * @return General azimuth, 0 is north, 90 east, 180 south and 270 west.
+ */
+float getAzimuth(Vec3f aim)
+{
+    aim = aim.normalize();
+
+    float val = atan2(aim[2], aim[0])*180.0/PI;
+
+    if (val>=90) val -= 90;
+    else val += 270;
+
+    return val;
+}
+
+/**
+ * @brief getInclination This is the inverse operation of the one above.  Given a vector, it returs the inclination of the given vector.
+ * @param aim
+ * @return The inclination in degrees.  -90 is the cenit, 0 is the horizon, positive looking down towards the floor and 90 is your feet.
+ */
+float getInclination(Vec3f aim)
+{
+    aim = aim.normalize();
+
+    float incl = atan2(aim[1], aim[0]) * 180.0/PI;
+
+    if (getAzimuth(aim) < 180.0f)
+        incl += 180.0;
+
+    return incl;
+}
+
 

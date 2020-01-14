@@ -448,10 +448,10 @@ void Vehicle::wrapDynamics(dBodyID body)
     **/
 
     // @NOTE:  Uncomment the following line if you want the game to be more stable.
-    //if (VERIFY(newpos, body)) {
+    if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
-    //}
+    }
 }
 
 void Vehicle::alignToMe(dBodyID fBodyID)
