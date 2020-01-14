@@ -20,6 +20,8 @@
 
 enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, RAY=1,COLLISIONABLE=7, LANDINGABLE = 8, CONTROL=9 };
 
+enum AISTATUS { FREE, DESTINATION };
+
 class Vehicle : Observable
 {
 private:
@@ -49,6 +51,7 @@ protected:
     struct controlregister myCopy;
 
     bool aienable = false;
+    int aistatus = FREE;
 
     int status=0;
 

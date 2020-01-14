@@ -137,6 +137,19 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
+void Turret::doControl()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    //c.registers.roll = 1;
+    //if ((rand() % 100 + 1)<10)
+    //    firing = !firing;
+
+    Turret::doControl(c);
+}
+
 /**
  * The values are modified from the rc
  * @brief Turret::doControl
@@ -145,6 +158,8 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 void Turret::doControl(Controller controller)
 {
     zoom = 20.0f + controller.registers.precesion*100;
+
+    printf ("Incl:%10.5f    Az: %10.5f\n", inclination, azimuth);
 
     inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;

@@ -14,7 +14,7 @@ void firesound(int times)
 
 void smallenginestart()
 {
-    system("afplay sounds/fishstart.m4a &");
+    system("afplay sounds/boozing.m4a &");
 }
 
 void enginestart()

@@ -30,6 +30,7 @@ public:
     void setOrigin(dBodyID);
     dBodyID getOrigin();
 
+
 };
 
 #endif // GUNSHOT_H

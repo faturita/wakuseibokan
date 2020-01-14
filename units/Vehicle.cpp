@@ -447,6 +447,7 @@ void Vehicle::wrapDynamics(dBodyID body)
         printf("Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
+    // @NOTE:  Uncomment the following line if you want the game to be more stable.
     //if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
@@ -497,6 +498,7 @@ void Vehicle::setDestination(Vec3f dest)
 {
     Vehicle::destination = dest;
     reached = false;
+    aistatus = DESTINATION;
 }
 
 Vec3f Vehicle::getDestination() const

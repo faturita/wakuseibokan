@@ -163,7 +163,7 @@ void centermap(int ccx, int ccy)
     int ysize = 800/mapzoom;
 
     // @FIXME: This should be adapted according to the screen resolution.
-    cx = (int)(ccx*(xsize)/1450.0)+cx-xsize/2;
+    cx = (int)(ccx*(xsize)/1440.0)+cx-xsize/2;
     cy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
 }
 
@@ -174,7 +174,7 @@ Vec3f setLocationOnMap(int ccx, int ccy)
     int ysize = 800/mapzoom;
 
     // @FIXME: This should be adapted according to the screen resolution.
-    ccx = (int)(ccx*(xsize)/1450.0)+cx-xsize/2;
+    ccx = (int)(ccx*(xsize)/1440.0)+cx-xsize/2;
     ccy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
 
     // Map coordinates in kmf are centered at (0,0) which is the center of the screen.  Positive is upwards, left.

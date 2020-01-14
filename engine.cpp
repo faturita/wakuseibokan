@@ -663,6 +663,7 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
 {
     static int statuses[2] = {0,0};
 
+    // @FIXME: This is SO wrong.
     int status = statuses[faction-1];
 
     int action=-1;
@@ -672,16 +673,19 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
     {
         Vehicle *b = findCarrier(faction);
 
+        if (b)
+        {
 
-        BoxIsland *is = findNearestEmptyIsland(b->getPos());
+            BoxIsland *is = findNearestEmptyIsland(b->getPos());
 
-        Vec3f vector = (b->getPos()) - (is->getPos());
+            Vec3f vector = (b->getPos()) - (is->getPos());
 
-        vector = vector.normalize();
+            vector = vector.normalize();
 
-        b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
-        b->enableAuto();
-        status = 1;
+            b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
+            b->enableAuto();
+            status = 1;
+        }
 
         break;
     }

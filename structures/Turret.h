@@ -19,7 +19,8 @@ public:
 
     Vehicle* fire(dWorldID world, dSpaceID space);
 
-    void doControl(Controller);
+    void virtual doControl(Controller);
+    void virtual doControl();
 };
 
 #endif // TURRET_H

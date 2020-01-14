@@ -228,6 +228,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
 
+                 if (v1 && isWalrus(v1)) { v1->inert = false;}
+                 if (v2 && isWalrus(v2)) { v2->inert = false;}
+
             } else {
                 /**
                 // Water buyoncy reaction
@@ -326,10 +329,7 @@ void test2()
     entities.push_back(_manta1);
 }
 
-void test3()
-{
-    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
-}
+
 void test4()
 {
     entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
@@ -372,7 +372,7 @@ void test8()
     entities.push_back(_walrus);
 }
 
-void checktest8(unsigned long  timer)
+void checktest8(unsigned long  timer)      // Check Walrus entering and leaving an island.
 {
     static bool isWalrusInIsland = false;
     static bool didWalrusLeftIsland = false;
@@ -392,7 +392,7 @@ void checktest8(unsigned long  timer)
         }
     }
 
-    if (timer>=3500)
+    if (timer>=4000)
     {
         Walrus *_walrus = (Walrus*)entities[1];
 
@@ -414,68 +414,10 @@ void checktest8(unsigned long  timer)
 
 }
 
-void test9()
-{
-    Walrus *_walrus = new Walrus(GREEN_FACTION);
-    _walrus->init();
-    _walrus->embody(world, space);
-    _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
-    _walrus->stop();
 
-    entities.push_back(_walrus);
-}
 
-void test10()
-{
-    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
-    if (walrus != NULL)
-    {
-        size_t id = entities.push_back(walrus);
-        messages.insert(messages.begin(), std::string("Walrus has been deployed."));
-    }
-}
 
-void test11()
-{
-    // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    _b->embody(world,space);
-    _b->setPos(-400 kmf,20.5f,-400 kmf);
-    _b->stop();
 
-    entities.push_back(_b);
-}
-
-void test12()
-{
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,space,world));
-
-    Walrus *_walrus = new Walrus(GREEN_FACTION);
-    _walrus->init();
-    _walrus->embody(world, space);
-    _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
-    _walrus->stop();
-
-    entities.push_back(_walrus);
-}
-
-void test13()
-{
-    // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,+4000.0f);
-    _b->stop();
-
-    entities.push_back(_b);
-
-    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,space,world));
-}
 
 
 void test14()
@@ -547,7 +489,7 @@ void checktest1(unsigned long timer)
 }
 void checktest2(unsigned long timer)
 {
-    if (timer==550)
+    if (timer==320)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -588,9 +530,16 @@ void checktest2(unsigned long timer)
 }
 
 
+void test3()
+{
+    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
+}
+
+
 void checktest3(unsigned long timer)
 {
-    if (timer==620)
+
+    if (timer==90)  // Slow down Manta so that it can hit the structure.
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -600,7 +549,7 @@ void checktest3(unsigned long timer)
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
     }
-    if (timer==1000)
+    if (timer==1000)   // In case it hit the structure, their health will be lower.
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
 
@@ -619,7 +568,7 @@ void checktest3(unsigned long timer)
 
 void checktest4(unsigned long  timer)
 {
-    if (timer==720)
+    if (timer==100)   // Slow down Manta so that it can land on the runway
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -648,9 +597,9 @@ void checktest4(unsigned long  timer)
 }
 
 
-void checktest5(unsigned long  timer)
+void checktest5(unsigned long  timer)   // Manta lands on carrier.
 {
-    if (timer==240)
+    if (timer==70)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -661,7 +610,7 @@ void checktest5(unsigned long  timer)
         _manta1->setThrottle(400.0f);
         _manta1->setStatus(Manta::FLYING);
     }
-    if (timer==265)
+    if (timer==240)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
         _manta1->elevator = -4;
@@ -691,11 +640,11 @@ void checktest5(unsigned long  timer)
 
 }
 
-void checktest6(unsigned long timer)
+void checktest6(unsigned long timer)   // Carrier offshoring.
 {
     static bool isOffshoring = false;
 
-    if (timer==100)
+    if (timer==100)  // This is not autopilot.  If you control de carrier, you will override the controlregister parameters.
     {
         Balaenidae *b = (Balaenidae*)entities[0];
         struct controlregister c;
@@ -751,16 +700,16 @@ void checktest6(unsigned long timer)
 }
 
 
-void checktest7(unsigned long  timer)
+void checktest7(unsigned long  timer)    // Manta crashing on water (reducing its health).
 {
 
     if (timer==380)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
-        _manta1->elevator = +14;
+        _manta1->elevator -= 29;
         struct controlregister c;
         c.thrust = 3500.0f/(10.0);
-        c.pitch = 0;
+        c.pitch = -29;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(350.0f);
         _manta1->setStatus(Manta::FLYING);
@@ -769,6 +718,8 @@ void checktest7(unsigned long  timer)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
 
+        // @FIXME Health reduction should be a parameter and this test should minimize it to make it work.
+        // Manta should be immediately destroyed at this speed.
         if (_manta1->getHealth()==1000)
         {
             printf("Test failed.\n");
@@ -783,8 +734,19 @@ void checktest7(unsigned long  timer)
 
 }
 
+void test9()
+{
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
 
-void checktest9(unsigned long timer)
+    entities.push_back(_walrus);
+}
+
+void checktest9(unsigned long timer)     // Check walrus stability.
 {
     if (timer>500)
     {
@@ -824,7 +786,17 @@ void checktest9(unsigned long timer)
     }
 }
 
-void checktest10(unsigned long timer)
+void test10()
+{
+    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
+    if (walrus != NULL)
+    {
+        size_t id = entities.push_back(walrus);
+        messages.insert(messages.begin(), std::string("Walrus has been deployed."));
+    }
+}
+
+void checktest10(unsigned long timer)     // Check Walrus arriving to an island and creating the command center.
 {
     static unsigned long timerstep = 0;
     Walrus *_walrus = (Walrus*)entities[1];
@@ -915,8 +887,19 @@ void checktest10(unsigned long timer)
 
 }
 
+void test11()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(-400 kmf,20.5f,-400 kmf);
+    _b->stop();
 
-void checktest11(unsigned long timer)
+    entities.push_back(_b);
+}
+
+void checktest11(unsigned long timer)     // Check Carrier stability.
 {
     if (timer>1500)
     {
@@ -956,8 +939,32 @@ void checktest11(unsigned long timer)
     }
 }
 
-void checktest13(unsigned long timer)
+void test13()
 {
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,+4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,space,world));
+}
+
+
+void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
+{
+    if (timer==100)
+    {
+        LaserTurret *l=(LaserTurret*)entities[1];
+        l->enableAuto();
+        l->inclination = 0.3f; // Pushing down the turret.
+        struct controlregister c;
+        c.pitch = 0.0;
+        l->setControlRegisters(c);
+    }
     if (timer==500)
     {
         //dMatrix3 R;
@@ -967,7 +974,6 @@ void checktest13(unsigned long timer)
         //dGeomSetRotation (ray,R);
 
         LaserTurret *l=(LaserTurret*)entities[1];
-        l->inclination = 0.5;
         Vehicle *action = (l)->fire(world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
@@ -998,6 +1004,76 @@ void checktest13(unsigned long timer)
 
     }
 
+}
+
+void test12()
+{
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,space,world));
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+}
+
+void checktest12(unsigned long timer)
+{
+    if (timer==100)
+    {
+        Turret *l=(Turret*)entities[1];
+        l->enableAuto();
+        l->inclination = 0.12f; // Pushing down the turret.
+        l->azimuth = 159.0f;   // Moving around the turret.
+        struct controlregister c;
+        c.pitch = 0.0;
+        l->setControlRegisters(c);
+
+        // Extra
+        controller.controlling = 0;
+    }
+    if (timer==500)
+    {
+        //dMatrix3 R;
+        //ray = dCreateRay(space,4000.0f);
+        //dGeomSetPosition(ray,1000.0f,20.5f,-4000.0f);   // 0 20 -4000
+        //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
+        //dGeomSetRotation (ray,R);
+
+        LaserTurret *l=(LaserTurret*)entities[1];
+        Vehicle *action = (l)->fire(world,space);
+        //int *idx = new int();
+        //*idx = vehicles.push_back(action);
+        //dBodySetData( action->getBodyID(), (void*)idx);
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
+
+    if (timer == 700)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: The laser did nothing to the Carrier.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
 }
 
 void checktest14(unsigned long timer)
@@ -1234,7 +1310,7 @@ void worldStep(int value)
     switch(testing)
     {
     case 1:checktest1(timer);break; // Check system stability with islands and carrier.
-    case 2:checktest2(timer);break;
+    case 2:checktest2(timer);break; // Check Manta droping on island when trust is interrupted.
     case 3:checktest3(timer);break;
     case 4:checktest4(timer);break;
     case 5:checktest5(timer);break;
@@ -1244,6 +1320,7 @@ void worldStep(int value)
     case 9:checktest9(timer);break;
     case 10:checktest10(timer);break;
     case 11:checktest11(timer);break;
+    case 12:checktest12(timer);break;
     case 13:checktest13(timer);break;
     case 14:checktest14(timer);break;
     case 15:checktest15(timer);break;
