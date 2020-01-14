@@ -170,6 +170,9 @@ bool hit(Vehicle *vehicle, Gunshot *g)
     }
     **/
 
+    // @NOTE: Gunshot are a source of inestability.  I added some extra checks and to avoid tweakings I hide bullets after hitting targets.
+    g->setVisible(false);
+
     // Dont hit me
     if (g->getOrigin() != vehicle->getBodyID())
     {

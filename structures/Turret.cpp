@@ -159,6 +159,7 @@ void Turret::doControl(Controller controller)
 {
     zoom = 20.0f + controller.registers.precesion*100;
 
+    // @NOTE debug
     printf ("Incl:%10.5f    Az: %10.5f\n", inclination, azimuth);
 
     inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;

@@ -45,8 +45,8 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
     f[0] = 0; f[1] = 0; f[2] = 0;
 
     //Draw the saved model
-    //if (_model != NULL)
-    //{
+    if (visible)
+    {
         glPushMatrix();
         glTranslatef(x, y, z);
 
@@ -62,7 +62,7 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
         //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
 
         glPopMatrix();
-    //}
+    }
     //else
     //{
     //    printf ("model is null\n");
@@ -107,4 +107,9 @@ void Gunshot::embody(dBodyID myBodySelf)
 int Gunshot::getType()
 {
     return 5;
+}
+
+void Gunshot::setVisible(bool val)
+{
+    Gunshot::visible = val;
 }

@@ -14,6 +14,8 @@ protected:
 
     dBodyID origin;
 
+    bool visible = true;
+
 public:
     Gunshot();
     ~Gunshot();
@@ -29,6 +31,8 @@ public:
 
     void setOrigin(dBodyID);
     dBodyID getOrigin();
+
+    void setVisible(bool val);
 
 
 };
