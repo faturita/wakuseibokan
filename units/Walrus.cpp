@@ -352,19 +352,7 @@ void Walrus::doDynamics(dBodyID body)
         // Walrus
         dBodyAddRelForce (body,0, 0,getThrottle());
 
-        if (getStatus() == Walrus::SAILING)
-        {
-            //dBodyAddForce(body, v[0]*(-0.01), 0, v[2]*(-0.01));
-            dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
-        }
-
-        else if (getStatus() == Walrus::SAILING && speed > 5.0f)
-            dBodyAddRelTorque( body, 0, -xRotAngle*0.1,0 );
-
-        else if (getStatus() == Walrus::ROLLING)
-        {
-            dBodyAddRelTorque(body, 0, -xRotAngle*0.7, 0);
-        }
+        dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
     }
 
     wrapDynamics(body);

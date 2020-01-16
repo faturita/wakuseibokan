@@ -563,7 +563,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
             {
                 if (c->getTtl()<=0)
                 {
-                    // Add a structure (Structures should be randomly rotated also).
+                    // @TODO Structures should be rotated also.  Now they all have the same orientation.
                     int which = (rand() % 30 + 1);
                     Structure *s;
 
@@ -579,18 +579,20 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                     else
                         s = new Turret(c->getFaction());
 
-                    int x = (rand() % 2000 + 1); x -= 1000;
-                    int z = (rand() % 2000 + 1); z -= 1000;
+                    //int x = (rand() % 2000 + 1); x -= 1000;
+                    //int z = (rand() % 2000 + 1); z -= 1000;
 
-                    island->addStructure(s,x,z,space,world);
+                    island->addStructure(s,space,world);
+
+                    //island->addStructure(s,x,z,space,world);
 
                     entities.push_back(s);
 
                     if (8<=which && which<=10)
                     {
                         Structure *s2 = new Hangar(c->getFaction());
-                        z-=550;
-                        island->addStructure(s2,x,z,space,world);
+                        //z-=550;
+                        island->addStructure(s2,s->getPos()[0],s->getPos()[2]-550,space,world);
 
                         entities.push_back(s2);
                     }
@@ -651,10 +653,8 @@ void launchManta(Vehicle *v)
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
 {
-    int x = (rand() % 2000 + 1); x -= 1000;
-    int z = (rand() % 2000 + 1); z -= 1000;
 
-    Structure *s = island->addStructure(new CommandCenter(faction),x,z,space,world);
+    Structure *s = island->addStructure(new CommandCenter(faction),space,world);
     entities.push_back(s);
 
     char msg[256];
