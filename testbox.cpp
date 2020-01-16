@@ -1551,9 +1551,174 @@ void checktest19(unsigned long timer)
     }
 }
 
+void test20()
+{
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
+    nemesis->buildTerrainModel(space,"terrain/nm.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,space,world));
+
+}
+
+void checktest20(unsigned long timer)
+{
+    Turret *l1=(Turret*)entities[1];
+    Turret *l2=(Turret*)entities[2];
+
+    Vehicle *b=NULL;
+    if (entities.exists(0))
+        b = entities[0];
+    else
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+    float azimuth1, inclination1;
+    float azimuth2, inclination2;
+
+    azimuth1 = getAzimuth((b->getPos())-(l1->getPos()));
+    inclination1 = getInclination((b->getPos())-(l1->getPos()));
+
+    azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
+    inclination2 = getInclination((b->getPos())-(l2->getPos()));
+
+    printf ("1:Incl:%10.5f    Bg: %10.5f\tIncl:%10.5f    Bg: %10.5f\n", inclination1, azimuth1, inclination2, azimuth2);
+
+    if (timer>500 && (timer % 100 == 0))
+    {
+
+        l1->enableAuto();
+        l1->inclination = inclination1;
+        l1->azimuth = azimuth1;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l1->setControlRegisters(c);
+
+        Vehicle *action = (l1)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+
+    }
 
 
+    if (timer>600 && (timer % 54 == 0))
+    {
+        l2->enableAuto();
+        l2->inclination = inclination2;
+        l2->azimuth = azimuth2;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l2->setControlRegisters(c);
 
+
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+    }
+
+
+    if (timer == 3000)
+    {
+        Vehicle *_b = entities[0];
+
+        if (_b->getHealth() == 1000.0f)
+        {
+            printf("Test failed: Carrier has not been hit. Either aiming or fire was wrong..\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+void test21()
+{
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,space,world);
+
+    entities.push_back(t);
+
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+
+    entities.push_back(_walrus);
+
+    _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
+    _walrus->enableAuto();
+
+}
+
+void checktest21(unsigned long timer)   // Check arriving at Complex island like Nemesis and verify if Walrus can land on island.
+{
+    if (timer == 2000)
+    {
+        Walrus *b = findWalrus(GREEN_FACTION);
+        Structure *t = islands[0]->getStructures()[0]; // Risky
+
+        Vec3f d (b->getPos()-t->getPos());
+        if (d.magnitude()>600.0f)
+        {
+            printf("Test failed: Walrus couldn't reach destination.\n");
+            endWorldModelling();
+            exit(-1);
+
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
 
 
 static int testing=-1;
@@ -1611,8 +1776,10 @@ void initWorldModelling(int testcase)
     case 15:initIslands();test15();break;
     case 16:initIslands();test1();test12();break;   // Turret firing to the other Turret.
     case 17:initIslands();test1();test12();break;   // Turret automatically aiming at Carrier.
-    case 18:initIslands();test1();test12();break;
-    case 19:initIslands();test1();test12();break;
+    case 18:initIslands();test1();test12();break;   // The other Turret aims automatically to the Carrier.
+    case 19:initIslands();test1();test12();break;   // Both turrets aim to the carrier and start to fire.
+    case 20:test20();test12();break;                // Both turrets aim to the carrier at a far away island.
+    case 21:test21();break;
     default:initIslands();test1();break;
     }
 
@@ -1648,6 +1815,8 @@ void worldStep(int value)
     case 17:checktest17(timer);break;
     case 18:checktest18(timer);break;
     case 19:checktest19(timer);break;
+    case 20:checktest20(timer);break;
+    case 21:checktest21(timer);break;
     default: break;
     }
 

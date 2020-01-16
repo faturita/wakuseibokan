@@ -209,6 +209,7 @@ public:
     dGeomID getGeom();
 
     Structure* addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world);
+    Structure* addStructure(Structure* structure, dSpaceID space, dWorldID world);
 
     float getX();
     float getZ();

@@ -60,6 +60,10 @@ Terrain* loadTerrain(const char* filename, float height)
             unsigned char color =
             (unsigned char)image->pixels[3 * (y * image->width + x)];
             float h = height * ((color / 255.0f) - 0.5f);
+
+            // @NOTE:  Heightmap color 0 is FIXME
+            //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
+            //if (color == 0) h =  -70.0f;
             t->setHeight(x, y, h+height/2.0);
             //printf("%4d,%4d,%10.5f\n", x,y,h+height/2.0);
         }
@@ -175,6 +179,37 @@ void BoxIsland::draw()
 
 /**
  * x, z values are SCALED.  They are relative to the island center in 3600x3600 dimensions (3.6 km)
+ * This function generates x,z.  Only values that are above certain height are used to generate the structure.
+ *
+ * @brief BoxIsland::addStructure
+ * @param structure
+ * @param space
+ * @param world
+ * @return
+ */
+Structure* BoxIsland::addStructure(Structure *structure, dSpaceID space, dWorldID world)
+{
+    float heightOffset = 0;
+    float x = 0;
+    float z = 0;
+    do {
+
+        // @NOTE Make a parameter out of the size of the island.
+        x = (rand() % 3550 + 1); x -= 1800;
+        z = (rand() % 3550 + 1); z -= 1800;
+
+        // @FIXME Put this line in a different function and use it from there.  Repeated code here.
+        heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+        printf("Height %10.5f\n", heightOffset);
+    } while (heightOffset < 4);
+
+    return addStructure(structure,x,z,space,world);
+
+}
+
+/**
+ * x, z values are SCALED.  They are relative to the island center in 3600x3600 dimensions (3.6 km)
  *
  * @brief BoxIsland::addStructure
  * @param structure
@@ -193,7 +228,7 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpac
     structure->setPos(X+x,heightOffset,Z+z);
     structure->onIsland(this);
 
-    // @NOTE: when the structure is destroyed this pointer must be eliminated.
+    // @FIXME: when the structure is destroyed this pointer must be eliminated.
     structures.push_back(structure);
 
     return structure;
