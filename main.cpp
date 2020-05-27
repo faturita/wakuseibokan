@@ -28,6 +28,7 @@
 
 #include "camera.h"
 
+#include "sounds.h"
 
 
 float modAngleY=0, modAngleX = 0, modAngleZ=0;

@@ -57,8 +57,8 @@ void Normalize(float v[3][3], float out[3])
  * @param dx
  * @param dy
  * @param dz
- * @param azimuth           In degrees.
- * @param inclination       In degrees.
+ * @param azimuth           In degrees.  glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
+ * @param inclination       In degrees.  glRotatef(-Structure::inclination,0.0f,0.0f,1.0f);
  * @return
  */
 Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float azimuth, float inclination)
@@ -93,6 +93,7 @@ float getAzimuth(Vec3f aim)
 }
 
 /**
+ * @FIXME No funca
  * @brief getInclination This is the inverse operation of the one above.  Given a vector, it returs the inclination of the given vector.
  * @param aim
  * @return The inclination in degrees.  -90 is the cenit, 0 is the horizon, positive looking down towards the floor and 90 is your feet.

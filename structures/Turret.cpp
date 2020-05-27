@@ -73,7 +73,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
 
 Vec3f Turret::getForward()
 {
-    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,-Structure::inclination);
+    //Vec3f forward = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,-Structure::inclination);
     return forward;
 }
 
@@ -86,11 +86,11 @@ void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
     Vec3f orig;
 
-
     forward = forward.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
     position = position + (abs(zoom))*forward;
+
     //forward = -orig+position;
 }
 
@@ -130,6 +130,12 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
+
+    Vec3f d = action->getPos() - getPos();
+
+    //std::cout << d << std::endl;
+
+
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
@@ -143,10 +149,6 @@ void Turret::doControl()
 
     c.registers = myCopy;
 
-    //c.registers.roll = 1;
-    //if ((rand() % 100 + 1)<10)
-    //    firing = !firing;
-
     Turret::doControl(c);
 }
 
@@ -159,10 +161,8 @@ void Turret::doControl(Controller controller)
 {
     zoom = 20.0f + controller.registers.precesion*100;
 
-    // @NOTE debug
-    printf ("Incl:%10.5f    Az: %10.5f\n", inclination, azimuth);
-
     inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
 
+    setForward(toVectorInFixedSystem(0,0,1,azimuth, -inclination));
 }

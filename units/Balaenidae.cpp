@@ -353,7 +353,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = p.normalize();
         p = getForward()*450;
-        _walrus->setPos(pos[0]-p[0]-140,pos[1]-p[1]+40,pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+40,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
         _walrus->inert = true;

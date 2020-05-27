@@ -122,10 +122,6 @@ void LaserTurret::doControl()
 
     c.registers = myCopy;
 
-    //c.registers.roll = 1;
-    //if ((rand() % 100 + 1)<10)
-    //    firing = !firing;
-
     Turret::doControl(c);
 }
 

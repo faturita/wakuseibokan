@@ -182,7 +182,7 @@ void Walrus::doControl()
             float signn = T.cross(F) [1];
 
 
-            printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+            //printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
             if (abs(e)>=0.5f)
             {
@@ -346,13 +346,27 @@ void Walrus::doDynamics(dBodyID body)
     //if ((speed)>1.0 && speed < 1.3)
         //enginestart();
 
+    dVector3 result;
+    dBodyVectorToWorld(body, 0,1,0,result);
+
+    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+
+    upInBody = upInBody.normalize();
+
+    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+
 
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
-        // Walrus
-        dBodyAddRelForce (body,0, 0,getThrottle());
+        if (attitude < 45)
+        {
+            dBodyAddRelForce (body,0, 0,getThrottle());
 
-        dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
+            dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
+        }
     }
 
     wrapDynamics(body);
