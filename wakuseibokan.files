@@ -52,6 +52,8 @@ reinforcement.cpp
 sounds.h
 sounds/sounds.cpp
 sounds/sounds.h
+structures/Artillery.cpp
+structures/Artillery.h
 structures/CommandCenter.cpp
 structures/CommandCenter.h
 structures/Hangar.cpp

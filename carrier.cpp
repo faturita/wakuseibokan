@@ -591,6 +591,8 @@ int main(int argc, char** argv) {
     // Initialize ODE, create islands, structures and populate the world.
     if (argc>1 && strcmp(argv[1],"-test")==0)
         initWorldModelling(atoi(argv[2]));
+    else if (argc>2 && strcmp(argv[2],"-test")==0)
+        initWorldModelling(atoi(argv[3]));
     else
         initWorldModelling();
 

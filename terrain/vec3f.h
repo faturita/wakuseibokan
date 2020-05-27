@@ -55,6 +55,8 @@ class Vec3f {
 		Vec3f normalize() const;
 		float dot(const Vec3f &other) const;
 		Vec3f cross(const Vec3f &other) const;
+
+        char * toString(char *) const;
 };
 
 Vec3f operator*(float scale, const Vec3f &v);

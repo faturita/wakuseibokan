@@ -227,7 +227,7 @@ void BoxVehicle::doDynamics()
     // Antigravity field.
     if (repelling)
     {
-        printf ("Antigravity...\n");
+        //printf ("Antigravity...\n");
         dBodyAddForce(me, 0,9.81f,0);
     }
 
