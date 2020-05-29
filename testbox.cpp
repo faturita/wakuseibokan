@@ -1902,11 +1902,10 @@ void test24()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          0.0f,    0.0f,space,world);
-    Structure *h = islands[0]->addStructure(new LaserTurret(BLUE_FACTION),          -510.0f,    0.0f,space,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,space,world);
 
     entities.push_back(t);
-    entities.push_back(h);
+
 
 
     BoxVehicle * _bo= new BoxVehicle();
@@ -1916,44 +1915,22 @@ void test24()
     _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
     _bo->stop();
 
-    BoxVehicle * _ho= new BoxVehicle();
-    _ho->init();
-    _ho->embody(world, space);
-    _ho->setPos(_b->getPos()+Vec3f(500.0f,0.0f,-500.0f));
-    _ho->setPos(_ho->getPos()[0],50.0f, _ho->getPos()[2]);
-    _ho->stop();
-
-    BoxVehicle * _lo= new BoxVehicle();
-    _lo->init();
-    _lo->embody(world, space);
-    _lo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
-    _lo->setPos(_lo->getPos()[0],50.0f, _lo->getPos()[2]);
-    _lo->stop();
-
-    BoxVehicle * _mo= new BoxVehicle();
-    _mo->init();
-    _mo->embody(world, space);
-    _mo->setPos(_b->getPos()+Vec3f(500.0f,0.0f,-500.0f));
-    _mo->setPos(_mo->getPos()[0],50.0f, _mo->getPos()[2]);
-    _mo->stop();
-
     entities.push_back(_bo);
-    entities.push_back(_ho);
-    entities.push_back(_lo);
-    entities.push_back(_mo);
 
 }
 
 void checktest24(unsigned long timer)
 {
     Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
-    BoxVehicle *b = (BoxVehicle*)entities[3];
+    BoxVehicle *b = (BoxVehicle*)entities[2];
+
+    static Vec3f *p = NULL;
 
     if (!b)
     {
-        printf("Test passed OK!\n");
+        printf("Test Failed.\n");
         endWorldModelling();
-        exit(1);
+        exit(0);
     }
 
     // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
@@ -1975,6 +1952,12 @@ void checktest24(unsigned long timer)
 
     std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
+    if (timer>100 && !p)
+    {
+        p = new Vec3f(b->getPos());
+    }
+
+
     if (timer>600 && (timer % 17 == 0))
     {
         //l2->enableAuto();
@@ -1993,6 +1976,20 @@ void checktest24(unsigned long timer)
             entities.push_back(action);
             gunshot();
         }
+    }
+
+
+    if (timer>1100)
+    {
+        Vec3f l=*p;
+
+        if (!(l.isEquals(b->getPos())))
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
     }
 }
 

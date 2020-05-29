@@ -78,7 +78,6 @@ terrain/imageloader.cpp
 terrain/imageloader.h
 terrain/island.h
 terrain/main.cpp
-terrain/vec3f.cpp
 terrain/vec3f.h
 testall.cpp
 testbed.cpp

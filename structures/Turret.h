@@ -5,6 +5,8 @@
 
 class Turret : public Structure
 {
+protected:
+    Vec3f firingpos;
 public:
     GLfloat modelview[16];
 

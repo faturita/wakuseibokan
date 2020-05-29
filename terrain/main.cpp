@@ -33,7 +33,7 @@
 #endif
 
 #include "imageloader.h"
-#include "vec3f.h"
+#include "../math/vec3f.h"
 
 using namespace std;
 

@@ -18,6 +18,8 @@ void Turret::init()
     Structure::length=11.68;
     Structure::width=11.68;
 
+    Turret::firingpos = Vec3f(0.0f,19.0f,0.0f);
+
     setForward(0,0,1);
 }
 
@@ -93,7 +95,8 @@ void Turret::setForward(Vec3f forw)
 
 Vec3f Turret::getFiringPort()
 {
-    return Vec3f(getPos()[0],20.1765f, getPos()[2]);
+    //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
+    return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {

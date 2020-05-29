@@ -49,6 +49,7 @@ class Vec3f {
 		const Vec3f &operator/=(float scale);
 		const Vec3f &operator+=(const Vec3f &other);
 		const Vec3f &operator-=(const Vec3f &other);
+        bool isEquals(const Vec3f other);
 		
 		float magnitude() const;
 		float magnitudeSquared() const;
@@ -61,6 +62,8 @@ class Vec3f {
 		Vec3f rotateOnZ(float alpha);
 
         Vec3f rotateOn(Vec3f u, float alpha);
+
+        char * toString(char *) const;
 };
 
 Vec3f operator*(float scale, const Vec3f &v);
