@@ -2054,7 +2054,7 @@ void initWorldModelling(int testcase)
     case 21:test21();break;
     case 22:test22();break;
     case 23:test23();break;                         // Set walrus to reach the shore and the turret to fire to it
-    case 24:test24();break;                         // Check azimuth and inclination calculation based on a forward vector.
+    case 24:test24();break;                         // Check azimuth and declination calculation based on a forward vector.
     default:initIslands();test1();break;
     }
 
