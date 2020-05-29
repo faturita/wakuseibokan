@@ -961,7 +961,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
     {
         LaserTurret *l=(LaserTurret*)entities[1];
         l->enableAuto();
-        l->inclination = 0.3f; // Pushing down the turret.
+        l->elevation = 0.3f; // Pushing down the turret.
         struct controlregister c;
         c.pitch = 0.0;
         l->setControlRegisters(c);
@@ -1028,7 +1028,7 @@ void checktest12(unsigned long timer)
     {
         Turret *l=(Turret*)entities[1];
         l->enableAuto();
-        l->inclination = 0.12f; // Pushing down the turret.
+        l->elevation = 0.12f; // Pushing down the turret.
         l->azimuth = 159.0f;   // Moving around the turret.
         struct controlregister c;
         c.pitch = 0.0;
@@ -1247,7 +1247,7 @@ void checktest16(unsigned long timer)
     {
         Turret *l=(Turret*)entities[1];
         l->enableAuto();
-        l->inclination = 0.23f; // Pushing down the turret.
+        l->elevation = 0.23f; // Pushing down the turret.
         l->azimuth = 90.0f;   // Moving around the turret.
         struct controlregister c;
         c.pitch = 0.0;
@@ -1331,7 +1331,7 @@ void checktest17(unsigned long timer)
         // @NOTE The real test should be performed controlling the parameters to control the turret instead of the internal parameters of the turret.
         // I mean, this is not a real turret that should have mass and inertia.  This is straightforward aiming.
         l->enableAuto();
-        l->inclination = incl;
+        l->elevation = incl;
         l->azimuth = azimuth;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1416,7 +1416,7 @@ void checktest18(unsigned long timer)
         // @NOTE The real test should be performed controlling the parameters to control the turret instead of the internal parameters of the turret.
         // I mean, this is not a real turret that should have mass and inertia.  This is straightforward aiming.
         l->enableAuto();
-        l->inclination = incl;
+        l->elevation = incl;
         l->azimuth = azimuth;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1485,10 +1485,10 @@ void checktest19(unsigned long timer)
     float azimuth2, inclination2;
 
     azimuth1 = getAzimuth((b->getPos())-(l1->getPos()));
-    inclination1 = getInclination((b->getPos())-(l1->getPos()));
+    inclination1 = getDeclination((b->getPos())-(l1->getPos()));
 
     azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
-    inclination2 = getInclination((b->getPos())-(l2->getPos()));
+    inclination2 = getDeclination((b->getPos())-(l2->getPos()));
 
     printf ("1:Incl:%10.5f    Bg: %10.5f\tIncl:%10.5f    Bg: %10.5f\n", inclination1, azimuth1, inclination2, azimuth2);
 
@@ -1496,7 +1496,7 @@ void checktest19(unsigned long timer)
     {
 
         l1->enableAuto();
-        l1->inclination = inclination1;
+        l1->elevation = inclination1;
         l1->azimuth = azimuth1;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1516,7 +1516,7 @@ void checktest19(unsigned long timer)
     if (timer>600 && (timer % 54 == 0))
     {
         l2->enableAuto();
-        l2->inclination = inclination2;
+        l2->elevation = inclination2;
         l2->azimuth = azimuth2;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1595,10 +1595,10 @@ void checktest20(unsigned long timer)
     float azimuth2, inclination2;
 
     azimuth1 = getAzimuth((b->getPos())-(l1->getPos()));
-    inclination1 = getInclination((b->getPos())-(l1->getPos()));
+    inclination1 = getDeclination((b->getPos())-(l1->getPos()));
 
     azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
-    inclination2 = getInclination((b->getPos())-(l2->getPos()));
+    inclination2 = getDeclination((b->getPos())-(l2->getPos()));
 
     printf ("1:Incl:%10.5f    Bg: %10.5f\tIncl:%10.5f    Bg: %10.5f\n", inclination1, azimuth1, inclination2, azimuth2);
 
@@ -1606,7 +1606,7 @@ void checktest20(unsigned long timer)
     {
 
         l1->enableAuto();
-        l1->inclination = inclination1;
+        l1->elevation = inclination1;
         l1->azimuth = azimuth1;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1626,7 +1626,7 @@ void checktest20(unsigned long timer)
     if (timer>600 && (timer % 54 == 0))
     {
         l2->enableAuto();
-        l2->inclination = inclination2;
+        l2->elevation = inclination2;
         l2->azimuth = azimuth2;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1772,14 +1772,14 @@ void checktest22(unsigned long timer)
     float azimuth2, inclination2;
 
     azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
-    inclination2 = getInclination((b->getPos())-(l2->getPos()));
+    inclination2 = getDeclination((b->getPos())-(l2->getPos()));
 
     printf ("Incl:%10.5f    Bg: %10.5f\n", inclination2, azimuth2);
 
     if (timer>600 && (timer % 54 == 0))
     {
         l2->enableAuto();
-        l2->inclination = inclination2;
+        l2->elevation = inclination2;
         l2->azimuth = azimuth2;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1832,9 +1832,10 @@ void test23()
     _walrus->enableAuto();
 }
 
+
 void checktest23(unsigned long timer)
 {
-    Artillery *l2=(Artillery*)islands[0]->getStructures()[0]; // Risky
+    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
     Walrus *b = findWalrus(GREEN_FACTION);
     //BoxVehicle *b = (BoxVehicle*)entities[2];
 
@@ -1848,20 +1849,9 @@ void checktest23(unsigned long timer)
     // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
     float azimuth2, inclination2;
 
-    Vec3f firingloc = l2->getPos();
+    Vec3f firingloc = l2->getFiringPort();
 
-    //firingloc = firingloc + 40*((l2->getForward()).normalize());
-    //firingloc = firingloc + Vec3f(0.0f,  6.0f, 0.0f);
-
-    firingloc = Vec3f(firingloc[0],20.1765f, firingloc[2]);
-    //firingloc = firingloc + 40*((l2->getForward()).normalize());
-
-    //(-9.1145, 15.2567, -38.7674)
-
-    //Vec3f u(0,0,0),x(0,0,0);
-    //l2->getViewPort(u,firingloc,x);
-
-
+    inclination2 = getDeclination((b->getPos())-(firingloc));
     azimuth2 = getAzimuth((b->getPos())-(firingloc));
     l2->setForward((b->getPos())-(firingloc));
 
@@ -1870,6 +1860,120 @@ void checktest23(unsigned long timer)
     //struct controlregister c;
     //c.pitch = 0.0;
     //l2->setControlRegisters(c);
+
+    if (timer>600 && (timer % 17 == 0))
+    {
+        //l2->enableAuto();
+        /**l2->inclination = inclination2;
+        l2->azimuth = azimuth2;
+        struct controlregister c;
+        c.pitch = 0.0;
+        l2->setControlRegisters(c);
+        **/
+
+        std::cout << "Azimuth: " << azimuth2 << " Inclination: " << inclination2 << std::endl;
+
+
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+    }
+}
+
+
+void test24()
+{
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          0.0f,    0.0f,space,world);
+    Structure *h = islands[0]->addStructure(new LaserTurret(BLUE_FACTION),          -510.0f,    0.0f,space,world);
+
+    entities.push_back(t);
+    entities.push_back(h);
+
+
+    BoxVehicle * _bo= new BoxVehicle();
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
+    _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
+    _bo->stop();
+
+    BoxVehicle * _ho= new BoxVehicle();
+    _ho->init();
+    _ho->embody(world, space);
+    _ho->setPos(_b->getPos()+Vec3f(500.0f,0.0f,-500.0f));
+    _ho->setPos(_ho->getPos()[0],50.0f, _ho->getPos()[2]);
+    _ho->stop();
+
+    BoxVehicle * _lo= new BoxVehicle();
+    _lo->init();
+    _lo->embody(world, space);
+    _lo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
+    _lo->setPos(_lo->getPos()[0],50.0f, _lo->getPos()[2]);
+    _lo->stop();
+
+    BoxVehicle * _mo= new BoxVehicle();
+    _mo->init();
+    _mo->embody(world, space);
+    _mo->setPos(_b->getPos()+Vec3f(500.0f,0.0f,-500.0f));
+    _mo->setPos(_mo->getPos()[0],50.0f, _mo->getPos()[2]);
+    _mo->stop();
+
+    entities.push_back(_bo);
+    entities.push_back(_ho);
+    entities.push_back(_lo);
+    entities.push_back(_mo);
+
+}
+
+void checktest24(unsigned long timer)
+{
+    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+    BoxVehicle *b = (BoxVehicle*)entities[3];
+
+    if (!b)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+    float azimuth, elevation;
+
+    Vec3f firingloc = l2->getFiringPort();
+
+    elevation = getDeclination((b->getPos())-(firingloc));
+    azimuth = getAzimuth((b->getPos())-(firingloc));
+    //l2->setForward((b->getPos())-(firingloc));
+
+    l2->elevation = elevation;
+    l2->azimuth = azimuth;
+
+    struct controlregister c;
+    c.pitch = 0.0;
+    c.roll = 0.0;
+    l2->setControlRegisters(c);
+
+    std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
     if (timer>600 && (timer % 17 == 0))
     {
@@ -1891,7 +1995,6 @@ void checktest23(unsigned long timer)
         }
     }
 }
-
 
 static int testing=-1;
 
@@ -1954,7 +2057,7 @@ void initWorldModelling(int testcase)
     case 21:test21();break;
     case 22:test22();break;
     case 23:test23();break;                         // Set walrus to reach the shore and the turret to fire to it
-    case 24:test23();break;
+    case 24:test24();break;                         // Check azimuth and inclination calculation based on a forward vector.
     default:initIslands();test1();break;
     }
 
@@ -1994,6 +2097,7 @@ void worldStep(int value)
     case 21:checktest21(timer);break;
     case 22:checktest22(timer);break;
     case 23:checktest23(timer);break;
+    case 24:checktest24(timer);break;
     default: break;
     }
 

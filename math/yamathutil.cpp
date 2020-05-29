@@ -93,21 +93,18 @@ float getAzimuth(Vec3f aim)
 }
 
 /**
- * @FIXME No funca
- * @brief getInclination This is the inverse operation of the one above.  Given a vector, it returs the inclination of the given vector.
+ * @FIXME: I need to invert the (-1) so that it is exactly standard declination convention.
+ * @brief This is the inverse operation of the one above.  Given a vector, it returs the declination of the given vector.
  * @param aim
- * @return The inclination in degrees.  -90 is the cenit, 0 is the horizon, positive looking down towards the floor and 90 is your feet.
+ * @return The declinarion in degrees.  -90 is the cenit, 0 is the horizon, positive looking down towards the floor and 90 is your feet.
  */
-float getInclination(Vec3f aim)
+float getDeclination(Vec3f aim)
 {
     aim = aim.normalize();
 
-    float incl = atan2(aim[1], aim[0]) * 180.0/PI;
+    float decl = atan2(aim[1], sqrt(pow(aim[0],2) + pow(aim[2],2))) * 180.0/PI;
 
-    if (getAzimuth(aim) < 180.0f)
-        incl += 180.0;
-
-    return incl;
+    return decl*(-1);
 }
 
 

@@ -25,6 +25,6 @@ Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float yAngle, float xAn
 void UnitarizeNormal(float vector[3]);
 void Normalize(float v[3][3], float out[3][3]);
 float getAzimuth(Vec3f aim);
-float getInclination(Vec3f aim);
+float getDeclination(Vec3f aim);
 
 #endif /* YAMATHUTIL_H_ */

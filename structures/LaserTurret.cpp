@@ -29,7 +29,7 @@ void LaserTurret::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
 
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
-        glRotatef(-Structure::inclination,0.0f,0.0f,1.0f);
+        glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
 
         draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
 

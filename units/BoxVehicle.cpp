@@ -24,7 +24,7 @@ void BoxVehicle::init()
 
 int BoxVehicle::getType()
 {
-    return 1;
+    return WALRUS;
 }
 
 

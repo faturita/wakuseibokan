@@ -16,7 +16,7 @@ protected:
 
 public:
     float azimuth;                      // x-y plane angle, starting from north clockwise towards east. in deg
-    float inclination;                  // angle from x-y plane positive towards the cenith at z. in deg
+    float elevation;                    // angle from x-y plane positive towards the cenith at z. in deg
     Island *island;
 
     Structure();

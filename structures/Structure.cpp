@@ -4,7 +4,7 @@ Structure::Structure()
 {
     island = NULL;
     azimuth=0;
-    inclination=0;
+    elevation=0;
 }
 
 Structure::Structure(int faction)
@@ -111,13 +111,13 @@ void Structure::embody(dBodyID myBodySelf)
 
 void Structure::doControl(Controller controller)
 {
-    Structure::inclination = controller.registers.pitch;
+    Structure::elevation = controller.registers.pitch;
     Structure::azimuth = controller.registers.roll;
 }
 
 Vec3f Structure::getForward()
 {
-    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,Structure::inclination);
+    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,Structure::elevation);
     return forward;
 }
 

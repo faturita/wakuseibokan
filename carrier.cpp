@@ -25,6 +25,8 @@
 #include <vector>
 #include <mutex>
 
+#include "commandline.h"
+
 #include "ThreeMaxLoader.h"
 
 #include "font/DrawFonts.h"
@@ -80,6 +82,12 @@ extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
 extern std::vector<std::string> messages;
+
+enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
+
+int aiplayer = FREE_AI;
+
+
 
 // @FIXME Change
 extern GLuint _textureBox;
@@ -460,8 +468,10 @@ void update(int value)
 	{
 
         // @FIXME: Check some parameter to see who control each faction. Either AI assisted or some user.
-        //playFaction(BLUE_FACTION,space,world);
-        //playFaction(GREEN_FACTION, space, world);
+        if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
+            playFaction(BLUE_FACTION,space,world);
+        if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
+            playFaction(GREEN_FACTION, space, world);
 
 
         // Auto Control: The controller can be controlled by the user or by the AI
@@ -595,6 +605,16 @@ int main(int argc, char** argv) {
         initWorldModelling(atoi(argv[3]));
     else
         initWorldModelling();
+
+    if (isPresentCommandLineParameter(argc,argv,"-free"))
+        aiplayer = FREE_AI;
+    else if (isPresentCommandLineParameter(argc,argv,"-aiplayerblue"))
+        aiplayer = BLUE_AI;
+    else if (isPresentCommandLineParameter(argc,argv,"-aiplayergreen"))
+        aiplayer = GREEN_AI;
+    else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
+        aiplayer = BOTH_AI;
+
 
     const char *conf = dGetConfiguration ();
 

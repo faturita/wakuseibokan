@@ -334,6 +334,7 @@ void Vehicle::antigravity(dBodyID myBodySelf)
     dBodyAddForce(myBodySelf, 0,9.81f,0);
 }
 
+//@FIXME swithc to getAzimuth in yamathutil.
 float Vehicle::getBearing()
 {
     Vec3f f = (getForward().normalize())*30;

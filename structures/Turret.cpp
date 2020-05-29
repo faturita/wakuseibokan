@@ -42,7 +42,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
 
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
-        glRotatef(-Structure::inclination,0.0f,0.0f,1.0f);
+        glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
 
         draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
 
@@ -77,6 +77,24 @@ Vec3f Turret::getForward()
     return forward;
 }
 
+void Turret::setForward(float x, float y, float z)
+{
+    Turret::setForward(Vec3f(x,y,z));
+}
+void Turret::setForward(Vec3f forw)
+{
+    Structure::elevation = getDeclination(forw);
+    Structure::azimuth = getAzimuth(forw);
+
+    Structure::setForward(forw);
+
+}
+
+
+Vec3f Turret::getFiringPort()
+{
+    return Vec3f(getPos()[0],20.1765f, getPos()[2]);
+}
 void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
     position = getPos();
@@ -161,8 +179,10 @@ void Turret::doControl(Controller controller)
 {
     zoom = 20.0f + controller.registers.precesion*100;
 
-    inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;
+    elevation -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
 
-    setForward(toVectorInFixedSystem(0,0,1,azimuth, -inclination));
+    //std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+
+    setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 }

@@ -38,7 +38,7 @@ void Artillery::drawModel(float yRot, float xRot, float x, float y, float z)
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
-        glRotatef(-Structure::inclination,0.0f,0.0f,1.0f);
+        glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
         draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
         glPopMatrix();
 
@@ -149,11 +149,11 @@ void Artillery::doControl(Controller controller)
     zoom = 20.0f + controller.registers.precesion*100;
 
     // @NOTE debug
-    printf ("Incl:%10.5f    Az: %10.5f\n", inclination, azimuth);
+    printf ("Incl:%10.5f    Az: %10.5f\n", elevation, azimuth);
 
-    inclination -= controller.registers.pitch * (20.0f/abs(zoom)) ;
+    elevation -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
 
-    setForward(toVectorInFixedSystem(0,0,1,azimuth, -inclination));
+    setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
 }

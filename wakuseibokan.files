@@ -20,6 +20,8 @@ camera.cpp
 camera.h
 carrier.cpp
 carrier.h
+commandline.cpp
+commandline.h
 container.cpp
 container.h
 engine.cpp
