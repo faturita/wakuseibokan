@@ -540,7 +540,7 @@ void drawFloor(float x, float y, float z)
     const float floor_size = 100.0f;
     
     //float horizon = 10450.0f;   /// 1450.0f es
-    float floorSize = horizon / floor_size;
+    float floorSize = (y + horizon) / floor_size;
     
     float start = -floorSize-x/floor_size;
     float stop =   floorSize-x/floor_size;
@@ -549,7 +549,7 @@ void drawFloor(float x, float y, float z)
     
     glPushMatrix();
     
-    glTranslatef(x,y,z);
+    glTranslatef(x,0.0f,z);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, _textureIdSea);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

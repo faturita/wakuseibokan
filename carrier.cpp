@@ -372,7 +372,7 @@ void drawScene() {
     
     // Floor is changing color.
     glPushAttrib(GL_CURRENT_BIT);
-    drawFloor(Camera.pos[0],0.0f,Camera.pos[2]);
+    drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
     
     // Draw islands.
@@ -391,8 +391,6 @@ void drawScene() {
             (entities[i]->drawModel());
         }
     }
-
-
 
     
     // GO with the HUD
