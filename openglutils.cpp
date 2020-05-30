@@ -23,6 +23,8 @@ GLuint _textureRoad;
 
 std::vector<GLuint*> textures;
 
+extern float horizon;
+
 
 void CheckGLError() {
 	GLuint err = glGetError();
@@ -535,9 +537,9 @@ void drawFloor(float x, float y, float z)
 {
 	// Slide the texture always from the starting position to generate
 	// the effect that we are moving...
-	const float floor_size = 100.0f;
+    const float floor_size = 100.0f;
     
-    float horizon = 10450.0f;   /// 1450.0f es
+    //float horizon = 10450.0f;   /// 1450.0f es
     float floorSize = horizon / floor_size;
     
     float start = -floorSize-x/floor_size;
@@ -577,8 +579,8 @@ void drawFloor(float x, float y, float z)
 
 void drawSky (float posX, float posY, float posZ)
 {
-    float sky_scale=10.0f;
-	float sky_height=10.0f;
+    float sky_scale=1.0f;
+    float sky_height=55.0f;
     glDisable (GL_LIGHTING);
     
     glEnable(GL_TEXTURE_2D);
@@ -646,43 +648,46 @@ void drawSky (float posX, float posY, float posZ)
 void drawLightning()
 {
     // Lighting, ambient light...
-	GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    //GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    GLfloat ambientLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
     
-    
-	//GLfloat ambientLight[] = { 0.3f  , 0.3f, 0.3f,   1.0f};
 	GLfloat diffuseLight[] = { 0.7f  , 0.7f, 0.7f,   1.0f};
 	GLfloat specular[]     = { 1.0f  , 1.0f, 1.0f,   1.0f};
-	GLfloat lightPos[]     = { -50.0f,50.0f,100.0f,  1.0f};
+    GLfloat lightPos[]     = { 0.0f  , -1.0f, 0.0f,   1.0f};
     
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-	glLightfv(GL_LIGHT0, GL_SPECULAR,specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR,specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     
 	glEnable(GL_COLOR_MATERIAL);
     
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientLight);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseLight);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, lightPos);
     
     
 	//glTranslatef(0.0f+posx, 0.0f+posy, -20.0f+posz);
 	
     // Lighting, ambient light...
 	//GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
     
     // Add positioned light (outisde glBegin-glEnd)
-     GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
-     GLfloat lightPos0[] = { 4.0f, 0.0f, 8.0f, 1.0f  };
-     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
-     glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+     //GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
+     //GLfloat lightPos0[] = { 4.0f, 0.0f, 8.0f, 1.0f  };
+     //glLightfv(GL_LIGHT2, GL_DIFFUSE, lightColor0);
+     //glLightfv(GL_LIGHT2, GL_POSITION, lightPos0);
      
      // Add directed light
-     GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f};
-     GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
-     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
-     glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
+     //GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f};
+     //GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
+     //glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
+     //glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
     
     /**
      GLfloat lightColor[] = {0.7f, 0.7f, 0.7f, 1.0f};

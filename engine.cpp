@@ -592,7 +592,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                     {
                         Structure *s2 = new Hangar(c->getFaction());
                         //z-=550;
-                        island->addStructure(s2,s->getPos()[0],s->getPos()[2]-550,space,world);
+                        island->addStructure(s2,s->getPos()[0]-island->getPos()[0],s->getPos()[2]-island->getPos()[2]-550,space,world);
 
                         entities.push_back(s2);
                     }

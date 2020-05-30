@@ -67,6 +67,8 @@
 extern  Controller controller;
 extern  Camera Camera;
 
+float horizon = 100000.0f;   // 100 kmf
+
 
 /* dynamics and collision objects */
 
@@ -307,10 +309,18 @@ void drawHUD()
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
     
-    drawLightning();
+    //drawLightning();
+
+    // This should not be here @FIXME
+    glutSetCursor(GLUT_CURSOR_NONE);
     
     Vec3f up,pos,forward;
     
@@ -347,7 +357,8 @@ void drawScene() {
         }
     }
     
-    drawSky(pos[0],pos[1],pos[2]);
+    // If you comment the drawsky it will go dark (night).
+    //drawSky(pos[0],pos[1],pos[2]);
     
     Camera.lookAtFrom(up, pos, forward);
     
@@ -390,7 +401,8 @@ void drawScene() {
     case 1: drawHUD();break;
     case 2: drawMap();break;
     }
-    
+
+
 	glDisable(GL_TEXTURE_2D);
 	
 	glutSwapBuffers();
@@ -405,7 +417,7 @@ void initRendering() {
     
     // Lighting not working.
 	glEnable(GL_LIGHT0);
-    drawLightning();
+
     
 	// Normalize the normals (this is very expensive).
 	glEnable(GL_NORMALIZE);
@@ -428,6 +440,7 @@ void initRendering() {
     
 	// Blue sky !!!
     //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
+    drawLightning();
     
     // Initialize scene textures.
     initTextures();
@@ -444,7 +457,7 @@ void handleResize(int w, int h) {
     
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ 10450.0f  /**+ yyy**/);
+    gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 }
 
 static bool did=false;

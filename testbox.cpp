@@ -1982,7 +1982,7 @@ void checktest24(unsigned long timer)
     if (timer>1100)
     {
         Vec3f l=*p;
-
+        // The vehicle got hit, hence it has moved.
         if (!(l.isEquals(b->getPos())))
         {
             printf("Test passed OK!\n");
