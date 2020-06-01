@@ -393,7 +393,7 @@ bool  groundcollisions(Vehicle *vehicle)
 {
     if (vehicle)
     {
-        if (vehicle->getSpeed()>70 and vehicle->getType() == MANTA)
+        if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
         {
             //explosion();
             SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;

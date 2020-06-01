@@ -91,7 +91,7 @@ std::vector<std::string> messages;
 extern float fps;
 extern clock_t elapsedtime;
 
-void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
+void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
 
@@ -102,7 +102,7 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
 
     if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
     {
-      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
+      //fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
       // colliding a space with something
       dSpaceCollide2(o1,o2,data,&nearCallback);
       // Note we do not want to test intersections within a space,
@@ -152,7 +152,7 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Water buyoncy reaction
                 contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
+                //printf("1\n");
                 contact[i].surface.mu = 0.0f;
                 contact[i].surface.slip1 = 1.0f;
                 contact[i].surface.slip2 = 1.0f;
@@ -166,7 +166,7 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.mu = 0;
                 contact[i].surface.slip1 = 0.1f;
                 contact[i].surface.slip2 = 0.1f;
-
+                //printf("2\n");
                 if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
@@ -182,7 +182,7 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Carrier
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-
+                //printf("3\n");
                 contact[i].surface.mu = dInfinity;
                 contact[i].surface.slip1 = 0.0f;
                 contact[i].surface.slip2 = 0.0f;
@@ -193,7 +193,7 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Runways.
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-
+                //printf("4\n");
 
                 contact[i].surface.mu = 0.99f;
                 contact[i].surface.slip1 = 0.9f;
@@ -204,12 +204,27 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                 if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
 
             } else
+            if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
+            {
+                // Island reaction
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                printf("Hit structure\n");
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+            }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
             {
                  // Island reaction
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
-
+                 //printf("5\n");
                  contact[i].surface.mu = 0;
                  contact[i].surface.bounce = 0.2f;
                  contact[i].surface.slip1 = 0.1f;
@@ -218,6 +233,9 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
                  contact[i].surface.soft_cfm = 0;
 
+
+                 //if (v1 && isManta(v1) && groundcollisions(v1)) {printf("Hit manta against structure.\n");}
+                 //if (v2 && isManta(v2) && groundcollisions(v2)) {printf("Hit manta against structure.\n");}
 
                  // Carrier stranded and Walrus arrived on island.
                  if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
@@ -250,17 +268,8 @@ void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (v2 && isWalrus(v2)) { v2->inert = false;}
 
             } else {
-                /**
-                // Water buyoncy reaction
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                // Object against object collision.
 
-                contact[i].surface.mu = 0.0f;
-                contact[i].surface.slip1 = 0.1f;
-                contact[i].surface.slip2 = 0.1f;
-                contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
-                contact[i].surface.soft_cfm = .3f;
-                **/
                 if (v1 && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && isManta(v2) && groundcollisions(v2)) {}
             }
@@ -376,6 +385,21 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
 
             } else
+            if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
+            {
+                // Island reaction
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                printf("Hit structure\n");
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+            }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
             {
                  // Island reaction
@@ -445,7 +469,7 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-void nearCallback (void *data, dGeomID o1, dGeomID o2)
+void __nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
 
@@ -2252,11 +2276,19 @@ void checktest25(unsigned long timer)
         Walrus* w = spawnWalrus(space,world,b);
     }
 
-    if (timer > 200 && fps<20.0)
+    if (timer > 200 && entities.size()>30)
     {
-        printf("Test passed OK!\n");
-        endWorldModelling();
-        exit(1);
+        if (fps>20.0)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else
+        {
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
     }
 
 }
@@ -2430,10 +2462,18 @@ void checktest26(unsigned long timer)
 
     if (timer > 3500)
     {
-        fpsfile.close();
-        printf("Test passed OK!\n");
-        endWorldModelling();
-        exit(1);
+        if (fps > 40)
+        {
+            fpsfile.close();
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            fpsfile.close();
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
     }
 }
 
