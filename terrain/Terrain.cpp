@@ -97,8 +97,11 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
     _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
-    
+
     modelname = model;
+
+    islandspace = dHashSpaceCreate(space);
+    //islandspace = space;
 
     printf("Island: %s\n", model);
     printf("Landmass width: %d\n", _landmass->width());
@@ -116,11 +119,12 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
     // These boundaries are used to limit how the heightfield affects objects.
     dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), TERRAIN_MAX_HEIGHT ); // +6000 decia
     
-    dGeomID gheight = dCreateHeightfield( space, heightid, 1 );
+    dGeomID gheight = dCreateHeightfield( islandspace, heightid, 1 );
     
     dGeomSetPosition( gheight, X, Y, Z );
 
     islandGeom = gheight;
+
     
     return gheight;
 }
@@ -187,7 +191,7 @@ void BoxIsland::draw()
  * @param world
  * @return
  */
-Structure* BoxIsland::addStructure(Structure *structure, dSpaceID space, dWorldID world)
+Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
 {
     float heightOffset = 0;
     float x = 0;
@@ -204,7 +208,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dSpaceID space, dWorldI
         printf("Height %10.5f\n", heightOffset);
     } while (heightOffset < 4);
 
-    return addStructure(structure,x,z,space,world);
+    return addStructure(structure,x,z,world);
 
 }
 
@@ -219,12 +223,12 @@ Structure* BoxIsland::addStructure(Structure *structure, dSpaceID space, dWorldI
  * @param world
  * @return
  */
-Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world)
+Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dWorldID world)
 {
     // This should be half the height of the structure. @FIXME
     float heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
     structure->init();
-    structure->embody(world,space);
+    structure->embody(world,islandspace);
     structure->setPos(X+x,heightOffset,Z+z);
     structure->onIsland(this);
 

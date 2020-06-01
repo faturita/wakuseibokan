@@ -191,6 +191,7 @@ private:
     float X,Y,Z;
 
     dGeomID islandGeom;
+    dSpaceID islandspace;
 
     std::vector<Structure*> structures;
 
@@ -208,8 +209,8 @@ public:
 
     dGeomID getGeom();
 
-    Structure* addStructure(Structure* structure, float x, float z, dSpaceID space, dWorldID world);
-    Structure* addStructure(Structure* structure, dSpaceID space, dWorldID world);
+    Structure* addStructure(Structure* structure, float x, float z,  dWorldID world);
+    Structure* addStructure(Structure* structure,  dWorldID world);
 
     float getX();
     float getZ();

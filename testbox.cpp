@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -87,7 +88,204 @@ std::vector<BoxIsland*> islands;
 
 std::vector<std::string> messages;
 
+extern float fps;
+extern clock_t elapsedtime;
+
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+    int i,n;
+
+    dBodyID b1,b2;
+
+    assert(o1);
+    assert(o2);
+
+    if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
+    {
+      //fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
+      // colliding a space with something
+      dSpaceCollide2(o1,o2,data,&nearCallback);
+      // Note we do not want to test intersections within a space,
+      // only between spaces.
+      return;
+    }
+
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
+
+        //return;
+    }
+
+
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+    if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
+    if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+
+    int val[]={CARRIER,WALRUS,MANTA};
+
+    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
+    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
+
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
+
+            Vehicle *v1=NULL,*v2=NULL;
+            Structure *s1=NULL, *s2=NULL;
+            gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
+
+
+            // Bullets
+            if ((isAction(v1) && isWalrus(v2) && isMineFire(v2,(Gunshot*)v1))
+                ||
+               (isAction(v2) && isWalrus(v1) && isMineFire(v1,(Gunshot*)v2)))
+            {
+                // Water buyoncy reaction
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                //printf("1\n");
+                contact[i].surface.mu = 0.0f;
+                contact[i].surface.slip1 = 1.0f;
+                contact[i].surface.slip2 = 1.0f;
+                contact[i].surface.soft_erp = 1.0f;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 1.0f;
+            } else
+            if ( isAction(v1) || isAction(v2))
+            {
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mu = 0;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+                //printf("2\n");
+                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && s2 && hit(s2)) {}
+                if (isAction(v2) && s1 && hit(s1)) {}
+            } else
+            if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
+                 ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
+                {
+                // Manta landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                //printf("3\n");
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+            } else
+            if  (isRunway(s1) || isRunway(s2))
+            {
+                // Manta landing on Runways.
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                //printf("4\n");
+
+                contact[i].surface.mu = 0.99f;
+                contact[i].surface.slip1 = 0.9f;
+                contact[i].surface.slip2 = 0.9f;
+                contact[i].surface.bounce = 0.2f;
+
+                if ( isRunway(s1) && isManta(v2) && landed(v2, s1->island)) {}
+                if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
+
+            } else
+            if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
+            {
+                // Island reaction
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                printf("Hit structure\n");
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+            }
+            if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+            {
+                 // Island reaction
+                 contact[i].surface.mode = dContactBounce |
+                 dContactApprox1;
+                 //printf("5\n");
+                 contact[i].surface.mu = 0;
+                 contact[i].surface.bounce = 0.2f;
+                 contact[i].surface.slip1 = 0.1f;
+                 contact[i].surface.slip2 = 0.1f;
+
+                 contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                 contact[i].surface.soft_cfm = 0;
+
+
+                 //if (v1 && isManta(v1) && groundcollisions(v1)) {printf("Hit manta against structure.\n");}
+                 //if (v2 && isManta(v2) && groundcollisions(v2)) {printf("Hit manta against structure.\n");}
+
+                 // Carrier stranded and Walrus arrived on island.
+                 if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
+                 if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+
+            } else
+            if (ground == contact[i].geom.g1 || ground == contact[i].geom.g2 ) {
+
+                 // Water buyoncy reaction
+                 contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                 contact[i].surface.mu = 0.0f;
+                 contact[i].surface.slip1 = 0.1f;
+                 contact[i].surface.slip2 = 0.1f;
+                 contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+                 contact[i].surface.soft_cfm = .3f;
+
+                 // Walrus reaching shore.
+                 if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                 if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+
+                 if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
+                 if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
+
+                 if (v1 && isWalrus(v1)) { v1->inert = false;}
+                 if (v2 && isWalrus(v2)) { v2->inert = false;}
+
+            } else {
+                // Object against object collision.
+
+                if (v1 && isManta(v1) && groundcollisions(v1)) {}
+                if (v2 && isManta(v2) && groundcollisions(v2)) {}
+            }
+
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
+}
+
+
+
+
+void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
 
@@ -187,6 +385,21 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
 
             } else
+            if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
+            {
+                // Island reaction
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                printf("Hit structure\n");
+
+                contact[i].surface.mu = 0;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+            }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
             {
                  // Island reaction
@@ -247,6 +460,41 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (v1 && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && isManta(v2) && groundcollisions(v2)) {}
             }
+
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
+}
+
+void __nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+    int i,n;
+
+    dBodyID b1,b2;
+
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
+
+        //return;
+    }
+
+
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
             dJointAttach (c,
@@ -333,8 +581,8 @@ void test2()
 
 void test4()
 {
-    entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,        -550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world));
+    entities.push_back(islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,        -550.0f,    0.0f,world));
 }
 
 
@@ -432,8 +680,8 @@ void test14()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,space,world));
-    entities.push_back(islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,space,world));
+    entities.push_back(islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world));
+    entities.push_back(islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,world));
 }
 
 void test15()
@@ -533,7 +781,7 @@ void checktest2(unsigned long timer)
 
 void test3()
 {
-    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,world));
 }
 
 
@@ -860,7 +1108,7 @@ void checktest10(unsigned long timer)     // Check Walrus arriving to an island 
         int x = (rand() % 2000 + 1); x -= 1000;
         int z = (rand() % 2000 + 1); z -= 1000;
 
-        Structure *s = island->addStructure(new CommandCenter(GREEN_FACTION),x,z,space,world);
+        Structure *s = island->addStructure(new CommandCenter(GREEN_FACTION),x,z,world);
         entities.push_back(s);
 
         timerstep = timer;
@@ -951,7 +1199,7 @@ void test13()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,world));
 }
 
 
@@ -1009,8 +1257,8 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
 
 void test12()
 {
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,world));
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
     _walrus->init();
@@ -1570,8 +1818,8 @@ void test20()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,space,world));
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,space,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,world));
+    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,world));
 
 }
 
@@ -1679,7 +1927,7 @@ void test21()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,space,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
     entities.push_back(t);
 
@@ -1738,7 +1986,7 @@ void test22()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,space,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
     entities.push_back(t);
 
@@ -1814,7 +2062,7 @@ void test23()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,space,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
     entities.push_back(t);
 
@@ -1902,7 +2150,7 @@ void test24()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,space,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
 
     entities.push_back(t);
 
@@ -1993,6 +2241,242 @@ void checktest24(unsigned long timer)
     }
 }
 
+void test25()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+}
+
+void checktest25(unsigned long timer)
+{
+    Balaenidae *b = (Balaenidae*)entities[0];
+
+    std::cout << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+
+    if (timer==100)  // This is not autopilot.  If you control the carrier, you will override the controlregister parameters (it wont move).
+    {
+        struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
+        c.thrust = 10000.0f;
+        c.pitch = 0;
+        c.roll = 10;
+        b->stop();
+        b->setControlRegisters(c);
+        b->setThrottle(1000.0f);
+        //b->enableAuto();
+    }
+    if (timer % 300 == 0)
+    {
+        Walrus* w = spawnWalrus(space,world,b);
+    }
+
+    if (timer > 200 && entities.size()>30)
+    {
+        if (fps>20.0)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else
+        {
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
+}
+
+void test26()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    BoxIsland *statera = new BoxIsland();
+    statera->setName("Statera");
+    statera->setLocation(0.0f,-1.0,0.0f);
+    statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *thermopilae = new BoxIsland();
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *nonsquareisland = new BoxIsland();
+    nonsquareisland->setName("Atolon");
+    nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+
+    BoxIsland *vulcano = new BoxIsland();
+    vulcano->setName("Vulcano");
+    vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
+    vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hera = new BoxIsland();
+    hera->setName("Hera");
+    hera->setLocation(-200 kmf, -1.0, 200 kmf);
+    hera->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hestia = new BoxIsland();
+    hestia->setName("Hestia");
+    hestia->setLocation(-250 kmf, -1.0, 250 kmf);
+    hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *atom = new BoxIsland();
+    atom->setName("Atom");
+    atom->setLocation( 500 kmf, -1.0, -100 kmf);
+    atom->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *island = new BoxIsland();
+    island->setName("Island");
+    island->setLocation(-500 kmf, -1.0, 200 kmf);
+    island->buildTerrainModel(space,"terrain/island.bmp");
+
+    BoxIsland *baltimore = new BoxIsland();
+    baltimore->setName("Baltimore");
+    baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
+
+    BoxIsland *fulcrum = new BoxIsland();
+    fulcrum->setName("Fulcrum");
+    fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
+    fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+
+    BoxIsland *vulcrum = new BoxIsland();
+    vulcrum->setName("Vulcrum");
+    vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
+    vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+    BoxIsland *lunae = new BoxIsland();
+    lunae->setName("Lunae");
+    lunae->setLocation(490 kmf, -1.0, 320 kmf);
+    lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *mururoa = new BoxIsland();
+    mururoa->setName("Mururoa");
+    mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
+    mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *bikini = new BoxIsland();
+    bikini->setName("Bikini");
+    bikini->setLocation(-150 kmf, -1.0, -235 kmf);
+    bikini->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *parentum = new BoxIsland();
+    parentum->setName("Parentum");
+    parentum->setLocation(-150 kmf, -1.0, 435 kmf);
+    parentum->buildTerrainModel(space,"terrain/parentum.bmp");
+
+    BoxIsland *goku = new BoxIsland();
+    goku->setName("SonGoku");
+    goku->setLocation(-200 kmf, -1.0, -435 kmf);
+    goku->buildTerrainModel(space,"terrain/goku.bmp");
+
+    BoxIsland *gaijin = new BoxIsland();
+    gaijin->setName("Gaijin-shima");
+    gaijin->setLocation(150 kmf, -1.0, -339 kmf);
+    gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    BoxIsland *tristan = new BoxIsland();
+    tristan->setName("Tristan da Cunha");
+    tristan->setLocation(250 kmf, -1.0, 10 kmf);
+    tristan->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    BoxIsland *sentinel = new BoxIsland();
+    sentinel->setName("North Sentinel");
+    sentinel->setLocation(150 kmf, -1.0, 390 kmf);
+    sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *midway = new BoxIsland();
+    midway->setName("Midway");
+    midway->setLocation(-150 kmf, -1.0, -290 kmf);
+    midway->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *enewetak = new BoxIsland();
+    enewetak->setName("Enewetak");
+    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
+    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+
+
+    islands.push_back(thermopilae);
+    islands.push_back(nonsquareisland);
+    islands.push_back(vulcano);
+    islands.push_back(nemesis);
+    islands.push_back(hestia);
+    islands.push_back(hera);
+    islands.push_back(atom);
+    islands.push_back(island);
+    islands.push_back(baltimore);
+    islands.push_back(fulcrum);
+    islands.push_back(vulcrum);
+    islands.push_back(lunae);
+    islands.push_back(mururoa);
+    islands.push_back(bikini);
+    islands.push_back(parentum);
+    islands.push_back(goku);
+    islands.push_back(gaijin);
+    islands.push_back(tristan);
+    islands.push_back(sentinel);
+    islands.push_back(midway);
+    islands.push_back(enewetak);
+    islands.push_back(statera);
+}
+
+void checktest26(unsigned long timer)
+{
+    static std::ofstream fpsfile;
+    if (timer == 1)
+    {
+        fpsfile.open ("fps.dat");
+    }
+
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile.flush();
+
+    if (timer == 200)
+    {
+        for (int j=0;j<islands.size();j++)
+        {
+            captureIsland(islands[j],GREEN_FACTION,space,world);
+        }
+    }
+
+    if (timer > 3500)
+    {
+        if (fps > 40)
+        {
+            fpsfile.close();
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            fpsfile.close();
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -2055,6 +2539,8 @@ void initWorldModelling(int testcase)
     case 22:test22();break;
     case 23:test23();break;                         // Set walrus to reach the shore and the turret to fire to it
     case 24:test24();break;                         // Check azimuth and declination calculation based on a forward vector.
+    case 25:test25();break;
+    case 26:test26();break;
     default:initIslands();test1();break;
     }
 
@@ -2095,6 +2581,8 @@ void worldStep(int value)
     case 22:checktest22(timer);break;
     case 23:checktest23(timer);break;
     case 24:checktest24(timer);break;
+    case 25:checktest25(timer);break;
+    case 26:checktest26(timer);break;
     default: break;
     }
 

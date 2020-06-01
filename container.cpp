@@ -3,6 +3,7 @@
 #include <vector>
 #include <mutex>
 #include <unistd.h>
+#include <unordered_map>
 
 template<class T> container<T>::container()
 {
@@ -42,6 +43,21 @@ template<class T> void container<T>::unlockme()
     usleep(1);
 }
 
+
+template<class T> size_t container<T>::push_back(T value,dBodyID body)
+{
+    size_t i = push_back(value);
+    bodyidmap[body] = i;
+    return i;
+}
+
+template<class T> size_t container<T>::push_back(T value, dGeomID geom)
+{
+    size_t i = push_back(value);
+    geomidmap[geom] = i;
+    return i;
+}
+
 template<class T> size_t container<T>::push_back(T value)
 {
     size_t i=0;
@@ -55,6 +71,7 @@ template<class T> size_t container<T>::push_back(T value)
     assert( i < MAX || !"The container is full and cannot hold more values.");
 
     elem[i] = value;
+
 
     return i;
 }
@@ -70,6 +87,34 @@ template<class T> T container<T>::operator[](size_t index)
     //printf("Accessing %d\n", index);
     t = elem[index];
     return t;
+}
+
+template<class T> T container<T>::find(dBodyID body)
+{
+    size_t i = bodyidmap[body];
+
+    if (exists(i))
+    {
+        return  operator[](i);
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+template<class T> T container<T>::find(dGeomID geom)
+{
+    size_t i = geomidmap[geom];
+
+    if (exists(i))
+    {
+        return operator[](i);
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 template <class T> size_t container<T>::indexAt(int position)
@@ -162,6 +207,25 @@ template<class T> size_t container<T>::next(size_t index)
 
     return i;
 
+}
+
+template<class T> void container<T>::erase(dBodyID body)
+{
+    size_t i = bodyidmap[body];
+
+    bodyidmap.erase(i);
+
+    erase(i);
+}
+
+
+template<class T> void container<T>::erase(dGeomID geom)
+{
+    size_t i = geomidmap[geom];
+
+    geomidmap.erase(i);
+
+    erase(i);
 }
 
 template<class T> void container<T>::erase(size_t index)

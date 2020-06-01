@@ -97,6 +97,7 @@ extern GLuint _textureMetal;
 
 float fps=0;
 extern unsigned long timer;
+clock_t elapsedtime;
 
 void disclaimer()
 {
@@ -387,8 +388,11 @@ void drawScene() {
     {
         for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
         {
-            (entities[i]->setTexture(_textureMetal));
-            (entities[i]->drawModel());
+            if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
+            {
+                (entities[i]->setTexture(_textureMetal));
+                (entities[i]->drawModel());
+            }
         }
     }
 
@@ -559,9 +563,10 @@ void update(int value)
 
         
 		// Ok, done with the dynamics
-        
+        clock_t inicio = clock();
         dSpaceCollide (space,0,&nearCallback);
         dWorldStep (world,0.05);
+        elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
         
 
         //dWorldQuickStep(world,0.05);
