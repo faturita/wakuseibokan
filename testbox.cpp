@@ -91,7 +91,192 @@ std::vector<std::string> messages;
 extern float fps;
 extern clock_t elapsedtime;
 
-void nearCallback (void *data, dGeomID o1, dGeomID o2)
+void hierarchicalnearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+    int i,n;
+
+    dBodyID b1,b2;
+
+    assert(o1);
+    assert(o2);
+
+    if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
+    {
+      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
+      // colliding a space with something
+      dSpaceCollide2(o1,o2,data,&nearCallback);
+      // Note we do not want to test intersections within a space,
+      // only between spaces.
+      return;
+    }
+
+    // only collide things with the ground
+    int g1 = (o1 == ground );
+    int g2 = (o2 == ground );
+    if (!(g1 ^ g2))
+    {
+        //printf ("Ground colliding..\n");
+
+        //return;
+    }
+
+
+    b1 = dGeomGetBody(o1);
+    b2 = dGeomGetBody(o2);
+    if (b1 && b2 && dAreConnected (b1,b2)) return;
+
+    if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
+    if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+
+    int val[]={CARRIER,WALRUS,MANTA};
+
+    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
+    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
+
+    const int N = 10;
+    dContact contact[N];
+    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+    if (n > 0) {
+        for (i=0; i<n; i++) {
+
+            Vehicle *v1=NULL,*v2=NULL;
+            Structure *s1=NULL, *s2=NULL;
+            gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
+
+
+            // Bullets
+            if ((isAction(v1) && isWalrus(v2) && isMineFire(v2,(Gunshot*)v1))
+                ||
+               (isAction(v2) && isWalrus(v1) && isMineFire(v1,(Gunshot*)v2)))
+            {
+                // Water buyoncy reaction
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                contact[i].surface.mu = 0.0f;
+                contact[i].surface.slip1 = 1.0f;
+                contact[i].surface.slip2 = 1.0f;
+                contact[i].surface.soft_erp = 1.0f;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 1.0f;
+            } else
+            if ( isAction(v1) || isAction(v2))
+            {
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact[i].surface.mu = 0;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && s2 && hit(s2)) {}
+                if (isAction(v2) && s1 && hit(s1)) {}
+            } else
+            if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
+                 ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
+                {
+                // Manta landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+            } else
+            if  (isRunway(s1) || isRunway(s2))
+            {
+                // Manta landing on Runways.
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+
+
+                contact[i].surface.mu = 0.99f;
+                contact[i].surface.slip1 = 0.9f;
+                contact[i].surface.slip2 = 0.9f;
+                contact[i].surface.bounce = 0.2f;
+
+                if ( isRunway(s1) && isManta(v2) && landed(v2, s1->island)) {}
+                if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
+
+            } else
+            if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
+            {
+                 // Island reaction
+                 contact[i].surface.mode = dContactBounce |
+                 dContactApprox1;
+
+                 contact[i].surface.mu = 0;
+                 contact[i].surface.bounce = 0.2f;
+                 contact[i].surface.slip1 = 0.1f;
+                 contact[i].surface.slip2 = 0.1f;
+
+                 contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                 contact[i].surface.soft_cfm = 0;
+
+
+                 // Carrier stranded and Walrus arrived on island.
+                 if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
+                 if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+
+            } else
+            if (ground == contact[i].geom.g1 || ground == contact[i].geom.g2 ) {
+
+                 // Water buyoncy reaction
+                 contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                 contact[i].surface.mu = 0.0f;
+                 contact[i].surface.slip1 = 0.1f;
+                 contact[i].surface.slip2 = 0.1f;
+                 contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+                 contact[i].surface.soft_cfm = .3f;
+
+                 // Walrus reaching shore.
+                 if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
+                 if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+
+                 if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
+                 if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
+
+                 if (v1 && isWalrus(v1)) { v1->inert = false;}
+                 if (v2 && isWalrus(v2)) { v2->inert = false;}
+
+            } else {
+                /**
+                // Water buyoncy reaction
+                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+                contact[i].surface.mu = 0.0f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+                contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = .3f;
+                **/
+                if (v1 && isManta(v1) && groundcollisions(v1)) {}
+                if (v2 && isManta(v2) && groundcollisions(v2)) {}
+            }
+
+            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+            dJointAttach (c,
+                          dGeomGetBody(contact[i].geom.g1),
+                          dGeomGetBody(contact[i].geom.g2));
+        }
+    }
+}
+
+
+
+
+void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
 
@@ -260,7 +445,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-void _nearCallback (void *data, dGeomID o1, dGeomID o2)
+void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
 
