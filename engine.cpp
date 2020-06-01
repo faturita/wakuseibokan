@@ -582,7 +582,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                     //int x = (rand() % 2000 + 1); x -= 1000;
                     //int z = (rand() % 2000 + 1); z -= 1000;
 
-                    island->addStructure(s,space,world);
+                    island->addStructure(s,world);
 
                     //island->addStructure(s,x,z,space,world);
 
@@ -590,11 +590,11 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
                     if (8<=which && which<=10)
                     {
-                        Structure *s2 = new Hangar(c->getFaction());
+                        //Structure *s2 = new Hangar(c->getFaction());
                         //z-=550;
-                        island->addStructure(s2,s->getPos()[0]-island->getPos()[0],s->getPos()[2]-island->getPos()[2]-550,space,world);
+                        //island->addStructure(s2,s->getPos()[0]-island->getPos()[0],s->getPos()[2]-island->getPos()[2]-550,space,world);
 
-                        entities.push_back(s2);
+                        //entities.push_back(s2);
                     }
 
                     c->restart();
@@ -654,7 +654,7 @@ void launchManta(Vehicle *v)
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
 {
 
-    Structure *s = island->addStructure(new CommandCenter(faction),space,world);
+    Structure *s = island->addStructure(new CommandCenter(faction),world);
     entities.push_back(s);
 
     char msg[256];

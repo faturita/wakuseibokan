@@ -50,6 +50,8 @@ odeutils.h
 opengltemplate.cpp
 openglutils.cpp
 openglutils.h
+profiling.cpp
+profiling.h
 reinforcement.cpp
 sounds.h
 sounds/sounds.cpp

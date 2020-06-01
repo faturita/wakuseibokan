@@ -5,6 +5,9 @@
 
 #include <vector>
 #include <mutex>
+#include <unordered_map>
+
+#include "ode/common.h"
 
 #define synchronized(m) \
     for(std::unique_lock<std::recursive_mutex> lk(m); lk; lk.unlock())
@@ -14,6 +17,9 @@ template <class T> class container
 protected:
     //std::vector<T> elements;
     std::mutex mlock;
+
+    std::unordered_map<dBodyID, size_t> bodyidmap;
+    std::unordered_map<dGeomID, size_t> geomidmap;
 
     T elem[MAX];
 
@@ -38,6 +44,8 @@ public:
      * @return
      */
     size_t push_back(T value);
+    size_t push_back(T value,dGeomID);
+    size_t push_back(T value,dBodyID);
 
     /**
      * Verify whether is lock is released.
@@ -55,6 +63,9 @@ public:
      * @return
      */
     T operator[](size_t index);
+
+    T find(dGeomID element);
+    T find(dBodyID element);
 
     /**
      * Returns the index for a given position (1-based).
@@ -111,6 +122,8 @@ public:
      * @param index
      */
     void erase(size_t index);
+    void erase(dBodyID body);
+    void erase(dGeomID geom);
 
     void prune();
 
@@ -130,6 +143,9 @@ public:
      * @return
      */
     bool isValid(size_t index);
+
+
+
 
 
 

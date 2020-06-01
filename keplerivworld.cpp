@@ -238,6 +238,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                           dGeomGetBody(contact[i].geom.g2));
         }
     }
+
 }
 
 void inline initIslands()
