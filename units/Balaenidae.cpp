@@ -376,7 +376,7 @@ void Balaenidae::taxi(Manta *m)
 
 void Balaenidae::launch(Manta* m)
 {
-    m->inert = true;
+    m->inert = false;
     m->setStatus(Manta::FLYING);
     m->elevator = +12;
     struct controlregister c;
@@ -391,10 +391,12 @@ void Balaenidae::launch(Manta* m)
     // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
     //((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
+    m->release(getForward());
+    m->setForward(getForward());
 
     Vec3f f;
     f = m->getForward();
-    f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
-    f = f*200;
+    //f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
+    //f = f*200;
     dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
 }

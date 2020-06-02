@@ -23,7 +23,10 @@ void Manta::setNumber(int value)
 {
     number = value;
 }
-
+void Manta::release(Vec3f orientation)
+{
+    assert(!"Not implemented");
+}
 void Manta::init()
 {
     //Load the model

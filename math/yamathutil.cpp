@@ -93,6 +93,24 @@ float getAzimuth(Vec3f aim)
 }
 
 /**
+ * @brief getAzimuthRadians: ODE works with a different orientation for azimuth. Positive anticlockwise, negative clockwise from north and pi/2
+ * at south.
+ * @param orientation
+ * @return Azimuth orientation in radians.
+ */
+float getAzimuthRadians(Vec3f orientation)
+{
+    float x = getAzimuth(orientation)* (PI/180.0f) * (-1);
+
+    if (getAzimuth(orientation)>180 && getAzimuth(orientation)<360)
+    {
+        x = getAzimuth(orientation)-360;
+        x = x * (PI/180.0f) * (-1);
+    }
+    return x;
+}
+
+/**
  * @FIXME: I need to invert the (-1) so that it is exactly standard declination convention.
  * @brief This is the inverse operation of the one above.  Given a vector, it returs the declination of the given vector.
  * @param aim

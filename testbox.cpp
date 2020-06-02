@@ -2477,6 +2477,87 @@ void checktest26(unsigned long timer)
     }
 }
 
+void test27()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Vec3f pos(0.0f,10.0f,-4400.0f);
+    Camera.setPos(pos);
+}
+
+void checktest27(unsigned long timer)
+{
+    Balaenidae *b = (Balaenidae*)entities[0];
+
+    if (timer==100)  // This is not autopilot.  If you control the carrier, you will override the controlregister parameters (it wont move).
+    {
+        struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
+        c.thrust = 0.0f;
+        c.pitch = 0;
+        c.roll = -60;
+        c.yaw = 0;
+        b->setControlRegisters(c);
+        b->setThrottle(0.0f);
+        b->doControl(c);
+        //b->enableAuto();
+    }
+
+    if (timer == 120)
+    {
+        struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
+        c.thrust = 0.0f;
+        c.pitch = 0;
+        c.roll = 0;
+        c.yaw = 0;
+        b->setControlRegisters(c);
+        b->setThrottle(0.0f);
+        b->doControl(c);
+        //b->enableAuto();
+    }
+
+    if (timer == 490)
+    {
+        b->stop();
+    }
+    if (timer == 500)
+    {
+        spawnManta(space,world,b);
+    }
+
+    if (timer == 800)
+    {
+        // launch
+        launchManta(b);
+    }
+
+
+    if (timer == 1000)
+    {
+        Manta *m = (Manta*)findManta(Manta::FLYING);
+        if ((b->getBearing()-(m->getBearing()))<5)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: Manta bearing do not match carrier bearing.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -2539,8 +2620,9 @@ void initWorldModelling(int testcase)
     case 22:test22();break;
     case 23:test23();break;                         // Set walrus to reach the shore and the turret to fire to it
     case 24:test24();break;                         // Check azimuth and declination calculation based on a forward vector.
-    case 25:test25();break;
-    case 26:test26();break;
+    case 25:test25();break;                         // Spawn many walruses and check FPS
+    case 26:test26();break;                         // Initialize structures on all islands and check FPS
+    case 27:test27();break;                         // Launch Manta from a drifted Carrier, check orientation.
     default:initIslands();test1();break;
     }
 
@@ -2583,6 +2665,7 @@ void worldStep(int value)
     case 24:checktest24(timer);break;
     case 25:checktest25(timer);break;
     case 26:checktest26(timer);break;
+    case 27:checktest27(timer);break;
     default: break;
     }
 
@@ -2591,7 +2674,7 @@ void worldStep(int value)
 void endWorldModelling()
 {
     dJointGroupDestroy (contactgroup);
-    dSpaceDestroy (space);
+    dSpaceDestroy (space);// Destroy spaces on islands.
     dWorldDestroy (world);
     dCloseODE();
 

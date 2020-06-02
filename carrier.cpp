@@ -310,9 +310,9 @@ void drawHUD()
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+    //glMatrixMode(GL_PROJECTION);
+    //glLoadIdentity();
+    //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 
 
 	glMatrixMode(GL_MODELVIEW);
@@ -320,9 +320,6 @@ void drawScene() {
     
     //drawLightning();
 
-    // This should not be here @FIXME
-    glutSetCursor(GLUT_CURSOR_NONE);
-    
     Vec3f up,pos,forward;
     
     int ctrling = 0;
@@ -518,7 +515,8 @@ void update(int value)
             {
                 entities[i]->doControl();
             }
-
+            if ((entities[i]->getSpeed()>1000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
+                entities[i]->stop();
             entities[i]->doDynamics();
             entities[i]->tick();
         }

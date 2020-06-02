@@ -15,6 +15,8 @@ public:
     void embody(dBodyID myBodySelf);
     void embody(dWorldID world, dSpaceID space);
 
+    void release(Vec3f orientation);
+
 
     Vehicle* fire(dWorldID world, dSpaceID space);
     void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);

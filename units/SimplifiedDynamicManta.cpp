@@ -132,11 +132,22 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     dQMultiply0(q3,q2,q1);
 
+    float x = getAzimuthRadians(getForward());
+
+    //std::cout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
+
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
 
 
+}
+
+void SimplifiedDynamicManta::release(Vec3f orientation)
+{
+    Vehicle::inert = false;
+
+    angularPos[0] = getAzimuthRadians(orientation);
 }
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
