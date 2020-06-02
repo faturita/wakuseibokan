@@ -69,6 +69,36 @@ void processMouse(int button, int state, int x, int y) {
 
     int specialKey = glutGetModifiers();
     // if both a mouse button, and the ALT key, are pressed  then
+
+
+    // This should not be here @FIXME
+    //glutSetCursor(GLUT_CURSOR_NONE);
+
+
+    if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
+    {
+        if (controller.controlling != CONTROLLING_NONE &&  entities[controller.controlling]->getType() == VehicleTypes::MANTA)
+        {
+            printf("Active control\n");
+            // Activate airplane controller.
+            if (buttonState != 1)
+            {
+                buttonState = 1;
+                glutSetCursor(GLUT_CURSOR_NONE);
+            }
+            else
+            {
+                buttonState = 0;
+                glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+            }
+
+            _xoffset = x;
+            _yoffset = y;
+            return;
+        }
+    }
+
+
     if ((state == GLUT_DOWN)) {
 
         _xoffset = _yoffset = 0;
@@ -127,7 +157,7 @@ void processMouseActiveMotion(int x, int y) {
     {
     	Camera.xAngle += ( (x-_xoffset) * 0.005);
 
-    	Camera.yAngle += ( (y - _yoffset ) * 0.005) ;
+        Camera.yAngle += ( (y - _yoffset ) * 0.005) ;
     } //else if (buttonState == 0)
     {
     	//Vec3f forward = Camera.getForward();
@@ -145,6 +175,15 @@ void processMouseActiveMotion(int x, int y) {
 
 // Movement of the mouse alone.
 void processMousePassiveMotion(int x, int y) {
+
+    if (buttonState==1)
+    {
+        controller.registers.pitch = ( (y-_yoffset) * 0.08);
+        controller.registers.roll = ( (x - _xoffset ) * 0.05) ;
+    }
+
+
+
     //int specialKey = glutGetModifiers();
     // User must press the SHIFT key to change the
     // rotation in the X axis
