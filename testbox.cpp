@@ -2502,7 +2502,7 @@ void checktest27(unsigned long timer)
         memset(&c,0,sizeof(struct controlregister));
         c.thrust = 0.0f;
         c.pitch = 0;
-        c.roll = 40;
+        c.roll = -60;
         c.yaw = 0;
         b->setControlRegisters(c);
         b->setThrottle(0.0f);

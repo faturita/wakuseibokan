@@ -515,7 +515,8 @@ void update(int value)
             {
                 entities[i]->doControl();
             }
-
+            if ((entities[i]->getSpeed()>1000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
+                entities[i]->stop();
             entities[i]->doDynamics();
             entities[i]->tick();
         }

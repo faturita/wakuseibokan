@@ -178,7 +178,7 @@ void processMousePassiveMotion(int x, int y) {
 
     if (buttonState==1)
     {
-        controller.registers.pitch = ( (y-_yoffset) * 0.08);
+        controller.registers.pitch = ( (y-_yoffset) * 0.08);   // @FIXME these parameters should be dependant on what are you moving.
         controller.registers.roll = ( (x - _xoffset ) * 0.05) ;
     }
 
