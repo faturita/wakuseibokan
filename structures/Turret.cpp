@@ -98,6 +98,7 @@ Vec3f Turret::getFiringPort()
     //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
+
 void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
     position = getPos();

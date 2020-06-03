@@ -133,9 +133,9 @@ void Camera::lookAtFrom(Vec3f up, Vec3f poss, Vec3f forward)
     // How to move in forward direction.
 
     if (dx!=0 && abs(dx)>0.1) {
-        pos[0]+=(forward[0]);
-        pos[1]+=(forward[1]);
-        pos[2]+=(forward[2]);
+        //pos[0]+=(forward[0]);
+        //pos[1]+=(forward[1]);
+        //pos[2]+=(forward[2]);
     }
 
     

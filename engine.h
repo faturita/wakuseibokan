@@ -33,6 +33,7 @@
 #include "structures/Warehouse.h"
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
+#include "structures/Artillery.h"
 
 #include "actions/Gunshot.h"
 
@@ -130,9 +131,11 @@ bool  groundcollisions(Vehicle *vehicle);
 void  groundcollisions(dBodyID body);
 
 CommandCenter* findCommandCenter(Island *island);
+Manta* findMantaByNumber(size_t &pos, int number);
 Manta* findManta(int status);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
+Walrus* findWalrusByNumber(size_t &pos, int number);
 void list();
 
 int findNextNumber(int type);

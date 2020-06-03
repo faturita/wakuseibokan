@@ -5,6 +5,8 @@
 
 class Artillery : public Structure
 {
+protected:
+    Vec3f firingpos;
 public:
     GLfloat modelview[16];
 
@@ -16,6 +18,10 @@ public:
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     Vec3f getForward();
+    void setForward(float x, float y, float z);
+    void setForward(Vec3f);
+
+    Vec3f getFiringPort();
 
     Vehicle* fire(dWorldID world, dSpaceID space);
 

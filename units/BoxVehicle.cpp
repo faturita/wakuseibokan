@@ -179,6 +179,7 @@ void  BoxVehicle::drawModel()
     glVertex3f(BOX_SIZE / 2+ x, -BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
     
     glEnd();
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
     
     //boxangle += 0.5f;

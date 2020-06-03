@@ -6,6 +6,8 @@ OdeWorld.h
 ThreeMaxLoader.cpp
 ThreeMaxLoader.h
 actions/Action.h
+actions/ArtilleryAmmo.cpp
+actions/ArtilleryAmmo.h
 actions/Gunshot.cpp
 actions/Gunshot.h
 actions/LaserBeam.cpp

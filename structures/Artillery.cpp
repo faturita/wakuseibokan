@@ -1,5 +1,5 @@
 #include "Artillery.h"
-#include "../actions/Gunshot.h"
+#include "../actions/ArtilleryAmmo.h"
 
 Artillery::Artillery(int faction)
 {
@@ -17,6 +17,8 @@ void Artillery::init()
     Structure::height=27.97;
     Structure::length=11.68;
     Structure::width=11.68;
+
+    Artillery::firingpos = Vec3f(0.0f,19.0f,0.0f);
 
     setForward(Vec3f(0,0,1));
 }
@@ -57,23 +59,42 @@ Vec3f Artillery::getForward()
     return forward;
 }
 
+void Artillery::setForward(float x, float y, float z)
+{
+    Artillery::setForward(Vec3f(x,y,z));
+}
+
+void Artillery::setForward(Vec3f forw)
+{
+    Structure::elevation = getDeclination(forw);
+    Structure::azimuth = getAzimuth(forw);
+
+    Structure::setForward(forw);
+
+}
+
+Vec3f Artillery::getFiringPort()
+{
+    //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
+    return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
+}
+
 void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
     position = getPos();
+    position[1] -= 2.0f;
     forward = getForward();
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
-    std::cout << "Forward:" << forward << std::endl;
+    //std::cout << "Forward:" << forward << std::endl;
 
     Vec3f orig;
 
 
     forward = forward.normalize();
     orig = position;
-    //Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
+    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
     position = position + (abs(zoom))*forward;
-
-    std::cout << "View Port:" << position << std::endl;
 
     //forward = -orig+position;
 }
@@ -82,10 +103,9 @@ void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
 {
-    Gunshot *action = new Gunshot();
+    ArtilleryAmmo *action = new ArtilleryAmmo();
     // Need axis conversion.
     action->init();
-
 
 
     Vec3f position = getPos();
@@ -100,7 +120,7 @@ Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
     position = position + 40*forward;
     forward = -orig+position;
 
-    Vec3f Ft = forward*100;
+    Vec3f Ft = forward*15;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
@@ -132,10 +152,6 @@ void Artillery::doControl()
 
     c.registers = myCopy;
 
-    //c.registers.roll = 1;
-    //if ((rand() % 100 + 1)<10)
-    //    firing = !firing;
-
     Artillery::doControl(c);
 }
 
@@ -147,9 +163,6 @@ void Artillery::doControl()
 void Artillery::doControl(Controller controller)
 {
     zoom = 20.0f + controller.registers.precesion*100;
-
-    // @NOTE debug
-    printf ("Incl:%10.5f    Az: %10.5f\n", elevation, azimuth);
 
     elevation -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
