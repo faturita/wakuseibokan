@@ -259,6 +259,29 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(atoi(content));
 
             } else
+            if (controller.str.find("walrus") != std::string::npos)
+            {
+                const char *content = controller.str.substr(6).c_str();
+
+                printf ("Walrus %s\n", content);
+
+                size_t pos = CONTROLLING_NONE;
+                findWalrusByNumber(pos,atoi(content));
+                switchControl(pos);
+
+            } else
+            if (controller.str.find("manta") != std::string::npos)
+            {
+                const char *content = controller.str.substr(5).c_str();
+
+                size_t pos = CONTROLLING_NONE;
+                findMantaByNumber(pos,atoi(content));
+
+                printf ("Manta %d\n", pos);
+
+                switchControl(pos);
+
+            } else
             if (controller.str.find("taxi") != std::string::npos)
             {
                 Balaenidae *r = (Balaenidae*)entities[controller.controlling];

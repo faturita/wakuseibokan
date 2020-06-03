@@ -113,7 +113,7 @@ void drawHUD()
 {
     // This will make things dark.
     
-	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
@@ -346,9 +346,9 @@ void drawScene() {
         Camera.fw = forward;
 
         if (Camera.dx!=0) {
-            pos[0]+=(forward[0]);
-            pos[1]+=(forward[1]);
-            pos[2]+=(forward[2]);
+            //pos[0]+=(forward[0]);
+            //pos[1]+=(forward[1]);
+            //pos[2]+=(forward[2]);
             
             pos[2]+=controller.registers.pitch;
             pos[0]+=controller.registers.roll;
@@ -393,14 +393,12 @@ void drawScene() {
         }
     }
 
-    
     // GO with the HUD
     switch (controller.view)
     {
     case 1: drawHUD();break;
     case 2: drawMap();break;
     }
-
 
 	glDisable(GL_TEXTURE_2D);
 	

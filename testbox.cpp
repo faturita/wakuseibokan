@@ -2558,6 +2558,48 @@ void checktest27(unsigned long timer)
 
 }
 
+void test28()
+{
+    BoxIsland *nemesis = new BoxIsland();
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    0.0f,world);
+
+    entities.push_back(t);
+
+
+
+    BoxVehicle * _bo= new BoxVehicle();
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
+    _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
+    _bo->stop();
+
+    entities.push_back(_bo);
+
+    Vec3f pos(0.0f,60.0f,-71.0f);
+    Camera.setPos(pos);
+
+}
+
+void checktest28(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -2623,6 +2665,7 @@ void initWorldModelling(int testcase)
     case 25:test25();break;                         // Spawn many walruses and check FPS
     case 26:test26();break;                         // Initialize structures on all islands and check FPS
     case 27:test27();break;                         // Launch Manta from a drifted Carrier, check orientation.
+    case 28:test28();break;                         // Add artillery and fire it !  (this is so fun !).
     default:initIslands();test1();break;
     }
 
@@ -2666,6 +2709,7 @@ void worldStep(int value)
     case 25:checktest25(timer);break;
     case 26:checktest26(timer);break;
     case 27:checktest27(timer);break;
+    case 28:checktest28(timer);break;
     default: break;
     }
 

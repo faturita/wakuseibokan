@@ -417,6 +417,20 @@ void groundcollisions(dBodyID body)
     }
 }
 
+Manta* findMantaByNumber(size_t &pos, int number)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && ((Manta*)v)->getNumber() == number-1)
+        {
+            pos = i+1;  // @FIXME Risky
+            return (Manta*)v;
+        }
+    }
+    return NULL;
+}
+
 Manta* findManta(int status)
 {
     for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
@@ -429,6 +443,21 @@ Manta* findManta(int status)
     }
     return NULL;
 }
+
+Walrus* findWalrusByNumber(size_t &pos, int number)
+{
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS  && ((Walrus*)v)->getNumber() == number - 1)
+        {
+            pos = i+1;   // @FIXME Fix this risky numbering system.
+            return (Walrus*)v;
+        }
+    }
+    return NULL;
+}
+
 
 Walrus* findWalrus(int faction)
 {
@@ -576,8 +605,13 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         s = new Runway(c->getFaction());
                     else if (11<=which && which<=13)
                         s = new Warehouse(c->getFaction());
-                    else
+                    else if (14<=which && which<=20)
                         s = new Turret(c->getFaction());
+                    else if (21<=which && which<=23)
+                        s = new Artillery(c->getFaction());
+                    else
+                        s = new Warehouse(c->getFaction());
+
 
                     //int x = (rand() % 2000 + 1); x -= 1000;
                     //int z = (rand() % 2000 + 1); z -= 1000;
