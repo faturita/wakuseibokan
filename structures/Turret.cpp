@@ -161,10 +161,15 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
+
+    // Shell loading time.
+    setTtl(500);
+
     // I can set power or something here.
     return (Vehicle*)action;
 }
 
+// Pick the target that was identified, aim to it and fire.
 void Turret::doControl()
 {
     Controller c;

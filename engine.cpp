@@ -526,6 +526,30 @@ int findNextNumber(int type)
 }
 
 
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
+{
+    int nearesti = -1;
+    float closest = threshold;
+    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v && v->getType() != ACTION && v->getFaction()!=friendlyfaction)
+        {
+            if ((v->getPos()-l).magnitude()<closest) {
+                closest = (v->getPos()-l).magnitude();
+                nearesti = i;
+            }
+        }
+    }
+    if (nearesti < 0)
+        return NULL;
+    else
+        return entities[nearesti];
+}
+
+
+
+
 BoxIsland* findNearestEmptyIsland(Vec3f Po)
 {
     int nearesti = 0;
@@ -579,6 +603,66 @@ void list()
     }
 }
 
+void defendIsland(dSpaceID space, dWorldID world)
+{
+    for (int i = 0; i < islands.size(); i++)
+    {
+        BoxIsland *island = islands[i];
+
+        // First check whether the radar detect that there is some enemy vehicle close to the island center.
+
+        Vehicle *target = NULL;
+
+        if (Structure *c = island->getCommandCenter())
+        {
+            target = findNearestEnemyVehicle(c->getFaction(),island->getPos(), 3 * 3.6 kmf);
+
+            Vehicle *b = target;
+
+            if (!b)
+            {
+                continue;
+            }
+
+            std::vector<size_t> str = island->getStructures();
+
+            for(int i=0;i<str.size();i++)
+            {
+                // RTTI Stuff
+                if(Turret* lb = dynamic_cast<Turret*>(entities[str[i]]))
+                {
+                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                    Vec3f firingloc = lb->getFiringPort();
+
+                    lb->elevation = getDeclination((b->getPos())-(firingloc));
+                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+
+                    struct controlregister c;
+                    c.pitch = 0.0;
+                    c.roll = 0.0;
+                    lb->setControlRegisters(c);
+
+                    std::cout << "Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                    lb->setForward((b->getPos())-(firingloc));
+
+                    if (lb->getTtl()<=0)
+                    {
+                        Vehicle *action = (lb)->fire(world,space);
+
+                        if (action != NULL)
+                        {
+                            entities.push_back(action);
+                            gunshot();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void buildAndRepair(dSpaceID space, dWorldID world)
 {
     for (int i = 0; i < islands.size(); i++)
@@ -620,7 +704,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
                     //island->addStructure(s,x,z,space,world);
 
-                    entities.push_back(s);
+                    //entities.push_back(s);
 
                     if (8<=which && which<=10)
                     {
@@ -689,12 +773,12 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 {
 
     Structure *s = island->addStructure(new CommandCenter(faction),world);
-    entities.push_back(s);
 
     char msg[256];
     sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
     messages.insert(messages.begin(), std::string(msg));
 }
+
 
 void playFaction(int faction, dSpaceID space, dWorldID world)
 {

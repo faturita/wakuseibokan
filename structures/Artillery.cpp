@@ -1,6 +1,8 @@
 #include "Artillery.h"
 #include "../actions/ArtilleryAmmo.h"
 
+#include "../sounds/sounds.h"
+
 Artillery::Artillery(int faction)
 {
     Artillery::zoom = 20.0f;
@@ -82,7 +84,7 @@ Vec3f Artillery::getFiringPort()
 void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 {
     position = getPos();
-    position[1] -= 2.0f;
+    position[1] += 2.0f;
     forward = getForward();
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
@@ -138,9 +140,13 @@ Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
 
     //std::cout << d << std::endl;
 
+    std::cout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
+
+    artilleryshot();
 
     // I can set power or something here.
     return (Vehicle*)action;

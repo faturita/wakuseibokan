@@ -89,8 +89,6 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 int aiplayer = FREE_AI;
 
-
-
 // @FIXME Change
 extern GLuint _textureBox;
 extern GLuint _textureMetal;
@@ -381,6 +379,8 @@ void drawScene() {
     //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 
     // Draw vehicles and objects
+    // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
+    // This is a very easy enhancement with tremendous consequences in fps stability.
     synchronized(entities.m_mutex)
     {
         for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
@@ -503,6 +503,8 @@ void update(int value)
         // Build island structures, international water structures and repair carriers.
         buildAndRepair(space,world);
 
+        defendIsland(space,world);
+
 
         //printf("Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
@@ -524,7 +526,7 @@ void update(int value)
         {
             for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
             {
-                //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                //printf("Type and ttl: %p \n", entities[i]);
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY) && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");

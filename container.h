@@ -1,6 +1,8 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+
+// In Mac Sierra, if you change this 10000 value to something different, the bellow mutex does not work and generates a core dump :O
 #define MAX 10000
 
 #include <vector>

@@ -142,6 +142,8 @@ int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
 
+void defendIsland(dSpaceID space, dWorldID world);
+
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);

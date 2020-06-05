@@ -7,6 +7,7 @@ void takeoff();
 void explosion();
 void honk();
 void gunshot();
+void artilleryshot();
 void smallenginestart();
 void soaring();
 

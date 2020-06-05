@@ -506,32 +506,32 @@ void __nearCallback (void *data, dGeomID o1, dGeomID o2)
 
 void inline initIslands()
 {
-    BoxIsland *thermopilae = new BoxIsland();
+    BoxIsland *thermopilae = new BoxIsland(&entities);
     thermopilae->setName("Thermopilae");
     thermopilae->setLocation(0.0f,-1.0,0.0f);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
-    BoxIsland *nonsquareisland = new BoxIsland();
+    BoxIsland *nonsquareisland = new BoxIsland(&entities);
     nonsquareisland->setName("Atolon");
     nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
     nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
-    BoxIsland *vulcano = new BoxIsland();
+    BoxIsland *vulcano = new BoxIsland(&entities);
     vulcano->setName("Vulcano");
     vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
     vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
 
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
-    BoxIsland *atom = new BoxIsland();
+    BoxIsland *atom = new BoxIsland(&entities);
     atom->setName("Atom");
     atom->setLocation( 500 kmf, -1.0, -100 kmf);
     atom->buildTerrainModel(space,"terrain/atom.bmp");
 
-    BoxIsland *island = new BoxIsland();
+    BoxIsland *island = new BoxIsland(&entities);
     island->setName("Island");
     island->setLocation(-500 kmf, -1.0, 200 kmf);
     island->buildTerrainModel(space,"terrain/island.bmp");
@@ -581,8 +581,8 @@ void test2()
 
 void test4()
 {
-    entities.push_back(islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world));
-    entities.push_back(islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,        -550.0f,    0.0f,world));
+    islands[0]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world);
+    islands[0]->addStructure(new Hangar(GREEN_FACTION)     ,        -550.0f,    0.0f,world);
 }
 
 
@@ -680,8 +680,8 @@ void test14()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world));
-    entities.push_back(islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,world));
+    islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world);
+    islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,world);
 }
 
 void test15()
@@ -781,7 +781,7 @@ void checktest2(unsigned long timer)
 
 void test3()
 {
-    entities.push_back(islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,world));
+    islands[0]->addStructure(new Structure()  ,           0.0f,-1000.0f,world);
 }
 
 
@@ -1109,7 +1109,6 @@ void checktest10(unsigned long timer)     // Check Walrus arriving to an island 
         int z = (rand() % 2000 + 1); z -= 1000;
 
         Structure *s = island->addStructure(new CommandCenter(GREEN_FACTION),x,z,world);
-        entities.push_back(s);
 
         timerstep = timer;
         stateMachine = 3;
@@ -1199,7 +1198,7 @@ void test13()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,world));
+    islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,world);
 }
 
 
@@ -1257,8 +1256,8 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
 
 void test12()
 {
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,world));
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,world));
+    islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         1550.0f,    0.0f,world);
+    islands[0]->addStructure(new Turret(GREEN_FACTION)     ,        -1550.0f,    0.0f,world);
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
     _walrus->init();
@@ -1802,7 +1801,7 @@ void checktest19(unsigned long timer)
 
 void test20()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nm.bmp");
@@ -1818,8 +1817,8 @@ void test20()
 
     entities.push_back(_b);
 
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,world));
-    entities.push_back(islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,world));
+    islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,world);
+    islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,world);
 
 }
 
@@ -1912,7 +1911,7 @@ void checktest20(unsigned long timer)
 
 void test21()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
@@ -1928,8 +1927,6 @@ void test21()
     entities.push_back(_b);
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
-
-    entities.push_back(t);
 
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -1951,7 +1948,7 @@ void checktest21(unsigned long timer)   // Check arriving at Complex island like
     if (timer == 2000)
     {
         Walrus *b = findWalrus(GREEN_FACTION);
-        Structure *t = islands[0]->getStructures()[0]; // Risky
+        Structure *t = (Structure*) entities[islands[0]->getStructures()[0]]; // Risky
 
         Vec3f d (b->getPos()-t->getPos());
         if (d.magnitude()>600.0f)
@@ -1971,7 +1968,7 @@ void checktest21(unsigned long timer)   // Check arriving at Complex island like
 
 void test22()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
@@ -1987,8 +1984,6 @@ void test22()
     entities.push_back(_b);
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
-
-    entities.push_back(t);
 
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -2046,7 +2041,7 @@ void checktest22(unsigned long timer)
 
 void test23()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     //nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->setLocation(0.0f,-1.0,0.0f);
@@ -2063,8 +2058,6 @@ void test23()
     entities.push_back(_b);
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
-
-    entities.push_back(t);
 
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -2135,7 +2128,7 @@ void checktest23(unsigned long timer)
 
 void test24()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
@@ -2151,9 +2144,6 @@ void test24()
     entities.push_back(_b);
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
-
-    entities.push_back(t);
-
 
 
     BoxVehicle * _bo= new BoxVehicle();
@@ -2304,113 +2294,113 @@ void test26()
 
     entities.push_back(_b);
 
-    BoxIsland *statera = new BoxIsland();
+    BoxIsland *statera = new BoxIsland(&entities);
     statera->setName("Statera");
     statera->setLocation(0.0f,-1.0,0.0f);
     statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
-    BoxIsland *thermopilae = new BoxIsland();
+    BoxIsland *thermopilae = new BoxIsland(&entities);
     thermopilae->setName("Thermopilae");
     thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
     thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
-    BoxIsland *nonsquareisland = new BoxIsland();
+    BoxIsland *nonsquareisland = new BoxIsland(&entities);
     nonsquareisland->setName("Atolon");
     nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
     nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
-    BoxIsland *vulcano = new BoxIsland();
+    BoxIsland *vulcano = new BoxIsland(&entities);
     vulcano->setName("Vulcano");
     vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
     vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
 
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
-    BoxIsland *hera = new BoxIsland();
+    BoxIsland *hera = new BoxIsland(&entities);
     hera->setName("Hera");
     hera->setLocation(-200 kmf, -1.0, 200 kmf);
     hera->buildTerrainModel(space,"terrain/nemesis.bmp");
 
-    BoxIsland *hestia = new BoxIsland();
+    BoxIsland *hestia = new BoxIsland(&entities);
     hestia->setName("Hestia");
     hestia->setLocation(-250 kmf, -1.0, 250 kmf);
     hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
 
-    BoxIsland *atom = new BoxIsland();
+    BoxIsland *atom = new BoxIsland(&entities);
     atom->setName("Atom");
     atom->setLocation( 500 kmf, -1.0, -100 kmf);
     atom->buildTerrainModel(space,"terrain/atom.bmp");
 
-    BoxIsland *island = new BoxIsland();
+    BoxIsland *island = new BoxIsland(&entities);
     island->setName("Island");
     island->setLocation(-500 kmf, -1.0, 200 kmf);
     island->buildTerrainModel(space,"terrain/island.bmp");
 
-    BoxIsland *baltimore = new BoxIsland();
+    BoxIsland *baltimore = new BoxIsland(&entities);
     baltimore->setName("Baltimore");
     baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
     baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
 
-    BoxIsland *fulcrum = new BoxIsland();
+    BoxIsland *fulcrum = new BoxIsland(&entities);
     fulcrum->setName("Fulcrum");
     fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
     fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
 
 
-    BoxIsland *vulcrum = new BoxIsland();
+    BoxIsland *vulcrum = new BoxIsland(&entities);
     vulcrum->setName("Vulcrum");
     vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
     vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
 
-    BoxIsland *lunae = new BoxIsland();
+    BoxIsland *lunae = new BoxIsland(&entities);
     lunae->setName("Lunae");
     lunae->setLocation(490 kmf, -1.0, 320 kmf);
     lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
 
-    BoxIsland *mururoa = new BoxIsland();
+    BoxIsland *mururoa = new BoxIsland(&entities);
     mururoa->setName("Mururoa");
     mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
     mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
-    BoxIsland *bikini = new BoxIsland();
+    BoxIsland *bikini = new BoxIsland(&entities);
     bikini->setName("Bikini");
     bikini->setLocation(-150 kmf, -1.0, -235 kmf);
     bikini->buildTerrainModel(space,"terrain/atom.bmp");
 
-    BoxIsland *parentum = new BoxIsland();
+    BoxIsland *parentum = new BoxIsland(&entities);
     parentum->setName("Parentum");
     parentum->setLocation(-150 kmf, -1.0, 435 kmf);
     parentum->buildTerrainModel(space,"terrain/parentum.bmp");
 
-    BoxIsland *goku = new BoxIsland();
+    BoxIsland *goku = new BoxIsland(&entities);
     goku->setName("SonGoku");
     goku->setLocation(-200 kmf, -1.0, -435 kmf);
     goku->buildTerrainModel(space,"terrain/goku.bmp");
 
-    BoxIsland *gaijin = new BoxIsland();
+    BoxIsland *gaijin = new BoxIsland(&entities);
     gaijin->setName("Gaijin-shima");
     gaijin->setLocation(150 kmf, -1.0, -339 kmf);
     gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
 
-    BoxIsland *tristan = new BoxIsland();
+    BoxIsland *tristan = new BoxIsland(&entities);
     tristan->setName("Tristan da Cunha");
     tristan->setLocation(250 kmf, -1.0, 10 kmf);
     tristan->buildTerrainModel(space,"terrain/tristan.bmp");
 
-    BoxIsland *sentinel = new BoxIsland();
+    BoxIsland *sentinel = new BoxIsland(&entities);
     sentinel->setName("North Sentinel");
     sentinel->setLocation(150 kmf, -1.0, 390 kmf);
     sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
 
-    BoxIsland *midway = new BoxIsland();
+    BoxIsland *midway = new BoxIsland(&entities);
     midway->setName("Midway");
     midway->setLocation(-150 kmf, -1.0, -290 kmf);
     midway->buildTerrainModel(space,"terrain/heightmap.bmp");
 
-    BoxIsland *enewetak = new BoxIsland();
+    BoxIsland *enewetak = new BoxIsland(&entities);
     enewetak->setName("Enewetak");
     enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
     enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
@@ -2560,7 +2550,7 @@ void checktest27(unsigned long timer)
 
 void test28()
 {
-    BoxIsland *nemesis = new BoxIsland();
+    BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
@@ -2575,20 +2565,7 @@ void test28()
 
     entities.push_back(_b);
 
-    Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    0.0f,world);
-
-    entities.push_back(t);
-
-
-
-    BoxVehicle * _bo= new BoxVehicle();
-    _bo->init();
-    _bo->embody(world, space);
-    _bo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
-    _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
-    _bo->stop();
-
-    entities.push_back(_bo);
+    Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,world);
 
     Vec3f pos(0.0f,60.0f,-71.0f);
     Camera.setPos(pos);
@@ -2596,6 +2573,81 @@ void test28()
 }
 
 void checktest28(unsigned long timer)
+{
+    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+
+    if (timer == 100)
+    {
+
+
+        l2->elevation = -5;
+        l2->azimuth = 180;
+
+        struct controlregister c;
+        c.pitch = 0.0;
+        c.roll = 0.0;
+        l2->setControlRegisters(c);
+        l2->setForward(toVectorInFixedSystem(0,0,1,l2->azimuth, -l2->elevation));
+
+    }
+
+    if (timer == 300)
+    {
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+        }
+    }
+
+    if (timer == 500)
+    {
+        Balaenidae *b = (Balaenidae*)entities[0];
+        if (b->getHealth()<1000)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: Artillery did not hit carrier.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
+}
+
+void test29()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,17000.0f));
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Turret(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+
+    //t1->enableAuto();
+    t2->enableAuto();
+    t3->enableAuto();
+
+    Vec3f pos(0.0f,60.0f,-71.0f);
+    Camera.setPos(pos);
+}
+
+void checktest29(unsigned long timer)
 {
 
 }
@@ -2665,7 +2717,8 @@ void initWorldModelling(int testcase)
     case 25:test25();break;                         // Spawn many walruses and check FPS
     case 26:test26();break;                         // Initialize structures on all islands and check FPS
     case 27:test27();break;                         // Launch Manta from a drifted Carrier, check orientation.
-    case 28:test28();break;                         // Add artillery and fire it !  (this is so fun !).
+    case 28:test28();break;                         // Add artillery and fire it !
+    case 29:test29();break;                         // Turrets open fire to coming Manta
     default:initIslands();test1();break;
     }
 
@@ -2710,6 +2763,7 @@ void worldStep(int value)
     case 26:checktest26(timer);break;
     case 27:checktest27(timer);break;
     case 28:checktest28(timer);break;
+    case 29:checktest29(timer);break;
     default: break;
     }
 

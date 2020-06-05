@@ -52,6 +52,11 @@ void gunshot()
     system("afplay sounds/Gunshot.m4a &");
 }
 
+void artilleryshot()
+{
+    system("afplay sounds/Artillery.wav &");
+}
+
 void intro()
 {
     system("afplay sounds/intro.mp3 &");

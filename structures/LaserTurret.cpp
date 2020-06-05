@@ -98,18 +98,20 @@ void LaserTurret::locateLaserRay(LaserRay *action)
 Vehicle* LaserTurret::fire(dWorldID world, dSpaceID space)
 {
     LaserRay *action=NULL;
-    if (!firing)
+    if (!firing && getTtl()<=0)
     {
         action = new LaserRay();
         action->init();
         action->embody(world,space);
         locateLaserRay(action);
 
+        setTtl(200);
 
         LaserTurret::ls = action;
-    } else {
+    } else if (getTtl()<=0){
         LaserTurret::ls->disable();
         LaserTurret::ls = NULL;
+        setTtl(1000);
     }
 
     firing = !firing;

@@ -94,6 +94,10 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
     return h;
 }
 
+BoxIsland::BoxIsland(container<Vehicle*> *enti)
+{
+    entities = enti;
+}
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
     _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
@@ -233,12 +237,12 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dWorl
     structure->onIsland(this);
 
     // @FIXME: when the structure is destroyed this pointer must be eliminated.
-    structures.push_back(structure);
+    structures.push_back(entities->push_back(structure));
 
     return structure;
 }
 
-std::vector<Structure*> BoxIsland::getStructures()
+std::vector<size_t> BoxIsland::getStructures()
 {
     return structures;
 }
@@ -247,9 +251,17 @@ Structure* BoxIsland::getCommandCenter()
 {
     for(int i=0;i<structures.size();i++)
     {
-        Structure *s = structures[i];
-        if (s->getType() == CONTROL)
-            return s;
+        if (entities->exists(structures[i]) && entities->isValid(structures[i]))
+        {
+            Structure *s = (Structure*) entities->operator[](structures[i]);
+            printf("s %p\n", s);
+            if (s && s->getType() == CONTROL)
+                return s;
+        }
+        else
+        {
+            structures.erase(structures.begin()+i);
+        }
     }
     return NULL;
 }
@@ -307,6 +319,8 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
         }
         glEnd();
     }
+
+    glDisable(GL_TEXTURE_2D);
 }
 
 void buildTerrainModel(dSpaceID space, Terrain *_landmass, float fscale,float xx,float yy,float zz)

@@ -2,7 +2,7 @@
 
 ArtilleryAmmo::ArtilleryAmmo()
 {
-    Vehicle::setTtl(1000);
+    Vehicle::setTtl(500);
 }
 
 ArtilleryAmmo::~ArtilleryAmmo()
@@ -19,7 +19,7 @@ void ArtilleryAmmo::init()
     ArtilleryAmmo::length=10.0f;
     ArtilleryAmmo::width=10.0f;
 
-    ArtilleryAmmo::mass = 1000.0f;
+    ArtilleryAmmo::mass = 100.0f;
 
     setForward(0,0,1);
 }

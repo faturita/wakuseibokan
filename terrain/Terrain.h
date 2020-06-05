@@ -15,6 +15,7 @@
 #include "../openglutils.h"
 #include "island.h"
 #include "../structures/Structure.h"
+#include "../container.h"
 
 
 #define HFIELD_WSTEP			60			// Vertex count along edge >= 2
@@ -193,14 +194,15 @@ private:
     dGeomID islandGeom;
     dSpaceID islandspace;
 
-    std::vector<Structure*> structures;
+    std::vector<size_t> structures;
+    container<Vehicle*> *entities;
 
     std::string name;
 
     std::string modelname;
     
 public:
-    
+    BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
     
     //void draw(float x, float y, float z, float side, float height);
@@ -221,7 +223,7 @@ public:
 
     std::string getModelName();
     Structure* getCommandCenter();
-    std::vector<Structure*> getStructures();
+    std::vector<size_t> getStructures();
 };
 
 
