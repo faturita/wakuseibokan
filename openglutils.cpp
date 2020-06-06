@@ -411,6 +411,7 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glVertex3f(x, -y, -z);
 
     glEnd();
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 

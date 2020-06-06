@@ -93,7 +93,7 @@ template<class T> T container<T>::find(dBodyID body)
 {
     size_t i = bodyidmap[body];
 
-    if (exists(i))
+    if (hasMore(i))
     {
         return  operator[](i);
     }
@@ -107,7 +107,7 @@ template<class T> T container<T>::find(dGeomID geom)
 {
     size_t i = geomidmap[geom];
 
-    if (exists(i))
+    if (hasMore(i))
     {
         return operator[](i);
     }
@@ -175,7 +175,7 @@ template<class T> bool container<T>::isValid(size_t index)
 }
 
 
-template<class T> bool container<T>::exists(size_t index)
+template<class T> bool container<T>::hasMore(size_t index)
 {
     size_t i=index;
     while ( (i>=0 && i<MAX) && elem[i] == NULL)

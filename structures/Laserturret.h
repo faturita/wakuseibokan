@@ -8,6 +8,9 @@
 class LaserTurret : public Turret
 {
 protected:
+    const int LASER_OVERHEATING = 30;
+    const int LASER_RECHARGING = 1000;
+
     bool firing=false;
 
     LaserRay *ls=NULL;
@@ -19,6 +22,8 @@ public:
     void doControl();
     void doControl(Controller cr);
     void locateLaserRay(LaserRay *action);
+    void setForward(Vec3f forw);
+    void tick();
 };
 
 #endif // LASERTURRET_H

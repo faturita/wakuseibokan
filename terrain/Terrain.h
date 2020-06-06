@@ -224,6 +224,7 @@ public:
     std::string getModelName();
     Structure* getCommandCenter();
     std::vector<size_t> getStructures();
+    void checkStructures();
 };
 
 

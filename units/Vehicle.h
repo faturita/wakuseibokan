@@ -131,7 +131,7 @@ public:
     virtual Vehicle* fire(dWorldID world, dSpaceID space);
 
     virtual int getTtl();
-    void tick();
+    virtual void tick();
 
     bool isAuto();
     void enableAuto();

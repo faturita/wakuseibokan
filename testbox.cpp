@@ -1718,7 +1718,7 @@ void checktest19(unsigned long timer)
     Turret *l2=(Turret*)entities[2];
 
     Vehicle *b=NULL;
-    if (entities.exists(0))
+    if (entities.hasMore(0))
         b = entities[0];
     else
     {
@@ -1828,7 +1828,7 @@ void checktest20(unsigned long timer)
     Turret *l2=(Turret*)entities[2];
 
     Vehicle *b=NULL;
-    if (entities.exists(0))
+    if (entities.hasMore(0))
         b = entities[0];
     else
     {
@@ -2001,7 +2001,7 @@ void test22()
 
 void checktest22(unsigned long timer)
 {
-    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+    Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
     Walrus *b = findWalrus(GREEN_FACTION);
 
     if (!b)
@@ -2076,7 +2076,7 @@ void test23()
 
 void checktest23(unsigned long timer)
 {
-    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+    Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
     Walrus *b = findWalrus(GREEN_FACTION);
     //BoxVehicle *b = (BoxVehicle*)entities[2];
 
@@ -2159,7 +2159,7 @@ void test24()
 
 void checktest24(unsigned long timer)
 {
-    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+    Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
     BoxVehicle *b = (BoxVehicle*)entities[2];
 
     static Vec3f *p = NULL;
@@ -2574,11 +2574,10 @@ void test28()
 
 void checktest28(unsigned long timer)
 {
-    Turret *l2=(Turret*)islands[0]->getStructures()[0]; // Risky
+    Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
 
     if (timer == 100)
     {
-
 
         l2->elevation = -5;
         l2->azimuth = 180;
@@ -2638,6 +2637,11 @@ void test29()
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Turret(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
     Structure *t3 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    20.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         -230.0f,    230.0f,world);
 
     //t1->enableAuto();
     t2->enableAuto();
@@ -2651,6 +2655,116 @@ void checktest29(unsigned long timer)
 {
 
 }
+
+
+void test30()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
+
+    BoxVehicle * _bo= new BoxVehicle();
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
+    _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
+    _bo->stop();
+
+    entities.push_back(_bo);
+
+}
+
+void checktest30(unsigned long timer)
+{
+    LaserTurret *l2=(LaserTurret*)entities[islands[0]->getStructures()[0]]; // Risky
+    BoxVehicle *b = (BoxVehicle*)entities[2];
+
+    static Vec3f *p = NULL;
+
+    if (!b)
+    {
+        printf("Test Failed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+
+    // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
+    float azimuth, elevation;
+
+    Vec3f firingloc = l2->getFiringPort();
+
+    elevation = getDeclination((b->getPos())-(firingloc));
+    azimuth = getAzimuth((b->getPos())-(firingloc));
+    l2->setForward((b->getPos())-(firingloc));
+
+    l2->elevation = elevation;
+    l2->azimuth = azimuth;
+
+    struct controlregister c;
+    c.pitch = 0.0;
+    c.roll = 0.0;
+    l2->setControlRegisters(c);
+
+    std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+
+    if (timer>100 && !p)
+    {
+        p = new Vec3f(b->getPos());
+    }
+
+
+    if (timer==600)
+    {
+
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+    }
+
+    if (timer==1800)
+    {
+
+        Vehicle *action = (l2)->fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action);
+            gunshot();
+        }
+    }
+
+
+    if (timer>28000)
+    {
+        Vec3f l=*p;
+        // The vehicle got hit, hence it has moved.
+        if (!(l.isEquals(b->getPos())))
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
 
 static int testing=-1;
 
@@ -2719,6 +2833,7 @@ void initWorldModelling(int testcase)
     case 27:test27();break;                         // Launch Manta from a drifted Carrier, check orientation.
     case 28:test28();break;                         // Add artillery and fire it !
     case 29:test29();break;                         // Turrets open fire to coming Manta
+    case 30:test30();break;                         // Laser Turret opens fire on a static vehicle.
     default:initIslands();test1();break;
     }
 
@@ -2764,6 +2879,7 @@ void worldStep(int value)
     case 27:checktest27(timer);break;
     case 28:checktest28(timer);break;
     case 29:checktest29(timer);break;
+    case 30:checktest30(timer);break;
     default: break;
     }
 

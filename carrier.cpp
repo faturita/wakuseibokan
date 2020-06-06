@@ -370,7 +370,7 @@ void drawScene() {
     glPushAttrib(GL_CURRENT_BIT);
     drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
-    
+
     // Draw islands.
     for (int i=0; i<islands.size(); i++) {
         (islands[i]->draw());
@@ -383,7 +383,7 @@ void drawScene() {
     // This is a very easy enhancement with tremendous consequences in fps stability.
     synchronized(entities.m_mutex)
     {
-        for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
             {
@@ -508,7 +508,7 @@ void update(int value)
 
         //printf("Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
-        for(size_t i=entities.first();entities.exists(i);i=entities.next(i)) {
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
             // Autocontrol (AI)
             if (entities[i]->isAuto())
@@ -524,7 +524,7 @@ void update(int value)
 
         synchronized(entities.m_mutex)
         {
-            for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 //printf("Type and ttl: %p \n", entities[i]);
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY) && entities[i]->getTtl()==0)
@@ -638,7 +638,7 @@ int main(int argc, char** argv) {
     printf("Size %d\n", entities.size());
     synchronized(entities.m_mutex)
     {
-        for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             printf("Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
         }

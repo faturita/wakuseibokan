@@ -14,7 +14,7 @@ extern std::vector<std::string> messages;
 // SYNC
 Vehicle* gVehicle(dBodyID body)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *vehicle = entities[i];
         if (vehicle->getBodyID() == body)
@@ -27,7 +27,7 @@ Vehicle* gVehicle(dBodyID body)
 
 Vehicle* gVehicle(dGeomID geom)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *vehicle = entities[i];
         if (vehicle->getGeom() == geom)
@@ -40,7 +40,7 @@ Vehicle* gVehicle(dGeomID geom)
 
 void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *vehicle = entities[i];
         if (vehicle->getBodyID() == b1)
@@ -317,7 +317,7 @@ bool  isAction(Vehicle* vehicle)
 // SYNC
 bool isRay(dGeomID o)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getGeom() == o && v->getType()==RAY)
@@ -339,7 +339,7 @@ bool  isRunway(Structure* s)
 
 bool  isRunway(dGeomID candidate)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *vehicle = entities[i];
         if (vehicle && vehicle->getGeom() == candidate && vehicle->getType()==LANDINGABLE)
@@ -375,7 +375,7 @@ bool  isIsland(dGeomID candidate)
 // @FIXME Check the island !
 CommandCenter* findCommandCenter(Island *island)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == CONTROL)
@@ -419,7 +419,7 @@ void groundcollisions(dBodyID body)
 
 Manta* findMantaByNumber(size_t &pos, int number)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == MANTA && ((Manta*)v)->getNumber() == number-1)
@@ -433,7 +433,7 @@ Manta* findMantaByNumber(size_t &pos, int number)
 
 Manta* findManta(int status)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == MANTA && v->getStatus() == status)
@@ -446,7 +446,7 @@ Manta* findManta(int status)
 
 Walrus* findWalrusByNumber(size_t &pos, int number)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS  && ((Walrus*)v)->getNumber() == number - 1)
@@ -461,7 +461,7 @@ Walrus* findWalrusByNumber(size_t &pos, int number)
 
 Walrus* findWalrus(int faction)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS && v->getFaction() == faction)
@@ -474,7 +474,7 @@ Walrus* findWalrus(int faction)
 
 Walrus* findWalrus(int status, int faction)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS && v->getFaction() == faction && v->getStatus() == status)
@@ -487,7 +487,7 @@ Walrus* findWalrus(int status, int faction)
 
 Vehicle* findCarrier(int faction)
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == CARRIER && v->getFaction() == faction)
@@ -503,7 +503,7 @@ int findNextNumber(int type)
     int numbers[256];
     memset(numbers,0,sizeof(int)*256);
 
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (type == MANTA && v->getType() == type)
@@ -530,10 +530,10 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
 {
     int nearesti = -1;
     float closest = threshold;
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v && v->getType() != ACTION && v->getFaction()!=friendlyfaction)
+        if (v && v->getType() != ACTION && v->getType() != RAY && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
                 closest = (v->getPos()-l).magnitude();
@@ -597,7 +597,7 @@ BoxIsland* findNearestIsland(Vec3f Po)
 
 void list()
 {
-    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
     }
@@ -617,6 +617,8 @@ void defendIsland(dSpaceID space, dWorldID world)
         {
             target = findNearestEnemyVehicle(c->getFaction(),island->getPos(), 3 * 3.6 kmf);
 
+            printf("Found target %p\n",  target);
+
             Vehicle *b = target;
 
             if (!b)
@@ -629,6 +631,32 @@ void defendIsland(dSpaceID space, dWorldID world)
             for(int i=0;i<str.size();i++)
             {
                 // RTTI Stuff
+                if(LaserTurret* lb = dynamic_cast<LaserTurret*>(entities[str[i]]))
+                {
+                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                    Vec3f firingloc = lb->getFiringPort();
+
+                    lb->elevation = getDeclination((b->getPos())-(firingloc));
+                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+                    lb->setForward((b->getPos())-(firingloc));
+
+                    struct controlregister c;
+                    c.pitch = 0.0;
+                    c.roll = 0.0;
+                    lb->setControlRegisters(c);
+
+                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                    lb->setForward((b->getPos())-(firingloc));
+
+                    Vehicle *action = (lb)->fire(world,space);
+
+                    if (action != NULL)
+                    {
+                        entities.push_back(action);
+                        //gunshot();
+                    }
+                } else
                 if(Turret* lb = dynamic_cast<Turret*>(entities[str[i]]))
                 {
                     // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
@@ -636,26 +664,23 @@ void defendIsland(dSpaceID space, dWorldID world)
 
                     lb->elevation = getDeclination((b->getPos())-(firingloc));
                     lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-
+                    lb->setForward((b->getPos())-(firingloc));
 
                     struct controlregister c;
                     c.pitch = 0.0;
                     c.roll = 0.0;
                     lb->setControlRegisters(c);
 
-                    std::cout << "Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                     lb->setForward((b->getPos())-(firingloc));
 
-                    if (lb->getTtl()<=0)
-                    {
-                        Vehicle *action = (lb)->fire(world,space);
+                    Vehicle *action = (lb)->fire(world,space);
 
-                        if (action != NULL)
-                        {
-                            entities.push_back(action);
-                            gunshot();
-                        }
+                    if (action != NULL)
+                    {
+                        entities.push_back(action);
+                        //gunshot();
                     }
                 }
             }
@@ -868,7 +893,7 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
             // @FIXME: Find the walrus that is actually closer to the dock bay. REPEATED CODE DELETE
             synchronized(entities.m_mutex)
             {
-                for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+                for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
                 {
                     //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
                     if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)

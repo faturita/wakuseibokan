@@ -59,7 +59,6 @@ void LaserTurret::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-
 void LaserTurret::locateLaserRay(LaserRay *action)
 {
     Vec3f position = getPos();
@@ -94,30 +93,53 @@ void LaserTurret::locateLaserRay(LaserRay *action)
     dGeomSetRotation (action->getGeom(),Re);
 }
 
+void LaserTurret::setForward(Vec3f forw)
+{
+    Turret::setForward(forw);
+
+    if (LaserTurret::ls) locateLaserRay(LaserTurret::ls);
+}
 
 Vehicle* LaserTurret::fire(dWorldID world, dSpaceID space)
 {
     LaserRay *action=NULL;
-    if (!firing && getTtl()<=0)
+
+    if (!firing && getTtl()<0)
     {
         action = new LaserRay();
         action->init();
         action->embody(world,space);
         locateLaserRay(action);
 
-        setTtl(200);
+        setTtl(LASER_OVERHEATING);
+        firing = true;
 
         LaserTurret::ls = action;
-    } else if (getTtl()<=0){
+    } else if (getTtl()<0){
         LaserTurret::ls->disable();
         LaserTurret::ls = NULL;
-        setTtl(1000);
+        setTtl(LASER_RECHARGING);
+        firing = false;
     }
 
-    firing = !firing;
+
     return action;
 }
 
+void LaserTurret::tick()
+{
+    if (firing && LaserTurret::ls && getTtl()<=0)
+    {
+        firing = false;
+        setTtl(LASER_RECHARGING);
+        LaserTurret::ls->disable();
+        LaserTurret::ls = NULL;
+        printf("Shutting off laser\n");
+    }
+
+    Vehicle::tick();
+
+}
 void LaserTurret::doControl()
 {
     Controller c;

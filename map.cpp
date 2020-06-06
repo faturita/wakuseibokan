@@ -330,7 +330,7 @@ void drawMap()
         // Now show all the available units.
         synchronized(entities.m_mutex)
         {
-            for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 if (entities[i]->getType() == CARRIER)
                 {

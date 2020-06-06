@@ -5,6 +5,7 @@ Turret::Turret(int faction)
 {
     Turret::zoom = 20.0f;
     setFaction(faction);
+    Turret::firingpos = Vec3f(0.0f,19.0f,0.0f);
 }
 
 void Turret::init()
@@ -17,8 +18,6 @@ void Turret::init()
     Structure::height=27.97;
     Structure::length=11.68;
     Structure::width=11.68;
-
-    Turret::firingpos = Vec3f(0.0f,19.0f,0.0f);
 
     setForward(0,0,1);
 }
@@ -120,11 +119,12 @@ void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 {
+    if (getTtl()>0)
+        return NULL;
+
     Gunshot *action = new Gunshot();
     // Need axis conversion.
     action->init();
-
-
 
     Vec3f position = getPos();
     position[1] += 19.0f; // Move upwards to the center of the real rotation.
@@ -132,7 +132,6 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
-
 
     forward = forward.normalize();
     orig = position;
@@ -157,13 +156,11 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 
     //std::cout << d << std::endl;
 
-
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
-
     // Shell loading time.
-    setTtl(500);
+    setTtl(20);
 
     // I can set power or something here.
     return (Vehicle*)action;

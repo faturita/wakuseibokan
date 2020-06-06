@@ -94,5 +94,5 @@ int LaserRay::getType()
 
 void LaserRay::disable()
 {
-    setTtl(2);
+    setTtl(1);
 }

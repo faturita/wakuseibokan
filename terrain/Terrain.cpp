@@ -242,25 +242,36 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dWorl
     return structure;
 }
 
+void BoxIsland::checkStructures()
+{
+    for(int i=0;i<structures.size();i++)
+    {
+        // @FIMXE: This is wrong.  The index of container is not unique per object and what may happen is that it does not reference
+        // the same object.  Hence, this is a very ugly workaround so that I can check if there is still a valid pointer at that position
+        // I will retrieve it only when it is of type Structure.
+        if (!(entities->isValid(structures[i]) && dynamic_cast<Structure*>(entities->operator[](structures[i]))))
+        {
+            structures.erase(structures.begin()+i);
+        }
+    }
+}
+
+
 std::vector<size_t> BoxIsland::getStructures()
 {
+    checkStructures();
     return structures;
 }
 
 Structure* BoxIsland::getCommandCenter()
 {
+    checkStructures();
     for(int i=0;i<structures.size();i++)
     {
-        if (entities->exists(structures[i]) && entities->isValid(structures[i]))
+        if (Structure* s = dynamic_cast<Structure*>(entities->operator[](structures[i])))
         {
-            Structure *s = (Structure*) entities->operator[](structures[i]);
-            printf("s %p\n", s);
             if (s && s->getType() == CONTROL)
                 return s;
-        }
-        else
-        {
-            structures.erase(structures.begin()+i);
         }
     }
     return NULL;
@@ -309,12 +320,14 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
             float s = (float)x / (_landmass->width()- 1); // s in [0, 1]
             glTexCoord2f(s, t0);
             
-            glVertex3f(x, _landmass->getHeight(x, z), z);
+            // @NOTE: Z-Fighting.  if the height is 0, move only the view a little bit lower.
+            glVertex3f(x, (  _landmass->getHeight(x, z) <= 1 ? _landmass->getHeight(x, z)-10.9 : _landmass->getHeight(x, z) ) , z);
             normal = _landmass->getNormal(x, z + 1);
             glNormal3f(normal[0], normal[1], normal[2]);
             glTexCoord2f(s, t1);
             
-            glVertex3f(x, _landmass->getHeight(x, z + 1), z + 1);
+            // @NOTE: Z-Fighting.  if the height is 0, move only the view a little bit lower.
+            glVertex3f(x, (_landmass->getHeight(x, z + 1)<=1?_landmass->getHeight(x, z + 1)-10.9:_landmass->getHeight(x, z + 1)), z + 1);
             //glVertex3f(x, hedightfield_callback(_landmass,x,z+1), z+1);
         }
         glEnd();

@@ -108,7 +108,7 @@ public:
      * @param index
      * @return
      */
-    bool exists(size_t index);
+    bool hasMore(size_t index);
 
     /**
      * Size of the container.

@@ -77,7 +77,7 @@ void processMouse(int button, int state, int x, int y) {
 
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
-        if (controller.controlling != CONTROLLING_NONE &&  entities[controller.controlling]->getType() == VehicleTypes::MANTA)
+        if (controller.view == 1 && controller.controlling != CONTROLLING_NONE &&  entities[controller.controlling]->getType() == VehicleTypes::MANTA)
         {
             printf("Active control\n");
             // Activate airplane controller.
@@ -405,7 +405,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 synchronized(entities.m_mutex)
                 {
-                    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
                         if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
@@ -429,7 +429,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME: Find the walrus that is actually closer to the dock bay.
                 synchronized(entities.m_mutex)
                 {
-                    for(size_t i=entities.first();entities.exists(i);i=entities.next(i))
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
                     {
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
                         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
@@ -444,15 +444,21 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
         break;
         case 'h':
-            Vehicle *action = (entities[controller.controlling])->fire(world,space);
-            //int *idx = new int();
-            //*idx = vehicles.push_back(action);
-            //dBodySetData( action->getBodyID(), (void*)idx);
-            if (action != NULL)
             {
-                entities.push_back(action);
-                gunshot();
+                synchronized(entities.m_mutex)
+                {
+                    Vehicle *action = (entities[controller.controlling])->fire(world,space);
+                    //int *idx = new int();
+                    //*idx = vehicles.push_back(action);
+                    //dBodySetData( action->getBodyID(), (void*)idx);
+                    if (action != NULL)
+                    {
+                        entities.push_back(action);
+                        gunshot();
+                    }
+                }
             }
+
         break;
 	}
 }
