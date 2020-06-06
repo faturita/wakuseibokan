@@ -347,7 +347,7 @@ void Walrus::doDynamics(dBodyID body)
         //enginestart();
 
     dVector3 result;
-    dBodyVectorToWorld(body, 0,1,0,result);
+    dBodyVectorFromWorld(body, 0,1,0,result);
 
     Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
     Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
@@ -357,6 +357,14 @@ void Walrus::doDynamics(dBodyID body)
     //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
+
+    std::cout << "Attitude:" << attitude << std::endl;
+
+    if (attitude>80 || attitude<-80)
+    {
+        // Walrus has tumbled.
+        damage(1);
+    }
 
 
     if (VERIFY(pos,me) && !Vehicle::inert)

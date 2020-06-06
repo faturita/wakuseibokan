@@ -2765,6 +2765,76 @@ void checktest30(unsigned long timer)
     }
 }
 
+void test31()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    BoxIsland *atom = new BoxIsland(&entities);
+    atom->setName("Atom");
+    atom->setLocation(0.0f,-1.0,0.0f);
+    atom->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+
+    islands.push_back(atom);
+}
+
+void checktest31(unsigned long timer)
+{
+    Walrus *_walrus = findWalrus(GREEN_FACTION);
+
+    if (!_walrus)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+    static int stateMachine = 0;
+
+    if (timer == 100)
+    {
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 0.0f;
+        c.roll = 8.0f;
+        _walrus->setControlRegisters(c);
+    }
+
+
+    if (timer == 275)
+    {
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 0.0f;
+        c.roll = 0.0f;
+        _walrus->setControlRegisters(c);
+        _walrus->stop();
+    }
+
+    if (timer == 300)
+    {
+
+        _walrus->enableAuto();
+        struct controlregister c;
+        c.thrust = 10000.0f;
+        c.roll = 0;
+        _walrus->setControlRegisters(c);
+        _walrus->setThrottle(10000.0f);
+    }
+
+    if (timer == 3000)
+    {
+        printf("Test failed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
 
 static int testing=-1;
 
@@ -2834,6 +2904,7 @@ void initWorldModelling(int testcase)
     case 28:test28();break;                         // Add artillery and fire it !
     case 29:test29();break;                         // Turrets open fire to coming Manta
     case 30:test30();break;                         // Laser Turret opens fire on a static vehicle.
+    case 31:test31();test10();break;   // Walrus arrive to a weird island, tumbles and is destroyed.
     default:initIslands();test1();break;
     }
 
@@ -2880,6 +2951,7 @@ void worldStep(int value)
     case 28:checktest28(timer);break;
     case 29:checktest29(timer);break;
     case 30:checktest30(timer);break;
+    case 31:checktest31(timer);break;
     default: break;
     }
 
