@@ -28,6 +28,7 @@ private:
     int ttl=-1;  //Live for ever.
 
     int health = 1000;
+    int power = 1000;
 
     int faction=-1;
 
@@ -152,6 +153,8 @@ public:
     bool VERIFY(Vec3f newpos, dBodyID who);
 
     int getFaction();
+    int getPower() const;
+    void setPower(int value);
 };
 
 #endif /* VEHICLE_H_ */

@@ -881,6 +881,7 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
         {
             BoxIsland *is = findNearestEmptyIsland(w->getPos());
 
+            // @FIXME: It may happen that the walrus is wandering do nothing never de-autopilot and this is endless.
             if (!w->isAuto())
             {
                 captureIsland(is,w->getFaction(),space, world);

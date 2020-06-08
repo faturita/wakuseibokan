@@ -290,6 +290,8 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
 
     Manta::rudder = regs.precesion;
 
+    myCopy = regs;
+
 }
 
 void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn)

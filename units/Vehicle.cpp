@@ -405,6 +405,16 @@ void Vehicle::setTexture(const GLuint &value)
     texture = value;
 }
 
+int Vehicle::getPower() const
+{
+    return power;
+}
+
+void Vehicle::setPower(int value)
+{
+    power = value;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;

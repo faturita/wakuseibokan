@@ -139,18 +139,18 @@ void drawHUD()
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
     
-    float speed=0, health=0, energy = 0;
+    float speed=0, health=0, power = 0;
     
     if (controller.controlling != CONTROLLING_NONE)
     {
         speed = entities[controller.controlling]->getSpeed();
         health = entities[controller.controlling]->getHealth();
-        energy = entities[controller.controlling]->getHealth();
+        power = entities[controller.controlling]->getPower();
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Energy:  %5.2f\n", entities.indexOf(controller.controlling),controller.registers.thrust, health, energy);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", entities.indexOf(controller.controlling),controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
