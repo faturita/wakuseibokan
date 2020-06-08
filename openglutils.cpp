@@ -572,8 +572,8 @@ void drawFloor(float x, float y, float z)
     glTexCoord2f (start, sstart);
     glVertex3f(horizon, 0.0f, -horizon);
     
-    glDisable(GL_TEXTURE_2D);
     glEnd();
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 

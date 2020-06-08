@@ -131,7 +131,7 @@ void drawHUD()
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%5.2f\t,%5.2f\t,%5.2f\t)  TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2], timer);
+    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f)  TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2], timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -139,17 +139,18 @@ void drawHUD()
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
     
-    float speed=0, health=0;
+    float speed=0, health=0, energy = 0;
     
     if (controller.controlling != CONTROLLING_NONE)
     {
         speed = entities[controller.controlling]->getSpeed();
         health = entities[controller.controlling]->getHealth();
+        energy = entities[controller.controlling]->getHealth();
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f\n", entities.indexOf(controller.controlling),controller.registers.thrust, health);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Energy:  %5.2f\n", entities.indexOf(controller.controlling),controller.registers.thrust, health, energy);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())

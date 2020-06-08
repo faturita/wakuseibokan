@@ -35,7 +35,217 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
 
 void SimplifiedDynamicManta::doControl()
 {
-    doControl(myCopy);
+    switch (aistatus) {
+    case LANDING:
+        doControlLanding();
+        break;
+    case DESTINATION:
+        doControlDestination();
+        break;
+    default:
+        break;
+    }
+}
+
+
+
+void SimplifiedDynamicManta::doControlLanding()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    static int status = 0;
+
+    float height = Po[1];
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf(-100 kmf, 0.0f, 100 kmf);
+
+    Pf = destination;  // This is the carrier or a runway.  If it is the carrier this must be modified during each tick.
+    Pf[1] = 0;
+
+    // Go 10 kmf backwards from the carrier, very slowly.
+    Vec3f T;
+    float H=500, spspeed = 40.0f, TH = 200;
+
+    switch (status) {
+    case 0:
+        T = (Pf - attitude.normalize()*(2 kmf)) - Po;
+        H=450;spspeed = 40.0f;TH = 150;
+        break;
+    case 1:
+        H=180;spspeed = 22.0f; TH=250;
+        T = (Pf - attitude.normalize()*(0 kmf)) - Po;
+        break;
+    }
+
+
+    float eh, midpointpitch, distance;
+
+    if (!reached && T.magnitude()>TH)
+    {
+        float Kp = -0.8;
+        float val = ((getAzimuth(getForward())-180.0f)*PI/180.0f - (getAzimuth(T)-180.0f)*PI/180.0f);
+
+        distance =  T.magnitude();
+        c.registers.roll = 0;
+
+        setForward(T);
+        release(T);
+
+
+        printf("Landing:T: %10.3f %10.3f %10.3f\n", distance, val, c.registers.roll);
+
+
+        eh = height-H;
+        c.registers.thrust = spspeed;
+        setThrottle(spspeed * 10.0f);
+        midpointpitch = 2;
+
+        if ((abs(eh))>10.0f)
+        {
+            c.registers.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+        } else {
+            c.registers.pitch = midpointpitch;
+        }
+    } else
+    {
+        if (status<1)
+            status += 1;
+        else
+        {
+            //stop();
+            elevator = 0;
+
+            c.registers.thrust = 0.0f/(10.0);
+            c.registers.pitch = 0;
+            c.registers.roll = 0;
+            setThrottle(0.0f);
+
+            if (!reached)
+            {
+                status = 0;
+                char str[256];
+                sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
+                //messages.insert(messages.begin(), str);
+                reached = true;
+            }
+        }
+    }
+    doControl(c);
+
+}
+
+void SimplifiedDynamicManta::doControlDestination()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf(-100 kmf, 0.0f, 100 kmf);
+
+    Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float eh, midpointpitch;
+
+
+    if (!reached && T.magnitude()>precission)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 3.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 2.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 1.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+        eh = height-200.0f;
+        midpointpitch = -15;
+        c.registers.thrust = 150.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 30.0f;
+            midpointpitch = 17;
+        }
+
+
+        if ((abs(eh))>10.0f)
+        {
+            c.registers.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+        } else {
+            c.registers.pitch = midpointpitch;
+        }
+
+    } else
+    {
+        printf("Manta arrived to destination...\n");
+
+        elevator = 35;
+
+        c.registers.thrust = 300.0f/(10.0);
+
+        midpointpitch = 36;
+        eh=height-500.0f;
+        static float diff = eh;
+
+        c.registers.roll = -13;
+
+        if ((abs(eh))>10.0f)
+        {
+            c.registers.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+        } else {
+            c.registers.pitch = midpointpitch;
+        }
+
+        setThrottle(30.0f);
+
+        if (!reached)
+        {
+            char str[256];
+            sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
+            //messages.insert(messages.begin(), str);
+            reached = true;
+            setStatus(Manta::HOLDING);
+        }
+
+
+    }
+
+    doControl(c);
 }
 
 void SimplifiedDynamicManta::doControl(Controller controller)
@@ -111,6 +321,11 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
     Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
 
     printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\t", Cd, CL, Cy, Cm, Cl,Cn);
+}
+
+void SimplifiedDynamicManta::land()
+{
+    aistatus = LANDING;
 }
 
 void SimplifiedDynamicManta::rotateBody(dBodyID body)

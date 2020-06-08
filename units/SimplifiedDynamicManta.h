@@ -6,12 +6,19 @@
 class SimplifiedDynamicManta : public Manta
 {
 public:
+    float precission = 200;
+    Vec3f attitude;
     SimplifiedDynamicManta(int newfaction);
     float angularPos[3] = {0,0,0};
     void doDynamics(dBodyID body);
     void doControl(Controller controller);
     void doControl(struct controlregister cons);
     void doControl();
+
+    void doControlDestination();
+    void doControlLanding();
+
+
     void embody(dBodyID myBodySelf);
     void embody(dWorldID world, dSpaceID space);
 
@@ -21,6 +28,8 @@ public:
     Vehicle* fire(dWorldID world, dSpaceID space);
     void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);
     void rotateBody(dBodyID);
+
+    void land();
 };
 
 #endif // SIMPLIFIEDMANTA_H

@@ -866,6 +866,10 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
                 captureIsland(is,w->getFaction(),space, world);
                 status=3;
             }
+        } else
+        {
+            // Walrus has been destroyed.
+            status = 1;
         }
 
         break;
@@ -881,6 +885,9 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
             w->setDestination(b->getPos()+Vec3f(0.0f,0.0f,-50.0f));
             w->enableAuto();
             status = 4;
+        } else {
+            // There are no walrus so I can departure to the next island.
+            status = 0;
         }
         break;
     }

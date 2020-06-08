@@ -68,6 +68,8 @@
 
 #include "map.h"
 
+#define runonce static bool ond = true; for (;ond;ond = false)
+
 extern  Camera Camera;
 
 extern  Controller controller;
@@ -694,6 +696,101 @@ void test15()
     _b->stop();
 
     entities.push_back(_b);
+}
+
+void checktest15(unsigned long timer)
+{
+    static bool reached = false;
+
+
+    if (timer == 100)
+    {
+        spawnManta(space,world,entities[0]);
+    }
+
+    if (timer == 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+    }
+
+
+    if (timer == 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        _manta1->setDestination(_b->getPos()-_b->getForward().normalize()*(10 kmf));
+        _manta1->attitude = _b->getForward();
+        _manta1->enableAuto();
+    }
+    if (timer > 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        if (_manta1)
+           _manta1->attitude = _b->getForward();
+
+    }
+
+
+    if (timer > 700)
+    {
+        // Auto control
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::HOLDING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        if (_manta1)
+        {
+            runonce {
+                _manta1->setDestination(_b->getPos());
+                _manta1->attitude = _b->getForward();
+                _manta1->land();
+                _manta1->enableAuto();
+            }
+        }
+    }
+
+
+    if (timer>1000)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::ON_DECK);
+
+        if (_manta1)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+    if (timer>8000)
+    {
+        // Timeout
+        printf("Test failed.\n");
+        endWorldModelling();
+        exit(0);
+    }
 }
 
 
@@ -1328,19 +1425,20 @@ void checktest14(unsigned long timer)
 {
     static bool reached = false;
 
+
     if (timer == 100)
     {
         spawnManta(space,world,entities[0]);
     }
 
-    if (timer == 290)
+    if (timer == 320)
     {
         // launch
         launchManta(entities[0]);
     }
 
 
-    if (timer == 300)
+    if (timer == 420)
     {
         Vehicle *_b = entities[3];
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
@@ -1367,7 +1465,7 @@ void checktest14(unsigned long timer)
 
         Po[1] = 0.0f;
 
-        Vec3f Pf(-500 kmf, 0.0f, 200 kmf);
+        Vec3f Pf(-100 kmf, 0.0f, 100 kmf);
 
         Vec3f T = Pf - Po;
 
@@ -1431,11 +1529,13 @@ void checktest14(unsigned long timer)
         {
             printf("Manta arrived to destination...\n");
             SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[3];
-            _manta1->elevator = 36;
+            _manta1->elevator = 35;
             struct controlregister c;
             c.thrust = 300.0f/(10.0);
+
             midpointpitch = 36;
             eh=height-500.0f;
+            static float diff = eh;
 
             c.roll = -13;
 
@@ -1463,29 +1563,26 @@ void checktest14(unsigned long timer)
 
     }
 
+    if (timer>10000)
+    {
+        if (reached)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
 
 }
 
-void checktest15(unsigned long timer)
-{
-    if (timer==200)
-    {
-        Balaenidae *b = (Balaenidae*)entities[0];
-        spawnWalrus(space,world,b);
-    }
-    if (timer==400)
-    {
-        Balaenidae *b = (Balaenidae*)entities[0];
-        spawnWalrus(space,world,b);
-    }
 
-    if (timer>700)
-    {
-        printf("Test passed OK!\n");
-        endWorldModelling();
-        exit(1);
-    }
-}
 
 
 void checktest16(unsigned long timer)
@@ -2887,8 +2984,8 @@ void initWorldModelling(int testcase)
     case 11:initIslands();test11();break; // Carrier stability far away.
     case 12:initIslands();test1();test12();break; // Turret firing to Carrier.  Gunshot stability.
     case 13:initIslands();test13();break;   // Laser firing and hitting carrier.
-    case 14:initIslands();;test14();break;  // Spawn Manta from Carrier, launch it and land back on Carrier, and dock.
-    case 15:initIslands();test15();break;
+    case 14:initIslands();;test14();break;  // Spawn Manta from Carrier, launch it and direct it towards some coordinate.
+    case 15:initIslands();test15();break;   // Spawn Manta from Carrier, launch it, send it back behind the carrier and make it land.
     case 16:initIslands();test1();test12();break;   // Turret firing to the other Turret.
     case 17:initIslands();test1();test12();break;   // Turret automatically aiming at Carrier.
     case 18:initIslands();test1();test12();break;   // The other Turret aims automatically to the Carrier.

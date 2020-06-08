@@ -431,6 +431,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
                     {
+                        // @FIXME: Only put back the walrus that is close to the carrier.
                         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
                         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
                         {
@@ -447,14 +448,20 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 synchronized(entities.m_mutex)
                 {
-                    Vehicle *action = (entities[controller.controlling])->fire(world,space);
-                    //int *idx = new int();
-                    //*idx = vehicles.push_back(action);
-                    //dBodySetData( action->getBodyID(), (void*)idx);
-                    if (action != NULL)
+                    if (controller.controlling != CONTROLLING_NONE && entities.isValid(controller.controlling))
                     {
-                        entities.push_back(action);
-                        gunshot();
+                        Vehicle *action = (entities[controller.controlling])->fire(world,space);
+                        //int *idx = new int();
+                        //*idx = vehicles.push_back(action);
+                        //dBodySetData( action->getBodyID(), (void*)idx);
+                        if (action != NULL)
+                        {
+                            entities.push_back(action);
+                            gunshot();
+                        }
+                    } else
+                    {
+                        controller.controlling = CONTROLLING_NONE;
                     }
                 }
             }
