@@ -358,7 +358,7 @@ void Walrus::doDynamics(dBodyID body)
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
-    std::cout << "Attitude:" << attitude << std::endl;
+    //std::cout << "Attitude:" << attitude << std::endl;
 
     if (attitude>80 || attitude<-80)
     {

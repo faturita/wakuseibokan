@@ -480,16 +480,16 @@ void update(int value)
 
         // @FIXME: Check some parameter to see who control each faction. Either AI assisted or some user.
         if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
-            playFaction(BLUE_FACTION,space,world);
+            playFaction(timer, BLUE_FACTION,space,world);
         if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
-            playFaction(GREEN_FACTION, space, world);
+            playFaction(timer, GREEN_FACTION, space, world);
 
 
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
         // to control each object as if it were exactly the user (with doControl() in the loop ahead).
-        if (controller.controlling != CONTROLLING_NONE)
+        if (controller.controlling != CONTROLLING_NONE && entities.isValid(controller.controlling))
         {
             if (!entities[controller.controlling]->isAuto())
             {

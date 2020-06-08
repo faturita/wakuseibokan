@@ -147,6 +147,7 @@ void defendIsland(dSpaceID space, dWorldID world);
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
+void dockWalrus(Vehicle *docker);
 
 void launchManta(Vehicle *v);
 void landManta(Vehicle *v);
@@ -158,7 +159,7 @@ Vehicle* findCarrier(int faction);
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
 
-void playFaction(int faction, dSpaceID space, dWorldID world);
+void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world);
 
 
 #endif // ENGINE_H

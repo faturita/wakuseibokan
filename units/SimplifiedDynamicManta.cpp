@@ -42,6 +42,9 @@ void SimplifiedDynamicManta::doControl()
     case DESTINATION:
         doControlDestination();
         break;
+    case FREE:
+        setDestination(getPos()+getForward().normalize()*100);
+        break;
     default:
         break;
     }
@@ -78,7 +81,7 @@ void SimplifiedDynamicManta::doControlLanding()
         H=450;spspeed = 40.0f;TH = 150;
         break;
     case 1:
-        H=180;spspeed = 22.0f; TH=250;
+        H=180;spspeed = 27.0f; TH=250;
         T = (Pf - attitude.normalize()*(0 kmf)) - Po;
         break;
     }
@@ -233,6 +236,8 @@ void SimplifiedDynamicManta::doControlDestination()
 
         setThrottle(30.0f);
 
+                    setStatus(Manta::HOLDING);
+
         if (!reached)
         {
             char str[256];
@@ -274,7 +279,7 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
         setStatus(Manta::TACKINGOFF);
     }
 
-    if (speed>150)
+    if (speed>150 && getStatus()!=HOLDING)
     {
         setStatus(FLYING);
         // @NOTE: Eventually remove island after you takeoff.

@@ -617,7 +617,7 @@ void defendIsland(dSpaceID space, dWorldID world)
         {
             target = findNearestEnemyVehicle(c->getFaction(),island->getPos(), 3 * 3.6 kmf);
 
-            printf("Found target %p\n",  target);
+            //printf("Found target %p\n",  target);
 
             Vehicle *b = target;
 
@@ -777,6 +777,26 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     return (Walrus*)walrus;
 }
 
+// SYNCJ
+void dockWalrus(Vehicle *dock)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        // @FIXME: Only put back the walrus that is close to the carrier.
+        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
+                entities[i]->getFaction()==dock->getFaction())
+        {
+            int walrusNumber = ((Walrus*)entities[i])->getNumber()+1;
+            dBodyDisable(entities[i]->getBodyID());
+            entities.erase(i);
+            char msg[256];
+            sprintf(msg, "Walrus %d is now back on deck.",walrusNumber+1);
+            messages.insert(messages.begin(), std::string(msg));
+        }
+    }
+}
+
 
 void landManta(Vehicle *v)
 {
@@ -825,9 +845,10 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 }
 
 
-void playFaction(int faction, dSpaceID space, dWorldID world)
+void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world)
 {
     static int statuses[2] = {0,0};
+    static unsigned long timeevent = 0;
 
     // @FIXME: This is SO wrong.
     int status = statuses[faction-1];
@@ -858,18 +879,23 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
     case 1:
     {
         Vehicle *b = findCarrier(faction);
-        BoxIsland *is = findNearestEmptyIsland(b->getPos());
 
-        if (!b->isAuto())
+        if (b)
         {
-            printf("Carries has arrived to destination.\n");
+            BoxIsland *is = findNearestEmptyIsland(b->getPos());
 
-            Walrus* w = spawnWalrus(space,world,b);
-            w->setDestination(is->getPos());
-            w->enableAuto();
-            status = 2;
+            if (!b->isAuto())
+            {
+                printf("Carries has arrived to destination.\n");
 
+                Walrus* w = spawnWalrus(space,world,b);
+                w->setDestination(is->getPos());
+                w->enableAuto();
+                status = 2;timeevent = timer;
+
+            }
         }
+
         break;
     }
     case 2:
@@ -882,7 +908,7 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
             BoxIsland *is = findNearestEmptyIsland(w->getPos());
 
             // @FIXME: It may happen that the walrus is wandering do nothing never de-autopilot and this is endless.
-            if (!w->isAuto())
+            if (!w->isAuto() || ( w->getIsland() == is && timer>(timeevent + 1000))  )
             {
                 captureIsland(is,w->getFaction(),space, world);
                 status=3;
@@ -914,30 +940,22 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
     }
     case 4:
     {
+        Vehicle *b = findCarrier(faction);
         Walrus *w = findWalrus(faction);
 
-        if (w && !(w->isAuto()))
+        if (w)
         {
-            // @FIXME: Find the walrus that is actually closer to the dock bay. REPEATED CODE DELETE
-            synchronized(entities.m_mutex)
+            if (b && w && !(w->isAuto()))
             {
-                for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+                synchronized(entities.m_mutex)
                 {
-                    //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                    if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
-                    {
-                        //printf("Eliminating....\n");
-                        if (controller.controlling == i)
-                        {
-                            controller.controlling = CONTROLLING_NONE;
-                        }
-                        dBodyDisable(entities[i]->getBodyID());
-                        entities.erase(i);
-                        messages.insert(messages.begin(), std::string("Walrus is now back on deck."));
-                    }
+                    dockWalrus(b);
                 }
+                status=0;
             }
-            status=0;
+        } else {
+            // There are no walrus so I can departure to the next island.
+            status = 0;
         }
 
         break;

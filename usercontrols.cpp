@@ -434,18 +434,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME: Find the walrus that is actually closer to the dock bay.
                 synchronized(entities.m_mutex)
                 {
-                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-                    {
-                        // @FIXME: Only put back the walrus that is close to the carrier.
-                        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING)
-                        {
-                            //printf("Eliminating....\n");
-                            dBodyDisable(entities[i]->getBodyID());
-                            entities.erase(i);
-                            messages.insert(messages.begin(), std::string("Walrus is now back on deck."));
-                        }
-                    }
+                    dockWalrus(entities[controller.controlling]);
                 }
             }
         break;

@@ -456,25 +456,62 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 
 void initWorldPopulation()
 {
-    // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    _b->embody(world,space);
-    _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-    //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
-    _b->stop();
 
-    entities.push_back(_b);
+    if (true)
+    {
+        // Strategy Game
+        Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+        _b->init();
+        _b->embody(world,space);
+        //_b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
+        _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
+        _b->stop();
+
+        entities.push_back(_b);
 
 
-    Beluga *_bg = new Beluga(BLUE_FACTION);
-    _bg->init();
-    _bg->embody(world,space);
-    _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
-    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
-    _bg->stop();
+        Beluga *_bg = new Beluga(BLUE_FACTION);
+        _bg->init();
+        _bg->embody(world,space);
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        _bg->stop();
 
-    entities.push_back(_bg);
+        entities.push_back(_bg);
+    }
+    else
+    {
+        // Action Game
+        Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+        _b->init();
+        _b->embody(world,space);
+        _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
+        _b->setPos(0.0f + 0.0 kmf,20.5f,-12000.0f + 0.0 kmf);
+        //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
+        _b->stop();
+
+        entities.push_back(_b);
+
+
+        Beluga *_bg = new Beluga(BLUE_FACTION);
+        _bg->init();
+        _bg->embody(world,space);
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
+        _bg->stop();
+
+        entities.push_back(_bg);
+
+
+        for (int j=0;j<islands.size();j++)
+        {
+            if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))
+                captureIsland(islands[j],BLUE_FACTION,space,world);
+            else if (islands[j]->getZ()< (200 kmf))
+                captureIsland(islands[j],GREEN_FACTION,space,world);
+        }
+    }
 
 }
 
