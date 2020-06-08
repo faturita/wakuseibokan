@@ -507,6 +507,17 @@ Vec3f Vehicle::getDestination() const
     return Vehicle::destination;
 }
 
+void Vehicle::setAttitude(Vec3f attit)
+{
+    Vehicle::attitude = attit;
+
+}
+
+Vec3f Vehicle::getAttitude()
+{
+    return Vehicle::attitude;
+}
+
 /**
  * Check model consistencies.
  *

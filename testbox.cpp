@@ -738,7 +738,7 @@ void checktest15(unsigned long timer)
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
         _manta1->setDestination(_b->getPos()-_b->getForward().normalize()*(10 kmf));
-        _manta1->attitude = _b->getForward();
+        _manta1->setAttitude(_b->getForward());
         _manta1->enableAuto();
     }
     if (timer > 650)
@@ -748,7 +748,7 @@ void checktest15(unsigned long timer)
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
         if (_manta1)
-           _manta1->attitude = _b->getForward();
+           _manta1->setAttitude( _b->getForward());
 
     }
 
@@ -764,7 +764,7 @@ void checktest15(unsigned long timer)
         {
             runonce {
                 _manta1->setDestination(_b->getPos());
-                _manta1->attitude = _b->getForward();
+                _manta1->setAttitude( _b->getForward());
                 _manta1->land();
                 _manta1->enableAuto();
             }

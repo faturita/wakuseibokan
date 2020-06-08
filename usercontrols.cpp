@@ -302,6 +302,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 launchManta(entities[controller.controlling]);
 
             } else
+            if (controller.str.find("land") != std::string::npos)
+            {
+                landManta(entities[controller.controlling]);
+
+            } else
             if (controller.str.find("command") != std::string::npos)
             {
                 Walrus *w = (Walrus*) entities[controller.controlling];

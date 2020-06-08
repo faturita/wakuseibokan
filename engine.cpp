@@ -777,6 +777,26 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     return (Walrus*)walrus;
 }
 
+
+void landManta(Vehicle *v)
+{
+    // Auto control
+    if (v->getType() == CARRIER)
+    {
+        Balaenidae *b = (Balaenidae*)v;
+        Manta *m = findManta(Manta::HOLDING);
+
+        if (m)
+        {
+            m->setDestination(b->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
+            m->setAttitude(b->getForward());
+            m->land();
+            m->enableAuto();
+        }
+    }
+}
+
+
 void launchManta(Vehicle *v)
 {
     if (v->getType() == CARRIER)

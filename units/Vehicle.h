@@ -41,6 +41,7 @@ protected:
     float engine[3];
     float steering;
     Vec3f destination;
+    Vec3f attitude;         // This is the set point for forward.
 
     // @FIXME: This is super ugly.
     bool reached=false;
@@ -127,6 +128,9 @@ public:
     float getBearing();
     void setDestination(Vec3f target);
     Vec3f getDestination() const;
+
+    void setAttitude(Vec3f attit);
+    Vec3f getAttitude();
 
     virtual Vehicle* fire(dWorldID world, dSpaceID space);
 

@@ -7,7 +7,6 @@ class SimplifiedDynamicManta : public Manta
 {
 public:
     float precission = 200;
-    Vec3f attitude;
     SimplifiedDynamicManta(int newfaction);
     float angularPos[3] = {0,0,0};
     void doDynamics(dBodyID body);

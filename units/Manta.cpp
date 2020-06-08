@@ -27,6 +27,12 @@ void Manta::release(Vec3f orientation)
 {
     assert(!"Not implemented");
 }
+
+void Manta::land()
+{
+    assert(!"Not implemented");
+}
+
 void Manta::init()
 {
     //Load the model

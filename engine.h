@@ -149,6 +149,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 
 void launchManta(Vehicle *v);
+void landManta(Vehicle *v);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);

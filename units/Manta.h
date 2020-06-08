@@ -48,6 +48,7 @@ public:
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);
+    void virtual land();
     void doDynamics();
     void doControl();
 
