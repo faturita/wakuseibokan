@@ -39,6 +39,7 @@
 
 enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
 
+#define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
 // SYNC

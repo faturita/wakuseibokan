@@ -457,7 +457,7 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 void initWorldPopulation()
 {
 
-    if (true)
+    if (false)
     {
         // Strategy Game
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);

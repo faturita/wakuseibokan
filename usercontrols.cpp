@@ -48,6 +48,8 @@ extern std::vector<std::string> messages;
 
 extern container<Vehicle*> entities;
 
+extern std::vector<BoxIsland*> islands;
+
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
 int _yoffset = 0;
@@ -236,6 +238,10 @@ void switchControl(int controlposition)
     controller.controlling = id;
     //controller.reset();
     controller.registers = entities[controller.controlling]->getControlRegisters();
+
+    // Release mouse
+    glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+    buttonState = 0;
 }
 
 
@@ -282,6 +288,25 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(pos);
 
             } else
+            if (controller.str.find("def") != std::string::npos)
+            {
+                std::string islandcode = controller.str.substr(3+controller.str.substr(3).find(" "));
+                std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
+                const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
+
+                size_t pos = CONTROLLING_NONE;
+
+                for (int j=0;j<islands.size();j++)
+                {
+                    if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
+                    {
+                        std::cout << "Island found-" << islandname << "-structure " << structurenumber << std::endl;
+                        pos = entities.indexOf(islands[j]->getStructures()[atoi(structurenumber)]);
+                    }
+                }
+                switchControl(pos);
+
+            } else
             if (controller.str.find("taxi") != std::string::npos)
             {
                 Balaenidae *r = (Balaenidae*)entities[controller.controlling];
@@ -290,7 +315,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     r->taxi(m);
                     char msg[256];
-                    sprintf(msg,"Manta %2d is ready for launch.",m->getNumber()+1);
+                    sprintf(msg,"Manta %2d is ready for launch.",m->getNumber());
                     messages.insert(messages.begin(), std::string(msg));
                 }
             }

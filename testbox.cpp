@@ -3001,7 +3001,7 @@ void initWorldModelling(int testcase)
     case 28:test28();break;                         // Add artillery and fire it !
     case 29:test29();break;                         // Turrets open fire to coming Manta
     case 30:test30();break;                         // Laser Turret opens fire on a static vehicle.
-    case 31:test31();test10();break;   // Walrus arrive to a weird island, tumbles and is destroyed.
+    case 31:test31();test10();break;                // Walrus arrive to a weird island, tumbles and is destroyed.
     default:initIslands();test1();break;
     }
 

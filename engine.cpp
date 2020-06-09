@@ -425,6 +425,7 @@ Manta* findMantaByNumber(size_t &pos, int number)
         if (v->getType() == MANTA && ((Manta*)v)->getNumber() == number-1)
         {
             pos = i+1;  // @FIXME Risky
+            pos = entities.indexOf(i);
             return (Manta*)v;
         }
     }
@@ -452,6 +453,7 @@ Walrus* findWalrusByNumber(size_t &pos, int number)
         if (v->getType() == WALRUS  && ((Walrus*)v)->getNumber() == number - 1)
         {
             pos = i+1;   // @FIXME Fix this risky numbering system.
+            pos = entities.indexOf(i);
             return (Walrus*)v;
         }
     }
@@ -771,7 +773,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     {
         entities.push_back(walrus);
         char msg[256];
-        sprintf(msg, "Walrus %2d has been deployed.",walrusNumber+1);
+        sprintf(msg, "Walrus %2d has been deployed.",NUMBERING(walrusNumber));
         messages.insert(messages.begin(), std::string(msg));
     }
     return (Walrus*)walrus;
