@@ -159,6 +159,7 @@ void drawHUD()
         drawString(0,-180,1,str,0.2f);
     }
 
+    // This is the amount of ticks that are used to refresh the message board.
     static int mbrefresher = 1000;
     // Message board
     if (messages.size()>0)
@@ -546,6 +547,30 @@ void update(int value)
                     {
                         char str[256];
                         sprintf(str, "Balaenidae Carrier has been destroyed !");
+                        messages.insert(messages.begin(), str);
+                    }
+
+                    if (entities[i]->getType() == CONTROL)
+                    {
+                        CommandCenter *c = (CommandCenter*)entities[i];
+                        char str[256];
+                        sprintf(str, "Island %s is now a free island.", c->island->getName().c_str());
+                        messages.insert(messages.begin(), str);
+                    }
+
+                    if (entities[i]->getType() == VehicleTypes::MANTA)
+                    {
+                        Manta *m = (Manta*)entities[i];
+                        char str[256];
+                        sprintf(str, "Manta %2d has been destroyed.", NUMBERING(m->getNumber()));
+                        messages.insert(messages.begin(), str);
+                    }
+
+                    if (entities[i]->getType() == VehicleTypes::WALRUS)
+                    {
+                        Walrus *m = (Walrus*)entities[i];
+                        char str[256];
+                        sprintf(str, "Walrus %2d has been destroyed.", NUMBERING(m->getNumber()));
                         messages.insert(messages.begin(), str);
                     }
 
