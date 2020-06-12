@@ -15,6 +15,7 @@ public:
     void doControl();
     void doControlControl(Vec3f target);
     void doControlForced(Vec3f target);
+    void doControlFlipping(Vec3f target);
 
     void doControlDestination();
     void doControlLanding();

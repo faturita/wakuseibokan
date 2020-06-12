@@ -92,6 +92,34 @@ float getAzimuth(Vec3f aim)
     return val;
 }
 
+float getContinuosAzimuthRadians(Vec3f aim)
+{
+    static float quadrant = 0;
+    static float sp = 0;
+
+    float x = getAzimuthRadians(aim);
+
+    float currquadrant;  // clockwise 1,2,3,4
+    if (aim[0]<0 && aim[2]>0)
+        currquadrant = 1;
+    if (aim[0]<0 && aim[2]<0)
+        currquadrant = 2;
+    if (aim[0]>0 && aim[2]<0)
+        currquadrant = 3;
+    if (aim[0]>0 && aim[2]>0)
+        currquadrant = 4;
+
+    if (quadrant == 3 && currquadrant == 2)
+    {sp++;x = x + sp * 2 * PI;}
+    if (quadrant == 2 && currquadrant == 3)
+    {sp--;x = x + sp * 2 * PI;}
+
+    quadrant = currquadrant;
+
+    return x;
+}
+
+
 /**
  * @brief getAzimuthRadians: ODE works with a different orientation for azimuth. Positive anticlockwise, negative clockwise from north and pi/2
  * at south.

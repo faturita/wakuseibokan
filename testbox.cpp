@@ -2779,8 +2779,13 @@ void checktest29(unsigned long timer)
         Manta *m = findManta(Manta::FLYING);
 
         //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
-        m->attack(Vec3f(200.0, 0.0, -100.0f));
+        m->attack(Vec3f(200.0, 0.5, -100.0f));
         m->enableAuto();
+
+        size_t pos;
+        findMantaByNumber(pos,1);
+
+        controller.controlling = pos;
     }
 
 
@@ -2966,12 +2971,87 @@ void checktest31(unsigned long timer)
     }
 }
 
-
 void test32()
+{
+
+}
+
+void checktest32(unsigned long timer)
+{
+    // Launch Manta, set Destination to island, identify where a target is located, align the forward direction with the target, open fire
+
+    Vec3f orientation(100.0f, 0.0, 100.0f);
+    float sp=0;
+
+    float az = getAzimuth(orientation);
+    float arz = getAzimuthRadians(orientation);
+    float quadrant = 0;
+    float arq = getContinuosAzimuthRadians(orientation);
+
+    std::cout << "Orientation:" << orientation << std::endl;
+    std::cout << "az:" << az << std::endl;
+    std::cout << "arz:" << arz << std::endl;
+    std::cout << "qad:" << quadrant << std::endl;
+    std::cout << "arq:" << arq << std::endl ;
+
+    orientation = Vec3f(-100.0f, 0.0, 100.0f);
+
+    az = getAzimuth(orientation);
+    arz = getAzimuthRadians(orientation);
+    quadrant = 0;
+    arq = getContinuosAzimuthRadians(orientation);
+
+    std::cout << "Orientation:" << orientation << std::endl;
+    std::cout << "az:" << az << std::endl;
+    std::cout << "arz:" << arz << std::endl;
+    std::cout << "qad:" << quadrant << std::endl;
+    std::cout << "arq:" << arq << std::endl ;
+
+
+    orientation = Vec3f(-100.0f, 0.0, -100.0f);
+
+    az = getAzimuth(orientation);
+    arz = getAzimuthRadians(orientation);
+    arq = getContinuosAzimuthRadians(orientation);
+
+    std::cout << "Orientation:" << orientation << std::endl;
+    std::cout << "az:" << az << std::endl;
+    std::cout << "arz:" << arz << std::endl;
+    std::cout << "qad:" << quadrant << std::endl;
+    std::cout << "arq:" << arq << std::endl ;
+
+    orientation = Vec3f(100.0f, 0.0, -100.0f);
+
+    az = getAzimuth(orientation);
+    arz = getAzimuthRadians(orientation);
+    float arq2 = getContinuosAzimuthRadians(orientation);
+
+    std::cout << "Orientation:" << orientation << std::endl;
+    std::cout << "az:" << az << std::endl;
+    std::cout << "arz:" << arz << std::endl;
+    std::cout << "qad:" << quadrant << std::endl;
+    std::cout << "arq:" << arq << std::endl ;
+
+
+
+    orientation = Vec3f(-100.0f, 0.0, -100.0f);
+
+    az = getAzimuth(orientation);
+    arz = getAzimuthRadians(orientation);
+    float arq3 = getContinuosAzimuthRadians(orientation);
+
+    std::cout << "Orientation:" << orientation << std::endl;
+    std::cout << "az:" << az << std::endl;
+    std::cout << "arz:" << arz << std::endl;
+    std::cout << "qad:" << quadrant << std::endl;
+    std::cout << "arq:" << arq << std::endl ;
+}
+
+void test33()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
-    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->setLocation(10000.0f,-1.0,-4000.0f);
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
@@ -2980,6 +3060,7 @@ void test32()
     _b->init();
     _b->embody(world,space);
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,17000.0f));
+    _b->setPos(Vec3f(0.0f,0.0f,17000.0f));
     _b->stop();
 
     entities.push_back(_b);
@@ -2998,10 +3079,9 @@ void test32()
     Camera.setPos(pos);
 }
 
-void checktest32(unsigned long timer)
-{
-    // Launch Manta, set Destination to island, identify where a target is located, align the forward direction with the target, open fire
 
+void checktest33(unsigned long timer)
+{
     if (timer == 50)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
@@ -3022,10 +3102,10 @@ void checktest32(unsigned long timer)
 
         Manta *m = findManta(Manta::FLYING);
 
-        m->setDestination(Vec3f(i->getX()-200 kmf,0.0, i->getZ()));
+        m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
         m->enableAuto();
 
-        m->attack(Vec3f(200.0, 0.0, -100.0f));
+        //m->attack(Vec3f(200.0, 0.0, -100.0f));
         m->enableAuto();
 
         size_t pos;
@@ -3033,8 +3113,6 @@ void checktest32(unsigned long timer)
 
         controller.controlling = pos;
     }
-
-
 
 }
 
@@ -3107,7 +3185,8 @@ void initWorldModelling(int testcase)
     case 29:test29();break;                         // Turrets open fire to coming Manta
     case 30:test30();break;                         // Laser Turret opens fire on a static vehicle.
     case 31:test31();test10();break;                // Walrus arrive to a weird island, tumbles and is destroyed.
-    case 32:test32();break;                         // PID on Manta
+    case 32:test32();break;                         // Check continuous azimuth
+    case 33:test33();break;                         // PID Manta
     default:initIslands();test1();break;
     }
 
@@ -3156,6 +3235,7 @@ void worldStep(int value)
     case 30:checktest30(timer);break;
     case 31:checktest31(timer);break;
     case 32:checktest32(timer);break;
+    case 33:checktest33(timer);break;
     default: break;
     }
 
