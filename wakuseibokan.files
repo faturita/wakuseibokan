@@ -26,6 +26,8 @@ commandline.cpp
 commandline.h
 container.cpp
 container.h
+control.cpp
+control.h
 engine.cpp
 engine.h
 font/DrawFonts.cpp
@@ -94,6 +96,8 @@ units/BoxVehicle.cpp
 units/BoxVehicle.h
 units/Buggy.cpp
 units/Buggy.h
+units/Cephalopodo.cpp
+units/Cephalopodo.h
 units/Manta.cpp
 units/Manta.h
 units/MultiBodyVehicle.cpp

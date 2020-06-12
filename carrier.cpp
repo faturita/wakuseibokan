@@ -378,7 +378,7 @@ void drawScene() {
         (islands[i]->draw());
     }
 
-    //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+    //draw3DSModel("units/drone.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.

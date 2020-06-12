@@ -2664,8 +2664,14 @@ void test28()
 
     Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,world);
 
-    Vec3f pos(0.0f,60.0f,-71.0f);
+    Vec3f pos(4000,60.0f,-1500);
     Camera.setPos(pos);
+
+    Camera.dy = 0;
+    Camera.dz = 0;
+    Camera.xAngle = 90;
+    Camera.yAngle = 0;
+
 
 }
 
@@ -2697,7 +2703,7 @@ void checktest28(unsigned long timer)
         }
     }
 
-    if (timer == 500)
+    if (timer == 5000)
     {
         Balaenidae *b = (Balaenidae*)entities[0];
         if (b->getHealth()<1000)
@@ -2734,11 +2740,11 @@ void test29()
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Turret(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
     Structure *t3 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
-    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    20.0f,world);
-    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,        20.0f,    80.0f,world);
-    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         -60.0f,    -80.0f,world);
-    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    120.0f,world);
-    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         -230.0f,    230.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Artillery(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
 
     //t1->enableAuto();
     t2->enableAuto();
@@ -2750,6 +2756,34 @@ void test29()
 
 void checktest29(unsigned long timer)
 {
+    // Launch Manta, set Destination to island, identify where a target is located, align the forward direction with the target, open fire
+
+    if (timer == 200)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        Manta *m = spawnManta(space,world,b);
+        entities.push_back(m);
+    }
+
+    if (timer == 300)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        launchManta(b);
+    }
+
+    if (timer == 400)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        Manta *m = findManta(Manta::FLYING);
+
+        //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
+        m->attack(Vec3f(200.0, 0.0, -100.0f));
+        m->enableAuto();
+    }
+
+
 
 }
 
@@ -2933,6 +2967,77 @@ void checktest31(unsigned long timer)
 }
 
 
+void test32()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,17000.0f));
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0f,60.0f,-71.0f);
+    Camera.setPos(pos);
+}
+
+void checktest32(unsigned long timer)
+{
+    // Launch Manta, set Destination to island, identify where a target is located, align the forward direction with the target, open fire
+
+    if (timer == 50)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        Manta *m = spawnManta(space,world,b);
+        entities.push_back(m);
+    }
+
+    if (timer == 100)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        launchManta(b);
+    }
+
+    if (timer == 310)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        Manta *m = findManta(Manta::FLYING);
+
+        m->setDestination(Vec3f(i->getX()-200 kmf,0.0, i->getZ()));
+        m->enableAuto();
+
+        m->attack(Vec3f(200.0, 0.0, -100.0f));
+        m->enableAuto();
+
+        size_t pos;
+        findMantaByNumber(pos,1);
+
+        controller.controlling = pos;
+    }
+
+
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -3002,6 +3107,7 @@ void initWorldModelling(int testcase)
     case 29:test29();break;                         // Turrets open fire to coming Manta
     case 30:test30();break;                         // Laser Turret opens fire on a static vehicle.
     case 31:test31();test10();break;                // Walrus arrive to a weird island, tumbles and is destroyed.
+    case 32:test32();break;                         // PID on Manta
     default:initIslands();test1();break;
     }
 
@@ -3049,6 +3155,7 @@ void worldStep(int value)
     case 29:checktest29(timer);break;
     case 30:checktest30(timer);break;
     case 31:checktest31(timer);break;
+    case 32:checktest32(timer);break;
     default: break;
     }
 

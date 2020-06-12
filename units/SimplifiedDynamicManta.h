@@ -13,15 +13,20 @@ public:
     void doControl(Controller controller);
     void doControl(struct controlregister cons);
     void doControl();
+    void doControlControl(Vec3f target);
+    void doControlForced(Vec3f target);
 
     void doControlDestination();
     void doControlLanding();
-
+    void doControlAttack();
 
     void embody(dBodyID myBodySelf);
     void embody(dWorldID world, dSpaceID space);
 
     void release(Vec3f orientation);
+
+    void setOrientation(Vec3f orientation);
+
 
 
     Vehicle* fire(dWorldID world, dSpaceID space);
@@ -29,6 +34,7 @@ public:
     void rotateBody(dBodyID);
 
     void land();
+    void attack(Vec3f target);
 };
 
 #endif // SIMPLIFIEDMANTA_H

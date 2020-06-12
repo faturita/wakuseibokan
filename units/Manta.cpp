@@ -33,6 +33,11 @@ void Manta::land()
     assert(!"Not implemented");
 }
 
+void Manta::attack(Vec3f target)
+{
+    assert(!"Not implemented");
+}
+
 void Manta::init()
 {
     //Load the model
