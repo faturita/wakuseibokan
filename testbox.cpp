@@ -47,6 +47,7 @@
 
 #include "engine.h"
 #include "keplerivworld.h"
+#include "usercontrols.h"
 
 #include "units/Vehicle.h"
 #include "units/BoxVehicle.h"
@@ -2762,7 +2763,7 @@ void checktest29(unsigned long timer)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         Manta *m = spawnManta(space,world,b);
-        entities.push_back(m);
+
     }
 
     if (timer == 300)
@@ -2784,9 +2785,90 @@ void checktest29(unsigned long timer)
 
         size_t pos;
         findMantaByNumber(pos,1);
+        std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
-        controller.controlling = pos;
+        size_t id = entities.indexAt(pos);
+        controller.controlling = id;
     }
+
+
+    if (timer == 450)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        Manta *m = spawnManta(space,world,b);
+
+    }
+
+    if (timer == 600)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        launchManta(b);
+    }
+
+    if (timer == 700)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        size_t pos;
+        Manta *m = findMantaByNumber(pos,2);
+        std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
+
+        //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
+        m->attack(Vec3f(200.0, 0.5, -100.0f));
+        m->enableAuto();
+    }
+
+
+    if (timer == 800)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        Manta *m = spawnManta(space,world,b);
+
+    }
+
+    if (timer == 890)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        launchManta(b);
+
+    }
+
+    if (timer == 940)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        size_t pos;
+        Manta *m = findMantaByNumber(pos,3);
+
+        std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
+
+        //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
+        m->attack(Vec3f(200.0, 0.5, -100.0f));
+        m->enableAuto();
+    }
+
+
+    if (timer == 2500)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        CommandCenter *c = findCommandCenter(i);
+
+        if (!c || c->getHealth()<1000)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: CommandCenter is intact.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
 
 
 

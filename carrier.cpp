@@ -517,7 +517,7 @@ void update(int value)
             {
                 entities[i]->doControl();
             }
-            if ((entities[i]->getSpeed()>1000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
+            if ((entities[i]->getSpeed()>10000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
                 entities[i]->stop();
             entities[i]->doDynamics();
             entities[i]->tick();
@@ -528,7 +528,7 @@ void update(int value)
         {
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
-                //printf("Type and ttl: %p \n", entities[i]);
+                //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY) && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");

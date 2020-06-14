@@ -3,8 +3,18 @@
 
 #include "Manta.h"
 
+#include "../container.h"
+
 class SimplifiedDynamicManta : public Manta
 {
+protected:
+    Vec3f waypoint;
+    int flyingstate;
+
+    std::vector<std::vector<float> > signal;
+    float et1=0,et2=0, et3=0;
+    float midpointpitch = -5;
+
 public:
     float precission = 200;
     SimplifiedDynamicManta(int newfaction);
@@ -13,9 +23,9 @@ public:
     void doControl(Controller controller);
     void doControl(struct controlregister cons);
     void doControl();
-    void doControlControl(Vec3f target);
+    void doControlControl(Vec3f target, float thrust);
     void doControlForced(Vec3f target);
-    void doControlFlipping(Vec3f target);
+    void doControlFlipping(Vec3f target, float thust);
 
     void doControlDestination();
     void doControlLanding();
