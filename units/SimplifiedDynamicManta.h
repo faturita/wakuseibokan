@@ -13,6 +13,9 @@ protected:
 
     std::vector<std::vector<float> > signal;
     float et1=0,et2=0, et3=0;
+    float ett1=0, ett2=0, ett3=0;
+    float r1=0, r2=0, r3=0;
+    float rt1=0, rt2=0, rt3=0;
     float midpointpitch = -5;
 
 public:
@@ -26,6 +29,7 @@ public:
     void doControlControl(Vec3f target, float thrust);
     void doControlForced(Vec3f target);
     void doControlFlipping(Vec3f target, float thust);
+    void doControlControl2(Vec3f target, float thrust);
 
     void doControlDestination();
     void doControlLanding();

@@ -29,4 +29,7 @@ float getAzimuthRadians(Vec3f orientation);
 float getContinuosAzimuthRadians(Vec3f aim);
 float getDeclination(Vec3f aim);
 
+float min(float val, float defval);
+float max(float val, float defval);
+
 #endif /* YAMATHUTIL_H_ */

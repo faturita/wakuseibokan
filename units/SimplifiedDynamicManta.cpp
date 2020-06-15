@@ -4,6 +4,8 @@
 
 #include "../actions/Gunshot.h"
 
+#include "../math/yamathutil.h"
+
 extern dWorldID world;
 extern dSpaceID space;
 #include "../container.h"
@@ -45,8 +47,6 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
 
 void SimplifiedDynamicManta::doControl()
 {
-    std::cout << "Number:" << getNumber() << ";" << aistatus << std::endl;
-
     switch (aistatus) {
     case ATTACK:
         doControlAttack();
@@ -55,7 +55,8 @@ void SimplifiedDynamicManta::doControl()
         doControlLanding();
         break;
     case DESTINATION:
-        doControlControl(destination, 3000);// @FIXME
+        //doControlDestination();// @FIXME
+        doControlControl2(destination, 1000);
         break;
     case FREE:
         setDestination(getPos()+getForward().normalize()*100);
@@ -233,6 +234,90 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
     doControl(c);
 }
 
+
+
+void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
+{
+
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+    float declination = getDeclination(getForward());
+
+    float sp2=-0,        sp3 = 720;
+
+    Vec3f T = (target - Po);
+
+    sp2 = getDeclination(T);
+
+    // Needs fixing, check azimuth to make a continuos function.
+
+    // This function returns principal arc cosine of x, in the interval [0, pi] radians.
+    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e2 = sp2 - declination;
+    float e3 = sp3 - height;
+
+    if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
+        e1 = e1 * (-1);
+    else if (getAzimuth(getForward()) < getAzimuth(T))
+        e1 = e1 * (-1);
+
+
+    float Kp1 = 1.2,        Kp2 = 0.3,          Kp3 = 1.2;
+    float Ki1 = 0.9,        Ki2 = 0.6,          Ki3 = 0.6;
+    float Kd1 = 2.3,        Kd2 = 0,            Kd3 = 11.8;
+
+
+    float e[3] = { e1, e2, e3 };
+
+
+    float r1 =  rt1 + Kp1 * (e1 - et1)        + Ki1 * (e1 + et1)/2.0 + Kd1 * (e1 - 2 * et1 + ett1);
+    float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
+    float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
+
+    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+
+    r1 = max(r1, 5);
+    r1 = min(r1, -5);
+    r2 = max(r2, 40);
+    r2 = min(r2, -40);
+    r3 = max(r3, 20);
+    r3 = min(r3, -20);
+
+
+
+    rt1 = r1;
+    rt2 = r2;
+    rt3 = r3;
+
+
+    float roll = -r1;
+    float pitch = -r2*0 + r3;
+
+    //float thrust = (e3>800? e3 :800);
+
+    ett1 = et1;
+    ett2 = et2;
+    ett3 = et3;
+
+    et1 = e1;
+    et2 = e2;
+    et3 = e3;
+
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.pitch = pitch;
+    c.registers.roll = roll;
+    c.registers.yaw = 0;
+    setThrottle(thrust);
+
+    doControl(c);
+
+}
 
 /**
  * 1 Heuristic procedure #1:

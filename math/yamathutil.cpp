@@ -153,4 +153,17 @@ float getDeclination(Vec3f aim)
     return decl*(-1);
 }
 
+float min(float val, float defval)
+{
+    if (val < defval)
+        return defval;
 
+    return val;
+
+}
+float max(float val, float defval)
+{
+    if (val>defval)
+        return defval;
+    return val;
+}
