@@ -545,7 +545,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     if ((newpos-pos).magnitude()>1000.0f && getType() != ACTION)
     {
         //assert(!"position System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1],pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );
@@ -558,7 +558,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     if ((speed>1000.0f || isnan(speed)) && getType()!= ACTION)
     {
         //assert(!"high speed System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1],pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );
@@ -569,7 +569,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     if ((isnan(newpos[0]) || isnan(newpos[1] || isnan(newpos[2]))))
     {
         //assert(!"NAN System is unstable.");   // This does not work with bullets.
-        setPos(pos[0]+(rand() % 10 -5 +1),pos[1],pos[2]+(rand() % 10 -5 +1));
+        setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
         stop();
         dBodyAddRelForce (who,0, 0,0);
         dBodyAddRelTorque( who, 0, 0,0 );

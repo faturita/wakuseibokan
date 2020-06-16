@@ -1,6 +1,17 @@
 #include "SimplifiedDynamicManta.h"
 
+#include "../control.h"
+
 #include "../actions/Gunshot.h"
+
+#include "../math/yamathutil.h"
+
+extern dWorldID world;
+extern dSpaceID space;
+#include "../container.h"
+#include "../sounds/sounds.h"
+
+extern container<Vehicle*> entities;
 
 SimplifiedDynamicManta::SimplifiedDynamicManta(int newfaction) : Manta(newfaction)
 {
@@ -31,16 +42,21 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
 
     Manta::param[0] = 0.9;
     Manta::param[1] = 2;
+    Manta::param[3] = 0;
 }
 
 void SimplifiedDynamicManta::doControl()
 {
     switch (aistatus) {
+    case ATTACK:
+        doControlAttack();
+        break;
     case LANDING:
         doControlLanding();
         break;
     case DESTINATION:
-        doControlDestination();
+        //doControlDestination();// @FIXME
+        doControlControl2(destination, 1000);
         break;
     case FREE:
         setDestination(getPos()+getForward().normalize()*100);
@@ -48,6 +64,336 @@ void SimplifiedDynamicManta::doControl()
     default:
         break;
     }
+}
+
+void SimplifiedDynamicManta::doControlAttack()
+{
+
+    std::cout << "Attacking:" << getNumber() << ";" << destination << ":" << flyingstate << std::endl;
+
+    Vec3f target = destination;
+    switch (flyingstate) {
+        case 0:
+        {
+            target = Vec3f(destination[0],1000,destination[2]);
+            doControlFlipping(target,500);
+            Vec3f loc(destination[0],1000,destination[2]);
+            Vec3f ploc(getPos()[0],1000,getPos()[2]);
+            if ((loc-ploc).magnitude()<8500)
+                flyingstate = 1;
+        }
+        break;
+        case 1:
+        {
+            target = destination;
+            doControlFlipping(target, 500);
+            if ((destination-getPos()).magnitude()<2500)
+                flyingstate = 2;
+
+            if (getTtl() % 23 == 0)
+            {
+            Vehicle *action = fire(world,space);
+
+            if (action != NULL)
+            {
+                entities.push_back(action);
+                gunshot();
+            }
+            }
+        }
+        break;
+    case 2:
+        waypoint = destination + getForward().normalize()*(17000);
+        waypoint[1] = 1000;
+        flyingstate = 3;
+        break;
+    case 3:
+        doControlControl2(waypoint,10000);
+        if (((waypoint-getPos()).magnitude()<5000))
+                flyingstate = 0;
+        break;
+
+    }
+
+
+    //std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
+
+
+}
+
+void SimplifiedDynamicManta::doControlForced(Vec3f target)
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+    Vec3f maptaget(target[0],0,target[2]);
+    Vec3f mapPo(Po[0],0,Po[2]);
+
+    float pitch = -20;
+
+    if ((maptaget-mapPo).magnitude()>6500)
+    {
+        target[1]=900;
+        pitch = 0;
+    }
+
+
+    Vec3f T = (target - Po);
+
+    setForward(T);
+    release(T);
+
+    std::cout << "Number:" << getNumber() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
+
+    c.registers.thrust = 400/(10.0);
+    c.registers.pitch = pitch;
+    c.registers.roll = 0;
+    c.registers.yaw = 0;
+    setThrottle(400);
+
+    doControl(c);
+
+    setOrientation(T);
+
+}
+
+
+void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
+{
+
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+
+    float declination = getDeclination(getForward());
+
+    float sp2=-0,        sp3 = 720;
+
+    Vec3f T = (target - Po);
+
+    sp2 = getDeclination(T);
+
+    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e2 = sp2 - declination;
+    float e3 = sp3 - height;
+
+    // Needs fixing, check azimuth to make a continuos function.
+
+    float Kp1 = 0.42,    Kp2 = 2.98,     Kp3 = 0.2;
+    float Ki1 = 1,      Ki2 = 0.11,        Ki3 = 0;
+    float Kd1 = 0.8,      Kd2 = 0.03,        Kd3 = 0;
+
+    float I[3]= {0,0,0};
+
+    float e[3] = { e1, e2, e3};
+
+    getIntegrativeTerm(signal,I,e);
+
+    float In[3] = {0,0,0};
+
+    In[0] = I[0] * 0.99 + (e1);
+    In[1] = I[1] * 0.99 + (e2);
+    In[2] = I[2] * 0.99 + (e3);
+
+
+
+
+    if (e2>0)
+        midpointpitch -= 0.1;
+    else if (e2<0)
+        midpointpitch += 0.1;
+
+
+    if ((abs(e2))>10.0f)
+    {
+        c.registers.pitch = Ki2 * (In[1]) + Kd2 * (  (e2)-et2) + midpointpitch+1.0 * (e2>0 ? -1 : +1);
+    } else {
+        c.registers.pitch = midpointpitch;
+    }
+
+    setForward(T);
+    release(T);
+
+    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << e1 << ":Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+
+    et1 = e1;
+    et2 = e2;
+    et3 = e3;
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.yaw = 0;
+    c.registers.roll = 0;
+    setThrottle(thrust);
+
+    doControl(c);
+}
+
+
+
+void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
+{
+
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+    float declination = getDeclination(getForward());
+
+    float sp2=-0,        sp3 = 720;
+
+    Vec3f T = (target - Po);
+
+    sp2 = getDeclination(T);
+
+    // This function returns principal arc cosine of x, in the interval [0, pi] radians.
+    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e2 = sp2 - declination;
+    float e3 = sp3 - height;
+
+    // Set the sign of e1 in relation to rolling encoding.
+    if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
+        e1 = e1 * (-1);
+    else if (getAzimuth(getForward()) < getAzimuth(T))
+        e1 = e1 * (-1);
+
+
+    float Kp1 = 1.2,        Kp2 = 0.3,          Kp3 = 1.2;
+    float Ki1 = 0.9,        Ki2 = 0.6,          Ki3 = 0.6;
+    float Kd1 = 2.3,        Kd2 = 0,            Kd3 = 11.8;
+
+
+    float e[3] = { e1, e2, e3 };
+
+
+    float r1 =  rt1 + Kp1 * (e1 - et1)        + Ki1 * (e1 + et1)/2.0 + Kd1 * (e1 - 2 * et1 + ett1);
+    float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
+    float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
+
+    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+
+    r1 = max(r1, 5);
+    r1 = min(r1, -5);
+    r2 = max(r2, 40);
+    r2 = min(r2, -40);
+    r3 = max(r3, 20);
+    r3 = min(r3, -20);
+
+
+
+    rt1 = r1;
+    rt2 = r2;
+    rt3 = r3;
+
+
+    float roll = -r1;
+    float pitch = -r2*0 + r3;
+
+    //float thrust = (e3>800? e3 :800);
+
+    ett1 = et1;
+    ett2 = et2;
+    ett3 = et3;
+
+    et1 = e1;
+    et2 = e2;
+    et3 = e3;
+
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.pitch = pitch;
+    c.registers.roll = roll;
+    c.registers.yaw = 0;
+    setThrottle(thrust);
+
+    doControl(c);
+
+}
+
+/**
+ * 1 Heuristic procedure #1:
+ * 2 Set Kp to small value, KD and KI to 0
+ * 3 Increase KD until oscillation, then decrease by factor of 2-4
+ * 4 Increase Kp until oscillation or overshoot, decrease by factor of 2-4
+ * 5 Increase KI until oscillation or overshoot
+ * Iterate
+ *
+ * @brief SimplifiedDynamicManta::doControlAttack
+ */
+void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
+{
+
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+    float declination = getDeclination(getForward());
+
+    float sp2=-0,        sp3 = 720;
+
+    Vec3f T = (target - Po);
+
+    sp2 = getDeclination(T);
+
+    // Needs fixing, check azimuth to make a continuos function.
+
+    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e2 = sp2 - declination;
+    float e3 = sp3 - height;
+
+
+
+    float Kp1 = 0.42,    Kp2 = 2.98,     Kp3 = 0.2;
+    float Ki1 = 0.1,      Ki2 = 0.11,        Ki3 = 0;
+    float Kd1 = 0.003,      Kd2 = 0.03,        Kd3 = 0;
+
+    float I[3]= {0,0,0};
+
+    float e[3] = { e1, e2, e3 };
+
+    getIntegrativeTerm(signal,I,e);
+
+    float In[3] = {0,0,0};
+
+    In[0] = I[0] * 0.99 + (e1);
+    In[1] = I[1] * 0.99 + (e2);
+    In[2] = I[2] * 0.99 + (e3);
+
+    float error1 =  Kp1 * (e1)        + Ki1 * (In[0]) + Kd1 * (  (e1)-et1);
+    float error2 =  Kp2 * (e2)        + Ki2 * (In[1]) + Kd2 * (  (e2)-et2);
+    float error3 =  Kp3 * (e3)        + Ki3 * (In[1]) + Kd3 * (  (e3)-et3);
+
+    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << error1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+
+    float roll = -error1;
+    float pitch = -error2 + error3*0;
+
+    //float thrust = (e3>800? e3 :800);
+
+    et1 = e1;
+    et2 = e2;
+    et3 = e3;
+
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.pitch = pitch;
+    c.registers.roll = roll;
+    c.registers.yaw = 0;
+    setThrottle(thrust);
+
+    doControl(c);
+
 }
 
 
@@ -59,8 +405,6 @@ void SimplifiedDynamicManta::doControlLanding()
     c.registers = myCopy;
 
     Vec3f Po = getPos();
-
-    static int status = 0;
 
     float height = Po[1];
 
@@ -75,7 +419,7 @@ void SimplifiedDynamicManta::doControlLanding()
     Vec3f T;
     float H=500, spspeed = 40.0f, TH = 200;
 
-    switch (status) {
+    switch (flyingstate) {
     case 0:
         T = (Pf - attitude.normalize()*(2 kmf)) - Po;
         H=450;spspeed = 40.0f;TH = 150;
@@ -117,8 +461,8 @@ void SimplifiedDynamicManta::doControlLanding()
         }
     } else
     {
-        if (status<1)
-            status += 1;
+        if (flyingstate<1)
+            flyingstate += 1;
         else
         {
             //stop();
@@ -131,7 +475,7 @@ void SimplifiedDynamicManta::doControlLanding()
 
             if (!reached)
             {
-                status = 0;
+                flyingstate = 0;
                 char str[256];
                 sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
                 //messages.insert(messages.begin(), str);
@@ -139,6 +483,7 @@ void SimplifiedDynamicManta::doControlLanding()
             }
         }
     }
+
     doControl(c);
 
 }
@@ -223,7 +568,6 @@ void SimplifiedDynamicManta::doControlDestination()
 
         midpointpitch = 36;
         eh=height-500.0f;
-        static float diff = eh;
 
         c.registers.roll = -13;
 
@@ -335,6 +679,13 @@ void SimplifiedDynamicManta::land()
     aistatus = LANDING;
 }
 
+void SimplifiedDynamicManta::attack(Vec3f target)
+{
+    aistatus = ATTACK;
+    destination = target;
+    flyingstate=0;
+}
+
 void SimplifiedDynamicManta::rotateBody(dBodyID body)
 {
     dMatrix3 R,R2;
@@ -358,10 +709,8 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     //std::cout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
 
-
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
-
 
 }
 
@@ -370,6 +719,28 @@ void SimplifiedDynamicManta::release(Vec3f orientation)
     Vehicle::inert = false;
 
     angularPos[0] = getAzimuthRadians(orientation);
+}
+
+
+void SimplifiedDynamicManta::setOrientation(Vec3f orientation)
+{
+    dMatrix3 R1,R2;
+    dRSetIdentity(R1);
+    dRSetIdentity(R2);
+
+    dRFromAxisAndAngle(R1,0,1,0,getAzimuthRadians(orientation));
+
+    dRFromAxisAndAngle(R2,1,0,0,getDeclination(orientation)*PI/180.0f);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R1);
+
+    dQfromR(q2,R2);
+
+    dQMultiply0(q3,q2,q1);
+
+    if (!Vehicle::inert)
+        dBodySetQuaternion(me,q3);
 }
 
 void SimplifiedDynamicManta::doDynamics(dBodyID body)
@@ -388,7 +759,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Manta::alpha = Manta::beta = 0;
 
         float gamma = 0;
-
+//std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward()) << std::endl;
 
         if (linearVel[2]!=0 && speed > 2)
         {

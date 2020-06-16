@@ -378,7 +378,7 @@ void drawScene() {
         (islands[i]->draw());
     }
 
-    //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
+    //draw3DSModel("units/drone.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);
 
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
@@ -517,7 +517,7 @@ void update(int value)
             {
                 entities[i]->doControl();
             }
-            if ((entities[i]->getSpeed()>1000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
+            if ((entities[i]->getSpeed()>10000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
                 entities[i]->stop();
             entities[i]->doDynamics();
             entities[i]->tick();
@@ -528,7 +528,7 @@ void update(int value)
         {
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
-                //printf("Type and ttl: %p \n", entities[i]);
+                //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY) && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");

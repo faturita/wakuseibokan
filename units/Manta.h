@@ -49,6 +49,7 @@ public:
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);
     void virtual land();
+    void virtual attack(Vec3f target);
     void doDynamics();
     void doControl();
 

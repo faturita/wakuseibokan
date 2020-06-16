@@ -105,6 +105,9 @@ void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
 {
+    if (getTtl()>0)
+        return NULL;
+
     ArtilleryAmmo *action = new ArtilleryAmmo();
     // Need axis conversion.
     action->init();
@@ -147,6 +150,7 @@ Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
     dBodySetRotation(action->getBodyID(),Re);
 
     artilleryshot();
+    setTtl(200);
 
     // I can set power or something here.
     return (Vehicle*)action;

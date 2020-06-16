@@ -633,6 +633,33 @@ void defendIsland(dSpaceID space, dWorldID world)
             for(int i=0;i<str.size();i++)
             {
                 // RTTI Stuff
+                if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))
+                {
+                    if (b->getPos()[1]<60)   // 60 is island height.  Only aim to ground based units
+                    {
+                        // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                        Vec3f firingloc = lb->getFiringPort();
+
+                        lb->elevation = -5;
+                        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+                        struct controlregister c;
+                        c.pitch = 0.0;
+                        c.roll = 0.0;
+                        lb->setControlRegisters(c);
+                        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                        Vehicle *action = (lb)->fire(world,space);
+
+                        if (action != NULL)
+                        {
+                            entities.push_back(action);
+                            //gunshot();
+                        }
+                    }
+                } else
                 if(LaserTurret* lb = dynamic_cast<LaserTurret*>(entities[str[i]]))
                 {
                     // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
