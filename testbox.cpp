@@ -3133,7 +3133,7 @@ void test33()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
-    nemesis->setLocation(10000.0f,-1.0,-4000.0f);
+    nemesis->setLocation(-10000.0f,-1.0,-4000.0f);
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
@@ -3184,7 +3184,7 @@ void checktest33(unsigned long timer)
 
         Manta *m = findManta(Manta::FLYING);
 
-        m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
+        m->setDestination(Vec3f(i->getX(),1000.0, i->getZ()));
         m->enableAuto();
 
         //m->attack(Vec3f(200.0, 0.0, -100.0f));
@@ -3194,6 +3194,33 @@ void checktest33(unsigned long timer)
         findMantaByNumber(pos,1);
 
         controller.controlling = pos;
+    }
+
+    if (timer > 1000)
+    {
+        Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        BoxIsland *i = findNearestIsland(b->getPos());
+
+        Manta *m = findManta(Manta::FLYING);
+
+        Vec3f pos = m->getPos();
+        Vec3f center = i->getPos();
+
+        pos[1] = 0.0;
+
+        if ( (pos-center).magnitude() < 500 )
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+    if (timer == 9000)
+    {
+        printf("Test failed.\n");
+        endWorldModelling();
+        exit(0);
     }
 
 }

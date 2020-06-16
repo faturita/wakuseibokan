@@ -108,7 +108,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 3;
         break;
     case 3:
-        doControlFlipping(waypoint,10000);
+        doControlControl2(waypoint,10000);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 0;
         break;
@@ -254,13 +254,12 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
 
     sp2 = getDeclination(T);
 
-    // Needs fixing, check azimuth to make a continuos function.
-
     // This function returns principal arc cosine of x, in the interval [0, pi] radians.
     float e1 = acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
+    // Set the sign of e1 in relation to rolling encoding.
     if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
         e1 = e1 * (-1);
     else if (getAzimuth(getForward()) < getAzimuth(T))
