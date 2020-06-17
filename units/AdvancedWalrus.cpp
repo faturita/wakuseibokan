@@ -1,0 +1,352 @@
+
+#include "AdvancedWalrus.h"
+
+#include "../actions/ArtilleryAmmo.h"
+#include "../sounds/sounds.h"
+
+extern GLuint _textureSky;
+
+AdvancedWalrus::AdvancedWalrus(int newfaction) : Walrus(newfaction)
+{
+
+}
+
+void AdvancedWalrus::init()
+{
+    // Keep in mind that the 3DSModel should be centered.
+    _model = (Model*)T3DSModel::loadModel("units/walrus.3ds",0,0,0,1,1,1,0);
+    if (_model != NULL)
+        _model->setAnimation("run");
+
+    setForward(0,0,1);
+
+    Walrus::height=4.0f;
+    Walrus::width=5.0f;
+    Walrus::length=10.0f;
+
+    firingpos[1] = 2.3;
+    firingpos[0]=firingpos[2]=0;
+
+    aim = Vec3f(0,0,0);
+
+    azimuth=0;
+    elevation=0;
+
+
+}
+
+void AdvancedWalrus::doMaterial()
+{
+    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
+
+    glEnable(GL_COLOR_MATERIAL);
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+    glMateriali(GL_FRONT, GL_SHININESS,128);
+}
+
+void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z)
+{
+    float f[3];
+    f[0] = 0; f[1] = 0; f[2] = 0;
+
+    //Draw the saved model
+    if (_model != NULL)
+    {
+        glPushMatrix();
+        glTranslatef(x, y, z);
+
+        doTransform(f, R);
+
+        //drawArrow();
+
+        glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
+        //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+
+        //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
+
+        doMaterial();
+        //drawRectangularBox(width, height, length);
+
+        glRotatef(90.0, 0.0f, 1.0, 0.0f);
+
+        _model->setTexture(_textureSky);
+        _model->draw();
+
+
+        // Move to the roof of the Walrus
+        glTranslatef(0.0f,-2.3f,0.0f);
+
+        glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+
+        // Adjust azimuth and elevation which are used to aim the turret.
+        glRotatef(azimuth,0.0f,1.0f,0.0f);
+        glRotatef(-elevation,1.0f,0.0f,0.0f);
+
+        // Rotate the turret cannon so that it is aligned properly.
+        glRotatef(90.0f,0.0f,1.0f,0.0f);
+        glScalef(0.1f,0.1f,0.1f);
+        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,_textureSky);
+
+        glPopMatrix();
+    }
+    else
+    {
+        printf ("model is null\n");
+    }
+}
+
+
+
+void AdvancedWalrus::embody(dWorldID world, dSpaceID space)
+{
+    me = dBodyCreate(world);
+    embody(me);
+    //geom = dCreateSphere( space, 2.64f);
+    //geom = dCreateBox( space, 2.64f, 2.64f, 2.64f);
+    geom = dCreateBox( space, width, height, length);
+    //geom = dCreateBox (space,10.0f,2.0f,30.0f);
+    dGeomSetBody(geom, me);
+}
+
+void AdvancedWalrus::embody(dBodyID myBodySelf)
+{
+    dMass m;
+
+    float myMass = 20.0f;
+
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    dMassSetBox(&m,1,width,height,length);
+    //dMassSetSphere(&m,1,radius);
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+
+    me = myBodySelf;
+
+}
+
+void AdvancedWalrus::doDynamics()
+{
+    doDynamics(getBodyID());
+}
+
+void AdvancedWalrus::doDynamics(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    dVector3 O;
+    dBodyGetRelPointPos( body, 0,0,0, O);
+
+    dVector3 F;
+    dBodyGetRelPointPos( body, 0,0,1, F);
+
+    F[0] = (F[0]-O[0]);
+    F[1] = (F[1]-O[1]);
+    F[2] = (F[2]-O[2]);
+
+    Vec3f vec3fF;
+    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    speed = vec3fV.magnitude();
+
+    if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
+        setStatus(Walrus::SAILING);
+    else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
+        setStatus(Walrus::ROLLING);
+
+    // This algorithm is generating too many seg faults with ODE library.
+    //Vec3f dump;
+    //if (vec3fV.magnitude() != 0 && vec3fF.magnitude() != 0)
+    //{
+    //	dump = - ((vec3fV.cross(vec3fF).magnitude())/(vec3fV.magnitude()*vec3fF.magnitude())*10.0f) * vec3fV - 0.001 * vec3fV;
+    //}
+
+    //if (!isnan(dump[0]) && !isnan(dump[1]) && !isnan(dump[2]))
+    //{
+        //dBodyAddForce(body, dump[0], dump[1], dump[2]);
+    //}
+
+
+    //dBodyAddForce(body[i],damping[0]*-dumpMedia[i][0],damping[1]*-dumpMedia[i][0],damping[2]*-dumpMedia[i][0]);
+
+    //dReal *angulardumping = (dReal *)dBodyGetAngularVel(body);
+
+    //dBodyAddTorque(body,angulardumping[0]*-0.1,angulardumping[1]*-0.1,angulardumping[2]*-0.1 );
+
+
+    //if ((speed)>1.0 && speed < 1.3)
+        //enginestart();
+
+    dVector3 result;
+    dBodyVectorFromWorld(body, 0,1,0,result);
+
+    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+
+    upInBody = upInBody.normalize();
+
+    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+
+    //std::cout << "Attitude:" << attitude << std::endl;
+
+    if (attitude>80 || attitude<-80)
+    {
+        // Walrus has tumbled.
+        damage(1);
+    }
+
+
+    if (VERIFY(pos,me) && !Vehicle::inert)
+    {
+        if (attitude < 45)
+        {
+            //dBodyAddRelForce (body,0, 0,getThrottle());
+
+            //dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
+            Vec3f p(0.0, 0.0, getThrottle());
+
+            p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
+
+            dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, -0.8, -4.9);
+        }
+    }
+
+    wrapDynamics(body);
+}
+
+
+
+
+void AdvancedWalrus::doControl()
+{
+    Walrus::doControl();
+}
+
+void AdvancedWalrus::doControl(Controller controller)
+{
+    doControl(controller.registers);
+
+}
+
+void AdvancedWalrus::doControl(struct controlregister conts)
+{
+    Walrus::doControl(conts);
+
+    azimuth = conts.precesion;
+    elevation = conts.pitch;
+
+    setAim(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+}
+
+Vec3f AdvancedWalrus::getAim()
+{
+    return aim;
+}
+
+void AdvancedWalrus::setAim(Vec3f aim)
+{
+    AdvancedWalrus::aim = aim;
+}
+
+Vec3f AdvancedWalrus::getFiringPort()
+{
+    //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
+    return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
+}
+
+void  AdvancedWalrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
+{
+    position = getPos();
+    viewforward = toVectorInFixedSystem(0,0,1,azimuth, -0);
+
+    // Forward is in body coordinates, I need to convert it to global coordinates.
+    dVector3 result;
+    dBodyVectorToWorld(me, viewforward[0],viewforward[1],viewforward[2],result);
+    viewforward = Vec3f(result[0],result[1],result[2]);
+
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    viewforward = viewforward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=4;
+    position = position - 20*viewforward + Up;
+    viewforward = orig-position;
+}
+
+Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    ArtilleryAmmo *action = new ArtilleryAmmo();
+    // Need axis conversion.
+    action->init();
+
+    Vec3f position = getPos();
+
+    // Check where are we aiming in body coordinates.
+    forward = toVectorInFixedSystem(0,0,1,azimuth, elevation);
+    dVector3 result;
+    dBodyVectorToWorld(me, forward[0],forward[1],forward[2],result);
+
+    forward = Vec3f(result[0],result[1],result[2]);
+
+
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    // Calculates bullet initial position (trying to avoid hitting myself).
+    forward = forward.normalize();
+    orig = position;
+    position = position + 40*forward;
+    forward = -orig+position;
+
+    // Bullet energy
+    Vec3f Ft = forward*15;
+
+    // Bullet rotation (alignment with forward direction)
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+    // Shift origin up towards where the turret is located.
+    position = orig;
+    position[1] += 10;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+    Vec3f d = action->getPos() - getPos();
+
+    //std::cout << d << std::endl;
+
+    std::cout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // Recoil
+    Ft = Ft.normalize();  Ft=Ft * 0.2;
+
+    dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
+    artilleryshot();
+    //setTtl(200);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}

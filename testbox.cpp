@@ -53,6 +53,7 @@
 #include "units/BoxVehicle.h"
 #include "units/Manta.h"
 #include "units/Walrus.h"
+#include "units/AdvancedWalrus.h"
 #include "units/Balaenidae.h"
 #include "units/SimplifiedDynamicManta.h"
 
@@ -1083,7 +1084,7 @@ void checktest7(unsigned long  timer)    // Manta crashing on water (reducing it
 
 void test9()
 {
-    Walrus *_walrus = new Walrus(GREEN_FACTION);
+    AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
@@ -1091,6 +1092,9 @@ void test9()
     _walrus->stop();
 
     entities.push_back(_walrus);
+
+    Vec3f pos(200.0,1.32,-6000 - 60);
+    Camera.setPos(pos);
 }
 
 void checktest9(unsigned long timer)     // Check walrus stability.
@@ -3225,6 +3229,43 @@ void checktest33(unsigned long timer)
 
 }
 
+void test34()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+
+    Vec3f pos(200.0,1.32,-6000 - 60);
+    Camera.setPos(pos);
+}
+
+void checktest34(unsigned long timer)
+{
+    // Free test...
+
+    if (timer==2000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -3296,6 +3337,7 @@ void initWorldModelling(int testcase)
     case 31:test31();test10();break;                // Walrus arrive to a weird island, tumbles and is destroyed.
     case 32:test32();break;                         // Check continuous azimuth
     case 33:test33();break;                         // PID Manta
+    case 34:test34();break;                         // Test advanced Walrus.
     default:initIslands();test1();break;
     }
 
@@ -3345,6 +3387,7 @@ void worldStep(int value)
     case 31:checktest31(timer);break;
     case 32:checktest32(timer);break;
     case 33:checktest33(timer);break;
+    case 34:checktest34(timer);break;
     default: break;
     }
 

@@ -13,12 +13,10 @@
 
 class Walrus : public Vehicle
 {
-private:
+protected:
     float height;
     float width;
     float length;
-
-protected:
     int number;
 
     BoxIsland *island;

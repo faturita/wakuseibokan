@@ -211,4 +211,41 @@ void Beluga::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
+{
+    Vehicle *v;
+
+    if (type == MANTA)
+    {
+        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
+        _manta1->init();
+        _manta1->setNumber(number);
+        _manta1->embody(world, space);
+        _manta1->setPos(pos[0],pos[1]+28, pos[2]);
+        _manta1->setStatus(Manta::ON_DECK);
+        _manta1->inert = true;
+        alignToMe(_manta1->getBodyID());
+        v = (Vehicle*)_manta1;
+    } else if (type == WALRUS)
+    {
+        Walrus *_walrus = new Walrus(getFaction());
+        _walrus->init();
+        _walrus->setNumber(number);
+        _walrus->embody(world,space);
+        Vec3f p;
+        p = p.normalize();
+        p = getForward()*450;
+        _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+40,pos[2]-p[2]);
+        _walrus->setStatus(Walrus::SAILING);
+        _walrus->stop();
+        _walrus->inert = true;
+        dBodyAddRelForce(me,10.0f,0.0f,0.0f);
+
+        alignToMe(_walrus->getBodyID());
+        v = (Vehicle*)_walrus;
+    }
+
+    return v;
+}
+
 //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

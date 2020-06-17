@@ -760,6 +760,18 @@ T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z
     return loadModel(p_filename,x,y,z,scale,scale,scale,texture);
 }
 
+/**
+ * @brief T3DSModel::loadModel
+ * @param p_filename
+ * @param x
+ * @param y
+ * @param z
+ * @param scalex
+ * @param scaley
+ * @param scalez
+ * @param texture       Zero if you dont want any texture at all.
+ * @return
+ */
 T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scalex, float scaley, float scalez,GLuint texture)
 {
     T3DSModel* td = new T3DSModel();

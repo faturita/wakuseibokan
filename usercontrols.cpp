@@ -32,6 +32,7 @@
 #include "units/Balaenidae.h"
 #include "units/Manta.h"
 #include "units/Walrus.h"
+#include "units/AdvancedWalrus.h"
 
 #include "structures/Runway.h"
 #include "structures/CommandCenter.h"
@@ -294,13 +295,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
                 const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
 
+                std::cout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
+
                 size_t pos = CONTROLLING_NONE;
 
                 for (int j=0;j<islands.size();j++)
                 {
                     if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
                     {
-                        std::cout << "Island found-" << islandname << "-structure " << structurenumber << std::endl;
+                        std::cout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
                         pos = entities.indexOf(islands[j]->getStructures()[atoi(structurenumber)]);
                     }
                 }

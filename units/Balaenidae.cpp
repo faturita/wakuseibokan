@@ -1,6 +1,7 @@
 #include "Balaenidae.h"
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
+#include "AdvancedWalrus.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
 
@@ -346,7 +347,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         v = (Vehicle*)_manta1;
     } else if (type == WALRUS)
     {
-        Walrus *_walrus = new Walrus(getFaction());
+        AdvancedWalrus *_walrus = new AdvancedWalrus(getFaction());
         _walrus->init();
         _walrus->setNumber(number);
         _walrus->embody(world,space);

@@ -14,6 +14,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     void doControl();
+    Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };
 
 #endif // BELUGA_H
