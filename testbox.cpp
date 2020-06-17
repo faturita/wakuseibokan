@@ -730,6 +730,7 @@ void checktest15(unsigned long timer)
         c.pitch = 5;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
     }
 
 
@@ -743,6 +744,7 @@ void checktest15(unsigned long timer)
         _manta1->setAttitude(_b->getForward());
         _manta1->enableAuto();
     }
+
     if (timer > 650)
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);

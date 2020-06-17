@@ -234,7 +234,50 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
     doControl(c);
 }
 
+void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
+{
+    Controller c;
 
+    c.registers = myCopy;
+
+    float height = getPos()[1];
+
+    printf("Manta arrived to destination...\n");
+
+    elevator = 35;
+
+    c.registers.thrust = 300.0f/(10.0);
+
+    midpointpitch = 36;
+    float eh=height-500.0f;
+
+    c.registers.roll = -13;
+
+    if ((abs(eh))>10.0f)
+    {
+        c.registers.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+    } else {
+        c.registers.pitch = midpointpitch;
+    }
+
+    setThrottle(30.0f);
+
+    setStatus(Manta::HOLDING);
+
+    if (!reached)
+    {
+        char str[256];
+        sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
+        //messages.insert(messages.begin(), str);
+        reached = true;
+        setStatus(Manta::HOLDING);
+    }
+
+    c.registers.yaw = 0;
+
+    doControl(c);
+
+}
 
 void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
 {
@@ -251,6 +294,19 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
     float sp2=-0,        sp3 = 720;
 
     Vec3f T = (target - Po);
+
+
+    std::cout << "Destination:" << T.magnitude() << std::endl;
+
+
+    if (!(!reached && map(T).magnitude()>1000))
+    {
+        doHold(target, thrust);
+        return;
+    }
+
+    if (map(T).magnitude()<3500) thrust = 400.0;
+
 
     sp2 = getDeclination(T);
 
@@ -420,7 +476,7 @@ void SimplifiedDynamicManta::doControlLanding()
     float H=500, spspeed = 40.0f, TH = 200;
 
     switch (flyingstate) {
-    case 0:
+    case 0:default:
         T = (Pf - attitude.normalize()*(2 kmf)) - Po;
         H=450;spspeed = 40.0f;TH = 150;
         break;

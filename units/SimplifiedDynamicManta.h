@@ -30,6 +30,7 @@ public:
     void doControlForced(Vec3f target);
     void doControlFlipping(Vec3f target, float thust);
     void doControlControl2(Vec3f target, float thrust);
+    void doHold(Vec3f target, float thrust);
 
     void doControlDestination();
     void doControlLanding();

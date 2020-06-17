@@ -150,6 +150,8 @@ public:
     void damage(int d);
     void setTexture(const GLuint &value);
 
+    const Vec3f map(Vec3f);
+
     bool VERIFY(Vec3f newpos, dBodyID who);
 
     int getFaction();

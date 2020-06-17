@@ -579,3 +579,11 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
 
     return true;
 }
+
+// Returns a 2D map version of position using current height of the object.
+const Vec3f Vehicle::map(Vec3f position)
+{
+    Vec3f loc(position[0], getPos()[1], position[2]);
+
+    return loc;
+}
