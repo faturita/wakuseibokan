@@ -16,6 +16,8 @@ protected:
 
     bool visible = true;
 
+    float damage;
+
 public:
     Gunshot();
     ~Gunshot();
@@ -35,6 +37,8 @@ public:
     void setVisible(bool val);
 
 
+    float getDamage() const;
+    void setDamage(float value);
 };
 
 #endif // GUNSHOT_H

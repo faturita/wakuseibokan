@@ -733,6 +733,7 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 void SimplifiedDynamicManta::land()
 {
     aistatus = LANDING;
+    flyingstate=0;
 }
 
 void SimplifiedDynamicManta::attack(Vec3f target)

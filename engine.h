@@ -74,7 +74,7 @@ bool isMineFire(Vehicle* vehicle, Gunshot *g);
 bool hit(Vehicle *vehicle, Gunshot *g);
 
 
-bool hit(Structure* structure);
+bool hit(Structure* structure, Gunshot *g);
 
 // SYNC
 bool rayHit(Vehicle *vehicle, LaserRay *l);

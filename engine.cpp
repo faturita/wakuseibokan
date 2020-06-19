@@ -180,19 +180,19 @@ bool hit(Vehicle *vehicle, Gunshot *g)
         {
             vehicle->damage(50);
         } else
-            vehicle->damage(2);
+            vehicle->damage(g->getDamage());
         return false;
     }
     return true;
 }
 
-bool hit(Structure* structure)
+bool hit(Structure* structure, Gunshot *g)
 {
     static Island *b = NULL;
 
     if (structure)
     {
-        if (b != structure->island)
+        if (b && structure && structure->island && b != structure->island)
         {
             char str[256];
             sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
@@ -200,7 +200,9 @@ bool hit(Structure* structure)
             b = structure->island;
         }
 
-        structure->damage(2);
+        bullethit();
+        g->setVisible(false);
+        structure->damage(g->getDamage());
     }
 }
 
@@ -306,12 +308,12 @@ bool  isWalrus(Vehicle* vehicle)
 
 bool  isAction(dBodyID body)
 {
-    return isType(body, 5);
+    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION);
 }
 
 bool  isAction(Vehicle* vehicle)
 {
-    return isType(vehicle, 5);
+    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION);
 }
 
 // SYNC

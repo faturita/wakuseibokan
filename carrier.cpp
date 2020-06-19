@@ -529,7 +529,7 @@ void update(int value)
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
-                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY) && entities[i]->getTtl()==0)
+                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()==0)
                 {
                     //printf("Eliminating....\n");
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());

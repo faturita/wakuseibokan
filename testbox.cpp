@@ -58,6 +58,7 @@
 #include "units/SimplifiedDynamicManta.h"
 
 #include "actions/Gunshot.h"
+#include "actions/Missile.h"
 
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
@@ -69,8 +70,6 @@
 #include "structures/Artillery.h"
 
 #include "map.h"
-
-#define runonce static bool ond = true; for (;ond;ond = false)
 
 extern  Camera Camera;
 
@@ -177,8 +176,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2)) {}
-                if (isAction(v2) && s1 && hit(s1)) {}
+                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1))  {}
+                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v1))  {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -358,8 +357,8 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2)) {}
-                if (isAction(v2) && s1 && hit(s1)) {}
+                if (isAction(v1) && s2 && hit(s2,(Gunshot*)v1)) {}
+                if (isAction(v2) && s1 && hit(s1,(Gunshot*)v2)) {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -3268,6 +3267,70 @@ void checktest34(unsigned long timer)
 
 }
 
+
+void test35()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-4000.0f,20.5f,8000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
+
+    AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+}
+
+void checktest35(unsigned long timer)
+{
+    // Free test...
+
+    if (timer == 200)
+    {
+        Balaenidae *b = (Balaenidae *)findCarrier(GREEN_FACTION);
+
+        Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
+
+        Missile *a = (Missile*) b->fire(world, space);
+        if (a)
+            entities.push_back(a);
+
+        a->setDestination(bg->getPos());
+
+        a->enableAuto();
+
+
+    }
+
+    if (timer==2000000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -3340,6 +3403,7 @@ void initWorldModelling(int testcase)
     case 32:test32();break;                         // Check continuous azimuth
     case 33:test33();break;                         // PID Manta
     case 34:test34();break;                         // Test advanced Walrus.
+    case 35:test35();break;                         // Test Missiles fired from Carrier
     default:initIslands();test1();break;
     }
 
@@ -3390,6 +3454,7 @@ void worldStep(int value)
     case 32:checktest32(timer);break;
     case 33:checktest33(timer);break;
     case 34:checktest34(timer);break;
+    case 35:checktest35(timer);break;
     default: break;
     }
 

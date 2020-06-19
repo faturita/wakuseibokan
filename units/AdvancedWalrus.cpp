@@ -340,10 +340,10 @@ Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
-    // Recoil
+    // Recoil (excellent for the simulation, cumbersome for playing...)
     Ft = Ft.normalize();  Ft=Ft * 0.2;
 
-    dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
+    //dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
     artilleryshot();
     //setTtl(200);
 

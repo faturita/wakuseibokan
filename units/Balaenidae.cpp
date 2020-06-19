@@ -4,6 +4,7 @@
 #include "AdvancedWalrus.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
+#include "../actions/Missile.h"
 
 extern GLuint _textureMetal;
 
@@ -54,7 +55,7 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f, R);
 
-        //drawArrow();
+        //drawArrow(10);
         //drawArrow(S[0],S[1],S[2],1.0,0.0,0.0);
         //drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
@@ -400,4 +401,49 @@ void Balaenidae::launch(Manta* m)
     //f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
     //f = f*200;
     dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
+}
+
+
+Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
+{
+    Missile *action = new Missile();
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    forward = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 60.0f*forward;
+    forward = -orig+position;
+
+    // Shoot faster to avoid hurting myself (moving myself indeed, hurting is disabled per collision handling).
+    Vec3f Ft = forward*10000.0f;
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+
+    position = Vec3f(0.0,0.0,0.0);
+    position[1] = 100;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+    //dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
 }

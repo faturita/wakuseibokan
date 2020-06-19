@@ -42,6 +42,8 @@ public:
 
     void launch(Manta* m);
     void taxi(Manta *m);
+
+    Vehicle* fire(dWorldID world, dSpaceID space);
 };
 
 #endif // BALAENIDAE_H
