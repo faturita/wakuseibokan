@@ -3270,6 +3270,24 @@ void checktest34(unsigned long timer)
 
 void test35()
 {
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-10000.0f,-1.0,-4000.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -3282,7 +3300,7 @@ void test35()
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
     _bg->embody(world,space);
-    _bg->setPos(-4000.0f,20.5f,8000.0f);
+    _bg->setPos(-4000.0f,20.5f,11000.0f);
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
@@ -3315,7 +3333,12 @@ void checktest35(unsigned long timer)
         if (a)
             entities.push_back(a);
 
-        a->setDestination(bg->getPos());
+
+
+        Vec3f ff = Vec3f(-10000.0f,-1.0,-4000.0f) + Vec3f(+200,0,-100);
+
+
+        a->setDestination(ff);
 
         a->enableAuto();
 

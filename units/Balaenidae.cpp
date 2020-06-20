@@ -423,9 +423,6 @@ Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
     position = position + 60.0f*forward;
     forward = -orig+position;
 
-    // Shoot faster to avoid hurting myself (moving myself indeed, hurting is disabled per collision handling).
-    Vec3f Ft = forward*10000.0f;
-
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
@@ -436,12 +433,16 @@ Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
 
-    position = Vec3f(0.0,0.0,0.0);
-    position[1] = 100;
+    position = orig;
+    position[1] += 80;
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
 
+
+    Vec3f Ft=forward + Vec3f(0,20,0);
+    Ft=Ft*300;
     //dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
     // I can set power or something here.

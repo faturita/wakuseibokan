@@ -52,12 +52,6 @@ void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f, R);
 
-        Vec3f p(0.0, 0.0, getThrottle());
-
-        p = toVectorInFixedSystem(p[0],p[1],p[2],rudder, elevator);
-
-        drawArrow(p[0],p[1],p[2],1,0,0,1);
-
         glScalef(1.5f,1.5f,1.5f);
 
         doMaterial();
@@ -147,10 +141,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
 
     Vec3f T = (target - Po);
 
-
-    std::cout << "Destination:" << T.magnitude() << std::endl;
-
-    //if (map(T).magnitude()<3500) thrust = 2.0;
+    //if (map(T).magnitude()<3500) thrust = 50.0;
 
 
     sp2 = getDeclination(T);
@@ -167,13 +158,9 @@ void Missile::doControlControl2(Vec3f target, float thrust)
         e1 = e1 * (-1);
 
 
-    float Kp1 = 39.2,        Kp2 = 1.3,          Kp3 = 1.2;
-    float Ki1 = 14.9,        Ki2 = 1.6,          Ki3 = 0.6;
-    float Kd1 = 19.3,        Kd2 = 1.2,            Kd3 = 11.8;
-
-
-    float e[3] = { e1, e2, e3 };
-
+    float Kp1 = 99.2,        Kp2 = 34.3,          Kp3 = 1.2;
+    float Ki1 = 44.9,        Ki2 = 11.6,          Ki3 = 0.6;
+    float Kd1 = 99.3,        Kd2 = 61.2,            Kd3 = 11.8;
 
     float r1 =  rt1 + Kp1 * (e1 - et1)        + Ki1 * (e1 + et1)/2.0 + Kd1 * (e1 - 2 * et1 + ett1);
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
@@ -241,6 +228,8 @@ void Missile::doControl()
 
     //doControl(c.registers);
 
+
+
 }
 
 void Missile::doControl(Controller controller)
@@ -281,6 +270,8 @@ void Missile::doControl(struct controlregister conts)
     rudder      = -conts.roll  * 0.01;
 
     setThrottle(conts.thrust);
+
+    myCopy = conts;
 
 }
 
