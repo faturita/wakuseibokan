@@ -529,8 +529,11 @@ void update(int value)
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
-                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()==0)
+                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()<=0)
                 {
+                    if (controller.controlling == entities.indexOf(i))
+                        controller.controlling = CONTROLLING_NONE;
+
                     //printf("Eliminating....\n");
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
@@ -539,7 +542,7 @@ void update(int value)
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
                 {
-                    if (controller.controlling == i)
+                    if (controller.controlling == entities.indexOf(i))
                         controller.controlling = CONTROLLING_NONE;
 
 

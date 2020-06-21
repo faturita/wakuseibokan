@@ -124,4 +124,5 @@ int Gunshot::getType()
 void Gunshot::setVisible(bool val)
 {
     Gunshot::visible = val;
+    setTtl(2);
 }

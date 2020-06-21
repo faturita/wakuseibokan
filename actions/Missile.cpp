@@ -5,7 +5,7 @@ extern GLuint _textureRoad;
 
 Missile::Missile()
 {
-    Vehicle::setTtl(50000);
+    Vehicle::setTtl(5000);
 }
 
 Missile::~Missile()
@@ -158,9 +158,9 @@ void Missile::doControlControl2(Vec3f target, float thrust)
         e1 = e1 * (-1);
 
 
-    float Kp1 = 99.2,        Kp2 = 34.3,          Kp3 = 1.2;
-    float Ki1 = 44.9,        Ki2 = 11.6,          Ki3 = 0.6;
-    float Kd1 = 99.3,        Kd2 = 61.2,            Kd3 = 11.8;
+    float Kp1 = 14.0,        Kp2 = 01.5,            Kp3 = 1.2;
+    float Ki1 = 12.2,        Ki2 = 00.0,            Ki3 = 0.6;
+    float Kd1 = 67.3,        Kd2 = 00.0,            Kd3 = 11.8;
 
     float r1 =  rt1 + Kp1 * (e1 - et1)        + Ki1 * (e1 + et1)/2.0 + Kd1 * (e1 - 2 * et1 + ett1);
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
@@ -214,7 +214,7 @@ void Missile::doControl()
 
     c.registers = myCopy;
 
-    c.registers.thrust = 5;
+    c.registers.thrust = 100;
 
     //Vec3f p = getPos() - destination;
 
@@ -269,7 +269,7 @@ void Missile::doControl(struct controlregister conts)
     elevator    = -conts.pitch * 0.01;
     rudder      = -conts.roll  * 0.01;
 
-    setThrottle(conts.thrust);
+    setThrottle(100.0);
 
     myCopy = conts;
 
