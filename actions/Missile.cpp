@@ -5,7 +5,7 @@ extern GLuint _textureRoad;
 
 Missile::Missile()
 {
-    Vehicle::setTtl(5000);
+    Vehicle::setTtl(1000);
 }
 
 Missile::~Missile()
@@ -23,9 +23,9 @@ void Missile::init()
     if (_model != NULL)
         _model->setAnimation("run");
 
-    Missile::height=4.0f;
-    Missile::length=4.0f;
-    Missile::width=4.0f;
+    Missile::height=1.0f;
+    Missile::length=5.0f;
+    Missile::width=1.0f;
 
     Missile::mass = 1.0f;
 
@@ -56,6 +56,7 @@ void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doMaterial();
 
+        //drawRectangularBox(width, height, length);
         _model->setTexture(_textureRoad);
         _model->draw();
 
@@ -87,7 +88,7 @@ void Missile::doDynamics(dBodyID body)
 
     p = toVectorInFixedSystem(p[0],p[1],p[2],rudder, elevator);
 
-    dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, 0.0, -3.9);
+    dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, 0.0, -length - 0.1);
 
 
     // @FIXME: Bullets are really unstable.
@@ -132,29 +133,28 @@ void Missile::doControlControl2(Vec3f target, float thrust)
 
     c.registers = myCopy;
 
+    Vec3f fwd = getForward();
+
     Vec3f Po = getPos();
 
     float height = Po[1];
-    float declination = getDeclination(getForward());
+    float declination = getDeclination(fwd);
 
     float sp2=-0,        sp3 = 720;
 
     Vec3f T = (target - Po);
 
-    //if (map(T).magnitude()<3500) thrust = 50.0;
-
-
     sp2 = getDeclination(T);
 
     // This function returns principal arc cosine of x, in the interval [0, pi] radians.
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = acos(  T.normalize().dot(fwd.normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
     // Set the sign of e1 in relation to rolling encoding.
-    if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
+    if (getAzimuth(fwd)>270 && getAzimuth(T)<(getAzimuth(fwd)-180))
         e1 = e1 * (-1);
-    else if (getAzimuth(getForward()) < getAzimuth(T))
+    else if (getAzimuth(fwd) < getAzimuth(T))
         e1 = e1 * (-1);
 
 
@@ -166,12 +166,20 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+    std::cout << "Azimuth:" << getAzimuth(fwd) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+
+
+    if (abs((getAzimuth(fwd)-getAzimuth(T)))<0.1) {
+        dBodySetAngularVel(me,0,0,0);
+        runonce { std::cout << "Locked in target!" << std::endl; dBodySetLinearVel(me,0,0,0); }
+        r1=0;}
+    //if (abs((getDeclination(getForward())-getDeclination(T)))<0.1) { //dBodySetAngularVel(me,0,0,0);
+    //    r2=0;}
 
     r1 = max(r1, 2);
     r1 = min(r1, -2);
-    r2 = max(r2, 2);
-    r2 = min(r2, -2);
+    r2 = max(r2, 8);
+    r2 = min(r2, -8);
     r3 = max(r3, 20);
     r3 = min(r3, -20);
 
@@ -273,6 +281,12 @@ void Missile::doControl(struct controlregister conts)
 
     myCopy = conts;
 
+}
+
+void Missile::setVisible(bool val)
+{
+    Gunshot::visible = val;
+    setTtl(50);
 }
 
 //draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

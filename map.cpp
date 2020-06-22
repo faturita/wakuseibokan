@@ -347,9 +347,9 @@ void drawMap()
 
 
         // @FIXME: This sould be a list of targets and icons to show on the map.
-        if (controller.controlling != CONTROLLING_NONE)
+        if (controller.controllingid != CONTROLLING_NONE)
         {
-            Vehicle *_b = entities[controller.controlling];
+            Vehicle *_b = entities[controller.controllingid];
 
             Vec3f target = _b->getDestination();
 

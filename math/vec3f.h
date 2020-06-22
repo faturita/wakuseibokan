@@ -50,6 +50,7 @@ class Vec3f {
 		const Vec3f &operator+=(const Vec3f &other);
 		const Vec3f &operator-=(const Vec3f &other);
         bool isEquals(const Vec3f other);
+        bool isZero();
 		
 		float magnitude() const;
 		float magnitudeSquared() const;

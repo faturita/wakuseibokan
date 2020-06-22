@@ -68,6 +68,7 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 #include "structures/Artillery.h"
+#include "structures/Launcher.h"
 
 #include "map.h"
 
@@ -245,6 +246,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
 
 
             } else
@@ -1385,7 +1389,7 @@ void checktest12(unsigned long timer)
         l->setControlRegisters(c);
 
         // Extra
-        controller.controlling = 0;
+        controller.controllingid = 0;
     }
     if (timer==500)
     {
@@ -1604,7 +1608,7 @@ void checktest16(unsigned long timer)
         l->setControlRegisters(c);
 
         // Extra
-        controller.controlling = 2;
+        controller.controllingid = 2;
     }
     if (timer==500)
     {
@@ -1688,7 +1692,7 @@ void checktest17(unsigned long timer)
         l->setControlRegisters(c);
 
         // Extra
-        controller.controlling = 0;   // Shift screen to carrier.
+        controller.controllingid = 0;   // Shift screen to carrier.
     }
     if (timer==700)
     {
@@ -1773,7 +1777,7 @@ void checktest18(unsigned long timer)
         l->setControlRegisters(c);
 
         // Extra
-        controller.controlling = 0;   // Shift screen to carrier.
+        controller.controllingid = 0;   // Shift screen to carrier.
     }
     if (timer==700)
     {
@@ -2793,7 +2797,7 @@ void checktest29(unsigned long timer)
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
         size_t id = entities.indexAt(pos);
-        controller.controlling = id;
+        controller.controllingid = id;
     }
 
 
@@ -3198,7 +3202,7 @@ void checktest33(unsigned long timer)
         size_t pos;
         findMantaByNumber(pos,1);
 
-        controller.controlling = pos;
+        controller.controllingid = pos;
     }
 
     if (timer > 1000)
@@ -3330,8 +3334,10 @@ void checktest35(unsigned long timer)
         Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
 
         Missile *a = (Missile*) b->fire(world, space);
+
+        size_t i = CONTROLLING_NONE;
         if (a)
-            entities.push_back(a);
+            i = entities.push_back(a);
 
 
 
@@ -3342,14 +3348,327 @@ void checktest35(unsigned long timer)
 
         a->enableAuto();
 
+        if (a->getType()==CONTROLABLEACTION)
+        {
+            switchControl(entities.indexOf(i));
+
+        }
+
 
     }
 
-    if (timer==2000000)
+    if (timer == 1600)
     {
-        printf("Test passed OK!\n");
-        endWorldModelling();
-        exit(1);
+        Balaenidae *b = (Balaenidae *)findCarrier(GREEN_FACTION);
+
+        Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
+
+        Missile *a = (Missile*) b->fire(world, space);
+        size_t i = CONTROLLING_NONE;
+        if (a)
+            i = entities.push_back(a);
+
+
+        a->setDestination(bg->getPos());
+
+        a->enableAuto();
+
+        if (a->getType()==CONTROLABLEACTION)
+        {
+            switchControl(entities.indexOf(i));
+
+        }
+    }
+
+    if (timer==3000)
+    {
+        BoxIsland *nem = findIslandByName(std::string("Nemesis"));
+
+        if (!(nem->getCommandCenter()))
+        {
+            Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
+            if (!bg)
+            {
+                printf("Test passed OK!\n");
+                endWorldModelling();
+                exit(1);
+            }
+            else
+            {
+                printf("Test failed:  Carries was not destroyed.\n");
+                endWorldModelling();
+                exit(0);
+            }
+        }
+        else
+        {
+            printf("Test failed: Island's command center was not destroyed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
+    }
+
+}
+
+void test36()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+    Structure *t9 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,           -330.0f,    230.0f,world);
+
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+
+    Vec3f pos(-230,1.32, 0);
+    Camera.setPos(pos);
+}
+
+void checktest36(unsigned long timer)
+{
+    static Vehicle *action = NULL;
+
+    if (timer == 200)
+    {
+        BoxIsland *island = findIslandByName(std::string("Nemesis"));
+        Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
+
+        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+
+
+        if (!target)
+            return;
+
+        printf("Found target %p\n",  target);
+
+        Vehicle *b = target;
+
+        Vec3f firingloc = lb->getPos();
+
+        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
+
+        lb->elevation = -5; // A little bit up.
+        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+        struct controlregister c;
+        c.pitch = 0.0;
+        c.roll = 0.0;
+        //lb->setControlRegisters(c);
+        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+        action = (lb)->fire(world,space);
+
+        if (action != NULL)
+        {
+            size_t i = entities.push_back(action);
+            //gunshot();
+
+            //action->setDestination(b->getPos());
+
+            //action->enableAuto();
+
+            if (action->getType()==CONTROLABLEACTION)
+            {
+                switchControl(entities.indexOf(i));
+
+            }
+        }
+    }
+
+    if (timer > 240)
+    {
+        if (action)
+        {
+            BoxIsland *island = findIslandByName(std::string("Nemesis"));
+            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+
+
+            if (target)
+            {
+
+                std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
+
+                action->setDestination(target->getPos());
+                action->enableAuto();
+            }
+        }
+    }
+
+    if (timer == 1200)
+    {
+        Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
+        if (!bg)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: Carrier has not been destroyed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
+}
+
+
+void test37()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,world);
+
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-3000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+
+    Vec3f pos(-230,1.32, 0);
+    Camera.setPos(pos);
+}
+
+
+void checktest37(unsigned long timer)
+{
+    static Vehicle *action = NULL;
+
+    if (timer == 100)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        spawnManta(space,world,_b);
+    }
+
+    if (timer == 320)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        // launch
+        launchManta(_b);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+/**
+    if (timer == 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        _manta1->setDestination(Vec3f(1000,1000,1000));
+        _manta1->enableAuto();
+    }**/
+
+    if (timer == 1020)
+    {
+        BoxIsland *island = findIslandByName(std::string("Nemesis"));
+        Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
+
+        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+
+
+        if (!target)
+            return;
+
+        printf("Found target %p\n",  target);
+
+        Vehicle *b = target;
+
+        Vec3f firingloc = lb->getPos();
+
+        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
+
+        lb->elevation = -5; // A little bit up.
+        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+        struct controlregister c;
+        c.pitch = 0.0;
+        c.roll = 0.0;
+        //lb->setControlRegisters(c);
+        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+        action = (lb)->fire(world,space);
+
+        if (action != NULL)
+        {
+            size_t i = entities.push_back(action);
+            //gunshot();
+
+            //action->setDestination(b->getPos());
+
+            //action->enableAuto();
+
+            if (action->getType()==CONTROLABLEACTION)
+            {
+                switchControl(entities.indexOf(i));
+
+            }
+        }
+    }
+
+    if (timer > 1021)
+    {
+        if (action)
+        {
+            BoxIsland *island = findIslandByName(std::string("Nemesis"));
+            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+
+            if (!target)
+                return;
+
+            std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
+
+            action->setDestination(target->getPos());
+            action->enableAuto();
+
+        }
     }
 
 }
@@ -3427,6 +3746,8 @@ void initWorldModelling(int testcase)
     case 33:test33();break;                         // PID Manta
     case 34:test34();break;                         // Test advanced Walrus.
     case 35:test35();break;                         // Test Missiles fired from Carrier
+    case 36:test36();break;                         // Test Missile Launcher
+    case 37:test37();break;                         // Test Missile Launcher against Manta flying.
     default:initIslands();test1();break;
     }
 
@@ -3478,6 +3799,8 @@ void worldStep(int value)
     case 33:checktest33(timer);break;
     case 34:checktest34(timer);break;
     case 35:checktest35(timer);break;
+    case 36:checktest36(timer);break;
+    case 37:checktest37(timer);break;
     default: break;
     }
 

@@ -155,7 +155,9 @@ void landManta(Vehicle *v);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
+BoxIsland* findIslandByName(std::string islandname);
 
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);

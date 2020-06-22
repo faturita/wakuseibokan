@@ -34,7 +34,7 @@ public:
     void setOrigin(dBodyID);
     dBodyID getOrigin();
 
-    void setVisible(bool val);
+    void virtual setVisible(bool val);
 
 
     float getDamage() const;

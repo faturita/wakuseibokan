@@ -45,6 +45,7 @@
 #include "structures/CommandCenter.h"
 
 #include "actions/Gunshot.h"
+#include "actions/Missile.h"
 
 extern  Camera Camera;
 
@@ -205,7 +206,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             } else
             if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
             {
-                // Island reaction
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
                 printf("Hit structure\n");
@@ -241,6 +241,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
 
 
             } else

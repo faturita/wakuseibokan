@@ -141,16 +141,16 @@ void drawHUD()
     
     float speed=0, health=0, power = 0;
     
-    if (controller.controlling != CONTROLLING_NONE)
+    if (controller.controllingid != CONTROLLING_NONE)
     {
-        speed = entities[controller.controlling]->getSpeed();
-        health = entities[controller.controlling]->getHealth();
-        power = entities[controller.controlling]->getPower();
+        speed = entities[controller.controllingid]->getSpeed();
+        health = entities[controller.controllingid]->getHealth();
+        power = entities[controller.controllingid]->getPower();
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", entities.indexOf(controller.controlling),controller.registers.thrust, health, power);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", entities.indexOf(controller.controllingid),controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -324,9 +324,9 @@ void drawScene() {
     
     int ctrling = 0;
     
-    if (controller.controlling != CONTROLLING_NONE )
+    if (controller.controllingid != CONTROLLING_NONE )
     {
-        ctrling = controller.controlling;
+        ctrling = controller.controllingid;
         entities[ctrling]->getViewPort(up,pos,forward);
         
         Vec3f up2,pos2;
@@ -490,15 +490,15 @@ void update(int value)
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
         // to control each object as if it were exactly the user (with doControl() in the loop ahead).
-        if (controller.controlling != CONTROLLING_NONE && entities.isValid(controller.controlling))
+        if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
         {
-            if (!entities[controller.controlling]->isAuto())
+            if (!entities[controller.controllingid]->isAuto())
             {
-                entities[controller.controlling]->doControl(controller);
+                entities[controller.controllingid]->doControl(controller);
             }
             else
             {
-                controller.registers = entities[controller.controlling]->getControlRegisters();
+                controller.registers = entities[controller.controllingid]->getControlRegisters();
             }
         }
 
@@ -531,19 +531,18 @@ void update(int value)
                 //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()<=0)
                 {
-                    if (controller.controlling == entities.indexOf(i))
-                        controller.controlling = CONTROLLING_NONE;
+                    if (controller.controllingid == i)
+                        controller.controllingid = CONTROLLING_NONE;
 
-                    //printf("Eliminating....\n");
-                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
+                   if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
                     entities.erase(i);
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
                 {
-                    if (controller.controlling == entities.indexOf(i))
-                        controller.controlling = CONTROLLING_NONE;
+                    if (controller.controllingid == i)
+                        controller.controllingid = CONTROLLING_NONE;
 
 
                     if (entities[i]->getType() == CARRIER)

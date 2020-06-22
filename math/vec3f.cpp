@@ -103,6 +103,11 @@ bool Vec3f::isEquals(const Vec3f other)
         return false;
 }
 
+bool Vec3f::isZero()
+{
+    return isEquals(Vec3f(0,0,0));
+}
+
 float Vec3f::magnitude() const {
 	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }

@@ -38,6 +38,8 @@ public:
     void doControl(Controller controller);
 
     void doControl(struct controlregister conts);
+
+    void setVisible(bool val);
 };
 
 #endif // MISSILE_H

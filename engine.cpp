@@ -200,7 +200,7 @@ bool hit(Structure* structure, Gunshot *g)
             b = structure->island;
         }
 
-        bullethit();
+        //bullethit();
         g->setVisible(false);
         structure->damage(g->getDamage());
     }
@@ -537,7 +537,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v && v->getType() != ACTION && v->getType() != RAY && v->getFaction()!=friendlyfaction)   // Fix this.
+        if (v && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
                 closest = (v->getPos()-l).magnitude();
@@ -579,7 +579,17 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
     return islands[nearesti];
 }
 
-
+BoxIsland* findIslandByName(std::string islandname)
+{
+    for (int j=0;j<islands.size();j++)
+    {
+        if (islandname == islands[j]->getName())
+        {
+            return islands[j];
+        }
+    }
+    return NULL;
+}
 BoxIsland* findNearestIsland(Vec3f Po)
 {
     int nearesti = 0;
