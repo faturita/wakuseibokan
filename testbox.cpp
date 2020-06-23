@@ -3609,7 +3609,7 @@ void checktest37(unsigned long timer)
         BoxIsland *island = findIslandByName(std::string("Nemesis"));
         Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
 
-        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
 
 
         if (!target)
@@ -3658,7 +3658,7 @@ void checktest37(unsigned long timer)
         if (action)
         {
             BoxIsland *island = findIslandByName(std::string("Nemesis"));
-            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
 
             if (!target)
                 return;

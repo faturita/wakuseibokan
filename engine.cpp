@@ -529,15 +529,16 @@ int findNextNumber(int type)
     assert(!"No more available numbers !!!!!");
 }
 
-
-Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold)
 {
     int nearesti = -1;
     float closest = threshold;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY && v->getFaction()!=friendlyfaction)   // Fix this.
+        if (v &&
+                ( (type == -1 && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
                 closest = (v->getPos()-l).magnitude();
@@ -550,6 +551,12 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
     else
         return entities[nearesti];
 }
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
+{
+    return findNearestEnemyVehicle(friendlyfaction,-1,l,threshold);
+}
+
+
 
 
 
