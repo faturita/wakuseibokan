@@ -16,6 +16,8 @@ protected:
 
     bool visible = true;
 
+    float damage;
+
 public:
     Gunshot();
     ~Gunshot();
@@ -32,9 +34,11 @@ public:
     void setOrigin(dBodyID);
     dBodyID getOrigin();
 
-    void setVisible(bool val);
+    void virtual setVisible(bool val);
 
 
+    float getDamage() const;
+    void setDamage(float value);
 };
 
 #endif // GUNSHOT_H

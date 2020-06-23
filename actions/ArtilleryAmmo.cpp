@@ -21,6 +21,8 @@ void ArtilleryAmmo::init()
 
     ArtilleryAmmo::mass = 0.01f;
 
+    setDamage(80);
+
     setForward(0,0,1);
 }
 

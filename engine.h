@@ -74,7 +74,7 @@ bool isMineFire(Vehicle* vehicle, Gunshot *g);
 bool hit(Vehicle *vehicle, Gunshot *g);
 
 
-bool hit(Structure* structure);
+bool hit(Structure* structure, Gunshot *g);
 
 // SYNC
 bool rayHit(Vehicle *vehicle, LaserRay *l);
@@ -155,7 +155,10 @@ void landManta(Vehicle *v);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
+BoxIsland* findIslandByName(std::string islandname);
 
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);

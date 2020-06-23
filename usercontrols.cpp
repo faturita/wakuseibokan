@@ -80,7 +80,8 @@ void processMouse(int button, int state, int x, int y) {
 
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
-        if (controller.view == 1 && controller.controlling != CONTROLLING_NONE &&  entities[controller.controlling]->getType() == VehicleTypes::MANTA)
+        if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
+                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || entities[controller.controllingid]->getType() == CONTROLABLEACTION) )
         {
             printf("Active control\n");
             // Activate airplane controller.
@@ -121,7 +122,7 @@ void processMouse(int button, int state, int x, int y) {
                 {
                     Vec3f target = setLocationOnMap(x,y);
                     //@FIXME
-                    entities[controller.controlling]->setDestination(target);
+                    entities[controller.controllingid]->setDestination(target);
 
                     printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
 
@@ -212,14 +213,14 @@ void switchControl(int controlposition)
 {
     if (controlposition > entities.size())
     {
-        controller.controlling = CONTROLLING_NONE;
+        controller.controllingid = CONTROLLING_NONE;
         return;
     }
     size_t id = entities.indexAt(controlposition);
 
     if (!entities.isValid(id))
     {
-        controller.controlling = CONTROLLING_NONE;
+        controller.controllingid = CONTROLLING_NONE;
         return;
     }
 
@@ -230,15 +231,15 @@ void switchControl(int controlposition)
         return;
     }
 
-    if (controller.controlling != CONTROLLING_NONE)
+    if (controller.controllingid != CONTROLLING_NONE)
     {
-        if (!entities[controller.controlling]->isAuto())
-            entities[controller.controlling]->setControlRegisters(controller.registers);
+        if (!entities[controller.controllingid]->isAuto())
+            entities[controller.controllingid]->setControlRegisters(controller.registers);
     }
 
-    controller.controlling = id;
+    controller.controllingid = id;
     //controller.reset();
-    controller.registers = entities[controller.controlling]->getControlRegisters();
+    controller.registers = entities[controller.controllingid]->getControlRegisters();
 
     // Release mouse
     glutSetCursor(GLUT_CURSOR_CROSSHAIR);
@@ -312,7 +313,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("taxi") != std::string::npos)
             {
-                Balaenidae *r = (Balaenidae*)entities[controller.controlling];
+                Balaenidae *r = (Balaenidae*)entities[controller.controllingid];
                 Manta *m = findManta(Manta::ON_DECK);
                 if (m)
                 {
@@ -327,17 +328,17 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 //const char* content = controller.str.substr(7).c_str();
 
-                launchManta(entities[controller.controlling]);
+                launchManta(entities[controller.controllingid]);
 
             } else
             if (controller.str.find("land") != std::string::npos)
             {
-                landManta(entities[controller.controlling]);
+                landManta(entities[controller.controllingid]);
 
             } else
             if (controller.str.find("command") != std::string::npos)
             {
-                Walrus *w = (Walrus*) entities[controller.controlling];
+                Walrus *w = (Walrus*) entities[controller.controllingid];
                 // Chek if walrus is on island.
                 BoxIsland *island = w->getIsland();
 
@@ -394,11 +395,11 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.registers.thrust = 0.0;break;
-        case 'j':entities[controller.controlling]->enableAuto();break;
-        case 'J':entities[controller.controlling]->disableAuto();break;
+        case 'j':entities[controller.controllingid]->enableAuto();break;
+        case 'J':entities[controller.controllingid]->disableAuto();break;
 
         case '0':
-            controller.controlling = CONTROLLING_NONE;
+            controller.controllingid = CONTROLLING_NONE;
             controller.reset();
             Camera.reset();
         break;
@@ -419,7 +420,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 't':controller.teletype = true;break;
         case 'S':
             {
-            Vehicle *v = entities[controller.controlling];
+            Vehicle *v = entities[controller.controllingid];
             v->stop();
             break;
             }
@@ -427,9 +428,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
             synchronized(entities.m_mutex)
             {
-                if (entities[controller.controlling]->getType()==CARRIER)
+                if (entities[controller.controllingid]->getType()==CARRIER)
                 {
-                    spawnManta(space,world,entities[controller.controlling]);
+                    spawnManta(space,world,entities[controller.controllingid]);
                 }
             }
             }
@@ -454,7 +455,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case 'o':
             {
-                spawnWalrus(space,world,entities[controller.controlling]);
+                spawnWalrus(space,world,entities[controller.controllingid]);
             }
             break;
         case 'O':
@@ -462,7 +463,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME: Find the walrus that is actually closer to the dock bay.
                 synchronized(entities.m_mutex)
                 {
-                    dockWalrus(entities[controller.controlling]);
+                    dockWalrus(entities[controller.controllingid]);
                 }
             }
         break;
@@ -470,20 +471,29 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 synchronized(entities.m_mutex)
                 {
-                    if (controller.controlling != CONTROLLING_NONE && entities.isValid(controller.controlling))
+                    if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                     {
-                        Vehicle *action = (entities[controller.controlling])->fire(world,space);
+                        Vehicle *action = (entities[controller.controllingid])->fire(world,space);
                         //int *idx = new int();
                         //*idx = vehicles.push_back(action);
                         //dBodySetData( action->getBodyID(), (void*)idx);
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            size_t i = entities.push_back(action);
                             gunshot();
+
+                            if (action->getType()==CONTROLABLEACTION)
+                            {
+                                switchControl(entities.indexOf(i));
+
+                            }
                         }
+
+
+
                     } else
                     {
-                        controller.controlling = CONTROLLING_NONE;
+                        controller.controllingid = CONTROLLING_NONE;
                     }
                 }
             }

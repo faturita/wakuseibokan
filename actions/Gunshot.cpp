@@ -1,5 +1,15 @@
 #include "Gunshot.h"
 
+float Gunshot::getDamage() const
+{
+    return damage;
+}
+
+void Gunshot::setDamage(float value)
+{
+    damage = value;
+}
+
 Gunshot::Gunshot()
 {
     Vehicle::setTtl(100);
@@ -20,6 +30,8 @@ void Gunshot::init()
     Gunshot::width=0.1f;
 
     Gunshot::mass = 1.0f;
+
+    setDamage(2);
 
     setForward(0,0,1);
 }
@@ -112,4 +124,5 @@ int Gunshot::getType()
 void Gunshot::setVisible(bool val)
 {
     Gunshot::visible = val;
+    setTtl(2);
 }

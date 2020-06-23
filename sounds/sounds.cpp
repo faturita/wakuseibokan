@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+void bullethit()
+{
+    system("afplay sounds/bullethit.wav &");
+}
+
 void firesound(int times)
 {
     for(int i=0;i<times;i++)

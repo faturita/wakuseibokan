@@ -31,7 +31,7 @@ class Controller
 public:
     
 	// Device ID to be controller.
-    size_t controlling=CONTROLLING_NONE;
+    size_t controllingid=CONTROLLING_NONE;
     
 	// Index to Observable interfaces.
 	int camera;

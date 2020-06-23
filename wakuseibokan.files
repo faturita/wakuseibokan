@@ -22,6 +22,7 @@ camera.cpp
 camera.h
 carrier.cpp
 carrier.h
+collision.h
 commandline.cpp
 commandline.h
 container.cpp
@@ -68,6 +69,8 @@ structures/Hangar.cpp
 structures/Hangar.h
 structures/LaserTurret.cpp
 structures/Laserturret.h
+structures/Launcher.cpp
+structures/Launcher.h
 structures/Runway.cpp
 structures/Runway.h
 structures/Structure.cpp

@@ -10,6 +10,7 @@ void gunshot();
 void artilleryshot();
 void smallenginestart();
 void soaring();
+void bullethit();
 
 void intro();
 

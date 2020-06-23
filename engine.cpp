@@ -180,19 +180,19 @@ bool hit(Vehicle *vehicle, Gunshot *g)
         {
             vehicle->damage(50);
         } else
-            vehicle->damage(2);
+            vehicle->damage(g->getDamage());
         return false;
     }
     return true;
 }
 
-bool hit(Structure* structure)
+bool hit(Structure* structure, Gunshot *g)
 {
     static Island *b = NULL;
 
     if (structure)
     {
-        if (b != structure->island)
+        if (b && structure && structure->island && b != structure->island)
         {
             char str[256];
             sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
@@ -200,7 +200,9 @@ bool hit(Structure* structure)
             b = structure->island;
         }
 
-        structure->damage(2);
+        //bullethit();
+        g->setVisible(false);
+        structure->damage(g->getDamage());
     }
 }
 
@@ -306,12 +308,12 @@ bool  isWalrus(Vehicle* vehicle)
 
 bool  isAction(dBodyID body)
 {
-    return isType(body, 5);
+    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION);
 }
 
 bool  isAction(Vehicle* vehicle)
 {
-    return isType(vehicle, 5);
+    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION);
 }
 
 // SYNC
@@ -527,15 +529,16 @@ int findNextNumber(int type)
     assert(!"No more available numbers !!!!!");
 }
 
-
-Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold)
 {
     int nearesti = -1;
     float closest = threshold;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v && v->getType() != ACTION && v->getType() != RAY && v->getFaction()!=friendlyfaction)   // Fix this.
+        if (v &&
+                ( (type == -1 && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
                 closest = (v->getPos()-l).magnitude();
@@ -548,6 +551,12 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
     else
         return entities[nearesti];
 }
+Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
+{
+    return findNearestEnemyVehicle(friendlyfaction,-1,l,threshold);
+}
+
+
 
 
 
@@ -577,7 +586,17 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
     return islands[nearesti];
 }
 
-
+BoxIsland* findIslandByName(std::string islandname)
+{
+    for (int j=0;j<islands.size();j++)
+    {
+        if (islandname == islands[j]->getName())
+        {
+            return islands[j];
+        }
+    }
+    return NULL;
+}
 BoxIsland* findNearestIsland(Vec3f Po)
 {
     int nearesti = 0;
