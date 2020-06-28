@@ -35,7 +35,7 @@ void endWorldModelling();
 // **********************************************************************
 
 
-
+enum gamemodes { ACTIONGAME, STRATEGYGAME };
 
 
 

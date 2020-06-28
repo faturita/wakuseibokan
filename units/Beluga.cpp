@@ -19,8 +19,6 @@ void Beluga::init()
 {
     //Load the model
     _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,_textureRoad);
-    if (_model != NULL)
-        _model->setAnimation("run");
 
     setForward(0,0,1);
 
@@ -235,7 +233,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = p.normalize();
         p = getForward()*450;
-        _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+40,pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
         _walrus->inert = true;

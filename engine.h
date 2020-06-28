@@ -34,6 +34,7 @@
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
 #include "structures/Artillery.h"
+#include "structures/Launcher.h"
 
 #include "actions/Gunshot.h"
 
@@ -156,6 +157,7 @@ void landManta(Vehicle *v);
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
 BoxIsland* findIslandByName(std::string islandname);
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int faction);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);

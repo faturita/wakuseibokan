@@ -1,5 +1,5 @@
 #include "Artillery.h"
-#include "../actions/ArtilleryAmmo.h"
+#include "../actions/Shell.h"
 
 #include "../sounds/sounds.h"
 
@@ -14,7 +14,9 @@ void Artillery::init()
     //Load the model
     _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,Structure::texture);
     if (_model != NULL)
-        _model->setAnimation("run");
+    {
+
+    }
 
     Structure::height=27.97;
     Structure::length=11.68;
@@ -81,11 +83,11 @@ Vec3f Artillery::getFiringPort()
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
-void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
     position[1] += 2.0f;
-    forward = getForward();
+    fw = toVectorInFixedSystem(0, 0, 1,azimuth,-elevation);
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     //std::cout << "Forward:" << forward << std::endl;
@@ -93,12 +95,13 @@ void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     Vec3f orig;
 
 
-    forward = forward.normalize();
+    fw = fw.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position + (abs(zoom))*forward;
+    position = position + (abs(zoom))*fw;
 
     //forward = -orig+position;
+
 }
 
 
@@ -108,13 +111,13 @@ Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
     if (getTtl()>0)
         return NULL;
 
-    ArtilleryAmmo *action = new ArtilleryAmmo();
+    Shell *action = new Shell();
     // Need axis conversion.
     action->init();
 
 
     Vec3f position = getPos();
-    forward = getForward();
+    forward = getForward();forward = toVectorInFixedSystem(0, 0, 1,azimuth,-elevation);
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;

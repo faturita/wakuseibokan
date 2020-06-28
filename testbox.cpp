@@ -95,6 +95,8 @@ std::vector<std::string> messages;
 extern float fps;
 extern clock_t elapsedtime;
 
+int gamemode;
+
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;

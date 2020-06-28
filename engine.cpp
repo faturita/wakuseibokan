@@ -556,47 +556,6 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
     return findNearestEnemyVehicle(friendlyfaction,-1,l,threshold);
 }
 
-
-
-
-
-
-BoxIsland* findNearestEmptyIsland(Vec3f Po)
-{
-    int nearesti = 0;
-    float closest = 0;
-    for(int i=0;i<islands.size();i++)
-    {
-        BoxIsland *b = islands[i];
-        Vec3f l(b->getX(),0.0f,b->getZ());
-
-        Structure *d = b->getCommandCenter();
-
-        if (!d)
-        {
-            if ((l-Po).magnitude()<closest || closest ==0) {
-                closest = (l-Po).magnitude();
-                nearesti = i;
-            }
-        }
-
-
-    }
-
-    return islands[nearesti];
-}
-
-BoxIsland* findIslandByName(std::string islandname)
-{
-    for (int j=0;j<islands.size();j++)
-    {
-        if (islandname == islands[j]->getName())
-        {
-            return islands[j];
-        }
-    }
-    return NULL;
-}
 BoxIsland* findNearestIsland(Vec3f Po)
 {
     int nearesti = 0;
@@ -613,8 +572,50 @@ BoxIsland* findNearestIsland(Vec3f Po)
     }
 
     return islands[nearesti];
-
 }
+
+
+BoxIsland* findNearestEmptyIsland(Vec3f Po)
+{
+    return findNearestIsland(Po,true,-1);
+}
+
+
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int enemyfaction)
+{
+    int nearesti = 0;
+    float closest = 0;
+    for(int i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if ((!d && empty) || (d && !empty && d->getFaction()!=enemyfaction))
+        {
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+    }
+
+    return islands[nearesti];
+}
+
+BoxIsland* findIslandByName(std::string islandname)
+{
+    for (int j=0;j<islands.size();j++)
+    {
+        if (islandname == islands[j]->getName())
+        {
+            return islands[j];
+        }
+    }
+    return NULL;
+}
+
 
 void list()
 {
@@ -766,6 +767,8 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         s = new Turret(c->getFaction());
                     else if (21<=which && which<=23)
                         s = new Artillery(c->getFaction());
+                    else if (24<=which && which<=26)
+                        s = new Launcher(c->getFaction());
                     else
                         s = new Warehouse(c->getFaction());
 
@@ -910,6 +913,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
 
         if (b)
         {
+            //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
             BoxIsland *is = findNearestEmptyIsland(b->getPos());
 

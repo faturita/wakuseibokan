@@ -1,16 +1,14 @@
-#ifndef ARTILLERYAMMO_H
-#define ARTILLERYAMMO_H
+#ifndef SHELL_H
+#define SHELL_H
 
-#include "Gunshot.h"
+#include "ArtilleryAmmo.h"
 
-class ArtilleryAmmo : public Gunshot
+class Shell : public Gunshot
 {
-protected:
-    float range;
 public:
-    ArtilleryAmmo();
-    ~ArtilleryAmmo();
-    void virtual init();
+    Shell();
+    ~Shell();
+    void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void drawModel();
     void doDynamics(dBodyID body);
@@ -21,4 +19,4 @@ public:
     int getType();
 };
 
-#endif // ARTILLERYAMMO_H
+#endif // SHELL_H

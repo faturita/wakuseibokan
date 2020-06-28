@@ -35,6 +35,7 @@ private:
 protected:
     Vec3f pos;
     Model* _model;
+    Model* _topModel;
 	float speed;
 	float R[12];
 	Vec3f forward;

@@ -89,6 +89,8 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 int aiplayer = FREE_AI;
 
+extern int gamemode;
+
 // @FIXME Change
 extern GLuint _textureBox;
 extern GLuint _textureMetal;
@@ -625,7 +627,7 @@ int main(int argc, char** argv) {
     disclaimer();
 	glutCreateWindow("Wakuseibokan");
     
-    if (argc>1 && strcmp(argv[1],"-d")==0)
+    if (isPresentCommandLineParameter(argc,argv,"-d"))
         glutInitWindowSize(1200, 800);
     else
         glutFullScreen();
@@ -640,14 +642,6 @@ int main(int argc, char** argv) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported: %s\n", version);
 
-    // Initialize ODE, create islands, structures and populate the world.
-    if (argc>1 && strcmp(argv[1],"-test")==0)
-        initWorldModelling(atoi(argv[2]));
-    else if (argc>2 && strcmp(argv[2],"-test")==0)
-        initWorldModelling(atoi(argv[3]));
-    else
-        initWorldModelling();
-
     if (isPresentCommandLineParameter(argc,argv,"-free"))
         aiplayer = FREE_AI;
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerblue"))
@@ -656,6 +650,18 @@ int main(int argc, char** argv) {
         aiplayer = GREEN_AI;
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
         aiplayer = BOTH_AI;
+
+
+    if (isPresentCommandLineParameter(argc,argv,"-strategy"))
+        gamemode = STRATEGYGAME;
+    else if (isPresentCommandLineParameter(argc,argv,"-action"))
+        gamemode = ACTIONGAME;
+
+    // Initialize ODE, create islands, structures and populate the world.
+    if (isPresentCommandLineParameter(argc,argv,"-test"))
+        initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
+    else
+        initWorldModelling();
 
 
     const char *conf = dGetConfiguration ();

@@ -16,7 +16,9 @@ void AdvancedWalrus::init()
     // Keep in mind that the 3DSModel should be centered.
     _model = (Model*)T3DSModel::loadModel("units/walrus.3ds",0,0,0,1,1,1,0);
     if (_model != NULL)
-        _model->setAnimation("run");
+    {
+        _topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
+    }
 
     setForward(0,0,1);
 
@@ -87,8 +89,11 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
 
         // Rotate the turret cannon so that it is aligned properly.
         glRotatef(90.0f,0.0f,1.0f,0.0f);
-        glScalef(0.1f,0.1f,0.1f);
-        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,_textureSky);
+        //glScalef(0.1f,0.1f,0.1f);
+        //draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,_textureSky);
+
+        _topModel->setTexture(_textureSky);
+        _topModel->draw();
 
         glPopMatrix();
     }

@@ -715,7 +715,7 @@ T3DSModel::~T3DSModel()
 //Switches to the given animation
 void T3DSModel::setAnimation(const char* name)
 {
-
+    assert(!"This method is not implemented for this model type.");
 }
 //Draws the current state of the animated model.
 void T3DSModel::draw()

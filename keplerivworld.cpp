@@ -68,6 +68,8 @@ std::vector<BoxIsland*> islands;
 
 std::vector<std::string> messages;
 
+int gamemode;
+
 
 /**
  * Collision detection function.
@@ -460,7 +462,7 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 void initWorldPopulation()
 {
 
-    if (false)
+    if (gamemode == STRATEGYGAME)
     {
         // Strategy Game
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -482,7 +484,7 @@ void initWorldPopulation()
 
         entities.push_back(_bg);
     }
-    else
+    else if (gamemode == ACTIONGAME)
     {
         // Action Game
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);

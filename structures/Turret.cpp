@@ -13,7 +13,9 @@ void Turret::init()
     //Load the model
     _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,Structure::texture);
     if (_model != NULL)
-        _model->setAnimation("run");
+    {
+        _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
+    }
 
     Structure::height=27.97;
     Structure::length=11.68;
@@ -45,7 +47,8 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
 
-        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
+        _topModel->setTexture(Structure::texture);
+        _topModel->draw();
 
         // Gun shots
         //glTranslatef((firing+=100),0.0f,0.0f);
@@ -98,19 +101,19 @@ Vec3f Turret::getFiringPort()
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
-void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
     position[1] += 19.0f; // Move upwards to the center of the real rotation.
-    forward = getForward();
+    fw = getForward();
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
 
-    forward = forward.normalize();
+    fw = fw.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position + (abs(zoom))*forward;
+    position = position + (abs(zoom))*fw;
 
     //forward = -orig+position;
 }
@@ -175,6 +178,30 @@ void Turret::doControl()
 
     Turret::doControl(c);
 }
+
+
+
+void supersecureRSAGenerator(int seed)
+{
+    srand(seed);
+
+    char key[256];
+
+    int keyleng = 256;
+    for(int i=0;i<keyleng;i++)
+    {
+
+    }
+
+}
+
+
+
+
+
+
+
+
 
 /**
  * The values are modified from the rc

@@ -10,7 +10,9 @@ void Hangar::init()
     //Load the model
     _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
     if (_model != NULL)
-        _model->setAnimation("run");
+    {
+
+    }
 
     Structure::height=50;
     Structure::length=64.90;

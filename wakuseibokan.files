@@ -16,6 +16,8 @@ actions/LaserRay.cpp
 actions/LaserRay.h
 actions/Missile.cpp
 actions/Missile.h
+actions/Shell.cpp
+actions/Shell.h
 actions/actions.h
 anothermain.cpp
 camera.cpp

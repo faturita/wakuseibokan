@@ -14,7 +14,9 @@ void Launcher::init()
     //Load the model
     _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,1,1,1,Structure::texture);
     if (_model != NULL)
-        _model->setAnimation("run");
+    {
+        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,0.1,0.1,0.1,0);
+    }
 
     Structure::height=27.97;
     Structure::length=11.68;
@@ -46,7 +48,10 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
         //glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
-        draw3DSModel("structures/launchertop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
+
+        _topModel->setTexture(Structure::texture);
+        _topModel->draw();
+
         glPopMatrix();
 
     }
