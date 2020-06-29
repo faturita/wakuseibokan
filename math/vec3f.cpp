@@ -140,6 +140,11 @@ ostream &operator<<(ostream &output, const Vec3f &v) {
 	return output;
 }
 
+istream &operator>>(istream &input, Vec3f &v) {
+    input >> v;
+    return input;
+}
+
 char* Vec3f::toString(char *dat) const {
     sprintf(dat,"(%10.5f,%10.5f,%10.5f)", v[0],v[1],v[2]);
     return dat;

@@ -345,6 +345,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 captureIsland(island,w->getFaction(),space, world);
 
             } else
+            if (controller.str.find("save") != std::string::npos)
+            {
+                savegame();
+            } else
             if (controller.str.find("list") != std::string::npos)
             {
                 list();
@@ -437,20 +441,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             break;
         case 'M':
             {
-                synchronized(entities.m_mutex)
-                {
-                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-                    {
-                        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
-                        {
-                            //printf("Eliminating....\n");
-                            dBodyDisable(entities[i]->getBodyID());
-                            entities.erase(i);
-                            messages.insert(messages.begin(), std::string("Manta is now on bay."));
-                        }
-                    }
-                }
+            synchronized(entities.m_mutex)
+            {
+                dockManta();
+            }
             }
         break;
         case 'o':

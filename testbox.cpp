@@ -3675,13 +3675,70 @@ void checktest37(unsigned long timer)
 
 }
 
+void test38()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-4000.0f,20.5f,11000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+}
+
+void checktest38(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
+
+void savegame()
+{
+    assert(!"This should not be called in test mode.");
+}
+
+void loadgame()
+{
+    assert(!"This should not be called in test mode.");
+}
+
 
 void initWorldModelling()
 {
     initWorldModelling(-1);
 }
-void initWorldModelling(int testcase)
+void setupWorldModelling()
 {
     /* create world */
     dRandSetSeed(1);
@@ -3710,7 +3767,10 @@ void initWorldModelling(int testcase)
     ground = dCreatePlane (space,0,1,0,0);
 
 
+}
 
+void initWorldModelling(int testcase)
+{
     switch(testcase)
     {
     case 1:initIslands();test1();break;// Carrier stability
@@ -3750,6 +3810,7 @@ void initWorldModelling(int testcase)
     case 35:test35();break;                         // Test Missiles fired from Carrier
     case 36:test36();break;                         // Test Missile Launcher
     case 37:test37();break;                         // Test Missile Launcher against Manta flying.
+    case 38:test38();break;                         // Carrier attacks an island and try to conquer it.
     default:initIslands();test1();break;
     }
 
@@ -3803,6 +3864,7 @@ void worldStep(int value)
     case 35:checktest35(timer);break;
     case 36:checktest36(timer);break;
     case 37:checktest37(timer);break;
+    case 38:checktest38(timer);break;
     default: break;
     }
 

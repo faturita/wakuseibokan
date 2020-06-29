@@ -69,6 +69,7 @@ class Vec3f {
 
 Vec3f operator*(float scale, const Vec3f &v);
 std::ostream &operator<<(std::ostream &output, const Vec3f &v);
+std::istream &operator>>(std::istream &input, Vec3f &v);
 
 
 

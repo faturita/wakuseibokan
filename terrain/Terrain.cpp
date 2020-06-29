@@ -277,7 +277,6 @@ Structure* BoxIsland::getCommandCenter()
     return NULL;
 }
 
-
 void drawTerrain(Terrain *_landmass, float fscale)
 {
     drawTerrain(_landmass, fscale, 0.3f, 0.9f, 0.0f);

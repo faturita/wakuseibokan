@@ -459,6 +459,291 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
+#include <iostream>
+#include <fstream>
+#include <regex>
+
+void savegame()
+{
+    //FILE *pf = fopen("savegame.w", "rb+");
+
+    /**
+    // Start traversing all the islands, all the structures and save everything.
+    for (int j=0;j<islands.size();j++)
+    {
+        fwrite(pf, "")
+    }
+
+    // Check every entity which is not an action, and save their position and orientation.
+    BoxIsland *enewetak = new BoxIsland(&entities);
+    enewetak->setName("Enewetak");
+    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
+    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+
+    **/
+
+    /**std::ofstream ss("savegame.w", std::ios_base::binary);
+
+    Vec3f f(90,9.0,23);
+    ss << f[0] << std::endl << f[1] << std::endl << f[2] << std::endl ;
+
+    ss.close();**/
+
+    std::ofstream ss("savegame.w", std::ios_base::binary);
+    ss << islands.size() << std::endl;
+    for (int j=0;j<islands.size();j++)
+    {
+        std::string s;
+        s = islands[j]->getName();
+
+        s = std::regex_replace(s, std::regex(" "), "-");
+        ss << s << std::endl;
+        ss << islands[j]->getX() << std::endl;
+        ss << islands[j]->getZ() << std::endl;
+        ss << islands[j]->getModelName() << std::endl;
+        std::cout << "Name:" << islands[j]->getName() << std::endl;
+
+        Structure *c =  islands[j]->getCommandCenter();
+
+        if (c)
+        {
+            std::vector<size_t> strs = islands[j]->getStructures();
+            ss << 0x3f << std::endl;
+            ss << strs.size() << std::endl;
+            for(int i=0;i<strs.size();i++)
+            {
+                ss << entities[strs[i]]->getFaction() << std::endl;
+                ss << entities[strs[i]]->getType() << std::endl;
+                int subtype = 0;
+
+                if (Artillery *lb = dynamic_cast<Artillery*>(entities[strs[i]]))
+                    subtype = 1;
+                else if (CommandCenter *lb = dynamic_cast<CommandCenter*>(entities[strs[i]]))
+                    subtype = 2;
+                else if (Hangar *lb = dynamic_cast<Hangar*>(entities[strs[i]]))
+                    subtype = 3;
+                else if (Warehouse *lb = dynamic_cast<Warehouse*>(entities[strs[i]]))
+                    subtype = 4;
+                else if (Runway *lb = dynamic_cast<Runway*>(entities[strs[i]]))
+                    subtype = 5;
+                else if (LaserTurret *lb = dynamic_cast<LaserTurret*>(entities[strs[i]]))
+                    subtype = 6;
+                else if (Turret *lb = dynamic_cast<Turret*>(entities[strs[i]]))
+                    subtype = 7;
+                else if(Structure* lb = dynamic_cast<Structure*>(entities[strs[i]]))
+                    subtype = 8;
+
+                ss << subtype << std::endl;
+                std::cout << "Subtype saving:" << subtype << std::endl;
+
+
+                Vec3f p= entities[strs[i]]->getPos();
+                ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+                ss << entities[strs[i]]->getHealth() << std::endl;
+                ss << entities[strs[i]]->getPower() << std::endl;
+
+            }
+        } else {
+            ss << 0x4f << std::endl;
+        }
+
+
+    }
+
+    ss << entities.size() << std::endl;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        if (entities[i]->getType() == CARRIER)
+        {
+            ss << entities[i]->getFaction() << std::endl;
+            ss << entities[i]->getType() << std::endl;
+
+            int subtype = 0;
+
+
+            if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
+                subtype = 2;
+            else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
+                subtype = 1;
+
+            ss << subtype << std::endl;
+
+            std::cout << "Subtype saving:" << subtype << std::endl;
+
+
+
+            Vec3f p= entities[i]->getPos();
+            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+            ss << entities[i]->getHealth() << std::endl;
+            ss << entities[i]->getPower() << std::endl;
+
+
+
+            float R[12];
+            entities[i]->getR(R);
+            for(int j=0;j<12;j++) ss << R[j] << std::endl;
+        }
+    }
+
+
+
+
+    ss.flush();
+    ss.close();
+
+
+}
+
+
+
+void loadgame()
+{
+    /**std::ifstream ss("savegame.w", std::ios_base::binary);
+
+    Vec3f f(0,0,0);
+    ss >> f[0] >> f[1] >> f[2] ;
+
+    std::cout << f << std::endl;
+
+    ss.close();**/
+
+    std::ifstream ss("savegame.w", std::ios_base::binary);
+    int size;
+    ss >> size;
+    std::cout << "Size:" << size << std::endl;
+    for (int j=0;j<size;j++)
+    {
+        BoxIsland *is = new BoxIsland(&entities);
+        std::string name,modelname;
+        Vec3f loc;
+        ss >> name;is->setName(name);
+        ss >> loc[0];
+        ss >> loc[2];
+        is->setLocation(loc[0],-1,loc[2]);
+        ss >> modelname;
+        std::cout << "Name:" << name << std::endl;
+        is->buildTerrainModel(space,modelname.c_str());
+
+        islands.push_back(is);
+
+        int moredata;
+
+        ss >> moredata;
+
+        if (moredata == 0x3f)
+        {
+            int sze;
+            ss >> sze;
+            for (int i=0;i<sze;i++)
+            {
+                Structure *v = NULL;
+                int faction;
+                ss >> faction;
+                int type, subtype;
+                ss >> type;
+                ss >> subtype;
+                std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+
+                switch (subtype) {
+                    case 1:
+                        v = new Artillery(faction);
+                        break;
+                    case 2:
+                        v = new CommandCenter(faction);
+                        break;
+                    case 3:
+                        v = new Hangar(faction);
+                        break;
+                    case 4:
+                        v = new Warehouse(faction);
+                        break;
+                    case 5:
+                        v = new Runway(faction);
+                        break;
+                    case 6:
+                        v = new LaserTurret(faction);
+                        break;
+                    case 7:
+                        v = new Turret(faction);
+                        break;
+                    case 8:
+                        v = new Structure(faction);
+                    break;
+                }
+
+                Vec3f f(0,0,0);
+                ss >> f[0] >> f[1] >> f[2] ;
+                float health;ss >> health ;
+                float power; ss >> power ;
+
+                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],world);
+
+            }
+        }
+
+    }
+
+
+    ss >> size;
+    std::cout << "Size:" << size << std::endl;
+    for(int i=0;i<size;i++)
+    {
+        Vehicle *v = NULL;
+        int faction;
+        ss >> faction;
+        int type, subtype;
+        ss >> type;
+        ss >> subtype;
+        std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+
+        if (type == CARRIER)
+        {
+        switch (type) {
+            case CARRIER:
+            {
+                Balaenidae *b = NULL;
+                if (subtype==1)
+                    b = new Balaenidae(faction);
+                else if (subtype==2)
+                    b = new Beluga(faction);
+
+                b->init();
+                b->embody(world,space);
+                v = b;
+                break;
+            }
+            case MANTA:
+            {
+                SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(faction);
+                _manta1->init();
+                _manta1->setNumber(1);
+                _manta1->embody(world, space);
+                _manta1->setStatus(Manta::ON_DECK);
+                _manta1->inert = true;
+                v = _manta1;
+            }
+            }
+            Vec3f f(0,0,0);
+            ss >> f[0] >> f[1] >> f[2] ;
+            v->setPos(f);
+            float health;ss >> health ;
+            float power; ss >> power ;
+
+            float R[12];
+            for(int j=0;j<12;j++) ss >> R[j];
+            v->setR(R);
+
+            entities.push_back(v);
+        }
+    }
+
+    ss.close();
+
+}
+
+
+
 void initWorldPopulation()
 {
 
@@ -524,7 +809,7 @@ void initWorldModelling(int testcase)
 {
     initWorldModelling();
 }
-void initWorldModelling()
+void setupWorldModelling()
 {
     /* create world */
     dRandSetSeed(1);
@@ -552,6 +837,9 @@ void initWorldModelling()
 
     ground = dCreatePlane (space,0,1,0,0);
 
+}
+void initWorldModelling()
+{
     initIslands();
 
     initWorldPopulation();

@@ -580,8 +580,12 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
     return findNearestIsland(Po,true,-1);
 }
 
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction)
+{
+    return findNearestIsland(Po,empty,friendlyfaction,12000 kmf);
+}
 
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int enemyfaction)
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = 0;
     float closest = 0;
@@ -592,9 +596,9 @@ BoxIsland* findNearestIsland(Vec3f Po, bool empty, int enemyfaction)
 
         Structure *d = b->getCommandCenter();
 
-        if ((!d && empty) || (d && !empty && d->getFaction()!=enemyfaction))
+        if ((!d && empty) || (d && !empty && (d->getFaction()!=friendlyfaction || friendlyfaction == -1)) )
         {
-            if ((l-Po).magnitude()<closest || closest ==0) {
+            if ( ((l-Po).magnitude()<closest || closest ==0)  && (l-Po).magnitude()<threshold) {
                 closest = (l-Po).magnitude();
                 nearesti = i;
             }
@@ -707,6 +711,32 @@ void defendIsland(dSpaceID space, dWorldID world)
                     }
                 } else
                 if(Turret* lb = dynamic_cast<Turret*>(entities[str[i]]))
+                {
+                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                    Vec3f firingloc = lb->getFiringPort();
+
+                    lb->elevation = getDeclination((b->getPos())-(firingloc));
+                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+                    lb->setForward((b->getPos())-(firingloc));
+
+                    struct controlregister c;
+                    c.pitch = 0.0;
+                    c.roll = 0.0;
+                    lb->setControlRegisters(c);
+
+                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                    lb->setForward((b->getPos())-(firingloc));
+
+                    Vehicle *action = (lb)->fire(world,space);
+
+                    if (action != NULL)
+                    {
+                        entities.push_back(action);
+                        //gunshot();
+                    }
+                } else
+                if(Launcher* lb = dynamic_cast<Launcher*>(entities[str[i]]))
                 {
                     // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
                     Vec3f firingloc = lb->getFiringPort();
@@ -848,6 +878,22 @@ void dockWalrus(Vehicle *dock)
     }
 }
 
+// SYNC
+void dockManta()
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
+        {
+            //printf("Eliminating....\n");
+            dBodyDisable(entities[i]->getBodyID());
+            entities.erase(i);
+            messages.insert(messages.begin(), std::string("Manta is now on bay."));
+        }
+    }
+}
+
 
 void landManta(Vehicle *v)
 {
@@ -898,7 +944,7 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 
 void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world)
 {
-    static int statuses[2] = {0,0};
+    static int statuses[2] = {9,9};
     static unsigned long timeevent = 0;
 
     // @FIXME: This is SO wrong.
@@ -907,6 +953,121 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
     int action=-1;
 
     switch (status) {
+    case 9:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos(),false, faction,100 kmf);
+
+            if (!is)
+            {
+                // Closest enemy island is not found, lets check for an empty island.
+                status=0;
+                break;
+            }
+
+            Vec3f vector = (b->getPos()) - (is->getPos());
+
+            vector = vector.normalize();
+
+            b->setDestination(is->getPos()+Vec3f(12500.0f * vector));
+            b->enableAuto();
+            status = 10;
+        }
+
+        break;
+    }
+    case 10:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos(),false, faction);
+
+            if (!b->isAuto())
+            {
+                printf("Carries has arrived to destination.\n");
+
+                //Walrus* w = spawnWalrus(space,world,b);
+                //w->setDestination(is->getPos());
+                //w->enableAuto();
+                status = 11;timeevent = timer;
+
+            }
+        }
+
+        break;
+    }
+    case 11:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            if (timer==(timeevent + 200))
+            {
+                Manta *m = spawnManta(space,world,b);
+
+            }
+
+            if (timer==(timeevent + 300))
+            {
+                launchManta(b);
+            }
+
+            if (timer==(timeevent + 400))
+            {
+                BoxIsland *i = findNearestIsland(b->getPos());
+
+                Manta *m = findManta(Manta::FLYING);
+
+                CommandCenter *c = (CommandCenter*)i->getCommandCenter();
+
+                m->attack(c->getPos());
+                m->enableAuto();
+            }
+
+
+            if (timer>(timeevent + 400))
+            {
+                BoxIsland *i = findNearestIsland(b->getPos());
+
+                Manta *m = findManta(Manta::FLYING);
+
+                if (!m)
+                {
+                    status = 11;
+                    timeevent = timer;
+                    break;
+                }
+
+                CommandCenter *c = (CommandCenter*)i->getCommandCenter();
+
+                if (!c)
+                {
+                    // Command Center is destroyed.
+
+                    // @FIXME: find the right manta, the one which is closer.
+                    Manta *m = findManta(Manta::FLYING);
+
+
+                    if (m)
+                    {
+                        m->setDestination(Vec3f(i->getPos()[0],1000,i->getPos()[2]));
+                        m->enableAuto();
+                    }
+
+
+                    status = 0;
+                }
+            }
+        }
+
+        break;
+    }
     case 0: //find nearest island.
     {
         Vehicle *b = findCarrier(faction);
@@ -944,6 +1105,20 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 w->setDestination(is->getPos());
                 w->enableAuto();
                 status = 2;timeevent = timer;
+
+                Manta *m = findManta(Manta::HOLDING);
+
+                if (m)
+                {
+                    landManta(b);
+                } else {
+                    m = findManta(Manta::FLYING);
+
+                    if (m)
+                    {
+                        landManta(b);
+                    }
+                }
 
             }
         }
@@ -986,7 +1161,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
             status = 4;
         } else {
             // There are no walrus so I can departure to the next island.
-            status = 0;
+            status = 9;
         }
         break;
     }
@@ -995,6 +1170,8 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
         Vehicle *b = findCarrier(faction);
         Walrus *w = findWalrus(faction);
 
+        Manta *m = findManta(Manta::ON_DECK);
+
         if (w)
         {
             if (b && w && !(w->isAuto()))
@@ -1002,12 +1179,16 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 synchronized(entities.m_mutex)
                 {
                     dockWalrus(b);
+                    if (m)
+                    {
+                        dockManta();
+                    }
                 }
-                status=0;
+                status=9;
             }
         } else {
             // There are no walrus so I can departure to the next island.
-            status = 0;
+            status = 9;
         }
 
         break;

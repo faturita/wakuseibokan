@@ -657,11 +657,17 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
 
+    setupWorldModelling();
+
     // Initialize ODE, create islands, structures and populate the world.
     if (isPresentCommandLineParameter(argc,argv,"-test"))
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
+    else if (isPresentCommandLineParameter(argc,argv,"-load"))
+        loadgame();
     else
+    {
         initWorldModelling();
+    }
 
 
     const char *conf = dGetConfiguration ();

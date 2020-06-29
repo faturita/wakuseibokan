@@ -150,6 +150,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 void dockWalrus(Vehicle *docker);
+void dockManta();
 
 void launchManta(Vehicle *v);
 void landManta(Vehicle *v);
@@ -157,7 +158,8 @@ void landManta(Vehicle *v);
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
 BoxIsland* findIslandByName(std::string islandname);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int faction);
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction);
+BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
