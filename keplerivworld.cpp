@@ -13,6 +13,9 @@
 #include <vector>
 #include <mutex>
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
+#include <regex>
 
 #include "container.h"
 
@@ -35,6 +38,7 @@
 #include "units/MultiBodyVehicle.h"
 #include "units/Balaenidae.h"
 #include "units/Beluga.h"
+#include "units/AdvancedWalrus.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -459,38 +463,62 @@ void _nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-#include <iostream>
-#include <fstream>
-#include <regex>
-
 void savegame()
 {
-    //FILE *pf = fopen("savegame.w", "rb+");
+    std::ofstream ss("savegame.w", std::ios_base::binary);
 
-    /**
-    // Start traversing all the islands, all the structures and save everything.
-    for (int j=0;j<islands.size();j++)
+    // Version
+    ss << 0x01 << std::endl;
+
+    int entitiessize = 0;
+    // Get flying entities.
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
-        fwrite(pf, "")
+        if (entities[i]->getType() == CARRIER || entities[i]->getType() == MANTA || entities[i]->getType() == WALRUS)
+        {
+            entitiessize++;
+        }
     }
 
-    // Check every entity which is not an action, and save their position and orientation.
-    BoxIsland *enewetak = new BoxIsland(&entities);
-    enewetak->setName("Enewetak");
-    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
-    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    ss << entitiessize << std::endl;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        if (entities[i]->getType() == CARRIER || entities[i]->getType() == MANTA || entities[i]->getType() == WALRUS)
+        {
+            ss << entities[i]->getFaction() << std::endl;
+            ss << entities[i]->getType() << std::endl;
+
+            int subtype = 0;
 
 
-    **/
+            if (AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
+                subtype = 1;
+            else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
+                subtype = 2;
+            else if (SimplifiedDynamicManta *lb = dynamic_cast<SimplifiedDynamicManta*>(entities[i]))
+                subtype = 3;
+            else if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
+                subtype = 4;
+            else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
+                subtype = 5;
 
-    /**std::ofstream ss("savegame.w", std::ios_base::binary);
+            ss << subtype << std::endl;
 
-    Vec3f f(90,9.0,23);
-    ss << f[0] << std::endl << f[1] << std::endl << f[2] << std::endl ;
+            std::cout << "Subtype saving:" << subtype << std::endl;
 
-    ss.close();**/
+            Vec3f p= entities[i]->getPos();
+            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+            ss << entities[i]->getHealth() << std::endl;
+            ss << entities[i]->getPower() << std::endl;
 
-    std::ofstream ss("savegame.w", std::ios_base::binary);
+
+            float R[12];
+            entities[i]->getR(R);
+            for(int j=0;j<12;j++) ss << R[j] << std::endl;
+        }
+    }
+
+
     ss << islands.size() << std::endl;
     for (int j=0;j<islands.size();j++)
     {
@@ -551,44 +579,6 @@ void savegame()
 
     }
 
-    ss << entities.size() << std::endl;
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        if (entities[i]->getType() == CARRIER)
-        {
-            ss << entities[i]->getFaction() << std::endl;
-            ss << entities[i]->getType() << std::endl;
-
-            int subtype = 0;
-
-
-            if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
-                subtype = 2;
-            else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
-                subtype = 1;
-
-            ss << subtype << std::endl;
-
-            std::cout << "Subtype saving:" << subtype << std::endl;
-
-
-
-            Vec3f p= entities[i]->getPos();
-            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
-            ss << entities[i]->getHealth() << std::endl;
-            ss << entities[i]->getPower() << std::endl;
-
-
-
-            float R[12];
-            entities[i]->getR(R);
-            for(int j=0;j<12;j++) ss << R[j] << std::endl;
-        }
-    }
-
-
-
-
     ss.flush();
     ss.close();
 
@@ -609,7 +599,78 @@ void loadgame()
     ss.close();**/
 
     std::ifstream ss("savegame.w", std::ios_base::binary);
+
+    int version;
+    ss >> version;
+
     int size;
+    ss >> size;
+    std::cout << "Size:" << size << std::endl;
+    for(int i=0;i<size;i++)
+    {
+        Vehicle *v = NULL;
+        int faction;
+        ss >> faction;
+        int type, subtype;
+        ss >> type;
+        ss >> subtype;
+        std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+
+        if (type == CARRIER || type == MANTA || type == WALRUS)
+        {
+            switch (type) {
+            case CARRIER:
+            {
+                Balaenidae *b = NULL;
+                if (subtype==5)
+                    b = new Balaenidae(faction);
+                else if (subtype==4)
+                    b = new Beluga(faction);
+
+                b->init();
+                b->embody(world,space);
+                v = b;
+                break;
+            }
+            case MANTA:
+            {
+                SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(faction);
+                _manta1->init();
+                _manta1->setNumber(findNextNumber(MANTA));
+                _manta1->embody(world, space);
+                _manta1->setStatus(Manta::ON_DECK);
+                _manta1->inert = true;
+                v = _manta1;
+                break;
+            }
+            case WALRUS:
+                Walrus *_walrus = NULL;
+                if (subtype == 1)
+                    _walrus = new AdvancedWalrus(faction);
+                else if (subtype == 2)
+                    _walrus = new Walrus(faction);
+                _walrus->init();
+                _walrus->setNumber(findNextNumber(WALRUS));
+                _walrus->embody(world, space);
+                _walrus->setStatus(Walrus::SAILING);
+                _walrus->inert = true;
+                v = _walrus;
+
+            }
+            Vec3f f(0,0,0);
+            ss >> f[0] >> f[1] >> f[2] ;
+            v->setPos(f);
+            float health;ss >> health ;
+            float power; ss >> power ;
+
+            float R[12];
+            for(int j=0;j<12;j++) ss >> R[j];
+            v->setR(R);
+
+            entities.push_back(v);
+        }
+    }
+
     ss >> size;
     std::cout << "Size:" << size << std::endl;
     for (int j=0;j<size;j++)
@@ -646,29 +707,29 @@ void loadgame()
                 std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
 
                 switch (subtype) {
-                    case 1:
-                        v = new Artillery(faction);
-                        break;
-                    case 2:
-                        v = new CommandCenter(faction);
-                        break;
-                    case 3:
-                        v = new Hangar(faction);
-                        break;
-                    case 4:
-                        v = new Warehouse(faction);
-                        break;
-                    case 5:
-                        v = new Runway(faction);
-                        break;
-                    case 6:
-                        v = new LaserTurret(faction);
-                        break;
-                    case 7:
-                        v = new Turret(faction);
-                        break;
-                    case 8:
-                        v = new Structure(faction);
+                case 1:
+                    v = new Artillery(faction);
+                    break;
+                case 2:
+                    v = new CommandCenter(faction);
+                    break;
+                case 3:
+                    v = new Hangar(faction);
+                    break;
+                case 4:
+                    v = new Warehouse(faction);
+                    break;
+                case 5:
+                    v = new Runway(faction);
+                    break;
+                case 6:
+                    v = new LaserTurret(faction);
+                    break;
+                case 7:
+                    v = new Turret(faction);
+                    break;
+                case 8:
+                    v = new Structure(faction);
                     break;
                 }
 
@@ -684,59 +745,6 @@ void loadgame()
 
     }
 
-
-    ss >> size;
-    std::cout << "Size:" << size << std::endl;
-    for(int i=0;i<size;i++)
-    {
-        Vehicle *v = NULL;
-        int faction;
-        ss >> faction;
-        int type, subtype;
-        ss >> type;
-        ss >> subtype;
-        std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
-
-        if (type == CARRIER)
-        {
-        switch (type) {
-            case CARRIER:
-            {
-                Balaenidae *b = NULL;
-                if (subtype==1)
-                    b = new Balaenidae(faction);
-                else if (subtype==2)
-                    b = new Beluga(faction);
-
-                b->init();
-                b->embody(world,space);
-                v = b;
-                break;
-            }
-            case MANTA:
-            {
-                SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(faction);
-                _manta1->init();
-                _manta1->setNumber(1);
-                _manta1->embody(world, space);
-                _manta1->setStatus(Manta::ON_DECK);
-                _manta1->inert = true;
-                v = _manta1;
-            }
-            }
-            Vec3f f(0,0,0);
-            ss >> f[0] >> f[1] >> f[2] ;
-            v->setPos(f);
-            float health;ss >> health ;
-            float power; ss >> power ;
-
-            float R[12];
-            for(int j=0;j<12;j++) ss >> R[j];
-            v->setR(R);
-
-            entities.push_back(v);
-        }
-    }
 
     ss.close();
 

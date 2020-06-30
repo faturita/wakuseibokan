@@ -577,7 +577,25 @@ BoxIsland* findNearestIsland(Vec3f Po)
 
 BoxIsland* findNearestEmptyIsland(Vec3f Po)
 {
-    return findNearestIsland(Po,true,-1);
+    int nearesti = 0;
+    float closest = 0;
+    for(int i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if (!d )
+        {
+            if ( ((l-Po).magnitude()<closest || closest ==0) ) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+    }
+
+    return islands[nearesti];
 }
 
 BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction)
@@ -587,7 +605,7 @@ BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction)
 
 BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
-    int nearesti = 0;
+    int nearesti = -1;
     float closest = 0;
     for(int i=0;i<islands.size();i++)
     {
@@ -604,6 +622,9 @@ BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float th
             }
         }
     }
+
+    if (nearesti<0)
+        return NULL;
 
     return islands[nearesti];
 }
