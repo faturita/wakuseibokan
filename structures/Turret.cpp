@@ -14,7 +14,7 @@ void Turret::init()
     _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,Structure::texture);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
+        _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
     }
 
     Structure::height=27.97;

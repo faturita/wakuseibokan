@@ -12,10 +12,10 @@ Launcher::Launcher(int faction)
 void Launcher::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,4,4,4,Structure::texture);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,0.1,0.1,0.1,0);
+        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,2,2,2,0);
     }
 
     Structure::height=27.97;
@@ -38,12 +38,12 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(4.0f,4.0f,4.0f);
+        //glScalef(4.0f,4.0f,4.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         _model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
-        glTranslatef(0.0f,3.0f,0.0f);
+        glTranslatef(0.0f,19.0f,0.0f);
 
         //glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);

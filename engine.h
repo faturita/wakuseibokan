@@ -166,6 +166,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
+void wipeEnemyStructures(BoxIsland *island);
 
 void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world);
 

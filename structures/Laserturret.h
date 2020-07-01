@@ -18,7 +18,6 @@ protected:
 public:
     LaserTurret(int faction);
     Vehicle* fire(dWorldID world, dSpaceID space);
-    void drawModel(float yRot, float xRot, float x, float y, float z);
     void doControl();
     void doControl(Controller cr);
     void locateLaserRay(LaserRay *action);

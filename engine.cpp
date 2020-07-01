@@ -952,14 +952,34 @@ void launchManta(Vehicle *v)
     }
 }
 
+void wipeEnemyStructures(BoxIsland *island)
+{
+    std::vector<size_t> strs = island->getStructures();
+
+    int faction = island->getCommandCenter()->getFaction();
+
+    for(int i=0;i<strs.size();i++)
+    {
+        if (faction != entities[strs[i]]->getFaction())
+        {
+            entities[strs[i]]->damage(10000);
+        }
+    }
+}
+
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
 {
 
     Structure *s = island->addStructure(new CommandCenter(faction),world);
 
-    char msg[256];
-    sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
-    messages.insert(messages.begin(), std::string(msg));
+    if (s)
+    {
+        char msg[256];
+        sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
+        messages.insert(messages.begin(), std::string(msg));
+
+        wipeEnemyStructures(island);
+    }
 }
 
 
@@ -1036,6 +1056,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
 
             if (timer==(timeevent + 300))
             {
+                // @FIXME I need to register which manta is around.
                 launchManta(b);
             }
 
@@ -1047,8 +1068,16 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
 
                 CommandCenter *c = (CommandCenter*)i->getCommandCenter();
 
-                m->attack(c->getPos());
-                m->enableAuto();
+                if (!c)
+                {
+                    status = 0;
+                    dockManta();
+                } else
+                {
+
+                    m->attack(c->getPos());
+                    m->enableAuto();
+                }
             }
 
 

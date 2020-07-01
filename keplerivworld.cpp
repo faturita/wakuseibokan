@@ -515,6 +515,12 @@ void savegame()
             float R[12];
             entities[i]->getR(R);
             for(int j=0;j<12;j++) ss << R[j] << std::endl;
+
+            ss << entities[i]->isAuto() << std::endl;
+            p = entities[i]->getDestination();
+            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+
+
         }
     }
 
@@ -667,6 +673,14 @@ void loadgame()
             for(int j=0;j<12;j++) ss >> R[j];
             v->setR(R);
 
+            // Destination and auto
+            bool isauto;
+            ss >> isauto;
+            ( isauto ? v->enableAuto() : v->disableAuto());
+
+            ss >> f[0] >> f[1] >> f[2] ;
+            v->setDestination(f);
+
             entities.push_back(v);
         }
     }
@@ -683,7 +697,7 @@ void loadgame()
         ss >> loc[2];
         is->setLocation(loc[0],-1,loc[2]);
         ss >> modelname;
-        std::cout << "Name:" << name << std::endl;
+        std::cout << "Reading Island:" << name << "\t" << modelname << std::endl;
         is->buildTerrainModel(space,modelname.c_str());
 
         islands.push_back(is);
@@ -784,7 +798,7 @@ void initWorldPopulation()
         _b->init();
         _b->embody(world,space);
         _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-        _b->setPos(0.0f + 0.0 kmf,20.5f,-12000.0f + 0.0 kmf);
+        _b->setPos(0.0f + 0.0 kmf,20.5f,-16000.0f + 0.0 kmf);
         //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 

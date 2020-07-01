@@ -339,7 +339,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("command") != std::string::npos)
             {
                 Walrus *w = (Walrus*) entities[controller.controllingid];
-                // Chek if walrus is on island.
+                // Check if walrus is on island.
                 BoxIsland *island = w->getIsland();
 
                 captureIsland(island,w->getFaction(),space, world);
@@ -407,8 +407,30 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.reset();
             Camera.reset();
         break;
-        case '1':case '2':case '3': case '4': case '5': case '6':case '7':case '8':case '9':
+        case '1':case '2':
+        {
             switchControl((int)(key-48));
+        }
+        break;
+        case '3': case '4': case '5':
+        {
+            size_t pos = CONTROLLING_NONE;
+            findMantaByNumber(pos,(int)(key-48)-2);
+
+            printf ("Manta %d\n", pos);
+
+            switchControl(pos);
+        }
+        break;
+        case '6':case '7':case '8':case '9':
+        {
+            size_t pos = CONTROLLING_NONE;
+            findWalrusByNumber(pos,(int)(key-48)-5);
+
+            printf ("Manta %d\n", pos);
+
+            switchControl(pos);
+        }
         break;
         case 'i':
             {
