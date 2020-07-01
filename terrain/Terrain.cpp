@@ -270,7 +270,8 @@ Structure* BoxIsland::getCommandCenter()
     checkStructures();
     for(int i=0;i<structures.size();i++)
     {
-        if (Structure* s = dynamic_cast<Structure*>(entities->operator[](structures[i])))
+        Structure* s = NULL;
+        if (entities->isValid(structures[i]) && (s = dynamic_cast<Structure*>(entities->operator[](structures[i]))))
         {
             if (s && s->getType() == CONTROL)
                 return s;

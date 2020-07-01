@@ -12,17 +12,17 @@ Launcher::Launcher(int faction)
 void Launcher::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,4,4,4,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,6,6,6,Structure::texture);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,2,2,2,0);
+        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,4,4,4,0);
     }
 
     Structure::height=27.97;
     Structure::length=11.68;
     Structure::width=11.68;
 
-    Launcher::firingpos = Vec3f(0.0f,19.0f,0.0f);
+    Launcher::firingpos = Vec3f(0.0f,16.0f,0.0f);
 
     setForward(Vec3f(0,0,1));
 }
@@ -41,9 +41,9 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
         //glScalef(4.0f,4.0f,4.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         _model->draw(Structure::texture);
-        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
-        glTranslatef(0.0f,19.0f,0.0f);
+        glTranslatef(0.0f,16.0f,0.0f);
 
         //glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
@@ -113,6 +113,9 @@ void Launcher::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
 Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 {
+    if (getTtl()>0)
+        return NULL;
+
     Missile *action = new Missile();
     // Need axis conversion.
     action->init();
@@ -158,6 +161,7 @@ Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
 
+    setTtl(1000);
 
     // I can set power or something here.
     return (Vehicle*)action;

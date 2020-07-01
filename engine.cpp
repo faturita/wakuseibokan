@@ -434,6 +434,32 @@ Manta* findMantaByNumber(size_t &pos, int number)
     return NULL;
 }
 
+Manta* findNearestManta(int status, Vec3f l)
+{
+    int nearesti=-1;
+    float closest = 0;
+
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getStatus() == status)
+        {
+            if ((v->getPos()-l).magnitude()<closest || closest == 0) {
+                closest = (v->getPos()-l).magnitude();
+                nearesti = i;
+            }
+
+        }
+    }
+    if (nearesti<0)
+        return NULL;
+    else
+        return (Manta*)entities[nearesti];
+
+}
+
+
+
 Manta* findManta(int status)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
@@ -677,24 +703,53 @@ void defendIsland(dSpaceID space, dWorldID world)
 
             for(int i=0;i<str.size();i++)
             {
-                // RTTI Stuff
-                if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))
+                if (entities[str[i]]->getFaction()==c->getFaction())
                 {
-                    if (b->getPos()[1]<60)   // 60 is island height.  Only aim to ground based units
+                    // RTTI Stuff
+                    if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))
+                    {
+                        if (b->getPos()[1]<60)   // 60 is island height.  Only aim to ground based units
+                        {
+                            // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                            Vec3f firingloc = lb->getFiringPort();
+
+                            lb->elevation = -5;
+                            lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+                            struct controlregister c;
+                            c.pitch = 0.0;
+                            c.roll = 0.0;
+                            lb->setControlRegisters(c);
+                            lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+                            std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                            Vehicle *action = (lb)->fire(world,space);
+
+                            if (action != NULL)
+                            {
+                                entities.push_back(action);
+                                //gunshot();
+                            }
+                        }
+                    } else
+                    if(LaserTurret* lb = dynamic_cast<LaserTurret*>(entities[str[i]]))
                     {
                         // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
                         Vec3f firingloc = lb->getFiringPort();
 
-                        lb->elevation = -5;
+                        lb->elevation = getDeclination((b->getPos())-(firingloc));
                         lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+                        lb->setForward((b->getPos())-(firingloc));
 
                         struct controlregister c;
                         c.pitch = 0.0;
                         c.roll = 0.0;
                         lb->setControlRegisters(c);
-                        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
 
                         std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                        lb->setForward((b->getPos())-(firingloc));
 
                         Vehicle *action = (lb)->fire(world,space);
 
@@ -703,84 +758,69 @@ void defendIsland(dSpaceID space, dWorldID world)
                             entities.push_back(action);
                             //gunshot();
                         }
-                    }
-                } else
-                if(LaserTurret* lb = dynamic_cast<LaserTurret*>(entities[str[i]]))
-                {
-                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
-                    Vec3f firingloc = lb->getFiringPort();
-
-                    lb->elevation = getDeclination((b->getPos())-(firingloc));
-                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-                    lb->setForward((b->getPos())-(firingloc));
-
-                    struct controlregister c;
-                    c.pitch = 0.0;
-                    c.roll = 0.0;
-                    lb->setControlRegisters(c);
-
-                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
-
-                    lb->setForward((b->getPos())-(firingloc));
-
-                    Vehicle *action = (lb)->fire(world,space);
-
-                    if (action != NULL)
+                    } else
+                    if(Turret* lb = dynamic_cast<Turret*>(entities[str[i]]))
                     {
-                        entities.push_back(action);
-                        //gunshot();
-                    }
-                } else
-                if(Turret* lb = dynamic_cast<Turret*>(entities[str[i]]))
-                {
-                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
-                    Vec3f firingloc = lb->getFiringPort();
+                        // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+                        Vec3f firingloc = lb->getFiringPort();
 
-                    lb->elevation = getDeclination((b->getPos())-(firingloc));
-                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-                    lb->setForward((b->getPos())-(firingloc));
+                        lb->elevation = getDeclination((b->getPos())-(firingloc));
+                        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+                        lb->setForward((b->getPos())-(firingloc));
 
-                    struct controlregister c;
-                    c.pitch = 0.0;
-                    c.roll = 0.0;
-                    lb->setControlRegisters(c);
+                        struct controlregister c;
+                        c.pitch = 0.0;
+                        c.roll = 0.0;
+                        lb->setControlRegisters(c);
 
-                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-                    lb->setForward((b->getPos())-(firingloc));
+                        lb->setForward((b->getPos())-(firingloc));
 
-                    Vehicle *action = (lb)->fire(world,space);
+                        Vehicle *action = (lb)->fire(world,space);
 
-                    if (action != NULL)
+                        if (action != NULL)
+                        {
+                            entities.push_back(action);
+                            //gunshot();
+                        }
+                    } else
+                    if(Launcher* lb = dynamic_cast<Launcher*>(entities[str[i]]))
                     {
-                        entities.push_back(action);
-                        //gunshot();
-                    }
-                } else
-                if(Launcher* lb = dynamic_cast<Launcher*>(entities[str[i]]))
-                {
-                    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
-                    Vec3f firingloc = lb->getFiringPort();
+                        // Increase the range a little bit.
+                        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
 
-                    lb->elevation = getDeclination((b->getPos())-(firingloc));
-                    lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-                    lb->setForward((b->getPos())-(firingloc));
+                        if (!target)
+                            return;
 
-                    struct controlregister c;
-                    c.pitch = 0.0;
-                    c.roll = 0.0;
-                    lb->setControlRegisters(c);
+                        Vehicle *b = target;
 
-                    std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        Vec3f firingloc = lb->getPos();
 
-                    lb->setForward((b->getPos())-(firingloc));
+                        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
 
-                    Vehicle *action = (lb)->fire(world,space);
+                        lb->elevation = -5; // A little bit up.
+                        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
 
-                    if (action != NULL)
-                    {
-                        entities.push_back(action);
-                        //gunshot();
+                        struct controlregister c;
+                        c.pitch = 0.0;
+                        c.roll = 0.0;
+                        //lb->setControlRegisters(c);
+                        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                        Missile* action = (Missile*)(lb)->fire(world,space);
+
+                        if (action != NULL)
+                        {
+                            size_t i = entities.push_back(action);
+                            //gunshot();
+
+                            action->setDestination(target->getPos());
+                            action->enableAuto();
+
+                        }
                     }
                 }
             }
@@ -1064,7 +1104,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
             {
                 BoxIsland *i = findNearestIsland(b->getPos());
 
-                Manta *m = findManta(Manta::FLYING);
+                Manta *m = findNearestManta(Manta::FLYING,b->getPos());
 
                 CommandCenter *c = (CommandCenter*)i->getCommandCenter();
 
@@ -1085,7 +1125,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
             {
                 BoxIsland *i = findNearestIsland(b->getPos());
 
-                Manta *m = findManta(Manta::FLYING);
+                Manta *m = findNearestManta(Manta::FLYING, b->getPos());
 
                 if (!m)
                 {
@@ -1101,7 +1141,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                     // Command Center is destroyed.
 
                     // @FIXME: find the right manta, the one which is closer.
-                    Manta *m = findManta(Manta::FLYING);
+                    Manta *m = findNearestManta(Manta::FLYING, b->getPos());
 
 
                     if (m)
@@ -1156,13 +1196,13 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 w->enableAuto();
                 status = 2;timeevent = timer;
 
-                Manta *m = findManta(Manta::HOLDING);
+                Manta *m = findNearestManta(Manta::HOLDING, b->getPos());
 
                 if (m)
                 {
                     landManta(b);
                 } else {
-                    m = findManta(Manta::FLYING);
+                    m = findNearestManta(Manta::FLYING, b->getPos());
 
                     if (m)
                     {

@@ -180,29 +180,6 @@ void Turret::doControl()
 }
 
 
-
-void supersecureRSAGenerator(int seed)
-{
-    srand(seed);
-
-    char key[256];
-
-    int keyleng = 256;
-    for(int i=0;i<keyleng;i++)
-    {
-
-    }
-
-}
-
-
-
-
-
-
-
-
-
 /**
  * The values are modified from the rc
  * @brief Turret::doControl
