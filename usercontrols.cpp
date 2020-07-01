@@ -51,6 +51,8 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
+extern bool warp;
+
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
 int _yoffset = 0;
@@ -398,6 +400,17 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'f':controller.registers.thrust-=0.05;break;
         case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
+        case '\\':
+        {
+
+
+        warp = !warp;
+
+        //{Vec3f p = entities[0]->getPos();  p[1] = 0;entities[0]->setPos(p);}
+        //{Vec3f p = entities[1]->getPos();  p[1] = 0;entities[1]->setPos(p);}
+
+        }
+        break;
         case 'Q':controller.registers.thrust = 0.0;break;
         case 'j':entities[controller.controllingid]->enableAuto();break;
         case 'J':entities[controller.controllingid]->disableAuto();break;

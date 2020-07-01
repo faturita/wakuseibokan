@@ -1,6 +1,6 @@
 //
 //  carrier.cpp
-//  mycarrier
+//
 //
 //  Created by Rodrigo Ramele on 22/05/14.
 //  Copyright (c) 2014 Baufest. All rights reserved.
@@ -307,9 +307,30 @@ void drawHUD()
 	glPopMatrix();
 }
 
-
+bool warp = false;
 
 void drawScene() {
+    if (warp)
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //glMatrixMode(GL_PROJECTION);
+        //glLoadIdentity();
+        //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        drawMap();
+
+        glDisable(GL_TEXTURE_2D);
+
+        glutSwapBuffers();
+
+        return;
+    }
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     //glMatrixMode(GL_PROJECTION);
@@ -590,21 +611,30 @@ void update(int value)
         }
 
         
-		// Ok, done with the dynamics
-        clock_t inicio = clock();
-        dSpaceCollide (space,0,&nearCallback);
-        dWorldStep (world,0.05);
-        elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
+        if (!warp)
+        {
+            // Ok, done with the dynamics
+            clock_t inicio = clock();
+            dSpaceCollide (space,0,&nearCallback);
+            dWorldStep (world,0.05);
+            elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
+        } else {
+            // Ok, done with the dynamics
+            clock_t inicio = clock();
+            dSpaceCollide (space,0,&nearCallback);
+            dWorldStep (world,0.05);
+            elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
+        }
         
 
         //dWorldQuickStep(world,0.05);
 
 		/* remove all contact joints */
 		dJointGroupEmpty (contactgroup);
-	}
+    }
     
 	glutPostRedisplay();
-    // @NOTE: update time should be adapted to real FPS (lower is faster).
+    // @NOTE: update time should be adapted to real FPS (lower is faster).  Milliseconds per frame
     glutTimerFunc(25, worldStep, 0);
 }
 
