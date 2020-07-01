@@ -84,32 +84,32 @@ echo "Installation complete."
 * ./configure
 * make clean && make && sudo make install
 
-Next steps
-----------
-* Resolve issues: the open architecture based on ODE generates too many glitches in the game.  In such a way, the game has too many degrees of freedom that needs to be constrained.
 
-
-Issues and missing stuff
-------------------------
-* Floor is working great.
-    * However, the floor is squared so when you fly high you see that the horizon changes weirdly.  Need improvement.
-    * Sea is good.  
-    * Sky must be improved.
-* Island generation works very good.
+Characteristics
+---------------
+* Floor
+    * The floor is squared.  Horizon works according the fulcrum representation.
+    * Sea is good.  Works as a texture that is shifted based on the camera position.  
+* Sky
+    * Sky does not work at all.
+* Islands
     * The engine is calculating the islands perfectly.
-    * Islands are BMP heightmaps 60x60.  These values are hardcoded to 600x600 in the model.
+    * Islands are BMP heightmaps 60x60.  These values are hardcoded to 3600x3600 in the model.
     * Max height (255) is 60. Hardcoded.
-    * Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement.
-* Collision detection has been improved.
-    * Island heights works PERFECT for Walrus.  It is amazing how well they work.
-* 3DS Engine has been incorporated so I can now use 3DS models!!!!
-* Walrus mechanics works but can be improved, and the texture of the Walrus is broken again.
-    * Walrus control, although it works, can be improved also.
-* New library for sound-support.
+    * Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement->Some Z Fighting.
+* Collision detection
+    * Island heights works PERFECT for Walruses. 
+* Models
+    * MDModel: Unreal.
+    * 3DSModel: it works only when you have just one object and without textures.
+* Walruses
+    * Two models.  They work very nicely on water.  The thrust simulates and offboard engine.
+* Sound
     * I am using TEMPORARILY system calls and afplay.
+    * STK
 * Manta
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
-    * I implemented a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
+    * Current implementation is a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.
 
 Blender
