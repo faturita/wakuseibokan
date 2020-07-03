@@ -96,6 +96,7 @@ extern float fps;
 extern clock_t elapsedtime;
 
 int gamemode;
+extern int aiplayer;
 
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -3714,10 +3715,158 @@ void test38()
 
     Vec3f pos(0.0,1.32, - 60);
     Camera.setPos(pos);
+
+    aiplayer = GREEN_AI;
 }
 
 void checktest38(unsigned long timer)
 {
+    // Just check that after a while, the command center is destroyed.
+
+    if (timer > 25000)
+    {
+        BoxIsland *b = islands[0];
+        CommandCenter *c = (CommandCenter*)b->getCommandCenter();
+
+        if (c && c->getFaction() == GREEN_FACTION)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: Island has not been conquered.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
+    }
+
+}
+
+void test39()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-4000.0f,20.5f,-12000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = GREEN_AI;
+}
+
+void checktest39(unsigned long timer)
+{
+    static int number = 0;
+    if (timer==500)
+    {
+        // Detect enemy carrier
+        // Move towards it
+        // Aim and shoot
+
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        Walrus* w = spawnWalrus(space,world,b);
+        number = w->getNumber();
+
+        Vehicle *v = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),5000);
+
+        // FIXME 50 meters before from my point of view, along the difference vector.
+        w->setDestination(v->getPos()+Vec3f(0.0f,0.0f,-50.0f));
+        w->enableAuto();
+
+    }
+
+    if (timer>650)
+    {
+        size_t p = CONTROLLING_NONE;
+        Walrus *w= findWalrus(GREEN_FACTION);
+
+        Vehicle *e = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),5000);
+
+        if (!e)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+        Vec3f target = e->getPos() - w->getPos();
+
+        // Get azimuth and declination of the target.
+        float azimuth=getAzimuth(target);
+        float declination=getDeclination(target);
+
+        // Map azimuth and declination to body coordinates (north is the forward direction of the body).
+        Vec3f aim = toVectorInFixedSystem(0,0,1,azimuth, declination);
+        dVector3 result;
+        dBodyVectorFromWorld(w->getBodyID(), aim[0],aim[1],aim[2],result);
+
+        aim = Vec3f(result[0],result[1],result[2]);
+
+        std::cout << aim <<  ":Loc: " << w->getPos() << " Target: " << e->getPos() << std::endl;
+
+
+        azimuth=getAzimuth(aim);
+        declination=getDeclination(aim);
+
+        struct controlregister c;
+        c = w->getControlRegisters();
+        c.precesion = azimuth;
+        c.pitch = declination;
+        w->setControlRegisters(c);
+
+        if (timer % 54 == 0)
+        {
+            Vehicle *action = (w)->fire(world,space);
+
+            if (action != NULL)
+            {
+                entities.push_back(action);
+                //gunshot();
+            }
+        }
+    }
+
+    if (timer==9000)
+    {
+        printf("Test failed: Enemy vehicle is not destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
 
 }
 
@@ -3811,6 +3960,7 @@ void initWorldModelling(int testcase)
     case 36:test36();break;                         // Test Missile Launcher
     case 37:test37();break;                         // Test Missile Launcher against Manta flying.
     case 38:test38();break;                         // Carrier attacks an island and try to conquer it.
+    case 39:test39();break;                         // Walrus attack enemy carrier trying to destroy it.
     default:initIslands();test1();break;
     }
 
@@ -3865,6 +4015,7 @@ void worldStep(int value)
     case 36:checktest36(timer);break;
     case 37:checktest37(timer);break;
     case 38:checktest38(timer);break;
+    case 39:checktest39(timer);break;
     default: break;
     }
 

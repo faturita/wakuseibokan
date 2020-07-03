@@ -85,8 +85,6 @@ extern std::vector<BoxIsland*> islands;
 
 extern std::vector<std::string> messages;
 
-enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
-
 int aiplayer = FREE_AI;
 
 extern int gamemode;

@@ -506,7 +506,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                         }
 
 
-
                     } else
                     {
                         controller.controllingid = CONTROLLING_NONE;

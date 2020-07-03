@@ -41,6 +41,9 @@
 
 enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
 
+enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
+
+
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
@@ -151,7 +154,7 @@ void defendIsland(dSpaceID space, dWorldID world);
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
-void dockWalrus(Vehicle *docker);
+void dockWalrus(Vehicle *dock);
 void dockManta();
 
 void launchManta(Vehicle *v);

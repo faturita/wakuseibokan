@@ -59,8 +59,8 @@ void CommandCenter::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
     forward = forward.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position - 40*forward + Up;
+    Up[0]=Up[2]=0;Up[1]=10;// poner en 4 si queres que este un toque arriba desde atras.
+    position = position - 90*forward + Up;
     forward = orig-position;
 }
 

@@ -922,12 +922,13 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
 // SYNCJ
 void dockWalrus(Vehicle *dock)
 {
+
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         // @FIXME: Only put back the walrus that is close to the carrier.
         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
-                entities[i]->getFaction()==dock->getFaction())
+                entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<600)
         {
             int walrusNumber = ((Walrus*)entities[i])->getNumber()+1;
             dBodyDisable(entities[i]->getBodyID());
@@ -1083,6 +1084,61 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
         break;
     }
     case 11:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos(),false, faction);
+
+            // If it has available missiles, then fire them.
+
+            if (timer==(timeevent + 100))
+            {
+                Missile *a = (Missile*) b->fire(world, space);
+
+                size_t i = CONTROLLING_NONE;
+                if (a)
+                {
+                    i = entities.push_back(a);
+
+                    CommandCenter *c = (CommandCenter*)is->getCommandCenter();
+
+                    a->setDestination(c->getPos());
+
+                    a->enableAuto();
+
+                    if (a->getType()==CONTROLABLEACTION)
+                    {
+                        switchControl(entities.indexOf(i));
+
+                    }
+                }
+
+            }
+
+            if (timer==(timeevent + 600))
+            {
+                CommandCenter *c = (CommandCenter*)is->getCommandCenter();
+
+                if (c)
+                {
+                    status=12;timeevent = timer;
+                }
+                else
+                {
+                    status=0;timeevent=timer;
+                }
+
+            }
+
+
+
+        }
+
+        break;
+    }
+    case 12:
     {
         Vehicle *b = findCarrier(faction);
 
