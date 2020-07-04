@@ -65,9 +65,6 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
         //drawArrow();
 
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
-        //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-
-        //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
         doMaterial();
         //drawRectangularBox(width, height, length);
@@ -89,8 +86,6 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
 
         // Rotate the turret cannon so that it is aligned properly.
         glRotatef(90.0f,0.0f,1.0f,0.0f);
-        //glScalef(0.1f,0.1f,0.1f);
-        //draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,_textureSky);
 
         _topModel->setTexture(_textureSky);
         _topModel->draw();
@@ -269,12 +264,10 @@ Vec3f AdvancedWalrus::getFiringPort()
 void  AdvancedWalrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
 {
     position = getPos();
-    viewforward = toVectorInFixedSystem(0,0,1,azimuth, -0);
+    viewforward = toVectorInFixedSystem(0,0,1,azimuth, -0);                         // I dont care the declination for the viewport
 
-    // Forward is in body coordinates, I need to convert it to global coordinates.
-    dVector3 result;
-    dBodyVectorToWorld(me, viewforward[0],viewforward[1],viewforward[2],result);
-    viewforward = Vec3f(result[0],result[1],result[2]);
+    // ViewForward is in body coordinates, I need to convert it to global coordinates.
+    viewforward = toWorld(me, viewforward);
 
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 

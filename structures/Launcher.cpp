@@ -41,7 +41,7 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
         //glScalef(4.0f,4.0f,4.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         _model->draw(Structure::texture);
-        drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glTranslatef(0.0f,16.0f,0.0f);
 

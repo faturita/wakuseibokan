@@ -587,3 +587,17 @@ const Vec3f Vehicle::map(Vec3f position)
 
     return loc;
 }
+
+Vec3f Vehicle::toWorld(dBodyID body,Vec3f fw)
+{
+    dVector3 result;
+    dBodyVectorToWorld(body, fw[0],fw[1],fw[2],result);
+    return Vec3f(result[0],result[1],result[2]);
+}
+
+Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
+{
+    dVector3 result;
+    dBodyVectorFromWorld(body, fw[0],fw[1],fw[2],result);
+    return Vec3f(result[0],result[1],result[2]);
+}

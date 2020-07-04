@@ -13,6 +13,8 @@
 
 #include "../engine.h"
 
+extern GLuint _textureSky;
+
 Walrus::Walrus(int newfaction)
 {
     setFaction(newfaction);
@@ -49,6 +51,7 @@ void Walrus::init()
     if (_model != NULL)
     {
         _model->setAnimation("run");
+        _topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.4,0.4,0.4,0);
     }
     else
     	printf ("Model has been initialized");
@@ -99,16 +102,17 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        //doMaterial();
+        doMaterial();
         //drawRectangularBox(width, height, length);
 
-        _model->setTexture(texture);
+        _model->setTexture(_textureSky);
         glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 
         glRotatef(90.0f,0.0f,1.0f,0.0f);
-        glScalef(0.4f,0.4f,0.4f);
-        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,texture);
+        //glScalef(0.4f,0.4f,0.4f);
+        _topModel->setTexture(_textureSky);
+        _topModel->draw();
 
         glPopMatrix();
     }

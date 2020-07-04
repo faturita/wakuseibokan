@@ -158,6 +158,9 @@ public:
     int getFaction();
     int getPower() const;
     void setPower(int value);
+
+    Vec3f toWorld(dBodyID body,Vec3f fw);
+    Vec3f toBody(dBodyID body, Vec3f fw);
 };
 
 #endif /* VEHICLE_H_ */
