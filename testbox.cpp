@@ -3919,6 +3919,54 @@ void checktest40(unsigned long timer)
 
 }
 
+void test41()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-4000.0f,20.5f,-12000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = GREEN_FACTION;
+}
+
+void checktest41(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
 
 void savegame()
@@ -4011,6 +4059,7 @@ void initWorldModelling(int testcase)
     case 38:test38();break;                         // Carrier attacks an island and try to conquer it.
     case 39:test39();break;                         // Walrus attack enemy carrier trying to destroy it.
     case 40:test40();break;                         // Different walrus attack enemy carrier trying to destroy it.
+    case 41:test41();break;                         // Carrier detect enemy automatically, stops what it is doing and attack it.
     default:initIslands();test1();break;
     }
 
@@ -4067,6 +4116,7 @@ void worldStep(int value)
     case 38:checktest38(timer);break;
     case 39:checktest39(timer);break;
     case 40:checktest40(timer);break;
+    case 41:checktest41(timer);break;
     default: break;
     }
 

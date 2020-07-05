@@ -1034,7 +1034,67 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
 
     int action=-1;
 
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return;
+
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
+
+        if (v && v->getType() == CARRIER && status != 20 && status != 21)
+        {
+            // Shift to the state to send walruses to destroy the enemy carrier.
+
+            status = 20;
+        }
+    }
+
     switch (status) {
+    case 20:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return;
+
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
+
+        Walrus* w1 = spawnWalrus(space,world,b);
+
+        Walrus* w2 = spawnWalrus(space,world,b);
+
+        w1->attack(v->getPos());
+        w1->enableAuto();
+
+        w2->attack(v->getPos());
+        w2->enableAuto();
+
+        status=21;timeevent=timer;
+
+        break;
+    }
+    case 21:
+    {
+        Vehicle *b = findCarrier(faction);
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
+
+        Walrus *w1 = findWalrus(Walrus::SAILING,faction);
+
+        if (v)
+        {
+            w1->attack(v->getPos());
+        }
+        else
+        {
+            if (w1) dockWalrus(b);
+            w1 = findWalrus(Walrus::SAILING, faction);
+            if (w1) dockWalrus(b);
+
+            status = 9;timeevent= timer;
+        }
+
+
+        break;
+    }
     case 9:
     {
         Vehicle *b = findCarrier(faction);
