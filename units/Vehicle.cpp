@@ -517,6 +517,11 @@ Vec3f Vehicle::getDestination() const
     return Vehicle::destination;
 }
 
+void Vehicle::attack(Vec3f target)
+{
+    assert(!"Not implemented.");
+}
+
 void Vehicle::setAttitude(Vec3f attit)
 {
     Vehicle::attitude = attit;

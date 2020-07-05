@@ -3799,64 +3799,35 @@ void checktest39(unsigned long timer)
 
         Vehicle *b = findCarrier(GREEN_FACTION);
 
-        Walrus* w = spawnWalrus(space,world,b);
+        AdvancedWalrus* w = (AdvancedWalrus*)spawnWalrus(space,world,b);
         number = w->getNumber();
 
         Vehicle *v = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),8000);
 
         // FIXME 50 meters before from my point of view, along the difference vector.
-        w->setDestination(v->getPos()+Vec3f(0.0f,0.0f,-50.0f));
+        w->attack(v->getPos());
         w->enableAuto();
 
 
     }
 
-    if (timer>650)
+    if (timer==9000)
     {
-        size_t p = CONTROLLING_NONE;
-        Walrus *w= findWalrus(GREEN_FACTION);
+        Vehicle *b = findCarrier(BLUE_FACTION);
 
-        Vehicle *e = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),8000);
-
-        if (!e)
+        if (!b)
         {
-            printf("Test passed OK!\n");
+            printf("Test Ok!.\n");
             endWorldModelling();
             exit(1);
         }
-
-        Vec3f target = e->getPos() - w->getPos();
-        Vec3f aim = w->toBody(w->getBodyID(),target);
-
-        std::cout << aim <<  ":Loc: " << w->getPos() << " Target: " << e->getPos() << std::endl;
-
-
-        float azimuth=getAzimuth(aim);
-        float declination=getDeclination(aim);
-
-        struct controlregister c;
-        c = w->getControlRegisters();
-        c.precesion = azimuth;
-        c.pitch = declination;
-        w->setControlRegisters(c);
-
-        if (timer % 54 == 0)
+        else
         {
-            Vehicle *action = (w)->fire(world,space);
-
-            if (action != NULL)
-            {
-                entities.push_back(action);
-                //gunshot();
-            }
+            printf("Test failed: Enemy vehicle is not destroyed.\n");
+            endWorldModelling();
+            exit(0);
         }
-    }
 
-    if (timer==9000)
-    {
-        printf("Test failed: Enemy vehicle is not destroyed.\n");
-        endWorldModelling();
-        exit(0);
     }
 
 }
@@ -3921,57 +3892,29 @@ void checktest40(unsigned long timer)
         Vehicle *v = findNearestEnemyVehicle(BLUE_FACTION,w->getPos(),8000);
 
         // FIXME 50 meters before from my point of view, along the difference vector.
-        w->setDestination(v->getPos());
+        w->attack(v->getPos());
         w->enableAuto();
 
-
     }
 
-    if (timer>650)
-    {
-        size_t p = CONTROLLING_NONE;
-        Walrus *w= findWalrus(BLUE_FACTION);
-
-        Vehicle *e = findNearestEnemyVehicle(BLUE_FACTION,w->getPos(),8000);
-
-        if (!e)
-        {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
-        }
-
-        Vec3f target = e->getPos() - w->getPos();
-        Vec3f aim = w->toBody(w->getBodyID(),target);
-
-        std::cout << aim <<  ":Loc: " << w->getPos() << " Target: " << e->getPos() << std::endl;
-
-
-        float azimuth=getAzimuth(aim);
-        float declination=getDeclination(aim);
-
-        if ( abs(azimuth-getAzimuth(target))<2 )
-        {
-            w->stop();
-        }
-
-        if (timer % 54 == 0)
-        {
-            Vehicle *action = (w)->fire(world,space);
-
-            if (action != NULL)
-            {
-                entities.push_back(action);
-                //gunshot();
-            }
-        }
-    }
 
     if (timer==15000)
     {
-        printf("Test failed: Enemy vehicle is not destroyed.\n");
-        endWorldModelling();
-        exit(0);
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        if (!b)
+        {
+            printf("Test Ok!.\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: Enemy vehicle is not destroyed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
     }
 
 }

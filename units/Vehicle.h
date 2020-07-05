@@ -131,6 +131,8 @@ public:
     void setDestination(Vec3f target);
     Vec3f getDestination() const;
 
+    void virtual attack(Vec3f target);
+
     void setAttitude(Vec3f attit);
     Vec3f getAttitude();
 

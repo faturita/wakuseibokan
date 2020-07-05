@@ -32,6 +32,8 @@ public:
     void doControl();
     void doControl(struct controlregister cons);
 
+    void doControlAttack();
+
     Vec3f getFiringPort();
     void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 
