@@ -139,7 +139,7 @@ void  groundcollisions(dBodyID body);
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByNumber(size_t &pos, int number);
 Manta* findManta(int status);
-Manta* findNearestManta(int status, Vec3f l);
+Manta* findNearestManta(int status, int faction, Vec3f l);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
 Walrus* findWalrusByNumber(size_t &pos, int number);

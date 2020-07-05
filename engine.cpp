@@ -434,7 +434,7 @@ Manta* findMantaByNumber(size_t &pos, int number)
     return NULL;
 }
 
-Manta* findNearestManta(int status, Vec3f l)
+Manta* findNearestManta(int status, int faction, Vec3f l)
 {
     int nearesti=-1;
     float closest = 0;
@@ -442,7 +442,7 @@ Manta* findNearestManta(int status, Vec3f l)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getType() == MANTA && v->getStatus() == status)
+        if (v->getType() == MANTA && v->getStatus() == status && v->getFaction() == faction)
         {
             if ((v->getPos()-l).magnitude()<closest || closest == 0) {
                 closest = (v->getPos()-l).magnitude();
@@ -1041,15 +1041,69 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
 
         Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
 
-        if (v && v->getType() == CARRIER && status != 20 && status != 21)
+        if (v && (v->getType() == CARRIER || v->getType() == WALRUS) && status != 20 && status != 21)
         {
             // Shift to the state to send walruses to destroy the enemy carrier.
 
-            status = 20;
+            status = 20;timeevent = timer;
+        }
+
+        if (v && v->getType() == MANTA && status != 22 && status != 23)
+        {
+            // Shift to the state to send walruses to destroy the enemy carrier.
+
+            status = 22;timeevent=timer;
         }
     }
 
     switch (status) {
+    case 22:
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return;
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
+
+        if (!v) {
+            Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+
+            if (m)
+            {
+                landManta(b);
+            }
+            status=9;timeevent=timer;
+        }
+
+        if (timer==(timeevent + 200))
+        {
+            Manta *m = spawnManta(space,world,b);
+
+        }
+
+        if (timer==(timeevent + 300))
+        {
+            // @FIXME I need to register which manta is around.
+            launchManta(b);
+        }
+
+        if (timer>(timeevent + 400))
+        {
+
+            Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+
+            if (m)
+            {
+                m->attack(v->getPos());
+                m->enableAuto();
+            } else {
+                timeevent = timer;
+            }
+        }
+
+
+
+        break;
+    }
     case 20:
     {
         Vehicle *b = findCarrier(faction);
@@ -1220,7 +1274,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
             {
                 BoxIsland *i = findNearestIsland(b->getPos());
 
-                Manta *m = findNearestManta(Manta::FLYING,b->getPos());
+                Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
 
                 CommandCenter *c = (CommandCenter*)i->getCommandCenter();
 
@@ -1241,7 +1295,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
             {
                 BoxIsland *i = findNearestIsland(b->getPos());
 
-                Manta *m = findNearestManta(Manta::FLYING, b->getPos());
+                Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
 
                 if (!m)
                 {
@@ -1257,7 +1311,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                     // Command Center is destroyed.
 
                     // @FIXME: find the right manta, the one which is closer.
-                    Manta *m = findNearestManta(Manta::FLYING, b->getPos());
+                    Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
 
 
                     if (m)
@@ -1312,13 +1366,13 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 w->enableAuto();
                 status = 2;timeevent = timer;
 
-                Manta *m = findNearestManta(Manta::HOLDING, b->getPos());
+                Manta *m = findNearestManta(Manta::HOLDING, faction,b->getPos());
 
                 if (m)
                 {
                     landManta(b);
                 } else {
-                    m = findNearestManta(Manta::FLYING, b->getPos());
+                    m = findNearestManta(Manta::FLYING, faction,b->getPos());
 
                     if (m)
                     {
