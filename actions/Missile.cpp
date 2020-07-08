@@ -173,7 +173,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
 
     if (abs((getAzimuth(fwd)-getAzimuth(T)))<0.1) {
         dBodySetAngularVel(me,0,0,0);
-        runonce { std::cout << "Locked in target!" << std::endl; dBodySetLinearVel(me,0,0,0); }
+        runonceinclass { std::cout << "Locked in target!" << std::endl; dBodySetLinearVel(me,0,0,0); }
         r1=0;}
     //if (abs((getDeclination(getForward())-getDeclination(T)))<0.1) { //dBodySetAngularVel(me,0,0,0);
     //    r2=0;}

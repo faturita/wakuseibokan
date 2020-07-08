@@ -991,12 +991,12 @@ void dockManta()
 }
 
 
-void landManta(Vehicle *v)
+void landManta(Vehicle *carrier)
 {
     // Auto control
-    if (v->getType() == CARRIER)
+    if (carrier->getType() == CARRIER)
     {
-        Balaenidae *b = (Balaenidae*)v;
+        Balaenidae *b = (Balaenidae*)carrier;
         Manta *m = findManta(Manta::HOLDING);
 
         if (m)

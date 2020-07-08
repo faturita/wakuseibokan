@@ -16,6 +16,7 @@
 #define SGN(x) (x>=0?+1:-1)
 
 #define runonce static bool ond = true; for (;ond;ond = false)
+#define runonceinclass for (;ond;ond = false)
 
 Vec3f ToVec3f(dReal *val, Vec3f retValue);
 
