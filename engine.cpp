@@ -473,6 +473,30 @@ Manta* findManta(int status)
     return NULL;
 }
 
+Walrus* findNearestWalrus(int faction, Vec3f l)
+{
+    int nearesti=-1;
+    float closest = 0;
+
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            if ((v->getPos()-l).magnitude()<closest || closest == 0) {
+                closest = (v->getPos()-l).magnitude();
+                nearesti = i;
+            }
+
+        }
+    }
+    if (nearesti<0)
+        return NULL;
+    else
+        return (Walrus*)entities[nearesti];
+
+}
+
 Walrus* findWalrusByNumber(size_t &pos, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
@@ -502,17 +526,24 @@ Walrus* findWalrus(int faction)
     return NULL;
 }
 
-Walrus* findWalrus(int status, int faction)
+Walrus* findWalrus(int status, int faction, int order)
 {
+    int ordr = 0;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS && v->getFaction() == faction && v->getStatus() == status)
         {
-            return (Walrus*)v;
+            if ((++ordr)==order)
+                return (Walrus*)v;
         }
     }
     return NULL;
+}
+
+Walrus* findWalrus(int status, int faction)
+{
+    return findWalrus(status,faction,1);
 }
 
 Vehicle* findCarrier(int faction)
@@ -603,7 +634,7 @@ BoxIsland* findNearestIsland(Vec3f Po)
 
 BoxIsland* findNearestEmptyIsland(Vec3f Po)
 {
-    int nearesti = 0;
+    int nearesti = -1;
     float closest = 0;
     for(int i=0;i<islands.size();i++)
     {
@@ -620,6 +651,9 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
             }
         }
     }
+
+    if (nearesti<0)
+        return NULL;
 
     return islands[nearesti];
 }

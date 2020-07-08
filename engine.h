@@ -142,7 +142,9 @@ Manta* findManta(int status);
 Manta* findNearestManta(int status, int faction, Vec3f l);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
+Walrus* findWalrus(int status, int faction, int order);
 Walrus* findWalrusByNumber(size_t &pos, int number);
+Walrus* findNearestWalrus(int faction, Vec3f l);
 void list();
 
 int findNextNumber(int type);

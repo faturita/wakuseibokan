@@ -145,6 +145,8 @@ public:
     void enableAuto();
     void disableAuto();
 
+    bool arrived();
+
     virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type, int number);
 
     int getStatus() const;
