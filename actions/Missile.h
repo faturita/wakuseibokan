@@ -17,6 +17,8 @@ protected:
     float r1=0, r2=0, r3=0;
     float rt1=0, rt2=0, rt3=0;
     float midpointpitch = -5;
+
+    bool ond;                   // Used for runonce.
 public:
     Missile();
     ~Missile();

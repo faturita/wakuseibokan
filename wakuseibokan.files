@@ -19,6 +19,8 @@ actions/Missile.h
 actions/Shell.cpp
 actions/Shell.h
 actions/actions.h
+ai.cpp
+ai.h
 anothermain.cpp
 camera.cpp
 camera.h

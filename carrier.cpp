@@ -64,6 +64,8 @@
 
 #include "map.h"
 
+#include "ai.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -324,6 +326,10 @@ void drawScene() {
     
     int ctrling = 0;
     
+    // @FIXME Safe code.  Destroy something and see what happens here.
+    if (!entities.isValid(controller.controllingid))
+        controller.controllingid = CONTROLLING_NONE;
+
     if (controller.controllingid != CONTROLLING_NONE )
     {
         ctrling = controller.controllingid;
@@ -351,6 +357,7 @@ void drawScene() {
             //pos[2]+=(forward[2]);
             
             pos[2]+=controller.registers.pitch;
+            pos[1]+=controller.registers.precesion;
             pos[0]+=controller.registers.roll;
         }
     }
@@ -478,12 +485,20 @@ void update(int value)
     }
     if (!controller.pause)
 	{
+        static Player pg(GREEN_FACTION);
+        static Player pb(BLUE_FACTION);
+
+        if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
+            pb.playFaction(timer);
+        if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
+            pg.playFaction(timer);
+
 
         // @FIXME: Check some parameter to see who control each faction. Either AI assisted or some user.
-        if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
-            playFaction(timer, BLUE_FACTION,space,world);
-        if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
-            playFaction(timer, GREEN_FACTION, space, world);
+        //if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
+        //    playFaction(timer, BLUE_FACTION,space,world);
+        //if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
+        //    playFaction(timer, GREEN_FACTION, space, world);
 
 
         // Auto Control: The controller can be controlled by the user or by the AI
@@ -506,6 +521,11 @@ void update(int value)
         buildAndRepair(space,world);
 
         defendIsland(space,world);
+
+        commLink(GREEN_FACTION, space,world);
+        commLink(BLUE_FACTION, space, world);
+
+
 
 
         //printf("Elements alive now: %d\n", vehicles.size());

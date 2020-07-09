@@ -434,7 +434,7 @@ Manta* findMantaByNumber(size_t &pos, int number)
     return NULL;
 }
 
-Manta* findNearestManta(int status, int faction, Vec3f l)
+Manta* findNearestManta(int status, int faction, Vec3f l, float threshold)
 {
     int nearesti=-1;
     float closest = 0;
@@ -444,7 +444,7 @@ Manta* findNearestManta(int status, int faction, Vec3f l)
         Vehicle *v=entities[i];
         if (v->getType() == MANTA && v->getStatus() == status && v->getFaction() == faction)
         {
-            if ((v->getPos()-l).magnitude()<closest || closest == 0) {
+            if (((v->getPos()-l).magnitude()<closest || closest == 0) && ((v->getPos()-l).magnitude()<threshold) )  {
                 closest = (v->getPos()-l).magnitude();
                 nearesti = i;
             }
@@ -473,6 +473,30 @@ Manta* findManta(int status)
     return NULL;
 }
 
+Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
+{
+    int nearesti=-1;
+    float closest = 0;
+
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            if (((v->getPos()-l).magnitude()<closest || closest == 0) && ((v->getPos()-l).magnitude()<threshold) )  {
+                closest = (v->getPos()-l).magnitude();
+                nearesti = i;
+            }
+
+        }
+    }
+    if (nearesti<0)
+        return NULL;
+    else
+        return (Walrus*)entities[nearesti];
+
+}
+
 Walrus* findWalrusByNumber(size_t &pos, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
@@ -489,6 +513,21 @@ Walrus* findWalrusByNumber(size_t &pos, int number)
 }
 
 
+Walrus* findWalrusByOrder(int faction, int order)
+{
+    int ordr = 0;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            if ((++ordr)==order)
+                return (Walrus*)v;
+        }
+    }
+    return NULL;
+}
+
 Walrus* findWalrus(int faction)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
@@ -502,17 +541,24 @@ Walrus* findWalrus(int faction)
     return NULL;
 }
 
-Walrus* findWalrus(int status, int faction)
+Walrus* findWalrus(int status, int faction, int order)
 {
+    int ordr = 0;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS && v->getFaction() == faction && v->getStatus() == status)
         {
-            return (Walrus*)v;
+            if ((++ordr)==order)
+                return (Walrus*)v;
         }
     }
     return NULL;
+}
+
+Walrus* findWalrus(int status, int faction)
+{
+    return findWalrus(status,faction,1);
 }
 
 Vehicle* findCarrier(int faction)
@@ -603,7 +649,7 @@ BoxIsland* findNearestIsland(Vec3f Po)
 
 BoxIsland* findNearestEmptyIsland(Vec3f Po)
 {
-    int nearesti = 0;
+    int nearesti = -1;
     float closest = 0;
     for(int i=0;i<islands.size();i++)
     {
@@ -620,6 +666,9 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
             }
         }
     }
+
+    if (nearesti<0)
+        return NULL;
 
     return islands[nearesti];
 }
@@ -675,6 +724,39 @@ void list()
         printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
     }
 }
+
+
+void commLink(int faction, dSpaceID space, dWorldID world)
+{
+    Vehicle *b = findCarrier(faction);
+
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        // Damage vehicles that are far away from the command link center.
+        // Should check if the vehicle has some device to allow further control.
+        if ((entities[i]->getType() == WALRUS || entities[i]->getType() == MANTA ) && (entities[i]->getFaction() == faction) )
+        {
+            if ((entities[i]->getPos() - b->getPos()).magnitude() > COMM_RANGE)
+            {
+                if (entities[i]->getSignal()==3)
+                {
+                    char msg[256];
+                    sprintf(msg, "Vehicle is loosing connection.");
+                    messages.insert(messages.begin(), std::string(msg));
+                }
+                entities[i]->setSignal(2);
+                entities[i]->damage(1);
+            }
+            else
+            {
+                entities[i]->setSignal(3);                  // Put connection back to normal.
+            }
+        }
+
+    }
+}
+
+
 
 void defendIsland(dSpaceID space, dWorldID world)
 {
@@ -928,7 +1010,7 @@ void dockWalrus(Vehicle *dock)
         // @FIXME: Only put back the walrus that is close to the carrier.
         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
-                entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<600)
+                entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
             int walrusNumber = ((Walrus*)entities[i])->getNumber()+1;
             dBodyDisable(entities[i]->getBodyID());
@@ -957,12 +1039,12 @@ void dockManta()
 }
 
 
-void landManta(Vehicle *v)
+void landManta(Vehicle *carrier)
 {
     // Auto control
-    if (v->getType() == CARRIER)
+    if (carrier->getType() == CARRIER)
     {
-        Balaenidae *b = (Balaenidae*)v;
+        Balaenidae *b = (Balaenidae*)carrier;
         Manta *m = findManta(Manta::HOLDING);
 
         if (m)

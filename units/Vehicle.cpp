@@ -415,6 +415,16 @@ void Vehicle::setPower(int value)
     power = value;
 }
 
+int Vehicle::getSignal() const
+{
+    return signal;
+}
+
+void Vehicle::setSignal(int value)
+{
+    signal = value;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;
@@ -605,4 +615,9 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
     dVector3 result;
     dBodyVectorFromWorld(body, fw[0],fw[1],fw[2],result);
     return Vec3f(result[0],result[1],result[2]);
+}
+
+bool Vehicle::arrived()
+{
+    return reached;
 }
