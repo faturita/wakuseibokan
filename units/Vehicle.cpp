@@ -415,6 +415,16 @@ void Vehicle::setPower(int value)
     power = value;
 }
 
+int Vehicle::getSignal() const
+{
+    return signal;
+}
+
+void Vehicle::setSignal(int value)
+{
+    signal = value;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;

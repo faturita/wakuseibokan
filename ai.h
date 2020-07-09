@@ -3,6 +3,9 @@
 
 #include "engine.h"
 
+#define DEFENSE_RANGE   8000
+#define IN_RANGE        10000
+
 class QAction
 {
 public:
@@ -30,17 +33,17 @@ public:
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
-class CarrierDefense : public QAction
+class NavalDeffense : public QAction
 {
 public:
-    CarrierDefense() { }
+    NavalDeffense() { }
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
-class CarrierDefense2 : public QAction
+class NavalDeffending : public QAction
 {
 public:
-    CarrierDefense2() { }
+    NavalDeffending() { }
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 class ApproachEnemyIsland : public QAction

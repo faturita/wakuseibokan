@@ -45,6 +45,8 @@ protected:
     Vec3f destination;
     Vec3f attitude;         // This is the set point for forward.
 
+    int signal=3;
+
     // @FIXME: This is super ugly.
     bool reached=false;
     
@@ -165,6 +167,8 @@ public:
 
     Vec3f toWorld(dBodyID body,Vec3f fw);
     Vec3f toBody(dBodyID body, Vec3f fw);
+    int getSignal() const;
+    void setSignal(int value);
 };
 
 #endif /* VEHICLE_H_ */

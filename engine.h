@@ -47,6 +47,10 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
+
+#define DOCK_RANGE      600
+#define COMM_RANGE      25000
+
 // SYNC
 Vehicle* gVehicle(dBodyID body);
 
@@ -136,15 +140,18 @@ bool  groundcollisions(Vehicle *vehicle);
 
 void  groundcollisions(dBodyID body);
 
+void commLink(int faction, dSpaceID space, dWorldID world);
+
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByNumber(size_t &pos, int number);
 Manta* findManta(int status);
-Manta* findNearestManta(int status, int faction, Vec3f l);
+Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
 Walrus* findWalrus(int status, int faction, int order);
+Walrus* findWalrusByOrder(int faction, int order);
 Walrus* findWalrusByNumber(size_t &pos, int number);
-Walrus* findNearestWalrus(int faction, Vec3f l);
+Walrus* findNearestWalrus(int faction, Vec3f l, float threshold);
 void list();
 
 int findNextNumber(int type);

@@ -522,6 +522,11 @@ void update(int value)
 
         defendIsland(space,world);
 
+        commLink(GREEN_FACTION, space,world);
+        commLink(BLUE_FACTION, space, world);
+
+
+
 
         //printf("Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
