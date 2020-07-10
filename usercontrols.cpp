@@ -314,7 +314,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("taxi") != std::string::npos)
             {
                 Balaenidae *r = (Balaenidae*)entities[controller.controllingid];
-                Manta *m = findManta(Manta::ON_DECK);
+                Manta *m = findManta(r->getFaction(),Manta::ON_DECK);
                 if (m)
                 {
                     r->taxi(m);
@@ -417,8 +417,6 @@ void handleKeypress(unsigned char key, int x, int y) {
             size_t pos = CONTROLLING_NONE;
             findMantaByNumber(pos,(int)(key-48)-2);
 
-            printf ("Manta %d\n", pos);
-
             switchControl(pos);
         }
         break;
@@ -426,8 +424,6 @@ void handleKeypress(unsigned char key, int x, int y) {
         {
             size_t pos = CONTROLLING_NONE;
             findWalrusByNumber(pos,(int)(key-48)-5);
-
-            printf ("Manta %d\n", pos);
 
             switchControl(pos);
         }

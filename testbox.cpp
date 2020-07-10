@@ -725,7 +725,7 @@ void checktest15(unsigned long timer)
 
     if (timer == 420)
     {
-        Vehicle *_b = findManta(Manta::FLYING);
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
         _manta1->inert = false;
         _manta1->enableAuto();
@@ -742,7 +742,7 @@ void checktest15(unsigned long timer)
 
     if (timer == 650)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::FLYING);
 
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
@@ -753,7 +753,7 @@ void checktest15(unsigned long timer)
 
     if (timer > 650)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::FLYING);
 
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
@@ -766,7 +766,7 @@ void checktest15(unsigned long timer)
     if (timer > 700)
     {
         // Auto control
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::HOLDING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::HOLDING);
 
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
@@ -784,7 +784,7 @@ void checktest15(unsigned long timer)
 
     if (timer>1000)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(Manta::ON_DECK);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::ON_DECK);
 
         if (_manta1)
         {
@@ -2642,7 +2642,7 @@ void checktest27(unsigned long timer)
 
     if (timer == 1000)
     {
-        Manta *m = (Manta*)findManta(Manta::FLYING);
+        Manta *m = (Manta*)findManta(b->getFaction(),Manta::FLYING);
         if ((b->getBearing()-(m->getBearing()))<5)
         {
             printf("Test passed OK!\n");
@@ -2789,7 +2789,7 @@ void checktest29(unsigned long timer)
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         BoxIsland *i = findNearestIsland(b->getPos());
 
-        Manta *m = findManta(Manta::FLYING);
+        Manta *m = findManta(GREEN_FACTION,Manta::FLYING);
 
         //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
         m->attack(Vec3f(200.0, 0.5, -100.0f));
@@ -3194,7 +3194,7 @@ void checktest33(unsigned long timer)
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         BoxIsland *i = findNearestIsland(b->getPos());
 
-        Manta *m = findManta(Manta::FLYING);
+        Manta *m = findManta(GREEN_FACTION,Manta::FLYING);
 
         m->setDestination(Vec3f(i->getX(),1000.0, i->getZ()));
         m->enableAuto();
@@ -3213,7 +3213,7 @@ void checktest33(unsigned long timer)
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         BoxIsland *i = findNearestIsland(b->getPos());
 
-        Manta *m = findManta(Manta::FLYING);
+        Manta *m = findManta(GREEN_FACTION,Manta::FLYING);
 
         Vec3f pos = m->getPos();
         Vec3f center = i->getPos();
@@ -3582,7 +3582,7 @@ void checktest37(unsigned long timer)
 
     if (timer == 420)
     {
-        Vehicle *_b = findManta(Manta::FLYING);
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
         _manta1->inert = false;
         _manta1->enableAuto();
@@ -3988,7 +3988,7 @@ void test42()
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
     _bg->embody(world,space);
-    _bg->setPos(-24000.0f,20.5f,-12000.0f);
+    _bg->setPos(-2400.0f,20.5f,-12000.0f);
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
@@ -4007,7 +4007,7 @@ void test42()
     Vec3f pos(0.0,1.32, - 60);
     Camera.setPos(pos);
 
-    aiplayer = GREEN_FACTION;
+    aiplayer = BOTH_AI;
 }
 
 void checktest42(unsigned long timer)

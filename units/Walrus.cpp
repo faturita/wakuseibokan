@@ -242,7 +242,7 @@ void Walrus::doControlAttack()
         {
             entities.push_back(action);
             gunshot();
-            setTtl(50);
+            setTtl(5);
         }
 
 

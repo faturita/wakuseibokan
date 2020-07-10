@@ -49,7 +49,7 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 
 #define DOCK_RANGE      600
-#define COMM_RANGE      25000
+#define COMM_RANGE      50000
 
 // SYNC
 Vehicle* gVehicle(dBodyID body);
@@ -144,7 +144,7 @@ void commLink(int faction, dSpaceID space, dWorldID world);
 
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByNumber(size_t &pos, int number);
-Manta* findManta(int status);
+Manta* findManta(int faction, int status);
 Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);

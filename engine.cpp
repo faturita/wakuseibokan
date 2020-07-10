@@ -460,12 +460,12 @@ Manta* findNearestManta(int status, int faction, Vec3f l, float threshold)
 
 
 
-Manta* findManta(int status)
+Manta* findManta(int faction, int status)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getType() == MANTA && v->getStatus() == status)
+        if (v->getType() == MANTA && v->getStatus() == status && v->getFaction() == faction)
         {
             return (Manta*)v;
         }
@@ -729,6 +729,9 @@ void list()
 void commLink(int faction, dSpaceID space, dWorldID world)
 {
     Vehicle *b = findCarrier(faction);
+
+    // @NOTE We should decide here what to do.
+    if (!b) return;
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -1045,7 +1048,7 @@ void landManta(Vehicle *carrier)
     if (carrier->getType() == CARRIER)
     {
         Balaenidae *b = (Balaenidae*)carrier;
-        Manta *m = findManta(Manta::HOLDING);
+        Manta *m = findManta(carrier->getFaction(),Manta::HOLDING);
 
         if (m)
         {
@@ -1063,7 +1066,7 @@ void launchManta(Vehicle *v)
     if (v->getType() == CARRIER)
     {
         Balaenidae *b = (Balaenidae*)v;
-        Manta *m = findManta(Manta::ON_DECK);
+        Manta *m = findManta(v->getFaction(),Manta::ON_DECK);
         if (m)
         {
             b->launch(m);
@@ -1512,7 +1515,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
         Vehicle *b = findCarrier(faction);
         Walrus *w = findWalrus(faction);
 
-        Manta *m = findManta(Manta::ON_DECK);
+        Manta *m = findManta(faction,Manta::ON_DECK);
 
         if (w)
         {

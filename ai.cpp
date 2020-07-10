@@ -96,18 +96,21 @@ int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsig
 
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
+    std::cout << "read" << v->getPos() << std::endl;
     Walrus* w1 = spawnWalrus(space,world,b);
 
     Walrus* w2 = spawnWalrus(space,world,b);
 
-    w1->attack(v->getPos());
+    //w1->attack(b->getPos());
     w1->enableAuto();
 
-    w2->attack(v->getPos());
+    //w2->attack(b->getPos());
     w2->enableAuto();
 
 
     timeevent=timer;return 21;
+
+    return state;
 }
 
 
@@ -116,6 +119,9 @@ int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsig
 int NavalDeffending::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
+
+    if (!b) return state;
+
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
     Walrus *w1 = findWalrusByOrder(faction,1);
@@ -500,7 +506,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
         }
     }
 
-    Manta *m = findManta(Manta::ON_DECK);
+    Manta *m = findManta(b->getFaction(),Manta::ON_DECK);
 
     if (m)
     {
@@ -511,7 +517,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     }
     else
     {
-        Manta *m = findManta(Manta::FLYING);
+        Manta *m = findManta(b->getFaction(),Manta::FLYING);
 
         // Updating the current carrier postion to Manta so that it improves landing.
         if (m)
@@ -571,6 +577,8 @@ void Player::playFaction(unsigned long timer)
 {
     // Check for enemies nearby and shift strategy if they are present.
     state = interruption->apply(state,faction,timeevent,timer);
+
+    //std::cout << "Status:" << state << std::endl;
 
     // Fire the action according to the state.
     state = qactions[state]->apply(state,faction,timeevent,timer);
