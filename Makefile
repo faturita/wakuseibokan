@@ -1,7 +1,7 @@
 ODEF=$(shell ode-config --cflags)
 ODEFL=$(shell ode-config --libs)
 CC = g++
-CFLAGS = -w -g -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers
+CFLAGS = -w -g -Wall $(ODEF) -I/System/Library/Frameworks/OpenGL.framework/Headers -I/usr/local/include/stk/
 PROG = waku
 
 SCS = usercontrols.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp engine.cpp commandline.cpp control.cpp ai.cpp
@@ -18,7 +18,7 @@ TESTSRCS = opengltemplate.cpp openglutils.cpp imageloader.cpp
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
 ifeq ($(shell uname),Darwin)
-	LIBS = -framework OpenGL -framework GLUT $(ODEFL)
+	LIBS = -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread 
 else
 	LIBS = -lglut $(ODEFL)
 endif

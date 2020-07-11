@@ -33,7 +33,7 @@ int main()
     error.printMessage();
     goto cleanup;
   }
-  sine.setFrequency(440.0);
+  sine.setFrequency(490.0);
   try {
     dac.startStream();
   }

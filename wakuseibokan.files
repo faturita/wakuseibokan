@@ -63,6 +63,8 @@ profiling.cpp
 profiling.h
 reinforcement.cpp
 sounds.h
+sounds/playaudio.cpp
+sounds/sineosc.cpp
 sounds/sounds.cpp
 sounds/sounds.h
 structures/Artillery.cpp
