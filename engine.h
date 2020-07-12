@@ -44,10 +44,6 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 
-#define NUMBERING(m) (m + 1)
-#define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
-
-
 #define DOCK_RANGE      600
 #define COMM_RANGE      50000
 

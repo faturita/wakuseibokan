@@ -154,10 +154,10 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
-    // Set the sign of e1 in relation to rolling encoding.
-    if (getAzimuth(fwd)>270 && getAzimuth(T)<(getAzimuth(fwd)-180))
+    // Set the sign of e1 in relation to rolling encoding (@NOTE Check Manta control is basically the same code).
+    if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
         e1 = e1 * (-1);
-    else if (getAzimuth(fwd) < getAzimuth(T))
+    else if (getAzimuth(getForward()) < getAzimuth(T) && (getAzimuth(T) - getAzimuth(getForward()))<180)
         e1 = e1 * (-1);
 
 

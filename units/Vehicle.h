@@ -22,6 +22,9 @@ enum VehicleTypes { WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, RAY=1,COLLISIONABLE=
 
 enum AISTATUS { FREE, DESTINATION, LANDING, ATTACK };
 
+#define NUMBERING(m) (m + 1)
+#define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
+
 class Vehicle : Observable
 {
 private:
