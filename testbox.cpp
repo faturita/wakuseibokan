@@ -90,7 +90,7 @@ container<Vehicle*> entities;
 
 std::vector<BoxIsland*> islands;
 
-std::vector<std::string> messages;
+std::vector<Message> messages;
 
 extern float fps;
 extern clock_t elapsedtime;
@@ -1151,7 +1151,10 @@ void test10()
     if (walrus != NULL)
     {
         size_t id = entities.push_back(walrus);
-        messages.insert(messages.begin(), std::string("Walrus has been deployed."));
+        Message mg;
+        mg.faction = walrus->getFaction();
+        mg.msg = std::string("Walrus has been deployed.");
+        messages.insert(messages.begin(), mg);
     }
 }
 
@@ -1566,8 +1569,11 @@ void checktest14(unsigned long timer)
             if (!reached)
             {
                 char str[256];
+                Message mg;
+                mg.faction = _manta1->getFaction();
                 sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
-                messages.insert(messages.begin(), str);
+                mg.msg = std::string(str);
+                messages.insert(messages.begin(), mg);
                 reached = true;
             }
         }

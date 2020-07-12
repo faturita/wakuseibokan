@@ -85,7 +85,7 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 
 int aiplayer = FREE_AI;
 
@@ -166,13 +166,18 @@ void drawHUD()
     // Message board
     if (messages.size()>0)
     {
+        int msgonboard=0;
         for(int i=0;i<messages.size();i++)
         {
-            std::string line = messages[i];
-            if (i==0)
-                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
-            else
-                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f);
+            if (messages[i].faction == controller.usercontrolling || messages[i].faction == BOTH_FACTION)
+            {
+                std::string line = messages[i].msg;
+                if (msgonboard==0)
+                    drawString(0,-700-msgonboard*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
+                else
+                    drawString(0,-700-msgonboard*25,1,(char*)line.c_str(),0.2f);
+                msgonboard++;
+            }
         }
 
         if (mbrefresher--<=0)
@@ -568,32 +573,44 @@ void update(int value)
                     if (entities[i]->getType() == CARRIER)
                     {
                         char str[256];
-                        sprintf(str, "Balaenidae Carrier has been destroyed !");
-                        messages.insert(messages.begin(), str);
+                        Message m;
+                        m.faction = BOTH_FACTION;
+                        sprintf(str, "%s Carrier has been destroyed !", FACTION(entities[i]->getFaction()));
+                        m.msg = std::string(str);
+                        messages.insert(messages.begin(), m);
                     }
 
                     if (entities[i]->getType() == CONTROL)
                     {
                         CommandCenter *c = (CommandCenter*)entities[i];
                         char str[256];
+                        Message m;
+                        m.faction = BOTH_FACTION;
                         sprintf(str, "Island %s is now a free island.", c->island->getName().c_str());
-                        messages.insert(messages.begin(), str);
+                        m.msg = std::string(str);
+                        messages.insert(messages.begin(), m);
                     }
 
                     if (entities[i]->getType() == VehicleTypes::MANTA)
                     {
                         Manta *m = (Manta*)entities[i];
                         char str[256];
+                        Message mg;
+                        mg.faction = BOTH_FACTION;
                         sprintf(str, "Manta %2d has been destroyed.", NUMBERING(m->getNumber()));
-                        messages.insert(messages.begin(), str);
+                        mg.msg = std::string(str);
+                        messages.insert(messages.begin(), mg);
                     }
 
                     if (entities[i]->getType() == VehicleTypes::WALRUS)
                     {
                         Walrus *m = (Walrus*)entities[i];
                         char str[256];
+                        Message mg;
+                        mg.faction = BOTH_FACTION;
                         sprintf(str, "Walrus %2d has been destroyed.", NUMBERING(m->getNumber()));
-                        messages.insert(messages.begin(), str);
+                        mg.msg = std::string(str);
+                        messages.insert(messages.begin(), mg);
                     }
 
 
@@ -669,6 +686,7 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
         aiplayer = BOTH_AI;
 
+    controller.usercontrolling = GREEN_FACTION;
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
         gamemode = STRATEGYGAME;

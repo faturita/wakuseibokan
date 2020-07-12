@@ -3,10 +3,11 @@
 #include "Walrus.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
+#include "../keplerivworld.h"
 
 extern GLuint _textureRoad;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
 
@@ -124,8 +125,12 @@ void Beluga::doControl()
         if (!reached)
         {
             char str[256];
-            sprintf(str, "Balaenidae has arrived to destination.");
-            messages.insert(messages.begin(), str);
+            Message mg;
+            mg.faction = getFaction();
+            sprintf(str, "Beluga has arrived to destination.");
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
+
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;

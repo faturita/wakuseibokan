@@ -7,7 +7,7 @@ extern  Controller controller;
 
 extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 
 extern dWorldID world;
 extern dSpaceID space;

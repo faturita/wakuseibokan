@@ -45,7 +45,7 @@ extern dSpaceID space;
 
 Controller controller;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 
 extern container<Vehicle*> entities;
 
@@ -231,6 +231,13 @@ void switchControl(int controlposition)
         return;
     }
 
+    // Check if it is from users faction
+    if (!(entities[id]->getFaction() == controller.usercontrolling || controller.usercontrolling == BOTH_FACTION))
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        return;
+    }
+
     if (controller.controllingid != CONTROLLING_NONE)
     {
         if (!entities[controller.controllingid]->isAuto())
@@ -319,8 +326,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     r->taxi(m);
                     char msg[256];
+                    Message mg;
+                    mg.faction = m->getFaction();
                     sprintf(msg,"Manta %2d is ready for launch.",m->getNumber());
-                    messages.insert(messages.begin(), std::string(msg));
+                    mg.msg = std::string(msg);
+                    messages.insert(messages.begin(), mg);
                 }
             }
             else
@@ -345,6 +355,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 captureIsland(island,w->getFaction(),space, world);
 
             } else
+            if (controller.str.find("godmode") != std::string::npos)
+            {
+                controller.usercontrolling = BOTH_FACTION;
+            } else
+            if (controller.str.find("greenmode") != std::string::npos)
+            {
+                controller.usercontrolling = GREEN_FACTION;
+            } else
+            if (controller.str.find("bluemode") != std::string::npos)
+            {
+                controller.usercontrolling = BLUE_FACTION;
+            } else
             if (controller.str.find("save") != std::string::npos)
             {
                 savegame();
@@ -358,7 +380,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.view = 2;
             else {
                 // Send message to message board
-                messages.insert(messages.begin(),controller.str);
+                Message mg;
+                mg.faction = BOTH_FACTION;
+                mg.msg = std::string(controller.str);
+                messages.insert(messages.begin(),mg);
 
             }
 

@@ -9,7 +9,7 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 
 // SYNC
 Vehicle* gVehicle(dBodyID body)
@@ -76,8 +76,11 @@ bool stranded(Vehicle *carrier, Island *island)
         b->setStatus(Balaenidae::OFFSHORING);
         b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
         char str[256];
+        Message mg;
+        mg.faction = b->getFaction();
         sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
+        mg.msg = std::string(str);
+        messages.insert(messages.begin(), mg);
     }
 }
 
@@ -91,8 +94,11 @@ bool departed(Vehicle *walrus)
         BoxIsland *island = w->getIsland();
         w->setIsland(NULL);
         char str[256];
-        sprintf(str, "Walrus has departed from %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
+        Message mg;
+        sprintf(str, "Walrus %d has departed from %s.", NUMBERING(w->getNumber()), island->getName().c_str());
+        mg.msg = std::string(str);
+        mg.faction = w->getFaction();
+        messages.insert(messages.begin(), mg);
     }
     return true;
 }
@@ -107,8 +113,10 @@ bool arrived(Vehicle *walrus, Island *island)
         w->setStatus(Walrus::INSHORING);
         w->setIsland((BoxIsland*)island);
         char str[256];
+        Message mg;
+        mg.faction = w->getFaction();
         sprintf(str, "Walrus has arrived to %s.", island->getName().c_str());
-        messages.insert(messages.begin(), str);
+        messages.insert(messages.begin(), mg);
     }
     return true;
 }
@@ -121,8 +129,11 @@ bool landed(Vehicle *manta, Island *island)
         if (manta->getStatus() == Manta::FLYING)
         {
             char str[256];
+            Message mg;
+            mg.faction = manta->getFaction();
             sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
-            messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
 
             controller.reset();
             SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)manta;
@@ -195,8 +206,11 @@ bool hit(Structure* structure, Gunshot *g)
         if (b && structure && structure->island && b != structure->island)
         {
             char str[256];
+            Message mg;
+            mg.faction = structure->getFaction();
             sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
-            messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
             b = structure->island;
         }
 
@@ -223,7 +237,13 @@ bool releasecontrol(Vehicle* vehicle)
             s->setThrottle(0.0f);
             s->setStatus(Manta::ON_DECK);
             s->inert = true;
-            messages.insert(messages.begin(), std::string("Manta has landed on Aircraft."));
+
+            Message mg;
+            mg.faction = s->getFaction();
+            char str[256];
+            sprintf(str, "Manta %d has landed on Aircraft.", NUMBERING(s->getNumber()));
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
         }
     }
     return true;
@@ -744,8 +764,11 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                 if (entities[i]->getSignal()==3)
                 {
                     char msg[256];
+                    Message mg;
                     sprintf(msg, "Vehicle is loosing connection.");
-                    messages.insert(messages.begin(), std::string(msg));
+                    mg.faction = entities[i]->getFaction();
+                    mg.msg = std::string(msg);
+                    messages.insert(messages.begin(), mg);
                 }
                 entities[i]->setSignal(2);
                 entities[i]->damage(1);
@@ -984,8 +1007,11 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
     {
         entities.push_back(manta);
         char msg[256];
-        sprintf(msg, "Manta %2d is ready to takeoff.",mantaNumber+1);
-        messages.insert(messages.begin(), std::string(msg));
+        Message mg;
+        mg.faction = manta->getFaction();
+        sprintf(msg, "Manta %2d is ready to takeoff.",NUMBERING(mantaNumber));
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
     }
     return (Manta*)manta;
 }
@@ -998,8 +1024,11 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     {
         entities.push_back(walrus);
         char msg[256];
+        Message mg;
+        mg.faction = walrus->getFaction();
         sprintf(msg, "Walrus %2d has been deployed.",NUMBERING(walrusNumber));
-        messages.insert(messages.begin(), std::string(msg));
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
     }
     return (Walrus*)walrus;
 }
@@ -1016,11 +1045,15 @@ void dockWalrus(Vehicle *dock)
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
             int walrusNumber = ((Walrus*)entities[i])->getNumber()+1;
+            char msg[256];
+            Message mg;
+            mg.faction = entities[i]->getFaction();
+            sprintf(msg, "Walrus %d is now back on deck.",walrusNumber+1);
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
+
             dBodyDisable(entities[i]->getBodyID());
             entities.erase(i);
-            char msg[256];
-            sprintf(msg, "Walrus %d is now back on deck.",walrusNumber+1);
-            messages.insert(messages.begin(), std::string(msg));
         }
     }
 }
@@ -1033,10 +1066,16 @@ void dockManta()
         //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
         if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
         {
+            char str[256];
+            Message mg;
+            mg.faction = entities[i]->getFaction();
+            sprintf(str, "Manta %2d is now on bay.",((Manta*)entities[i])->getNumber());
+            mg.msg = std::string(str);
+
+            messages.insert(messages.begin(), mg);
             //printf("Eliminating....\n");
             dBodyDisable(entities[i]->getBodyID());
             entities.erase(i);
-            messages.insert(messages.begin(), std::string("Manta is now on bay."));
         }
     }
 }
@@ -1071,8 +1110,11 @@ void launchManta(Vehicle *v)
         {
             b->launch(m);
             char msg[256];
+            Message mg;
+            mg.faction = b->getFaction();
             sprintf(msg, "Manta %2d has been launched.", m->getNumber()+1);
-            messages.insert(messages.begin(), std::string(msg));
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
             takeoff();
         }
     }
@@ -1101,8 +1143,11 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
     if (s)
     {
         char msg[256];
+        Message mg;
+        mg.faction = s->getFaction();
         sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
-        messages.insert(messages.begin(), std::string(msg));
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(),  mg);
 
         wipeEnemyStructures(island);
     }

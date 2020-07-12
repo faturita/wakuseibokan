@@ -116,7 +116,7 @@ Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
     if (getTtl()>0)
         return NULL;
 
-    Missile *action = new Missile();
+    Missile *action = new Missile(getFaction());
     // Need axis conversion.
     action->init();
     action->setOrigin(me);

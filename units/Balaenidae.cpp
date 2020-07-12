@@ -5,12 +5,13 @@
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
 #include "../actions/Missile.h"
+#include "../keplerivworld.h"
 
 extern GLuint _textureMetal;
 
 extern GLuint _textureRoad;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
@@ -207,8 +208,11 @@ void Balaenidae::doControl()
         if (!reached)
         {
             char str[256];
+            Message mg;
+            mg.faction = getFaction();
             sprintf(str, "Balaenidae has arrived to destination.");
-            messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
@@ -404,7 +408,7 @@ void Balaenidae::launch(Manta* m)
 
 Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
 {
-    Missile *action = new Missile();
+    Missile *action = new Missile(getFaction());
     // Need axis conversion.
     action->init();
     action->setOrigin(me);

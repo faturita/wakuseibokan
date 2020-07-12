@@ -70,7 +70,7 @@ container<Vehicle*> entities;
 
 std::vector<BoxIsland*> islands;
 
-std::vector<std::string> messages;
+std::vector<Message> messages;
 
 int gamemode;
 

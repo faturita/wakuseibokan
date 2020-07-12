@@ -20,7 +20,7 @@ protected:
 
     bool ond;                   // Used for runonce.
 public:
-    Missile();
+    Missile(int faction);
     ~Missile();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);

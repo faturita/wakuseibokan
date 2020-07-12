@@ -74,6 +74,8 @@ public:
     {
         return teletype;
     };
+
+    int usercontrolling;
 };
 
 
