@@ -189,7 +189,7 @@ bool hit(Vehicle *vehicle, Gunshot *g)
     {
         if (vehicle->getType() == MANTA)
         {
-            vehicle->damage(50);
+            vehicle->damage(g->getDamage()*25);
         } else
             vehicle->damage(g->getDamage());
         return false;
@@ -918,7 +918,13 @@ void defendIsland(dSpaceID space, dWorldID world)
 
                         std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-                        Missile* action = (Missile*)(lb)->fire(world,space);
+                        if (target->getType() == MANTA || target->getType() == WALRUS)
+                        {
+                            lb->air();
+                        } else {
+                            lb->ground();
+                        }
+                        Gunshot* action = (Gunshot*)(lb)->fire(world,space);
 
                         if (action != NULL)
                         {

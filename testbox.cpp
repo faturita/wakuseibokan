@@ -3613,7 +3613,7 @@ void checktest37(unsigned long timer)
         _manta1->enableAuto();
     }**/
 
-    if (timer == 1020)
+    if (timer == 1220)
     {
         BoxIsland *island = findIslandByName(std::string("Nemesis"));
         Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
@@ -4021,6 +4021,274 @@ void checktest42(unsigned long timer)
 
 }
 
+
+void test43()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    _bg->embody(world,space);
+    _bg->setPos(-2400.0f,20.5f,-12000.0f);
+    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+    _bg->stop();
+
+    entities.push_back(_bg);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest43(unsigned long timer)
+{
+    Vehicle *b = findCarrier(GREEN_FACTION);
+    Vehicle *l = findCarrier(BLUE_FACTION);
+
+    if (timer == 100)
+    {
+        spawnManta(space,world,b);
+    }
+
+    if (timer == 320)
+    {
+        // launch
+        launchManta(b);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 800.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == 800)
+    {
+        spawnManta(space,world,l);
+    }
+
+    if (timer == 920)
+    {
+        // launch
+        launchManta(l);
+    }
+
+
+    if (timer == 1100)
+    {
+        Vehicle *_b = findManta(BLUE_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == 1200)
+    {
+        Manta *_m1 = findManta(GREEN_FACTION,Manta::FLYING);
+        Manta *_ma = findManta(BLUE_FACTION,Manta::FLYING);
+
+        _ma->dogfight(_m1->getPos());
+        _ma->enableAuto();
+
+    }
+
+    if (timer > 1200)
+    {
+        Manta *_m1 = findManta(GREEN_FACTION,Manta::FLYING);
+        Manta *_ma = findManta(BLUE_FACTION,Manta::FLYING);
+
+        if (_ma)
+        {
+            if (_m1)
+                _ma->dogfight(_m1->getPos());
+            else
+            {
+                printf("Test Ok!.\n");
+                endWorldModelling();
+                exit(1);
+
+            }
+        }
+    }
+
+    if (timer > 10000)
+    {
+        printf("Test failed: Enemy airplane is not destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
+void test44()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,+16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    AdvancedWalrus *_walrus = new AdvancedWalrus(BLUE_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-16000.0f);
+    _walrus->setStatus(Walrus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest44(unsigned long timer)
+{
+    Vehicle *b = findCarrier(GREEN_FACTION);
+
+    if (timer == 100)
+    {
+        spawnManta(space,world,b);
+    }
+
+    if (timer == 320)
+    {
+        // launch
+        launchManta(b);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 800.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == 800)
+    {
+        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+
+        BoxIsland *is = findIslandByName("Nemesis");
+
+        _w1->setDestination(is->getPos());
+        _w1->enableAuto();
+
+    }
+
+
+    if (timer == 1200)
+    {
+        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+        Manta *_m1 = findManta(GREEN_FACTION,Manta::FLYING);
+
+        _m1->dogfight(_w1->getPos());
+        _m1->enableAuto();
+
+    }
+
+    if (timer > 1200)
+    {
+        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+        Manta *_m1 = findManta(GREEN_FACTION,Manta::FLYING);
+
+        if (_m1)
+        {
+            if (_w1)
+                _m1->dogfight(_w1->getPos());
+            else
+            {
+                printf("Test Ok!.\n");
+                endWorldModelling();
+                exit(1);
+
+            }
+        }
+    }
+
+    if (timer > 10000)
+    {
+        printf("Test failed: Enemy walrus is not destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
 static int testing=-1;
 
 void savegame()
@@ -4115,10 +4383,14 @@ void initWorldModelling(int testcase)
     case 40:test40();break;                         // Different walrus attack enemy carrier trying to destroy it.
     case 41:test41();break;                         // Carrier detect enemy automatically, stops what it is doing and attack it.
     case 42:test42();break;                         // Carrier is attacked by Manta and activates defenses.
+    case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
+    case 44:test44();break;                         // Manta attacks incoming walruses.
     default:initIslands();test1();break;
     }
 
     testing = testcase;
+
+    controller.usercontrolling = BOTH_FACTION;
 
 }
 
@@ -4173,6 +4445,8 @@ void worldStep(int value)
     case 40:checktest40(timer);break;
     case 41:checktest41(timer);break;
     case 42:checktest42(timer);break;
+    case 43:checktest43(timer);break;
+    case 44:checktest44(timer);break;
     default: break;
     }
 

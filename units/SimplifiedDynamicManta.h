@@ -11,7 +11,7 @@ protected:
     Vec3f waypoint;
     int flyingstate;
 
-    std::vector<std::vector<float> > signal;
+    std::vector<std::vector<float> > errserie;
     float et1=0,et2=0, et3=0;
     float ett1=0, ett2=0, ett3=0;
     float r1=0, r2=0, r3=0;
@@ -35,6 +35,7 @@ public:
     void doControlDestination();
     void doControlLanding();
     void doControlAttack();
+    void doControlDogFight();
 
     void embody(dBodyID myBodySelf);
     void embody(dWorldID world, dSpaceID space);
@@ -42,7 +43,7 @@ public:
     void release(Vec3f orientation);
 
     void setOrientation(Vec3f orientation);
-
+    void virtual enableAuto();
 
 
     Vehicle* fire(dWorldID world, dSpaceID space);
@@ -51,6 +52,8 @@ public:
 
     void land();
     void attack(Vec3f target);
+    void dogfight(Vec3f target);
+
 };
 
 #endif // SIMPLIFIEDMANTA_H

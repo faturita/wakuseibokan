@@ -69,15 +69,24 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
         launchManta(b);
     }
 
-    if (timer>(timeevent + 400))
+    if (timer==(timeevent + 400))
+    {
+        Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+
+        if (m)
+        {
+            m->dogfight(v->getPos());
+            m->enableAuto();
+        }
+    }
+    if (timer>(timeevent + 405))
     {
 
         Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
 
         if (m)
         {
-            m->attack(v->getPos());
-            m->enableAuto();
+            m->dogfight(v->getPos());
         } else {
             timeevent = timer;
         }
