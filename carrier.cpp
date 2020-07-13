@@ -125,6 +125,8 @@ void drawHUD()
 	glDisable(GL_DEPTH_TEST);
 	glRotatef(180.0f,0,0,1);
 	glRotatef(180.0f,0,1,0);
+
+    int aimc=50,crossc=0;
     
     char str[256];
 
@@ -148,6 +150,14 @@ void drawHUD()
         speed = entities[controller.controllingid]->getSpeed();
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
+
+        if (entities[controller.controllingid]->getType() == MANTA)
+        {
+            aimc = 240;
+            crossc = 195;
+        }
+
+
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
@@ -204,8 +214,8 @@ void drawHUD()
         
         glLineWidth(2.5);
 
-        int uc=550;
-        int lc=0+50;
+        int uc=550;                     // Horizontal center, screen is 1100 pixels.
+        int lc=0+aimc;                   // Center is at 50.
         int w=40;
         int h=40;
 
@@ -252,31 +262,33 @@ void drawHUD()
 
 
         // Center cross
+        int cc = crossc;
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle-10, Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle-2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle-10, cc + Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle-2, cc + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle+2, Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle+10, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle+2, cc + Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle+10, cc + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle-10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle-2, 0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-2, 0);
         glEnd();        
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle+10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle+2, 0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+2, 0);
         glEnd();
 
         // Bearing arrow
 
         int cx=1150, cy=350;
 
+        // Borders
         glBegin(GL_LINES);
         glVertex3f(cx-50,  +cy+50, 0.0);
         glVertex3f(cx-50,  +cy-50, 0.0);
@@ -297,10 +309,13 @@ void drawHUD()
         glVertex3f(cx+50,  +cy-50, 0.0);
         glEnd();
 
+        // Arrow.
         glBegin(GL_LINES);
         glVertex3f(cx,           +cy, 0.0);
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
+
+        // Nearby units. @NOTE DO IT
 
         
     } glPopMatrix();
@@ -499,13 +514,6 @@ void update(int value)
             pg.playFaction(timer);
 
 
-        // @FIXME: Check some parameter to see who control each faction. Either AI assisted or some user.
-        //if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
-        //    playFaction(timer, BLUE_FACTION,space,world);
-        //if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
-        //    playFaction(timer, GREEN_FACTION, space, world);
-
-
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
@@ -529,7 +537,6 @@ void update(int value)
 
         commLink(GREEN_FACTION, space,world);
         commLink(BLUE_FACTION, space, world);
-
 
 
 

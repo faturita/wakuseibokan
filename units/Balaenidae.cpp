@@ -5,6 +5,7 @@
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
 #include "../actions/Missile.h"
+#include "../actions/AAM.h"
 #include "../keplerivworld.h"
 
 extern GLuint _textureMetal;

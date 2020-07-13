@@ -50,6 +50,9 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
 void SimplifiedDynamicManta::doControl()
 {
     switch (aistatus) {
+    case DOGFIGHT:
+        doControlDogFight();
+        break;
     case ATTACK:
         doControlAttack();
         break;
@@ -61,7 +64,6 @@ void SimplifiedDynamicManta::doControl()
         doControlControl2(destination, 1000);
         break;
     case FREE:
-        assert(!"ERRor");
         setDestination(getPos()+getForward().normalize()*100);
         break;
     default:
@@ -74,6 +76,76 @@ Vec3f mp(Vec3f pos)
     return Vec3f(pos[0],1000,pos[2]);
 }
 
+
+void SimplifiedDynamicManta::doControlDogFight()
+{
+
+    // Approach to target until I am at certain range.
+    // Follow the target increasing speed if I am trailing behind or decreasing it if I am too close.
+    // When in range, Aim with flipping increasing speed, shooting with all you have.
+    // If starts to trail behind go 2
+    // Fly away and restarts going to 1.
+    std::cout << "DF:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+
+    // @NOTE: Someone will give me, all the time, current target position.
+    Vec3f target = destination;
+    switch (flyingstate) {
+        case 0:// Approach
+        {
+            doControlControl2(target,10000);
+            std::cout << (destination-getPos()).magnitude() << std::endl;
+            if ((destination-getPos()).magnitude()<9000)
+                flyingstate = 1;
+        }
+        break;
+        case 1:// Engage
+        {
+            target = destination;
+            doControlFlipping(target, 1000);
+
+            // I am trailing behind, chase it.
+            if ((destination-getPos()).magnitude()>9000)
+                flyingstate = 0;
+
+            // I am too close, restart.
+            if ((destination-getPos()).magnitude()<300)
+                flyingstate = 2;
+
+            // I am too low, restart
+            if (getPos()[1] < 150)
+                flyingstate = 2;
+
+            // Open fire copiously
+            if (getTtl() % 5 == 0)
+            {
+                Vehicle *action = fire(world,space);
+
+                if (action != NULL)
+                {
+                    entities.push_back(action);
+                    gunshot();
+                }
+            }
+        }
+        break;
+    case 2:// Restart
+        waypoint = mp(destination) + mp(getForward().normalize()*(20000));
+        waypoint[1] = 1000;
+        flyingstate = 3;
+        break;
+    case 3:
+        doControlControl2(waypoint,10000);
+        if (((waypoint-getPos()).magnitude()<5000))
+                flyingstate = 0;
+        break;
+
+    }
+
+
+    //std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
+
+
+}
 
 void SimplifiedDynamicManta::doControlAttack()
 {
@@ -212,7 +284,7 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
 
     float e[3] = { e1, e2, e3};
 
-    getIntegrativeTerm(signal,I,e);
+    getIntegrativeTerm(errserie,I,e);
 
     float In[3] = {0,0,0};
 
@@ -453,7 +525,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
     float e[3] = { e1, e2, e3 };
 
-    getIntegrativeTerm(signal,I,e);
+    getIntegrativeTerm(errserie,I,e);
 
     float In[3] = {0,0,0};
 
@@ -768,14 +840,24 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 void SimplifiedDynamicManta::land()
 {
     aistatus = LANDING;
-    flyingstate=0;
 }
 
 void SimplifiedDynamicManta::attack(Vec3f target)
 {
     aistatus = ATTACK;
     destination = target;
+}
+
+void SimplifiedDynamicManta::enableAuto()
+{
+    Vehicle::enableAuto();
     flyingstate=0;
+}
+
+void SimplifiedDynamicManta::dogfight(Vec3f target)
+{
+    aistatus = DOGFIGHT;
+    destination = target;
 }
 
 void SimplifiedDynamicManta::rotateBody(dBodyID body)

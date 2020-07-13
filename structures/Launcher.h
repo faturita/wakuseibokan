@@ -3,6 +3,8 @@
 
 #include "Structure.h"
 
+enum TARGETS {GROUND, AIR};
+
 class Launcher : public Structure
 {
 protected:
@@ -24,6 +26,11 @@ public:
     Vec3f getFiringPort();
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fireAir(dWorldID world, dSpaceID space);
+    Vehicle* fireGround(dWorldID world, dSpaceID space);
+
+    void ground();
+    void air();
 
     void virtual doControl(Controller);
     void virtual doControl();

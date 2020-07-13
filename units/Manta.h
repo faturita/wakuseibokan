@@ -50,6 +50,7 @@ public:
     void virtual release(Vec3f orientation);
     void virtual land();
     void virtual attack(Vec3f target);
+    void virtual dogfight(Vec3f target);
     void doDynamics();
     void doControl();
 
