@@ -759,23 +759,26 @@ void commLink(int faction, dSpaceID space, dWorldID world)
         // Should check if the vehicle has some device to allow further control.
         if ((entities[i]->getType() == WALRUS || entities[i]->getType() == MANTA ) && (entities[i]->getFaction() == faction) )
         {
-            if ((entities[i]->getPos() - b->getPos()).magnitude() > COMM_RANGE)
+            if (entities[i]->getSignal()!=4)
             {
-                if (entities[i]->getSignal()==3)
+                if ((entities[i]->getPos() - b->getPos()).magnitude() > COMM_RANGE)
                 {
-                    char msg[256];
-                    Message mg;
-                    sprintf(msg, "Vehicle is loosing connection.");
-                    mg.faction = entities[i]->getFaction();
-                    mg.msg = std::string(msg);
-                    messages.insert(messages.begin(), mg);
+                    if (entities[i]->getSignal()==3)
+                    {
+                        char msg[256];
+                        Message mg;
+                        sprintf(msg, "Vehicle is loosing connection.");
+                        mg.faction = entities[i]->getFaction();
+                        mg.msg = std::string(msg);
+                        messages.insert(messages.begin(), mg);
+                    }
+                    entities[i]->setSignal(2);
+                    entities[i]->damage(1);
                 }
-                entities[i]->setSignal(2);
-                entities[i]->damage(1);
-            }
-            else
-            {
-                entities[i]->setSignal(3);                  // Put connection back to normal.
+                else
+                {
+                    entities[i]->setSignal(3);                  // Put connection back to normal.
+                }
             }
         }
 
