@@ -74,3 +74,20 @@ void CommandCenter::restart()
     setTtl(CommandCenter::BUILDING_TIME);
 }
 
+void CommandCenter::setUnderAttack(bool isunderattack)
+{
+    CommandCenter::isunderattack = isunderattack;
+}
+bool CommandCenter::isUnderAttack()
+{
+    return CommandCenter::isunderattack;
+}
+void CommandCenter::setTimer(unsigned long timer)
+{
+    myTimer = timer;
+}
+unsigned long CommandCenter::getTimer()
+{
+    return myTimer;
+}
+

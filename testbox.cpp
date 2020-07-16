@@ -3643,7 +3643,7 @@ void checktest37(unsigned long timer)
 
         std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-        action = (lb)->fire(world,space);
+        action = (lb)->fireAir(world,space);
 
         if (action != NULL)
         {
@@ -4289,6 +4289,46 @@ void checktest44(unsigned long timer)
     }
 }
 
+void test45()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,+16000.0f);
+    _b->stop();
+
+    entities.push_back(_b);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest45(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
 
 void savegame()
@@ -4385,6 +4425,7 @@ void initWorldModelling(int testcase)
     case 42:test42();break;                         // Carrier is attacked by Manta and activates defenses.
     case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
     case 44:test44();break;                         // Manta attacks incoming walruses.
+    case 45:test45();break;                         // Introducing Medusa.  Airplanes defending the islands.  They attack enemy carrier.
     default:initIslands();test1();break;
     }
 
@@ -4447,6 +4488,7 @@ void worldStep(int value)
     case 42:checktest42(timer);break;
     case 43:checktest43(timer);break;
     case 44:checktest44(timer);break;
+    case 45:checktest45(timer);break;
     default: break;
     }
 

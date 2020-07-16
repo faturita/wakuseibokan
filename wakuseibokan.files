@@ -111,6 +111,8 @@ units/Cephalopodo.cpp
 units/Cephalopodo.h
 units/Manta.cpp
 units/Manta.h
+units/Medusa.cpp
+units/Medusa.h
 units/MultiBodyVehicle.cpp
 units/MultiBodyVehicle.h
 units/SimplifiedDynamicManta.cpp

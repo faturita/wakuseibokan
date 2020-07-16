@@ -24,6 +24,9 @@ protected:
 
     // When the queue is empty the command center does nothing.
     std::queue<Structure*> productionqueue;
+
+    bool isunderattack = false;
+    unsigned long myTimer=0;
 public:
     static const int BUILDING_TIME = 400;
 
@@ -36,6 +39,10 @@ public:
     int getType();
 
     void restart();
+    void setUnderAttack(bool isunderattack);
+    bool isUnderAttack();
+    void setTimer(unsigned long timer);
+    unsigned long getTimer();
 };
 
 #endif // COMMANDCENTER_H
