@@ -185,21 +185,7 @@ void AAM::doControl()
 
     c.registers.thrust = 100;
 
-    //Vec3f p = getPos() - destination;
-
-    //std::cout << "Destination:" << p.magnitude() << std::endl;
-
-    //c.registers.roll = 0;
-    //c.registers.pitch = 0;
-
-    //doControlControl2(destination,100);
-
     doControlFlipping(destination, 1);
-
-
-    //doControl(c.registers);
-
-
 
 }
 
@@ -226,8 +212,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
-    // Needs fixing, check azimuth to make a continuos function.
-
+    // Pitch control, though working, the level of precission required to hit the target is hard to attain.
     float Kp3 = 110.1;
     float Ki3 = 5.1;
     float Kd3 = 2452.5;
@@ -248,13 +233,12 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
               << " Destination:"
               << std::setw(10) << T.magnitude() << std::endl;
 
-    if (abs(height - sp3)<1)
+    if (abs(height - sp3)<5)
     {
-        if (a++<5) {
-            stop();
+        if (a++<10  && T.magnitude()<100) {
             r3=0;
+            stop();
         }
-
     }
 
     r3 = max(r3, 600);
@@ -275,6 +259,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
     doControl(c);
 }
 
+
 void AAM::doControl(Controller controller)
 {
 
@@ -289,6 +274,7 @@ void AAM::doControl(struct controlregister conts)
     elevator    = -conts.pitch * 0.01;
     rudder      = -conts.roll  * 0.01;
 
+    // Throttle is fixed when you "teleoperate" the missile.
     setThrottle(100.0);
 
     myCopy = conts;

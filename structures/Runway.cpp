@@ -1,4 +1,5 @@
 #include "Runway.h"
+#include "../units/Medusa.h"
 
 
 extern GLuint _textureRoad;
@@ -49,6 +50,21 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+void Runway::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+{
+    position = getPos();
+    forward = getForward();
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    forward = forward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=15;// poner en 4 si queres que este un toque arriba desde atras.
+    position = position - 100*forward + Up;
+    forward = orig-position;
+}
+
 int Runway::getType()
 {
     return LANDINGABLE;
@@ -58,4 +74,49 @@ void Runway::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
     dBodySetPosition(m->getBodyID(),pos[0],pos[1]+10,pos[2]);
+}
+
+void Runway::launch(Manta* m)
+{
+    m->inert = false;
+    m->setStatus(Manta::FLYING);
+    m->elevator = +12;
+    struct controlregister c;
+    c.thrust = 600.0f/(10.0);
+    c.pitch = 12;
+    m->setControlRegisters(c);
+    m->setThrottle(600.0f);
+    Vec3f p = m->getPos();
+    p[1] += 20;
+    m->setPos(p);
+    dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
+
+    //m->release(getForward());
+    //m->setForward(getForward());
+
+    Vec3f f;
+    f = m->getForward();
+    //f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
+    //f = f*200;
+    dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
+}
+
+Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
+{
+    Vehicle *v;
+
+    if (type == MANTA)
+    {
+        Medusa *_manta1 = new Medusa(getFaction());
+        _manta1->init();
+        _manta1->setNumber(number);
+        _manta1->embody(world, space);
+        _manta1->setPos(pos[0],pos[1]+28, pos[2]);
+        _manta1->setStatus(Manta::LANDED);
+        _manta1->inert = true;
+        //alignToMe(_manta1->getBodyID());
+        v = (Vehicle*)_manta1;
+    }
+
+    return v;
 }

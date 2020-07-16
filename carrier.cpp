@@ -533,7 +533,7 @@ void update(int value)
         // Build island structures, international water structures and repair carriers.
         buildAndRepair(space,world);
 
-        defendIsland(space,world);
+        defendIsland(timer,space,world);
 
         commLink(GREEN_FACTION, space,world);
         commLink(BLUE_FACTION, space, world);

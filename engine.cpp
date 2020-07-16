@@ -784,7 +784,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
 
 
 
-void defendIsland(dSpaceID space, dWorldID world)
+void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 {
     for (int i = 0; i < islands.size(); i++)
     {
@@ -794,9 +794,9 @@ void defendIsland(dSpaceID space, dWorldID world)
 
         Vehicle *target = NULL;
 
-        if (Structure *c = island->getCommandCenter())
+        if (CommandCenter *sc = (CommandCenter*)island->getCommandCenter())
         {
-            target = findNearestEnemyVehicle(c->getFaction(),island->getPos(), 3 * 3.6 kmf);
+            target = findNearestEnemyVehicle(sc->getFaction(),island->getPos(), 3 * 3.6 kmf);
 
             //printf("Found target %p\n",  target);
 
@@ -804,14 +804,22 @@ void defendIsland(dSpaceID space, dWorldID world)
 
             if (!b)
             {
+                sc->setUnderAttack(false);
                 continue;
             }
+            if (!sc->isUnderAttack())
+            {
+                sc->setTimer(timer);
+                sc->setUnderAttack(true);
+            }
+
+            // If here, this island is under attack.
 
             std::vector<size_t> str = island->getStructures();
 
             for(int i=0;i<str.size();i++)
             {
-                if (entities[str[i]]->getFaction()==c->getFaction())
+                if (entities[str[i]]->getFaction()==sc->getFaction())
                 {
                     // RTTI Stuff
                     if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))
@@ -935,7 +943,51 @@ void defendIsland(dSpaceID space, dWorldID world)
                             action->enableAuto();
 
                         }
-                    }
+                    } /**else
+                    if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
+                    {
+                        // Launch airplanes to attack incoming mantas.
+                        unsigned long timeevent = sc->getTimer();
+
+                        if (timer==(timeevent + 200))
+                        {
+                            Vehicle *manta = (lb)->spawn(world,space,MANTA,9);
+
+                            //@FIXME : add the manta but before that fix the problem with the findXXX methods that are too slow.
+                            //entities.push_back(manta);
+
+                        }
+
+                        if (timer==(timeevent + 300))
+                        {
+                            // @FIXME I need to register which manta is around.
+                            launchManta(b);
+                        }
+
+                        if (timer==(timeevent + 400))
+                        {
+                            Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),lb->getPos());
+
+                            if (m)
+                            {
+                                m->dogfight(b->getPos());
+                                m->enableAuto();
+                            }
+                        }
+                        if (timer>(timeevent + 4000005))
+                        {
+
+                            Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),b->getPos());
+
+                            if (m)
+                            {
+                                m->dogfight(b->getPos());
+                            } else {
+                                timeevent = timer;
+                            }
+                        }
+
+                    }**/
                 }
             }
         }
@@ -1121,6 +1173,15 @@ void launchManta(Vehicle *v)
             sprintf(msg, "Manta %2d has been launched.", m->getNumber()+1);
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
+            takeoff();
+        }
+    } else if (v->getType() == LANDINGABLE)
+    {
+        Runway *r = (Runway*)v;
+        Manta *m = findManta(v->getFaction(),Manta::LANDED);
+        if (m)
+        {
+            r->launch(m);
             takeoff();
         }
     }

@@ -25,6 +25,7 @@ protected:
     bool ond;                   // Used for runonce.
 
     int a=0;
+
 public:
     AAM(int faction);
     ~AAM();

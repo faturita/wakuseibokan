@@ -15,6 +15,10 @@ public:
     int getType();
 
     void taxi(Manta *m);
+    void launch(Manta* m);
+    Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
+
+    void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 };
 
 #endif // RUNWAY_H

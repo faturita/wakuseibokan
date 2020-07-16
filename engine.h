@@ -154,7 +154,7 @@ int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
 
-void defendIsland(dSpaceID space, dWorldID world);
+void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
 
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
 

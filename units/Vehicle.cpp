@@ -440,6 +440,18 @@ struct controlregister Vehicle::getControlRegisters()
     return myCopy;
 }
 
+/**
+ * This is the key of the the binding between ODE and OpenGL to make this engine work.
+ * Get the speed.
+ * Get the forward direction in global coordinates (setForward is in global coordinates).
+ * Get the position and rotation from ODE, and set the position with setPos and with setLocation, it updates the R matrix of rotation
+ *  that is used by OpenGL to reorient the model.
+ *
+ * Additionally, the stability of ODE is verified and somehow hacked trying to shift the position or orientation a little bit to avoid the unstability issues.
+ *
+ * @brief Vehicle::wrapDynamics
+ * @param body
+ */
 void Vehicle::wrapDynamics(dBodyID body)
 {
     Vec3f linearVel = dBodyGetLinearVelVec(body);

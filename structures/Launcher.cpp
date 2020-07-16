@@ -158,7 +158,7 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 
 
     Vec3f Ft=fw + Vec3f(0,20,0);
-    Ft=Ft*220;
+    Ft=Ft*1;
 
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
@@ -224,7 +224,7 @@ Vehicle* Launcher::fireGround(dWorldID world, dSpaceID space)
 
 
     Vec3f Ft=fw + Vec3f(0,20,0);
-    Ft=Ft*5;
+    Ft=Ft*250;
 
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
