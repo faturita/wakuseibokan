@@ -239,7 +239,7 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dWorl
     structure->onIsland(this);
 
     // @FIXME: when the structure is destroyed this pointer must be eliminated.
-    structures.push_back(entities->push_back(structure));
+    structures.push_back(entities->push_back(structure,structure->getGeom()));
 
     return structure;
 }

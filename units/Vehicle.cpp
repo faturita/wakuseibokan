@@ -400,6 +400,11 @@ void Vehicle::damage(int amount)
     Vehicle::health-=amount;
 }
 
+void Vehicle::fix(int amount)
+{
+    damage(-amount);
+}
+
 void Vehicle::setTexture(const GLuint &value)
 {
     texture = value;

@@ -14,53 +14,45 @@ extern std::vector<Message> messages;
 // SYNC
 Vehicle* gVehicle(dBodyID body)
 {
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == body)
-        {
-            return vehicle;
-        }
-    }
-    return NULL;
+    Vehicle *v = entities.find(body);
+
+    return v;
 }
 
 Vehicle* gVehicle(dGeomID geom)
 {
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getGeom() == geom)
-        {
-            return vehicle;
-        }
-    }
-    return NULL;
+    Vehicle *v = entities.find(geom);
+
+    return v;
 }
 
 void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
 {
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == b1)
-        {
-            v1 = vehicle;
-        }
-        if (vehicle->getBodyID() == b2)
-        {
-            v2 = vehicle;
-        }
-        if (vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
-        {
-            s1 = (Structure*)vehicle;
-        }
-        if (vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
-        {
-            s2 = (Structure*)vehicle;
-        }
+    Vehicle *vehicle = entities.find(b1);
 
+    if (vehicle && vehicle->getBodyID() == b1)
+    {
+        v1 = vehicle;
     }
+
+    vehicle = entities.find(b2);
+    if (vehicle && vehicle->getBodyID() == b2)
+    {
+        v2 = vehicle;
+    }
+
+    vehicle = entities.find(g1);
+    if (vehicle && vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
+    {
+        s1 = (Structure*)vehicle;
+    }
+
+    vehicle = entities.find(g2);
+    if (vehicle && vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
+    {
+        s2 = (Structure*)vehicle;
+    }
+
 }
 
 // SYNC
@@ -72,7 +64,7 @@ bool stranded(Vehicle *carrier, Island *island)
 
         b->offshore();
         controller.reset();
-        b->doControl(controller);
+        b->setControlRegisters(controller.registers);
         b->setStatus(Balaenidae::OFFSHORING);
         b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
         char str[256];
@@ -847,7 +839,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action != NULL)
                             {
-                                entities.push_back(action);
+                                entities.push_back(action,action->getBodyID());
                                 //gunshot();
                             }
                         }
@@ -874,7 +866,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getBodyID());
                             //gunshot();
                         }
                     } else
@@ -900,7 +892,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getBodyID());
                             //gunshot();
                         }
                     } else
@@ -939,7 +931,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action);
+                            size_t i = entities.push_back(action,action->getBodyID());
                             //gunshot();
 
                             action->setDestination(target->getPos());
@@ -1066,7 +1058,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
     if (manta != NULL)
     {
-        entities.push_back(manta);
+        entities.push_back(manta,manta->getBodyID());
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
@@ -1083,7 +1075,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
     if (walrus != NULL)
     {
-        entities.push_back(walrus);
+        entities.push_back(walrus,walrus->getBodyID());
         char msg[256];
         Message mg;
         mg.faction = walrus->getFaction();
@@ -1114,7 +1106,7 @@ void dockWalrus(Vehicle *dock)
             messages.insert(messages.begin(), mg);
 
             dBodyDisable(entities[i]->getBodyID());
-            entities.erase(i);
+            entities.erase(entities[i]->getBodyID());
         }
     }
 }
@@ -1136,7 +1128,7 @@ void dockManta()
             messages.insert(messages.begin(), mg);
             //printf("Eliminating....\n");
             dBodyDisable(entities[i]->getBodyID());
-            entities.erase(i);
+            entities.erase(entities[i]->getBodyID());
         }
     }
 }
@@ -1207,6 +1199,10 @@ void wipeEnemyStructures(BoxIsland *island)
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
 {
+
+    CommandCenter *c = (CommandCenter*)island->getCommandCenter();
+
+    if (c) return;
 
     Structure *s = island->addStructure(new CommandCenter(faction),world);
 
@@ -1414,7 +1410,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 size_t i = CONTROLLING_NONE;
                 if (a)
                 {
-                    i = entities.push_back(a);
+                    i = entities.push_back(a,a->getBodyID());
 
                     CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 

@@ -681,7 +681,7 @@ void loadgame()
             ss >> f[0] >> f[1] >> f[2] ;
             v->setDestination(f);
 
-            entities.push_back(v);
+            entities.push_back(v,v->getBodyID());
         }
     }
 
@@ -779,7 +779,7 @@ void initWorldPopulation()
         _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
-        entities.push_back(_b);
+        entities.push_back(_b,_b->getBodyID());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
@@ -789,7 +789,7 @@ void initWorldPopulation()
         //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
         _bg->stop();
 
-        entities.push_back(_bg);
+        entities.push_back(_bg,_bg->getBodyID());
     }
     else if (gamemode == ACTIONGAME)
     {
@@ -802,7 +802,7 @@ void initWorldPopulation()
         //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
-        entities.push_back(_b);
+        entities.push_back(_b,_b->getBodyID());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
@@ -813,7 +813,7 @@ void initWorldPopulation()
         _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
         _bg->stop();
 
-        entities.push_back(_bg);
+        entities.push_back(_bg,_bg->getBodyID());
 
 
         for (int j=0;j<islands.size();j++)

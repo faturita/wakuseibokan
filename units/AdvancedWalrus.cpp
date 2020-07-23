@@ -345,7 +345,7 @@ void AdvancedWalrus::doControlAttack()
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getBodyID());
             //gunshot();
             setTtl(100);
         }

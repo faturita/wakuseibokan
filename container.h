@@ -30,6 +30,10 @@ protected:
     int semaphore=0;
 
     std::vector<T> prunning;
+
+    size_t push_back(T value);
+
+    void erase(size_t index);
 public:
     /**
      * Use with the synchronized macro to restrict access to a block.
@@ -45,7 +49,6 @@ public:
      * @param value
      * @return
      */
-    size_t push_back(T value);
     size_t push_back(T value,dGeomID);
     size_t push_back(T value,dBodyID);
 
@@ -123,7 +126,6 @@ public:
      * @brief erase
      * @param index
      */
-    void erase(size_t index);
     void erase(dBodyID body);
     void erase(dGeomID geom);
 

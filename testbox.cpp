@@ -98,6 +98,27 @@ extern clock_t elapsedtime;
 int gamemode;
 extern int aiplayer;
 
+/**
+ * Collision detection function.
+ *
+ * This is one of the most important pieces of code of this program.  It handles too many things.
+ * vTC26: Islands now contain their own ODE Space, which depends on the world space.
+ * The heightmap associated with each island is constructed on that space.  All the structures are associated with each
+ * space from each island.
+ *
+ * All the units are generated in the world space.  Hence this function first check both geoms and calls dSpaceCollid2 which
+ * verifies if some moving object may be colliding with some space (i.e. island).  If there is a collition this callback is called
+ * again and those collisions are handled.
+ *
+ * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
+ * the highest possible in this platform.
+ *
+ *
+ * @brief nearCallback
+ * @param data
+ * @param o1
+ * @param o2
+ */
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
@@ -114,6 +135,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
       dSpaceCollide2(o1,o2,data,&nearCallback);
       // Note we do not want to test intersections within a space,
       // only between spaces.
+      // @NOTE: If you ever want to test collisions within each space, call dSpaceCollide2((dSpaceID)o1) and the same for o2.
       return;
     }
 
@@ -180,8 +202,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1))  {}
-                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v1))  {}
+                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1)) {}
+                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v2)) {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -213,7 +235,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             } else
             if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
             {
-                // Island reaction
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
                 printf("Hit structure\n");
@@ -291,7 +312,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
         }
     }
 }
-
 
 
 
@@ -564,7 +584,7 @@ void test1()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 }
 
 void test2()
@@ -584,7 +604,7 @@ void test2()
     _manta1->setControlRegisters(c);
     _manta1->setThrottle(1000.0f);
 
-    entities.push_back(_manta1);
+    entities.push_back(_manta1,_manta1->getBodyID());
 }
 
 void checktest2(unsigned long timer)
@@ -664,7 +684,7 @@ void test8()
     _walrus->setControlRegisters(c);
     _walrus->setThrottle(200.0f);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 }
 
 void checktest8(unsigned long  timer)      // Check Walrus entering and leaving an island.
@@ -726,7 +746,7 @@ void test15()
     _b->setPos(0.0f,20.5f,-9000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 }
 
 void checktest15(unsigned long timer)
@@ -1102,7 +1122,7 @@ void test9()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
     Camera.setPos(pos);
@@ -1153,7 +1173,7 @@ void test10()
     Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
     if (walrus != NULL)
     {
-        size_t id = entities.push_back(walrus);
+        size_t id = entities.push_back(walrus,walrus->getBodyID());
         Message mg;
         mg.faction = walrus->getFaction();
         mg.msg = std::string("Walrus has been deployed.");
@@ -1260,7 +1280,7 @@ void test11()
     _b->setPos(-400 kmf,20.5f,-400 kmf);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 }
 
 void checktest11(unsigned long timer)     // Check Carrier stability.
@@ -1312,7 +1332,7 @@ void test13()
     _b->setPos(0.0f,20.5f,+4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,world);
 }
@@ -1344,7 +1364,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1382,7 +1402,7 @@ void test12()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 }
 
 void checktest12(unsigned long timer)
@@ -1415,7 +1435,7 @@ void checktest12(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1449,7 +1469,7 @@ void test14()
     _b->setPos(0.0f,20.5f,-9000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world);
     islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,world);
@@ -1656,7 +1676,7 @@ void checktest16(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1739,7 +1759,7 @@ void checktest17(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1824,7 +1844,7 @@ void checktest18(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1891,7 +1911,7 @@ void checktest19(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -1912,7 +1932,7 @@ void checktest19(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -1953,7 +1973,7 @@ void test20()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,world);
     islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,world);
@@ -2001,7 +2021,7 @@ void checktest20(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
 
@@ -2022,7 +2042,7 @@ void checktest20(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -2062,7 +2082,7 @@ void test21()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2074,7 +2094,7 @@ void test21()
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
@@ -2119,7 +2139,7 @@ void test22()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2131,7 +2151,7 @@ void test22()
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
@@ -2171,7 +2191,7 @@ void checktest22(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -2193,7 +2213,7 @@ void test23()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2205,7 +2225,7 @@ void test23()
     _walrus->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,100.0f));
     _walrus->enableAuto();
@@ -2257,7 +2277,7 @@ void checktest23(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -2279,7 +2299,7 @@ void test24()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
 
@@ -2291,7 +2311,7 @@ void test24()
     _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
     _bo->stop();
 
-    entities.push_back(_bo);
+    entities.push_back(_bo,_bo->getBodyID());
 
 }
 
@@ -2349,7 +2369,7 @@ void checktest24(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -2378,7 +2398,7 @@ void test25()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 }
 
 void checktest25(unsigned long timer)
@@ -2431,7 +2451,7 @@ void test26()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     BoxIsland *statera = new BoxIsland(&entities);
     statera->setName("Statera");
@@ -2615,7 +2635,7 @@ void test27()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Vec3f pos(0.0f,10.0f,-4400.0f);
     Camera.setPos(pos);
@@ -2702,7 +2722,7 @@ void test28()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,world);
 
@@ -2741,7 +2761,7 @@ void checktest28(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
         }
     }
 
@@ -2777,7 +2797,7 @@ void test29()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,17000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Turret(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -2931,7 +2951,7 @@ void test30()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
 
@@ -2942,7 +2962,7 @@ void test30()
     _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
     _bo->stop();
 
-    entities.push_back(_bo);
+    entities.push_back(_bo,_bo->getBodyID());
 
 }
 
@@ -2992,7 +3012,7 @@ void checktest30(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -3004,7 +3024,7 @@ void checktest30(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action,action->getBodyID());
             gunshot();
         }
     }
@@ -3033,7 +3053,7 @@ void test31()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     BoxIsland *atom = new BoxIsland(&entities);
     atom->setName("Atom");
@@ -3186,7 +3206,7 @@ void test33()
     _b->setPos(Vec3f(0.0f,0.0f,17000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3209,7 +3229,7 @@ void checktest33(unsigned long timer)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         Manta *m = spawnManta(space,world,b);
-        entities.push_back(m);
+        entities.push_back(m,m->getBodyID());
     }
 
     if (timer == 100)
@@ -3275,7 +3295,7 @@ void test34()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
     _walrus->init();
@@ -3284,7 +3304,7 @@ void test34()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
     Camera.setPos(pos);
@@ -3331,7 +3351,7 @@ void test35()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3340,7 +3360,7 @@ void test35()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
     _walrus->init();
@@ -3349,7 +3369,7 @@ void test35()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     Vec3f pos(0.0,1.32, - 60);
     Camera.setPos(pos);
@@ -3369,7 +3389,7 @@ void checktest35(unsigned long timer)
 
         size_t i = CONTROLLING_NONE;
         if (a)
-            i = entities.push_back(a);
+            i = entities.push_back(a,a->getBodyID());
 
 
 
@@ -3398,7 +3418,7 @@ void checktest35(unsigned long timer)
         Missile *a = (Missile*) b->fire(world, space);
         size_t i = CONTROLLING_NONE;
         if (a)
-            i = entities.push_back(a);
+            i = entities.push_back(a,a->getBodyID());
 
 
         a->setDestination(bg->getPos());
@@ -3463,7 +3483,7 @@ void test36()
     _b->setPos(0.0f,20.5f,-17000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
 
     Vec3f pos(-230,1.32, 0);
@@ -3508,7 +3528,7 @@ void checktest36(unsigned long timer)
 
         if (action != NULL)
         {
-            size_t i = entities.push_back(action);
+            size_t i = entities.push_back(action,action->getBodyID());
             //gunshot();
 
             //action->setDestination(b->getPos());
@@ -3582,7 +3602,7 @@ void test37()
     _b->setPos(0.0f,20.5f,-3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
 
     Vec3f pos(-230,1.32, 0);
@@ -3670,7 +3690,7 @@ void checktest37(unsigned long timer)
 
         if (action != NULL)
         {
-            size_t i = entities.push_back(action);
+            size_t i = entities.push_back(action,action->getBodyID());
             //gunshot();
 
             //action->setDestination(b->getPos());
@@ -3721,7 +3741,7 @@ void test38()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3730,7 +3750,7 @@ void test38()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3790,7 +3810,7 @@ void test39()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3799,7 +3819,7 @@ void test39()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3877,7 +3897,7 @@ void test40()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3886,7 +3906,7 @@ void test40()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3964,7 +3984,7 @@ void test41()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3973,7 +3993,7 @@ void test41()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4012,7 +4032,7 @@ void test42()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -4021,7 +4041,7 @@ void test42()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4061,7 +4081,7 @@ void test43()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -4070,7 +4090,7 @@ void test43()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4203,7 +4223,7 @@ void test44()
     _b->setPos(0.0f,20.5f,+16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(BLUE_FACTION);
     _walrus->init();
@@ -4212,7 +4232,7 @@ void test44()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus,_walrus->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4328,7 +4348,7 @@ void test45()
     _b->setPos(0.0f,20.5f,+16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b,_b->getBodyID());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4350,6 +4370,226 @@ void test45()
 void checktest45(unsigned long timer)
 {
 
+}
+
+
+
+void test46()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *nonsquareisland = new BoxIsland(&entities);
+    nonsquareisland->setName("Atolon");
+    nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+
+    BoxIsland *vulcano = new BoxIsland(&entities);
+    vulcano->setName("Vulcano");
+    vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
+    vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+
+    BoxIsland *hera = new BoxIsland(&entities);
+    hera->setName("Hera");
+    hera->setLocation(-200 kmf, -1.0, 200 kmf);
+    hera->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hestia = new BoxIsland(&entities);
+    hestia->setName("Hestia");
+    hestia->setLocation(-250 kmf, -1.0, 250 kmf);
+    hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *atom = new BoxIsland(&entities);
+    atom->setName("Atom");
+    atom->setLocation( 500 kmf, -1.0, -100 kmf);
+    atom->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *island = new BoxIsland(&entities);
+    island->setName("Island");
+    island->setLocation(-500 kmf, -1.0, 200 kmf);
+    island->buildTerrainModel(space,"terrain/island.bmp");
+
+    BoxIsland *baltimore = new BoxIsland(&entities);
+    baltimore->setName("Baltimore");
+    baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
+
+    BoxIsland *fulcrum = new BoxIsland(&entities);
+    fulcrum->setName("Fulcrum");
+    fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
+    fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+
+    BoxIsland *vulcrum = new BoxIsland(&entities);
+    vulcrum->setName("Vulcrum");
+    vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
+    vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+    BoxIsland *lunae = new BoxIsland(&entities);
+    lunae->setName("Lunae");
+    lunae->setLocation(490 kmf, -1.0, 320 kmf);
+    lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *mururoa = new BoxIsland(&entities);
+    mururoa->setName("Mururoa");
+    mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
+    mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *bikini = new BoxIsland(&entities);
+    bikini->setName("Bikini");
+    bikini->setLocation(-150 kmf, -1.0, -235 kmf);
+    bikini->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *parentum = new BoxIsland(&entities);
+    parentum->setName("Parentum");
+    parentum->setLocation(-150 kmf, -1.0, 435 kmf);
+    parentum->buildTerrainModel(space,"terrain/parentum.bmp");
+
+    BoxIsland *goku = new BoxIsland(&entities);
+    goku->setName("SonGoku");
+    goku->setLocation(-200 kmf, -1.0, -435 kmf);
+    goku->buildTerrainModel(space,"terrain/goku.bmp");
+
+    BoxIsland *gaijin = new BoxIsland(&entities);
+    gaijin->setName("Gaijin-shima");
+    gaijin->setLocation(150 kmf, -1.0, -339 kmf);
+    gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    BoxIsland *tristan = new BoxIsland(&entities);
+    tristan->setName("Tristan da Cunha");
+    tristan->setLocation(250 kmf, -1.0, 10 kmf);
+    tristan->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    BoxIsland *sentinel = new BoxIsland(&entities);
+    sentinel->setName("North Sentinel");
+    sentinel->setLocation(150 kmf, -1.0, 390 kmf);
+    sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *midway = new BoxIsland(&entities);
+    midway->setName("Midway");
+    midway->setLocation(-150 kmf, -1.0, -290 kmf);
+    midway->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *enewetak = new BoxIsland(&entities);
+    enewetak->setName("Enewetak");
+    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
+    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+
+
+    islands.push_back(nemesis);
+    islands.push_back(thermopilae);
+    islands.push_back(nonsquareisland);
+    islands.push_back(vulcano);
+    islands.push_back(hestia);
+    islands.push_back(hera);
+    islands.push_back(atom);
+    islands.push_back(island);
+    islands.push_back(baltimore);
+    islands.push_back(fulcrum);
+    islands.push_back(vulcrum);
+    islands.push_back(lunae);
+    islands.push_back(mururoa);
+    islands.push_back(bikini);
+    islands.push_back(parentum);
+    islands.push_back(goku);
+    islands.push_back(gaijin);
+    islands.push_back(tristan);
+    islands.push_back(sentinel);
+    islands.push_back(midway);
+    islands.push_back(enewetak);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b,_b->getBodyID());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new Turret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest46(unsigned long timer)
+{
+    static std::ofstream fpsfile;
+    if (timer == 1)
+    {
+        fpsfile.open ("fps.dat");
+    }
+
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile.flush();
+
+    if (timer == 200)
+    {
+        for (int j=0;j<islands.size();j++)
+        {
+            captureIsland(islands[j],BLUE_FACTION,space,world);
+        }
+    }
+
+    if (timer == 300)
+    {
+        spawnManta(space,world,entities[0]);
+    }
+
+    if (timer == 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+
+        _manta1->setDestination(Vec3f(0,1000,0));
+        _manta1->enableAuto();
+    }
+
+    if (timer>900)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::HOLDING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+
+        if (_manta1)
+            _manta1->damage(-100);
+    }
+
+    if (timer==4000)
+    {
+        fpsfile.flush();
+        fpsfile.close();
+
+        exit(1);
+    }
 }
 
 static int testing=-1;
@@ -4449,6 +4689,7 @@ void initWorldModelling(int testcase)
     case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
     case 44:test44();break;                         // Manta attacks incoming walruses.
     case 45:test45();break;                         // Introducing Medusa.  Airplanes defending the islands.  They attack enemy carrier.
+    case 46:test46();break;                         // Check and improve performance changing the container class.
     default:initIslands();test1();break;
     }
 
@@ -4512,6 +4753,7 @@ void worldStep(int value)
     case 43:checktest43(timer);break;
     case 44:checktest44(timer);break;
     case 45:checktest45(timer);break;
+    case 46:checktest46(timer);break;
     default: break;
     }
 

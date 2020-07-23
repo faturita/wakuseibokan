@@ -81,7 +81,7 @@ template<class T> T container<T>::operator[](size_t index)
 {
     T t;
     if (index>MAX)
-        assert(!"This should not happen");
+        assert(!"Specified index is out of max bound.");
     if (elem[index] == NULL)
         assert(!"Pointer is null");
     //printf("Accessing %d\n", index);
@@ -91,6 +91,9 @@ template<class T> T container<T>::operator[](size_t index)
 
 template<class T> T container<T>::find(dBodyID body)
 {
+    if (bodyidmap.find(body) == bodyidmap.end())
+        return NULL;
+
     size_t i = bodyidmap[body];
 
     if (hasMore(i))
@@ -105,6 +108,9 @@ template<class T> T container<T>::find(dBodyID body)
 
 template<class T> T container<T>::find(dGeomID geom)
 {
+    if (geomidmap.find(geom) == geomidmap.end())
+        return NULL;
+
     size_t i = geomidmap[geom];
 
     if (hasMore(i))
@@ -213,7 +219,7 @@ template<class T> void container<T>::erase(dBodyID body)
 {
     size_t i = bodyidmap[body];
 
-    bodyidmap.erase(i);
+    bodyidmap.erase(body);
 
     erase(i);
 }
@@ -223,7 +229,7 @@ template<class T> void container<T>::erase(dGeomID geom)
 {
     size_t i = geomidmap[geom];
 
-    geomidmap.erase(i);
+    geomidmap.erase(geom);
 
     erase(i);
 }

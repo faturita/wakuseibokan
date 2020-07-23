@@ -158,6 +158,7 @@ public:
     void setStatus(int value);
     int getHealth() const;
     void damage(int d);
+    void fix(int d);
     void setTexture(const GLuint &value);
 
     const Vec3f map(Vec3f);

@@ -528,7 +528,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         //dBodySetData( action->getBodyID(), (void*)idx);
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action);
+                            size_t i = entities.push_back(action,action->getBodyID());
                             gunshot();
 
                             if (action->getType()==CONTROLABLEACTION)
