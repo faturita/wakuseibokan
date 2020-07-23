@@ -44,17 +44,11 @@ template<class T> void container<T>::unlockme()
 }
 
 
-template<class T> size_t container<T>::push_back(T value,dBodyID body)
-{
-    size_t i = push_back(value);
-    bodyidmap[body] = i;
-    return i;
-}
-
 template<class T> size_t container<T>::push_back(T value, dGeomID geom)
 {
     size_t i = push_back(value);
     geomidmap[geom] = i;
+    idmap[i] = geom;
     return i;
 }
 
@@ -87,20 +81,6 @@ template<class T> T container<T>::operator[](size_t index)
     //printf("Accessing %d\n", index);
     t = elem[index];
     return t;
-}
-
-template<class T> T container<T>::find(dBodyID body)
-{
-    size_t i = bodyidmap[body];
-
-    if (hasMore(i))
-    {
-        return  operator[](i);
-    }
-    else
-    {
-        return NULL;
-    }
 }
 
 template<class T> T container<T>::find(dGeomID geom)
@@ -209,21 +189,12 @@ template<class T> size_t container<T>::next(size_t index)
 
 }
 
-template<class T> void container<T>::erase(dBodyID body)
-{
-    size_t i = bodyidmap[body];
-
-    bodyidmap.erase(i);
-
-    erase(i);
-}
-
 
 template<class T> void container<T>::erase(dGeomID geom)
 {
     size_t i = geomidmap[geom];
 
-    geomidmap.erase(i);
+    geomidmap.erase(geom);
 
     erase(i);
 }
@@ -237,6 +208,12 @@ template<class T> void container<T>::erase(size_t index)
 
     if (elem[index] != NULL)
     {
+        if ( idmap.find(index) != idmap.end())
+        {
+            dGeomID g = idmap[index];
+            idmap.erase(index);
+            geomidmap.erase(g);
+        }
         elem[index] = NULL;
 
         e_size--;

@@ -849,7 +849,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action != NULL)
                             {
-                                entities.push_back(action);
+                                entities.push_back(action,action->getGeom());
                                 //gunshot();
                             }
                         }
@@ -876,7 +876,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getGeom());
                             //gunshot();
                         }
                     } else
@@ -902,7 +902,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getGeom());
                             //gunshot();
                         }
                     } else
@@ -941,7 +941,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action);
+                            size_t i = entities.push_back(action,action->getGeom());
                             //gunshot();
 
                             action->setDestination(target->getPos());
@@ -1068,7 +1068,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
     if (manta != NULL)
     {
-        entities.push_back(manta);
+        entities.push_back(manta, manta->getGeom());
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
@@ -1085,7 +1085,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
     if (walrus != NULL)
     {
-        entities.push_back(walrus);
+        entities.push_back(walrus,walrus->getGeom());
         char msg[256];
         Message mg;
         mg.faction = walrus->getFaction();
@@ -1416,7 +1416,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 size_t i = CONTROLLING_NONE;
                 if (a)
                 {
-                    i = entities.push_back(a);
+                    i = entities.push_back(a, a->getGeom());
 
                     CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
@@ -1447,8 +1447,6 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 }
 
             }
-
-
 
         }
 

@@ -227,7 +227,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
             size_t i = CONTROLLING_NONE;
             if (a)
             {
-                i = entities.push_back(a);
+                i = entities.push_back(a,a->getGeom());
 
                 CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 

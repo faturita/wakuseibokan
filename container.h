@@ -20,8 +20,9 @@ protected:
     //std::vector<T> elements;
     std::mutex mlock;
 
-    std::unordered_map<dBodyID, size_t> bodyidmap;
     std::unordered_map<dGeomID, size_t> geomidmap;
+
+    std::unordered_map<size_t, dGeomID> idmap;
 
     T elem[MAX];
 
@@ -30,6 +31,9 @@ protected:
     int semaphore=0;
 
     std::vector<T> prunning;
+
+    size_t push_back(T value);
+
 public:
     /**
      * Use with the synchronized macro to restrict access to a block.
@@ -45,9 +49,7 @@ public:
      * @param value
      * @return
      */
-    size_t push_back(T value);
     size_t push_back(T value,dGeomID);
-    size_t push_back(T value,dBodyID);
 
     /**
      * Verify whether is lock is released.
@@ -67,7 +69,6 @@ public:
     T operator[](size_t index);
 
     T find(dGeomID element);
-    T find(dBodyID element);
 
     /**
      * Returns the index for a given position (1-based).
@@ -124,7 +125,6 @@ public:
      * @param index
      */
     void erase(size_t index);
-    void erase(dBodyID body);
     void erase(dGeomID geom);
 
     void prune();
