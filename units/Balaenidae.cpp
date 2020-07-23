@@ -330,7 +330,7 @@ void Balaenidae::doDynamics(dBodyID body)
 void Balaenidae::offshore()
 {
     Balaenidae::offshoring = 100;
-    Balaenidae::ap = dBodyGetLinearVelInBody(me);
+    Balaenidae::ap = getForward();
     Balaenidae::ap = Balaenidae::ap.normalize();
 }
 

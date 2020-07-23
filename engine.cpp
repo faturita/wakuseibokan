@@ -72,7 +72,9 @@ bool stranded(Vehicle *carrier, Island *island)
 
         b->offshore();
         controller.reset();
-        b->doControl(controller);
+        b->stop();
+        b->damage(100);
+        b->setControlRegisters(controller.registers);
         b->setStatus(Balaenidae::OFFSHORING);
         b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
         char str[256];
