@@ -87,7 +87,7 @@ template<class T> T container<T>::find(dGeomID geom)
 {
     size_t i = geomidmap[geom];
 
-    if (hasMore(i))
+    if (isValid(i))
     {
         return operator[](i);
     }
@@ -189,36 +189,21 @@ template<class T> size_t container<T>::next(size_t index)
 
 }
 
-
 template<class T> void container<T>::erase(dGeomID geom)
 {
-    size_t i = geomidmap[geom];
-
-    geomidmap.erase(geom);
-
-    erase(i);
-}
-
-template<class T> void container<T>::erase(size_t index)
-{
-    //prunning.push_back( *(elements.begin() + index) );
-    //elements.erase(elements.begin() + index);
+    size_t index = geomidmap[geom];
 
     T e = elem[index];
 
     if (elem[index] != NULL)
     {
-        if ( idmap.find(index) != idmap.end())
-        {
-            dGeomID g = idmap[index];
-            idmap.erase(index);
-            geomidmap.erase(g);
-        }
+        geomidmap.erase(geom);
+
         elem[index] = NULL;
 
         e_size--;
 
         delete e;
     }
-
 }
+

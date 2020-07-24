@@ -124,7 +124,6 @@ public:
      * @brief erase
      * @param index
      */
-    void erase(size_t index);
     void erase(dGeomID geom);
 
     void prune();

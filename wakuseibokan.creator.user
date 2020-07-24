@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-07-16T16:41:11. -->
+<!-- Written by QtCreator 4.11.0, 2020-07-24T16:00:40. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -124,7 +124,9 @@
     </valuemap>
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
-    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
+     <value type="QString">PATH=/Users/rramele/Qt/5.11.1/clang_64/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/</value>
+    </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Default</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">GenericProjectManager.GenericBuildConfiguration</value>
    </valuemap>

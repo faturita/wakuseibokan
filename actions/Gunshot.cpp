@@ -118,7 +118,7 @@ void Gunshot::embody(dBodyID myBodySelf)
 
 int Gunshot::getType()
 {
-    return 5;
+    return ACTION;
 }
 
 void Gunshot::setVisible(bool val)

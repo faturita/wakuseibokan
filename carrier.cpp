@@ -568,7 +568,7 @@ void update(int value)
 
                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+                    entities.erase(entities[i]->getGeom());
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
@@ -624,7 +624,8 @@ void update(int value)
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+
+                    entities.erase(entities[i]->getGeom());
 
                     explosion();
                 }

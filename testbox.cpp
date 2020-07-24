@@ -114,6 +114,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
       dSpaceCollide2(o1,o2,data,&nearCallback);
       // Note we do not want to test intersections within a space,
       // only between spaces.
+      // @NOTE: If you ever want to test collisions within each space, call dSpaceCollide2((dSpaceID)o1) and the same for o2.
       return;
     }
 
@@ -132,13 +133,13 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
 
-    if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
-    if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+    if (b1 && isAction(o1) && b2 && (isType(o2,WALRUS) || (isType(o2,MANTA))) && isMineFire(gVehicle(o2),(Gunshot*)gVehicle(o1)) ) return;
+    if (b2 && isAction(o2) && b1 && (isType(o1,WALRUS) || (isType(o1,MANTA))) && isMineFire(gVehicle(o1),(Gunshot*)gVehicle(o2)) ) return;
 
     int val[]={CARRIER,WALRUS,MANTA};
 
-    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
-    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
+    if (o1 && isRay(o1) && b2 && isType(o2,val,3) && rayHit(gVehicle(o2),(LaserRay*)gVehicle(o1))) {return;}
+    if (o2 && isRay(o2) && b1 && isType(o1,val,3) && rayHit(gVehicle(o1),(LaserRay*)gVehicle(o2))) {return;}
 
     const int N = 10;
     dContact contact[N];
@@ -148,7 +149,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             Vehicle *v1=NULL,*v2=NULL;
             Structure *s1=NULL, *s2=NULL;
-            gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
+            gVehicle(v1,v2,s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
             // Bullets
@@ -180,8 +181,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1))  {}
-                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v1))  {}
+                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1)) {}
+                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v2)) {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -213,7 +214,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             } else
             if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
             {
-                // Island reaction
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
                 printf("Hit structure\n");
@@ -293,191 +293,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 }
 
 
-
-
-void _nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-    int i,n;
-
-    dBodyID b1,b2;
-
-    // only collide things with the ground
-    int g1 = (o1 == ground );
-    int g2 = (o2 == ground );
-    if (!(g1 ^ g2))
-    {
-        //printf ("Ground colliding..\n");
-
-        //return;
-    }
-
-
-    b1 = dGeomGetBody(o1);
-    b2 = dGeomGetBody(o2);
-    if (b1 && b2 && dAreConnected (b1,b2)) return;
-
-    if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
-    if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
-
-    int val[]={CARRIER,WALRUS,MANTA};
-
-    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
-    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
-
-    const int N = 10;
-    dContact contact[N];
-    n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
-    if (n > 0) {
-        for (i=0; i<n; i++) {
-
-            Vehicle *v1=NULL,*v2=NULL;
-            Structure *s1=NULL, *s2=NULL;
-            gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
-
-
-            // Bullets
-            if ((isAction(v1) && isWalrus(v2) && isMineFire(v2,(Gunshot*)v1))
-                ||
-               (isAction(v2) && isWalrus(v1) && isMineFire(v1,(Gunshot*)v2)))
-            {
-                // Water buyoncy reaction
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-                contact[i].surface.mu = 0.0f;
-                contact[i].surface.slip1 = 1.0f;
-                contact[i].surface.slip2 = 1.0f;
-                contact[i].surface.soft_erp = 1.0f;   // 0 in both will force the surface to be tight.
-                contact[i].surface.soft_cfm = 1.0f;
-            } else
-            if ( isAction(v1) || isAction(v2))
-            {
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                contact[i].surface.mu = 0;
-                contact[i].surface.slip1 = 0.1f;
-                contact[i].surface.slip2 = 0.1f;
-
-                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
-                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
-                if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
-                if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2,(Gunshot*)v1)) {}
-                if (isAction(v2) && s1 && hit(s1,(Gunshot*)v2)) {}
-            } else
-            if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
-                 ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
-                {
-                // Manta landing on Carrier
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-
-                contact[i].surface.mu = dInfinity;
-                contact[i].surface.slip1 = 0.0f;
-                contact[i].surface.slip2 = 0.0f;
-                contact[i].surface.bounce = 0.2f;
-            } else
-            if  (isRunway(s1) || isRunway(s2))
-            {
-                // Manta landing on Runways.
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-
-
-                contact[i].surface.mu = 0.99f;
-                contact[i].surface.slip1 = 0.9f;
-                contact[i].surface.slip2 = 0.9f;
-                contact[i].surface.bounce = 0.2f;
-
-                if ( isRunway(s1) && isManta(v2) && landed(v2, s1->island)) {}
-                if ( isRunway(s2) && isManta(v1) && landed(v1, s2->island)) {}
-
-            } else
-            if ((v1 && isManta(v1) && s2) || (v2 && isManta(v2) && s1))
-            {
-                // Island reaction
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
-                printf("Hit structure\n");
-
-                contact[i].surface.mu = 0;
-                contact[i].surface.bounce = 0.2f;
-                contact[i].surface.slip1 = 0.1f;
-                contact[i].surface.slip2 = 0.1f;
-
-                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
-                contact[i].surface.soft_cfm = 0;
-            }
-            if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
-            {
-                 // Island reaction
-                 contact[i].surface.mode = dContactBounce |
-                 dContactApprox1;
-
-                 contact[i].surface.mu = 0;
-                 contact[i].surface.bounce = 0.2f;
-                 contact[i].surface.slip1 = 0.1f;
-                 contact[i].surface.slip2 = 0.1f;
-
-                 contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
-                 contact[i].surface.soft_cfm = 0;
-
-
-                 // Carrier stranded and Walrus arrived on island.
-                 if (isIsland(contact[i].geom.g1) && isCarrier(v2) && stranded(v2,getIsland(contact[i].geom.g1))) {}
-                 if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
-                 if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
-                 if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
-
-
-            } else
-            if (ground == contact[i].geom.g1 || ground == contact[i].geom.g2 ) {
-
-                 // Water buyoncy reaction
-                 contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                 dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-                 contact[i].surface.mu = 0.0f;
-                 contact[i].surface.slip1 = 0.1f;
-                 contact[i].surface.slip2 = 0.1f;
-                 contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
-                 contact[i].surface.soft_cfm = .3f;
-
-                 // Walrus reaching shore.
-                 if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
-                 if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
-
-                 if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
-                 if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
-
-                 if (v1 && isWalrus(v1)) { v1->inert = false;}
-                 if (v2 && isWalrus(v2)) { v2->inert = false;}
-
-            } else {
-                /**
-                // Water buyoncy reaction
-                contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-                contact[i].surface.mu = 0.0f;
-                contact[i].surface.slip1 = 0.1f;
-                contact[i].surface.slip2 = 0.1f;
-                contact[i].surface.soft_erp = .5f;   // 0 in both will force the surface to be tight.
-                contact[i].surface.soft_cfm = .3f;
-                **/
-                if (v1 && isManta(v1) && groundcollisions(v1)) {}
-                if (v2 && isManta(v2) && groundcollisions(v2)) {}
-            }
-
-            dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-            dJointAttach (c,
-                          dGeomGetBody(contact[i].geom.g1),
-                          dGeomGetBody(contact[i].geom.g2));
-        }
-    }
-}
 
 void __nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -564,7 +379,7 @@ void test1()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 }
 
 void test2()
@@ -584,7 +399,7 @@ void test2()
     _manta1->setControlRegisters(c);
     _manta1->setThrottle(1000.0f);
 
-    entities.push_back(_manta1);
+    entities.push_back(_manta1, _manta1->getGeom());
 }
 
 void checktest2(unsigned long timer)
@@ -664,7 +479,7 @@ void test8()
     _walrus->setControlRegisters(c);
     _walrus->setThrottle(200.0f);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 }
 
 void checktest8(unsigned long  timer)      // Check Walrus entering and leaving an island.
@@ -726,7 +541,7 @@ void test15()
     _b->setPos(0.0f,20.5f,-9000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 }
 
 void checktest15(unsigned long timer)
@@ -1102,7 +917,7 @@ void test9()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
     Camera.setPos(pos);
@@ -1153,7 +968,7 @@ void test10()
     Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
     if (walrus != NULL)
     {
-        size_t id = entities.push_back(walrus);
+        size_t id = entities.push_back(walrus, walrus->getGeom());
         Message mg;
         mg.faction = walrus->getFaction();
         mg.msg = std::string("Walrus has been deployed.");
@@ -1260,7 +1075,7 @@ void test11()
     _b->setPos(-400 kmf,20.5f,-400 kmf);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 }
 
 void checktest11(unsigned long timer)     // Check Carrier stability.
@@ -1312,7 +1127,7 @@ void test13()
     _b->setPos(0.0f,20.5f,+4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     islands[0]->addStructure(new LaserTurret(GREEN_FACTION)     ,             0.0f,      0.0f,world);
 }
@@ -1344,7 +1159,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1382,7 +1197,7 @@ void test12()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 }
 
 void checktest12(unsigned long timer)
@@ -1415,7 +1230,7 @@ void checktest12(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1449,7 +1264,7 @@ void test14()
     _b->setPos(0.0f,20.5f,-9000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     islands[5]->addStructure(new Runway(GREEN_FACTION)     ,           0.0f,    0.0f,world);
     islands[5]->addStructure(new Hangar(GREEN_FACTION)     ,           0.0f, +550.0f,world);
@@ -1656,7 +1471,7 @@ void checktest16(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1739,7 +1554,7 @@ void checktest17(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1824,7 +1639,7 @@ void checktest18(unsigned long timer)
         //dBodySetData( action->getBodyID(), (void*)idx);
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1891,7 +1706,7 @@ void checktest19(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -1912,7 +1727,7 @@ void checktest19(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -1953,7 +1768,7 @@ void test20()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     islands[0]->addStructure(new Turret(GREEN_FACTION)     ,          550.0f,    0.0f,world);
     islands[0]->addStructure(new Turret(GREEN_FACTION)     ,         -550.0f,    0.0f,world);
@@ -2001,7 +1816,7 @@ void checktest20(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
 
@@ -2022,7 +1837,7 @@ void checktest20(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -2062,7 +1877,7 @@ void test21()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2074,7 +1889,7 @@ void test21()
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
@@ -2119,7 +1934,7 @@ void test22()
     _b->setPos(-450 kmf, -1.0, 300 kmf - 3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2131,7 +1946,7 @@ void test22()
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
@@ -2171,7 +1986,7 @@ void checktest22(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -2193,7 +2008,7 @@ void test23()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,world);
 
@@ -2205,7 +2020,7 @@ void test23()
     _walrus->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,100.0f));
     _walrus->enableAuto();
@@ -2257,7 +2072,7 @@ void checktest23(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -2279,7 +2094,7 @@ void test24()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
 
@@ -2291,7 +2106,7 @@ void test24()
     _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
     _bo->stop();
 
-    entities.push_back(_bo);
+    entities.push_back(_bo, _bo->getGeom());
 
 }
 
@@ -2349,7 +2164,7 @@ void checktest24(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -2378,7 +2193,7 @@ void test25()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 }
 
 void checktest25(unsigned long timer)
@@ -2431,7 +2246,7 @@ void test26()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     BoxIsland *statera = new BoxIsland(&entities);
     statera->setName("Statera");
@@ -2615,7 +2430,7 @@ void test27()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Vec3f pos(0.0f,10.0f,-4400.0f);
     Camera.setPos(pos);
@@ -2702,7 +2517,7 @@ void test28()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,world);
 
@@ -2741,7 +2556,7 @@ void checktest28(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
         }
     }
 
@@ -2777,7 +2592,7 @@ void test29()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,17000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Turret(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -2931,7 +2746,7 @@ void test30()
     _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)     ,         0.0f,    0.0f,world);
 
@@ -2942,7 +2757,7 @@ void test30()
     _bo->setPos(_bo->getPos()[0],20.1765f, _bo->getPos()[2]);
     _bo->stop();
 
-    entities.push_back(_bo);
+    entities.push_back(_bo, _bo->getGeom());
 
 }
 
@@ -2992,7 +2807,7 @@ void checktest30(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -3004,7 +2819,7 @@ void checktest30(unsigned long timer)
 
         if (action != NULL)
         {
-            entities.push_back(action);
+            entities.push_back(action, action->getGeom());
             gunshot();
         }
     }
@@ -3033,7 +2848,7 @@ void test31()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     BoxIsland *atom = new BoxIsland(&entities);
     atom->setName("Atom");
@@ -3186,7 +3001,7 @@ void test33()
     _b->setPos(Vec3f(0.0f,0.0f,17000.0f));
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3209,7 +3024,7 @@ void checktest33(unsigned long timer)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
         Manta *m = spawnManta(space,world,b);
-        entities.push_back(m);
+        entities.push_back(m, m->getGeom());
     }
 
     if (timer == 100)
@@ -3275,7 +3090,7 @@ void test34()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
     _walrus->init();
@@ -3284,7 +3099,7 @@ void test34()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
     Camera.setPos(pos);
@@ -3331,7 +3146,7 @@ void test35()
     _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3340,7 +3155,7 @@ void test35()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
     _walrus->init();
@@ -3349,7 +3164,7 @@ void test35()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(0.0,1.32, - 60);
     Camera.setPos(pos);
@@ -3369,7 +3184,7 @@ void checktest35(unsigned long timer)
 
         size_t i = CONTROLLING_NONE;
         if (a)
-            i = entities.push_back(a);
+            i = entities.push_back(a, a->getGeom());
 
 
 
@@ -3398,7 +3213,7 @@ void checktest35(unsigned long timer)
         Missile *a = (Missile*) b->fire(world, space);
         size_t i = CONTROLLING_NONE;
         if (a)
-            i = entities.push_back(a);
+            i = entities.push_back(a, a->getGeom());
 
 
         a->setDestination(bg->getPos());
@@ -3463,7 +3278,7 @@ void test36()
     _b->setPos(0.0f,20.5f,-17000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
 
     Vec3f pos(-230,1.32, 0);
@@ -3508,7 +3323,7 @@ void checktest36(unsigned long timer)
 
         if (action != NULL)
         {
-            size_t i = entities.push_back(action);
+            size_t i = entities.push_back(action, action->getGeom());
             //gunshot();
 
             //action->setDestination(b->getPos());
@@ -3582,7 +3397,7 @@ void test37()
     _b->setPos(0.0f,20.5f,-3000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
 
     Vec3f pos(-230,1.32, 0);
@@ -3670,7 +3485,7 @@ void checktest37(unsigned long timer)
 
         if (action != NULL)
         {
-            size_t i = entities.push_back(action);
+            size_t i = entities.push_back(action, action->getGeom());
             //gunshot();
 
             //action->setDestination(b->getPos());
@@ -3721,7 +3536,7 @@ void test38()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3730,7 +3545,7 @@ void test38()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3790,7 +3605,7 @@ void test39()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3799,7 +3614,7 @@ void test39()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3877,7 +3692,7 @@ void test40()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3886,7 +3701,7 @@ void test40()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -3964,7 +3779,7 @@ void test41()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -3973,7 +3788,7 @@ void test41()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4012,7 +3827,7 @@ void test42()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -4021,7 +3836,7 @@ void test42()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg, _bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4061,7 +3876,7 @@ void test43()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
@@ -4070,7 +3885,7 @@ void test43()
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
-    entities.push_back(_bg);
+    entities.push_back(_bg,_bg->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4203,7 +4018,7 @@ void test44()
     _b->setPos(0.0f,20.5f,+16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     AdvancedWalrus *_walrus = new AdvancedWalrus(BLUE_FACTION);
     _walrus->init();
@@ -4212,7 +4027,7 @@ void test44()
     _walrus->setStatus(Walrus::SAILING);
     _walrus->stop();
 
-    entities.push_back(_walrus);
+    entities.push_back(_walrus, _walrus->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4328,7 +4143,7 @@ void test45()
     _b->setPos(0.0f,20.5f,+16000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
     Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
@@ -4361,7 +4176,7 @@ void test46()
     _b->setPos(0.0f,20.5f,-12000.0f);
     _b->stop();
 
-    entities.push_back(_b);
+    entities.push_back(_b, _b->getGeom());
 
     BoxIsland *statera = new BoxIsland(&entities);
     statera->setName("Statera");
@@ -4516,6 +4331,22 @@ void checktest46(unsigned long timer)
         for (int j=0;j<islands.size();j++)
         {
             captureIsland(islands[j],BLUE_FACTION,space,world);
+        }
+    }
+
+    if (timer > 3500)
+    {
+        if (fps > 40)
+        {
+            fpsfile.close();
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            fpsfile.close();
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
         }
     }
 
