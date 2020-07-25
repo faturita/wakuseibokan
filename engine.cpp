@@ -942,7 +942,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (action != NULL)
                         {
                             size_t i = entities.push_back(action);
-                            //gunshot();
+                            gunshot();
 
                             action->setDestination(target->getPos());
                             action->enableAuto();

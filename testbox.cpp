@@ -4352,6 +4352,252 @@ void checktest45(unsigned long timer)
 
 }
 
+void test46()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-12000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *statera = new BoxIsland(&entities);
+    statera->setName("Statera");
+    statera->setLocation(0.0f,-1.0,0.0f);
+    statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *nonsquareisland = new BoxIsland(&entities);
+    nonsquareisland->setName("Atolon");
+    nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
+    nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+
+    BoxIsland *vulcano = new BoxIsland(&entities);
+    vulcano->setName("Vulcano");
+    vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
+    vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
+    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hera = new BoxIsland(&entities);
+    hera->setName("Hera");
+    hera->setLocation(-200 kmf, -1.0, 200 kmf);
+    hera->buildTerrainModel(space,"terrain/nemesis.bmp");
+
+    BoxIsland *hestia = new BoxIsland(&entities);
+    hestia->setName("Hestia");
+    hestia->setLocation(-250 kmf, -1.0, 250 kmf);
+    hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    BoxIsland *atom = new BoxIsland(&entities);
+    atom->setName("Atom");
+    atom->setLocation( 500 kmf, -1.0, -100 kmf);
+    atom->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *island = new BoxIsland(&entities);
+    island->setName("Island");
+    island->setLocation(-500 kmf, -1.0, 200 kmf);
+    island->buildTerrainModel(space,"terrain/island.bmp");
+
+    BoxIsland *baltimore = new BoxIsland(&entities);
+    baltimore->setName("Baltimore");
+    baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
+    baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
+
+    BoxIsland *fulcrum = new BoxIsland(&entities);
+    fulcrum->setName("Fulcrum");
+    fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
+    fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+
+    BoxIsland *vulcrum = new BoxIsland(&entities);
+    vulcrum->setName("Vulcrum");
+    vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
+    vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+
+    BoxIsland *lunae = new BoxIsland(&entities);
+    lunae->setName("Lunae");
+    lunae->setLocation(490 kmf, -1.0, 320 kmf);
+    lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *mururoa = new BoxIsland(&entities);
+    mururoa->setName("Mururoa");
+    mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
+    mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *bikini = new BoxIsland(&entities);
+    bikini->setName("Bikini");
+    bikini->setLocation(-150 kmf, -1.0, -235 kmf);
+    bikini->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *parentum = new BoxIsland(&entities);
+    parentum->setName("Parentum");
+    parentum->setLocation(-150 kmf, -1.0, 435 kmf);
+    parentum->buildTerrainModel(space,"terrain/parentum.bmp");
+
+    BoxIsland *goku = new BoxIsland(&entities);
+    goku->setName("SonGoku");
+    goku->setLocation(-200 kmf, -1.0, -435 kmf);
+    goku->buildTerrainModel(space,"terrain/goku.bmp");
+
+    BoxIsland *gaijin = new BoxIsland(&entities);
+    gaijin->setName("Gaijin-shima");
+    gaijin->setLocation(150 kmf, -1.0, -339 kmf);
+    gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    BoxIsland *tristan = new BoxIsland(&entities);
+    tristan->setName("Tristan da Cunha");
+    tristan->setLocation(250 kmf, -1.0, 10 kmf);
+    tristan->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    BoxIsland *sentinel = new BoxIsland(&entities);
+    sentinel->setName("North Sentinel");
+    sentinel->setLocation(150 kmf, -1.0, 390 kmf);
+    sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *midway = new BoxIsland(&entities);
+    midway->setName("Midway");
+    midway->setLocation(-150 kmf, -1.0, -290 kmf);
+    midway->buildTerrainModel(space,"terrain/heightmap.bmp");
+
+    BoxIsland *enewetak = new BoxIsland(&entities);
+    enewetak->setName("Enewetak");
+    enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
+    enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+
+
+    islands.push_back(thermopilae);
+    islands.push_back(nonsquareisland);
+    islands.push_back(vulcano);
+    islands.push_back(nemesis);
+    islands.push_back(hestia);
+    islands.push_back(hera);
+    islands.push_back(atom);
+    islands.push_back(island);
+    islands.push_back(baltimore);
+    islands.push_back(fulcrum);
+    islands.push_back(vulcrum);
+    islands.push_back(lunae);
+    islands.push_back(mururoa);
+    islands.push_back(bikini);
+    islands.push_back(parentum);
+    islands.push_back(goku);
+    islands.push_back(gaijin);
+    islands.push_back(tristan);
+    islands.push_back(sentinel);
+    islands.push_back(midway);
+    islands.push_back(enewetak);
+    islands.push_back(statera);
+}
+
+void checktest46(unsigned long timer)
+{
+    static std::ofstream fpsfile;
+    if (timer == 1)
+    {
+        fpsfile.open ("fps.dat");
+    }
+
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile.flush();
+
+    if (timer == 200)
+    {
+        for (int j=0;j<islands.size();j++)
+        {
+            captureIsland(islands[j],BLUE_FACTION,space,world);
+        }
+    }
+
+    if (timer==300 + 90)
+    {
+        // Detect enemy carrier
+        // Move towards it
+        // Aim and shoot
+
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        for(int i=0;i<4;i++)
+        {
+            AdvancedWalrus* w = (AdvancedWalrus*)spawnWalrus(space,world,b);
+
+            // FIXME 50 meters before from my point of view, along the difference vector.
+            w->attack(Vec3f(0,5,0+10*i));
+            w->enableAuto();
+        }
+
+    }
+
+
+    if (timer == 300 + 100)
+    {
+        spawnManta(space,world,entities[0]);
+    }
+
+    if (timer == 300 + 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+    if (timer == 300 + 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == 300 + 450)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+
+        _manta1->attack(Vec3f(200.0, 0.5, -100.0f));
+        _manta1->enableAuto();
+    }
+
+
+
+
+    if (timer > 23500)
+    {
+        if (fps > 40)
+        {
+            fpsfile.close();
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            fpsfile.close();
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+
+
+}
+
 static int testing=-1;
 
 void savegame()
@@ -4449,6 +4695,7 @@ void initWorldModelling(int testcase)
     case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
     case 44:test44();break;                         // Manta attacks incoming walruses.
     case 45:test45();break;                         // Introducing Medusa.  Airplanes defending the islands.  They attack enemy carrier.
+    case 46:test46();break;
     default:initIslands();test1();break;
     }
 
@@ -4512,6 +4759,7 @@ void worldStep(int value)
     case 43:checktest43(timer);break;
     case 44:checktest44(timer);break;
     case 45:checktest45(timer);break;
+    case 46:checktest46(timer);break;
     default: break;
     }
 
