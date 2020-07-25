@@ -171,12 +171,15 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 
 Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 {
+
     switch (aistatus) {
-    case GROUND:fireGround(world,space);
+    case GROUND:return fireGround(world,space);
         break;
-    case AIR:fireAir(world, space);
+    case AIR:return fireAir(world, space);
         break;
     }
+
+    return NULL;
 }
 
 Vehicle* Launcher::fireGround(dWorldID world, dSpaceID space)

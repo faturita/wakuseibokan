@@ -27,7 +27,7 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, Structure* &s1, Structure* &s2, dGeomI
     {
         v1 = vehicle;
     }
-    if (vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
+    if (vehicle && vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
     {
         s1 = (Structure*)vehicle;
     }
@@ -37,7 +37,7 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, Structure* &s1, Structure* &s2, dGeomI
     {
         v2 = vehicle;
     }
-    if (vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
+    if (vehicle && vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
     {
         s2 = (Structure*)vehicle;
     }
@@ -920,10 +920,12 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(world,space);
 
+                        // @FIXME: AAM missiles guiding sucks.
+
                         if (action != NULL)
                         {
                             size_t i = entities.push_back(action,action->getGeom());
-                            //gunshot();
+                            gunshot();
 
                             action->setDestination(target->getPos());
                             action->enableAuto();

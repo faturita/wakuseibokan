@@ -4334,7 +4334,7 @@ void checktest46(unsigned long timer)
         }
     }
 
-    if (timer > 3500)
+    if (timer > 23500)
     {
         if (fps > 40)
         {
