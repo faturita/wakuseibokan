@@ -202,6 +202,7 @@ private:
     std::string modelname;
     
 public:
+
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
     

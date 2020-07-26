@@ -1,6 +1,8 @@
 #ifndef RUNWAY_H
 #define RUNWAY_H
 
+#include <vector>
+
 #include "Structure.h"
 #include "../units/Manta.h"
 
