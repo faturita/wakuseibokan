@@ -27,6 +27,7 @@ protected:
 
     bool isunderattack = false;
     unsigned long myTimer=0;
+
 public:
     static const int BUILDING_TIME = 400;
 
@@ -43,6 +44,7 @@ public:
     bool isUnderAttack();
     void setTimer(unsigned long timer);
     unsigned long getTimer();
+
 };
 
 #endif // COMMANDCENTER_H
