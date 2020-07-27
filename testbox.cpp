@@ -4318,6 +4318,9 @@ void test46()
 void checktest46(unsigned long timer)
 {
     static std::ofstream fpsfile;
+
+    long unsigned starttime = 2500;
+
     if (timer == 1)
     {
         fpsfile.open ("fps.dat");
@@ -4326,15 +4329,105 @@ void checktest46(unsigned long timer)
     fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
     fpsfile.flush();
 
+
     if (timer == 200)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Schedule attack at %ld", starttime);
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 100)
     {
         for (int j=0;j<islands.size();j++)
         {
             captureIsland(islands[j],BLUE_FACTION,space,world);
         }
+
+        BoxIsland *is = findIslandByName("Statera");
+        Structure *t8 = is->addStructure(new Runway(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
     }
 
-    if (timer > 23500)
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Air and amphibious attack started.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer==starttime + 90)
+    {
+
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        BoxIsland *is = findIslandByName("Statera");
+
+        Structure *c = is->getCommandCenter();
+
+        for(int i=0;i<4;i++)
+        {
+            AdvancedWalrus* w = (AdvancedWalrus*)spawnWalrus(space,world,b);
+
+            // FIXME 50 meters before from my point of view, along the difference vector.
+            w->attack(c->getPos());
+            w->enableAuto();
+        }
+
+    }
+
+
+    if (timer == starttime + 100)
+    {
+        spawnManta(space,world,entities[0]);
+    }
+
+    if (timer == starttime + 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+    if (timer == starttime + 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == starttime + 450)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+
+        BoxIsland *is = findIslandByName("Statera");
+
+        Structure *c = is->getCommandCenter();
+
+        _manta1->attack(c->getPos());
+        _manta1->enableAuto();
+    }
+
+
+
+
+    if (timer > starttime + 10000)
     {
         if (fps > 40)
         {
