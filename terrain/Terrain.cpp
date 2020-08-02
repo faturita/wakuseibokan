@@ -251,7 +251,7 @@ void BoxIsland::checkStructures()
         // @FIMXE: This is wrong.  The index of container is not unique per object and what may happen is that it does not reference
         // the same object.  Hence, this is a very ugly workaround so that I can check if there is still a valid pointer at that position
         // I will retrieve it only when it is of type Structure.
-        if (!(entities->isValid(structures[i]) && dynamic_cast<Structure*>(entities->operator[](structures[i]))))
+        if (!(entities->isValid(structures[i]) && entities->operator[](structures[i])->getType()>=COLLISIONABLE) )
         {
             structures.erase(structures.begin()+i);
         }
@@ -271,8 +271,9 @@ Structure* BoxIsland::getCommandCenter()
     for(int i=0;i<structures.size();i++)
     {
         Structure* s = NULL;
-        if (entities->isValid(structures[i]) && (s = dynamic_cast<Structure*>(entities->operator[](structures[i]))))
+        if (entities->isValid(structures[i]) && entities->operator[](structures[i])->getType()>=COLLISIONABLE)
         {
+            Structure *s = (Structure*) entities->operator[](structures[i]);
             if (s && s->getType() == CONTROL)
                 return s;
         }
