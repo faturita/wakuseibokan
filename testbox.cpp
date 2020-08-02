@@ -4164,7 +4164,79 @@ void test45()
 
 void checktest45(unsigned long timer)
 {
+    unsigned long starttime = 300;
+    static Manta *m;
+    static bool found=false;
 
+    if (timer == starttime + 100)
+    {
+        spawnManta(space,world,entities[0]);
+    }
+
+    if (timer == starttime + 320)
+    {
+        // launch
+        m = launchManta(entities[0]);
+    }
+
+    if (timer == starttime + 600)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)m;
+
+
+        BoxIsland *is = findIslandByName("Nemesis");
+
+        Structure *c = is->getCommandCenter();
+
+        _manta1->attack(c->getPos());
+        _manta1->enableAuto();
+    }
+
+    if (timer > starttime + 600)
+    {
+        Manta *enemy = findManta(BLUE_FACTION, Manta::FLYING);
+
+        if (enemy)
+        {
+            printf ("Medusa: %p\n", enemy);
+            printf ("Manta %p\n", m);
+
+            if (!found)
+            {
+                m->dogfight(enemy->getPos());
+                m->enableAuto();
+                found=true;
+            }
+
+            m->dogfight(enemy->getPos());
+        } else {
+            BoxIsland *is = findIslandByName("Nemesis");
+
+            Structure *c = is->getCommandCenter();
+
+            m->attack(c->getPos());
+            m->enableAuto();
+
+            found = false;
+        }
+
+
+    }
+
+
+    if (timer > starttime + 3000)
+    {
+        if (fps > 40)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
 }
 
 void test46()

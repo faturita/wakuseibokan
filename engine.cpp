@@ -942,7 +942,8 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                     {
                         // Launch airplanes to attack incoming mantas.
                         unsigned long timeevent = sc->getTimer();
-                        static int mantaNumber = -1;
+
+                        static bool found = false;
 
                         if (timer==(timeevent + 200))
                         {
@@ -950,7 +951,6 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             Vehicle *manta = (lb)->spawn(world,space,MANTA,mantNumber);
 
                             size_t i = entities.push_back(manta, manta->getGeom());
-                            mantaNumber = mantNumber;
 
 
                             // @FIXME: What should I do with mantas after the battle is finished?
@@ -961,36 +961,27 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (timer==(timeevent + 300))
                         {
                             Manta *m = launchManta(lb);
+                            printf ("Medusa: %p\n", m);
                         }
 
-                        if (timer==(timeevent + 500))
-                        {
-
-                            //Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),lb->getPos());
-                            size_t pos;
-                            Manta *m = findMantaByNumber(pos,mantaNumber);
-
-
-                            if (m)
-                            {
-                                m->dogfight(b->getPos());
-                                m->enableAuto();
-                            }
-                        }
                         if (timer>(timeevent + 500))                // Update position of the enemy.
                         {
 
-                            //Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),lb->getPos());
-                            size_t pos;
-                            Manta *m = findMantaByNumber(pos,mantaNumber);
+                            Manta *m = findManta(sc->getFaction(),Manta::FLYING);
 
                             if (m)
                             {
+                                printf ("Medusa: %p\n", m);
+
+                                if (!found)
+                                {
+                                    m->dogfight(b->getPos());
+                                    m->enableAuto();
+                                    found=true;
+                                }
+
                                 m->dogfight(b->getPos());
                             }
-                            //} else {
-                                //timeevent = timer;
-                            //}
                         }
 
                     }
@@ -1189,17 +1180,16 @@ Manta* launchManta(Vehicle *v)
         if (m)
         {
             r->launch(m);
+            BoxIsland *is = findNearestIsland(r->getPos(),false, -1);
 
-//            BoxIsland *is = findNearestIsland(r->getPos(),false, -1);
+            assert( is != NULL || !"A Runway structure should be on an island.");
 
-//            assert( is != NULL || !"A Runway structure should be on an island.");
-
-//            char msg[256];
-//            Message mg;
-//            mg.faction = r->getFaction();
-//            sprintf(msg, "Medusa %2d is departing from %s.", m->getNumber()+1, is->getName().c_str());
-//            mg.msg = std::string(msg);
-//            messages.insert(messages.begin(), mg);
+            char msg[256];
+            Message mg;
+            mg.faction = r->getFaction();
+            sprintf(msg, "Medusa %2d is departing from %s.", m->getNumber()+1, is->getName().c_str());
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
             takeoff();
         }
         return m;
