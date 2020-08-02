@@ -162,7 +162,7 @@ void drawHUD()
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", entities.indexOf(controller.controllingid),controller.registers.thrust, health, power);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -179,7 +179,7 @@ void drawHUD()
         int msgonboard=0;
         for(int i=0;i<messages.size();i++)
         {
-            if (messages[i].faction == controller.usercontrolling || messages[i].faction == BOTH_FACTION)
+            if (messages[i].faction == controller.usercontrolling || messages[i].faction == BOTH_FACTION || controller.usercontrolling == BOTH_FACTION)
             {
                 std::string line = messages[i].msg;
                 if (msgonboard==0)
@@ -568,7 +568,7 @@ void update(int value)
 
                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+                    entities.erase(entities[i]->getGeom());
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
@@ -624,7 +624,8 @@ void update(int value)
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+
+                    entities.erase(entities[i]->getGeom());
 
                     explosion();
                 }
@@ -693,7 +694,17 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
         aiplayer = BOTH_AI;
 
-    controller.usercontrolling = GREEN_FACTION;
+
+    if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
+        controller.usercontrolling = BLUE_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
+        controller.usercontrolling = GREEN_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
+        controller.usercontrolling = BOTH_FACTION;
+    else
+        controller.usercontrolling = GREEN_FACTION;
+
+
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
         gamemode = STRATEGYGAME;

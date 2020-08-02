@@ -48,12 +48,9 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 #define COMM_RANGE      50000
 
 // SYNC
-Vehicle* gVehicle(dBodyID body);
-
-// SYNC
 Vehicle* gVehicle(dGeomID geom);
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
+void gVehicle(Vehicle* &v1, Vehicle* &v2,Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
 
 // SYNC
@@ -89,24 +86,24 @@ bool rayHit(Vehicle *vehicle, LaserRay *l);
 bool releasecontrol(Vehicle* vehicle);
 
 
-void  releasecontrol(dBodyID body);
+void  releasecontrol(dGeomID geom);
 
 
 // SYNC
 bool  isType(Vehicle *vehicle, int type);
 
-bool isType(dBodyID body, int types[], int length);
+bool isType(dGeomID geom, int types[], int length);
 
-bool  isType(dBodyID body, int type);
+bool  isType(dGeomID geom, int type);
 
 
-bool  isManta(dBodyID body);
+bool  isManta(dGeomID body);
 
 
 bool  isManta(Vehicle* vehicle);
 
 
-bool  isCarrier(dBodyID body);
+bool  isCarrier(dGeomID body);
 
 
 bool  isCarrier(Vehicle* vehicle);
@@ -115,7 +112,7 @@ bool  isCarrier(Vehicle* vehicle);
 bool  isWalrus(Vehicle* vehicle);
 
 
-bool  isAction(dBodyID body);
+bool  isAction(dGeomID body);
 
 
 bool  isAction(Vehicle* vehicle);
@@ -134,7 +131,7 @@ bool  isIsland(dGeomID candidate);
 // SYNC
 bool  groundcollisions(Vehicle *vehicle);
 
-void  groundcollisions(dBodyID body);
+void  groundcollisions(dGeomID body);
 
 void commLink(int faction, dSpaceID space, dWorldID world);
 

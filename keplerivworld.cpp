@@ -131,13 +131,13 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = dGeomGetBody(o2);
     if (b1 && b2 && dAreConnected (b1,b2)) return;
 
-    if (b1 && isAction(b1) && b2 && (isType(b2,WALRUS) || (isType(b2,MANTA))) && isMineFire(gVehicle(b2),(Gunshot*)gVehicle(b1)) ) return;
-    if (b2 && isAction(b2) && b1 && (isType(b1,WALRUS) || (isType(b1,MANTA))) && isMineFire(gVehicle(b1),(Gunshot*)gVehicle(b2)) ) return;
+    if (b1 && isAction(o1) && b2 && (isType(o2,WALRUS) || (isType(o2,MANTA))) && isMineFire(gVehicle(o2),(Gunshot*)gVehicle(o1)) ) return;
+    if (b2 && isAction(o2) && b1 && (isType(o1,WALRUS) || (isType(o1,MANTA))) && isMineFire(gVehicle(o1),(Gunshot*)gVehicle(o2)) ) return;
 
     int val[]={CARRIER,WALRUS,MANTA};
 
-    if (o1 && isRay(o1) && b2 && isType(b2,val,3) && rayHit(gVehicle(b2),(LaserRay*)gVehicle(o1))) {return;}
-    if (o2 && isRay(o2) && b1 && isType(b1,val,3) && rayHit(gVehicle(b1),(LaserRay*)gVehicle(o2))) {return;}
+    if (o1 && isRay(o1) && b2 && isType(o2,val,3) && rayHit(gVehicle(o2),(LaserRay*)gVehicle(o1))) {return;}
+    if (o2 && isRay(o2) && b1 && isType(o1,val,3) && rayHit(gVehicle(o1),(LaserRay*)gVehicle(o2))) {return;}
 
     const int N = 10;
     dContact contact[N];
@@ -147,7 +147,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             Vehicle *v1=NULL,*v2=NULL;
             Structure *s1=NULL, *s2=NULL;
-            gVehicle(v1,v2,dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2),s1,s2,contact[i].geom.g1,contact[i].geom.g2);
+            gVehicle(v1,v2,s1,s2,contact[i].geom.g1,contact[i].geom.g2);
 
 
             // Bullets
@@ -681,7 +681,7 @@ void loadgame()
             ss >> f[0] >> f[1] >> f[2] ;
             v->setDestination(f);
 
-            entities.push_back(v);
+            entities.push_back(v, v->getGeom());
         }
     }
 
@@ -779,7 +779,7 @@ void initWorldPopulation()
         _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
-        entities.push_back(_b);
+        entities.push_back(_b, _b->getGeom());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
@@ -789,7 +789,7 @@ void initWorldPopulation()
         //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
         _bg->stop();
 
-        entities.push_back(_bg);
+        entities.push_back(_bg, _bg->getGeom());
     }
     else if (gamemode == ACTIONGAME)
     {
@@ -802,7 +802,7 @@ void initWorldPopulation()
         //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
-        entities.push_back(_b);
+        entities.push_back(_b,_b->getGeom());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
@@ -813,12 +813,12 @@ void initWorldPopulation()
         _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
         _bg->stop();
 
-        entities.push_back(_bg);
+        entities.push_back(_bg, _bg->getGeom());
 
 
         for (int j=0;j<islands.size();j++)
         {
-            if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))
+            if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))   //@FIXME
                 captureIsland(islands[j],BLUE_FACTION,space,world);
             else if (islands[j]->getZ()< (200 kmf))
                 captureIsland(islands[j],GREEN_FACTION,space,world);

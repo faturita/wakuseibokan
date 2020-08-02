@@ -171,6 +171,7 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 
 Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 {
+
     switch (aistatus) {
     case GROUND:return fireGround(world,space);
         break;

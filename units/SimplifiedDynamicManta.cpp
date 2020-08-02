@@ -122,7 +122,7 @@ void SimplifiedDynamicManta::doControlDogFight()
 
                 if (action != NULL)
                 {
-                    entities.push_back(action);
+                    entities.push_back(action, action->getGeom());
                     gunshot();
                 }
             }
@@ -177,7 +177,7 @@ void SimplifiedDynamicManta::doControlAttack()
 
                 if (action != NULL)
                 {
-                    entities.push_back(action);
+                    entities.push_back(action,action->getGeom());
                     gunshot();
                 }
             }

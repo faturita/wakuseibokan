@@ -286,7 +286,7 @@ void Balaenidae::doDynamics(dBodyID body)
 
         Vec3f V = ap*(-10000);
 
-        dBodyAddRelForce(body,V[0],V[1],V[2]);
+        dBodyAddForce(body,V[0],V[1],V[2]);
         offshoring--;
     }
 
@@ -330,7 +330,7 @@ void Balaenidae::doDynamics(dBodyID body)
 void Balaenidae::offshore()
 {
     Balaenidae::offshoring = 100;
-    Balaenidae::ap = getForward();
+    Balaenidae::ap =getForward();
     Balaenidae::ap = Balaenidae::ap.normalize();
 }
 

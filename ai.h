@@ -53,6 +53,14 @@ public:
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
+
+class ApproachAnyEnemyIsland : public QAction
+{
+public:
+    ApproachAnyEnemyIsland() { }
+    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
+};
+
 class ApproachingEnemyIsland : public QAction
 {
 public:

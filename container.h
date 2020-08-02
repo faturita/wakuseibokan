@@ -2,7 +2,7 @@
 #define CONTAINER_H
 
 
-// In Mac Sierra, if you change this 10000 value to something different, the bellow mutex does not work and generates a core dump :O
+// In Mac Sierra, if you change this 10000 value to something different, the mutex from bellow does not work and generates a core dump :O
 #define MAX 10000
 
 #include <vector>
@@ -20,7 +20,6 @@ protected:
     //std::vector<T> elements;
     std::mutex mlock;
 
-    std::unordered_map<dBodyID, size_t> bodyidmap;
     std::unordered_map<dGeomID, size_t> geomidmap;
 
     T elem[MAX];
@@ -30,6 +29,9 @@ protected:
     int semaphore=0;
 
     std::vector<T> prunning;
+
+    size_t push_back(T value);
+
 public:
     /**
      * Use with the synchronized macro to restrict access to a block.
@@ -45,9 +47,7 @@ public:
      * @param value
      * @return
      */
-    size_t push_back(T value);
     size_t push_back(T value,dGeomID);
-    size_t push_back(T value,dBodyID);
 
     /**
      * Verify whether is lock is released.
@@ -66,8 +66,12 @@ public:
      */
     T operator[](size_t index);
 
+    /**
+     * @brief Find an object given its geomID.
+     * @param element
+     * @return NULL if it is not present.
+     */
     T find(dGeomID element);
-    T find(dBodyID element);
 
     /**
      * Returns the index for a given position (1-based).
@@ -123,8 +127,6 @@ public:
      * @brief erase
      * @param index
      */
-    void erase(size_t index);
-    void erase(dBodyID body);
     void erase(dGeomID geom);
 
     void prune();
@@ -145,10 +147,6 @@ public:
      * @return
      */
     bool isValid(size_t index);
-
-
-
-
 
 
 };

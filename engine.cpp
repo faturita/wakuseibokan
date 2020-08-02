@@ -12,55 +12,36 @@ extern std::vector<BoxIsland*> islands;
 extern std::vector<Message> messages;
 
 // SYNC
-Vehicle* gVehicle(dBodyID body)
-{
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == body)
-        {
-            return vehicle;
-        }
-    }
-    return NULL;
-}
-
 Vehicle* gVehicle(dGeomID geom)
 {
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getGeom() == geom)
-        {
-            return vehicle;
-        }
-    }
-    return NULL;
+    Vehicle *v = entities.find(geom);
+
+    return v;
 }
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
+void gVehicle(Vehicle* &v1, Vehicle* &v2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2)
 {
-    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-    {
-        Vehicle *vehicle = entities[i];
-        if (vehicle->getBodyID() == b1)
-        {
-            v1 = vehicle;
-        }
-        if (vehicle->getBodyID() == b2)
-        {
-            v2 = vehicle;
-        }
-        if (vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
-        {
-            s1 = (Structure*)vehicle;
-        }
-        if (vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
-        {
-            s2 = (Structure*)vehicle;
-        }
 
+    Vehicle *vehicle = entities.find(g1);
+    if (vehicle && dGeomGetBody(g1) && vehicle->getGeom() == g1)
+    {
+        v1 = vehicle;
     }
+    if (vehicle && vehicle->getGeom() == g1 && vehicle->getType() >= COLLISIONABLE)
+    {
+        s1 = (Structure*)vehicle;
+    }
+
+    vehicle = entities.find(g2);
+    if (vehicle && dGeomGetBody(g2))
+    {
+        v2 = vehicle;
+    }
+    if (vehicle && vehicle->getGeom() == g2 && vehicle->getType() >= COLLISIONABLE)
+    {
+        s2 = (Structure*)vehicle;
+    }
+
 }
 
 // SYNC
@@ -251,11 +232,11 @@ bool releasecontrol(Vehicle* vehicle)
     return true;
 }
 
-void  releasecontrol(dBodyID body)
+void  releasecontrol(dGeomID geom)
 {
     synchronized(entities.m_mutex)
     {
-        Vehicle* vehicle = gVehicle(body);
+        Vehicle* vehicle = gVehicle(geom);
         releasecontrol(vehicle);
     }
 }
@@ -276,24 +257,24 @@ bool  isType(Vehicle *vehicle, int type)
 }
 
 
-bool  isType(dBodyID body, int type)
+bool  isType(dGeomID geom, int type)
 {
     bool result = false;
     synchronized(entities.m_mutex)
     {
-        Vehicle *vehicle = gVehicle(body);
+        Vehicle *vehicle = gVehicle(geom);
         result = isType(vehicle,type);
     }
     return result;
 }
 
 
-bool isType(dBodyID body, int types[], int length)
+bool isType(dGeomID geom, int types[], int length)
 {
     bool result = false;
     synchronized(entities.m_mutex)
     {
-        Vehicle *vehicle = gVehicle(body);
+        Vehicle *vehicle = gVehicle(geom);
 
         for(int s=0;s<length;s++)
             if (isType(vehicle,types[s])) result=true;
@@ -303,24 +284,24 @@ bool isType(dBodyID body, int types[], int length)
 }
 
 
-bool  isManta(dBodyID body)
+bool  isManta(dGeomID geom)
 {
-    return isType(body,3);
+    return isType(geom,MANTA);
 }
 
 bool  isManta(Vehicle* vehicle)
 {
-    return isType(vehicle,3);
+    return isType(vehicle,MANTA);
 }
 
-bool  isCarrier(dBodyID body)
+bool  isCarrier(dGeomID geom)
 {
-    return isType(body, 4);
+    return isType(geom, CARRIER);
 }
 
 bool  isCarrier(Vehicle* vehicle)
 {
-    return isType(vehicle,4);
+    return isType(vehicle,CARRIER);
 }
 
 bool  isWalrus(Vehicle* vehicle)
@@ -328,7 +309,7 @@ bool  isWalrus(Vehicle* vehicle)
     return isType(vehicle, WALRUS);
 }
 
-bool  isAction(dBodyID body)
+bool  isAction(dGeomID body)
 {
     return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION);
 }
@@ -432,11 +413,11 @@ bool  groundcollisions(Vehicle *vehicle)
     return true;
 }
 
-void groundcollisions(dBodyID body)
+void groundcollisions(dGeomID geom)
 {
     synchronized(entities.m_mutex)
     {
-        Vehicle *vehicle = gVehicle(body);
+        Vehicle *vehicle = gVehicle(geom);
         groundcollisions(vehicle);
     }
 }
@@ -855,7 +836,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action != NULL)
                             {
-                                entities.push_back(action);
+                                entities.push_back(action,action->getGeom());
                                 //gunshot();
                             }
                         }
@@ -882,7 +863,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getGeom());
                             //gunshot();
                         }
                     } else
@@ -908,7 +889,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            entities.push_back(action);
+                            entities.push_back(action,action->getGeom());
                             //gunshot();
                         }
                     } else
@@ -945,9 +926,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(world,space);
 
+                        // @FIXME: AAM missiles guiding sucks.
+
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action);
+                            size_t i = entities.push_back(action,action->getGeom());
                             gunshot();
 
                             action->setDestination(target->getPos());
@@ -959,15 +942,15 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                     {
                         // Launch airplanes to attack incoming mantas.
                         unsigned long timeevent = sc->getTimer();
-                        static int mantaNumber = -1;
+
+                        static bool found = false;
 
                         if (timer==(timeevent + 200))
                         {
                             int mantNumber = findNextNumber(MANTA);
                             Vehicle *manta = (lb)->spawn(world,space,MANTA,mantNumber);
 
-                            size_t i = entities.push_back(manta);
-                            mantaNumber = mantNumber;
+                            size_t i = entities.push_back(manta, manta->getGeom());
 
 
                             // @FIXME: What should I do with mantas after the battle is finished?
@@ -978,36 +961,27 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (timer==(timeevent + 300))
                         {
                             Manta *m = launchManta(lb);
+                            printf ("Medusa: %p\n", m);
                         }
 
-                        if (timer==(timeevent + 500))
-                        {
-
-                            //Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),lb->getPos());
-                            size_t pos;
-                            Manta *m = findMantaByNumber(pos,mantaNumber);
-
-
-                            if (m)
-                            {
-                                m->dogfight(b->getPos());
-                                m->enableAuto();
-                            }
-                        }
                         if (timer>(timeevent + 500))                // Update position of the enemy.
                         {
 
-                            //Manta *m = findNearestManta(Manta::FLYING,lb->getFaction(),lb->getPos());
-                            size_t pos;
-                            Manta *m = findMantaByNumber(pos,mantaNumber);
+                            Manta *m = findManta(sc->getFaction(),Manta::FLYING);
 
                             if (m)
                             {
+                                printf ("Medusa: %p\n", m);
+
+                                if (!found)
+                                {
+                                    m->dogfight(b->getPos());
+                                    m->enableAuto();
+                                    found=true;
+                                }
+
                                 m->dogfight(b->getPos());
                             }
-                            //} else {
-                                //timeevent = timer;
-                            //}
                         }
 
                     }
@@ -1086,7 +1060,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
     if (manta != NULL)
     {
-        entities.push_back(manta);
+        entities.push_back(manta, manta->getGeom());
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
@@ -1103,7 +1077,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
     if (walrus != NULL)
     {
-        entities.push_back(walrus);
+        entities.push_back(walrus,walrus->getGeom());
         char msg[256];
         Message mg;
         mg.faction = walrus->getFaction();
@@ -1134,7 +1108,7 @@ void dockWalrus(Vehicle *dock)
             messages.insert(messages.begin(), mg);
 
             dBodyDisable(entities[i]->getBodyID());
-            entities.erase(i);
+            entities.erase(entities[i]->getGeom());
         }
     }
 }
@@ -1156,7 +1130,7 @@ void dockManta()
             messages.insert(messages.begin(), mg);
             //printf("Eliminating....\n");
             dBodyDisable(entities[i]->getBodyID());
-            entities.erase(i);
+            entities.erase(entities[i]->getGeom());
         }
     }
 }
@@ -1206,17 +1180,16 @@ Manta* launchManta(Vehicle *v)
         if (m)
         {
             r->launch(m);
+            BoxIsland *is = findNearestIsland(r->getPos(),false, -1);
 
-//            BoxIsland *is = findNearestIsland(r->getPos(),false, -1);
+            assert( is != NULL || !"A Runway structure should be on an island.");
 
-//            assert( is != NULL || !"A Runway structure should be on an island.");
-
-//            char msg[256];
-//            Message mg;
-//            mg.faction = r->getFaction();
-//            sprintf(msg, "Medusa %2d is departing from %s.", m->getNumber()+1, is->getName().c_str());
-//            mg.msg = std::string(msg);
-//            messages.insert(messages.begin(), mg);
+            char msg[256];
+            Message mg;
+            mg.faction = r->getFaction();
+            sprintf(msg, "Medusa %2d is departing from %s.", m->getNumber()+1, is->getName().c_str());
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
             takeoff();
         }
         return m;
@@ -1251,7 +1224,7 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
     {
         char msg[256];
         Message mg;
-        mg.faction = s->getFaction();
+        mg.faction = BOTH_FACTION;
         sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
         mg.msg = std::string(msg);
         messages.insert(messages.begin(),  mg);
@@ -1261,6 +1234,7 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 }
 
 
+// @FIXME: This code is no longer used, it has been replaced by ai.
 void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world)
 {
     static int statuses[2] = {9,9};
@@ -1451,7 +1425,7 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 size_t i = CONTROLLING_NONE;
                 if (a)
                 {
-                    i = entities.push_back(a);
+                    i = entities.push_back(a, a->getGeom());
 
                     CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
@@ -1482,8 +1456,6 @@ void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID worl
                 }
 
             }
-
-
 
         }
 
