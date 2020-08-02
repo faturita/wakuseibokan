@@ -48,7 +48,6 @@ template<class T> size_t container<T>::push_back(T value, dGeomID geom)
 {
     size_t i = push_back(value);
     geomidmap[geom] = i;
-    idmap[i] = geom;
     return i;
 }
 

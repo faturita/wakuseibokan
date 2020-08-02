@@ -18,6 +18,9 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
+/**
+ * @brief Structures are identified if they type number is greater than or equal to COLLISIONABLE.
+ */
 enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEACTION = 6 ,COLLISIONABLE=7, LANDINGABLE = 8, CONTROL=9};
 
 enum AISTATUS { FREE, DESTINATION, LANDING, ATTACK, DOGFIGHT };

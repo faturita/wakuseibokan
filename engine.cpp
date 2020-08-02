@@ -1224,7 +1224,7 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
     {
         char msg[256];
         Message mg;
-        mg.faction = s->getFaction();
+        mg.faction = BOTH_FACTION;
         sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
         mg.msg = std::string(msg);
         messages.insert(messages.begin(),  mg);
@@ -1234,6 +1234,7 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 }
 
 
+// @FIXME: This code is no longer used, it has been replaced by ai.
 void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world)
 {
     static int statuses[2] = {9,9};

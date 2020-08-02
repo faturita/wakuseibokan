@@ -4447,6 +4447,7 @@ void checktest46(unsigned long timer)
         {
             AdvancedWalrus* w = (AdvancedWalrus*)spawnWalrus(space,world,b);
 
+
             // FIXME 50 meters before from my point of view, along the difference vector.
             w->attack(c->getPos());
             w->enableAuto();

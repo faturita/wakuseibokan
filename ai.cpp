@@ -179,6 +179,32 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 }
 
 
+int ApproachAnyEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+{
+    Vehicle *b = findCarrier(faction);
+
+    if (b)
+    {
+        BoxIsland *is = findNearestIsland(b->getPos(),false, faction,1000000 kmf);
+
+        if (!is)
+        {
+            // Closest enemy island is not found, lets check for an empty island.
+            return 0;
+        }
+
+        Vec3f vector = (b->getPos()) - (is->getPos());
+
+        vector = vector.normalize();
+
+        b->setDestination(is->getPos()+Vec3f(12500.0f * vector));
+        b->enableAuto();
+        timeevent=timer;return 10;
+    }
+    return state;
+}
+
+
 
 
 int ApproachingEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
@@ -187,8 +213,6 @@ int ApproachingEnemyIsland::apply(int state, int faction, unsigned long &timeeve
 
     if (b)
     {
-        BoxIsland *is = findNearestIsland(b->getPos(),false, faction,100 kmf);
-
         if (!b->isAuto())
         {
             printf("Carries has arrived to destination.\n");
@@ -366,6 +390,8 @@ int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, 
             b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
             b->enableAuto();
             timeevent = timer; return 1;
+        } else {
+            timeevent = timer; return 13;
         }
     }
 
@@ -445,6 +471,12 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
 int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
+
+    // @FIXME Do something when the carrier is destroyed.
+    if (!b)
+    {
+        return state;
+    }
 
     bool found = false;
 
@@ -564,6 +596,7 @@ Player::Player(int faction)
     qactions[10] = new ApproachingEnemyIsland();
     qactions[11] = new BallisticAttack();
     qactions[12] = new AirborneAttack();
+    qactions[13] = new ApproachAnyEnemyIsland();
     qactions[0] = new ApproachFreeIsland();
     qactions[1] = new InvadeIsland();
     qactions[2] = new CaptureIsland();

@@ -2,7 +2,7 @@
 #define CONTAINER_H
 
 
-// In Mac Sierra, if you change this 10000 value to something different, the bellow mutex does not work and generates a core dump :O
+// In Mac Sierra, if you change this 10000 value to something different, the mutex from bellow does not work and generates a core dump :O
 #define MAX 10000
 
 #include <vector>
@@ -21,8 +21,6 @@ protected:
     std::mutex mlock;
 
     std::unordered_map<dGeomID, size_t> geomidmap;
-
-    std::unordered_map<size_t, dGeomID> idmap;
 
     T elem[MAX];
 
@@ -68,6 +66,11 @@ public:
      */
     T operator[](size_t index);
 
+    /**
+     * @brief Find an object given its geomID.
+     * @param element
+     * @return NULL if it is not present.
+     */
     T find(dGeomID element);
 
     /**
@@ -144,10 +147,6 @@ public:
      * @return
      */
     bool isValid(size_t index);
-
-
-
-
 
 
 };
