@@ -201,7 +201,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Runways.
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                //printf("4\n");
+                //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
                 contact[i].surface.slip1 = 0.9f;
@@ -4585,6 +4585,73 @@ void checktest47(unsigned long timer)
     }
 }
 
+
+void test48()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest48(unsigned long timer)
+{
+    unsigned long starttime = 300;
+
+    if (timer == starttime + 500)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+        Walrus* w = spawnWalrus(space,world,b);
+
+        w->setDestination(Vec3f(0,0,0));
+        w->enableAuto();
+    }
+
+    // Walrus will approach the island, and hopefully will be destroyed
+
+    if (timer > starttime + 30000)
+    {
+        if (fps > 40)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: FPS is too slow. \n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+}
+
+
 static int testing=-1;
 
 void savegame()
@@ -4684,6 +4751,7 @@ void initWorldModelling(int testcase)
     case 45:test45();break;                         // Introducing Medusa.  Airplanes defending the islands.  They attack enemy carrier.
     case 46:test46();break;                         // Test FPS
     case 47:test47();break;                         // Heavy fighting while attackng an island.
+    case 48:test48();break;                         // Medusas fighters land after a failed attack from a walrus.
     default:initIslands();test1();break;
     }
 
@@ -4749,6 +4817,7 @@ void worldStep(int value)
     case 45:checktest45(timer);break;
     case 46:checktest46(timer);break;
     case 47:checktest47(timer);break;
+    case 48:checktest48(timer);break;
     default: break;
     }
 

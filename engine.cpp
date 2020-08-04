@@ -109,7 +109,7 @@ bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() == Manta::FLYING)
+        if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
         {
             char str[256];
             Message mg;
@@ -856,7 +856,41 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
             if (!b)
             {
-                sc->setUnderAttack(false);
+                if (sc->isUnderAttack())
+                {
+                    sc->setTimer(timer);
+                    sc->setUnderAttack(false);
+                }
+
+                // Find flying aircrafts and land them.
+                Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
+
+                if (m)
+                {
+                    if (timer==(sc->getTimer() + 10))
+                    {
+                        m->setDestination(island->getPos());
+                    }
+
+                    if (timer==(sc->getTimer() + 1000))
+                    {
+                        std::vector<size_t> str = island->getStructures();
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==sc->getFaction())
+                            {
+                                // RTTI Stuff
+                                if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
+                                {
+                                    landManta(lb, m) ;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
                 continue;
             }
             if (!sc->isUnderAttack())
@@ -1205,18 +1239,22 @@ void dockManta()
 }
 
 
-void landManta(Vehicle *carrier)
+void landManta(Vehicle *landplace)
 {
     // Auto control
-    if (carrier->getType() == CARRIER)
-    {
-        Balaenidae *b = (Balaenidae*)carrier;
-        Manta *m = findManta(carrier->getFaction(),Manta::HOLDING);
+    Manta *m = findManta(landplace->getFaction(),Manta::HOLDING);
 
+    landManta(landplace, m);
+}
+
+void landManta(Vehicle *landplace, Manta *m)
+{
+    if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
+    {
         if (m)
         {
-            m->setDestination(b->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
-            m->setAttitude(b->getForward());
+            m->setDestination(landplace->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
+            m->setAttitude(landplace->getForward());
             m->land();
             m->enableAuto();
         }

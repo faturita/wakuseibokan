@@ -162,6 +162,7 @@ void dockManta();
 
 Manta* launchManta(Vehicle *v);
 void landManta(Vehicle *v);
+void landManta(Vehicle *landplace, Manta *m);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);

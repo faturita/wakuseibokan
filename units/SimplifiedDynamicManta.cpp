@@ -582,11 +582,11 @@ void SimplifiedDynamicManta::doControlLanding()
 
     switch (flyingstate) {
     case 0:default:
-        T = (Pf - attitude.normalize()*(2 kmf)) - Po;
+        T = (Pf - attitude.normalize()*(5 kmf)) - Po;
         H=450;spspeed = 40.0f;TH = 150;
         break;
     case 1:
-        H=180;spspeed = 27.0f; TH=250;
+        H=180;spspeed = 37.0f; TH=250;
         T = (Pf - attitude.normalize()*(0 kmf)) - Po;
         break;
     }
