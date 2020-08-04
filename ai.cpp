@@ -33,7 +33,8 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
         // Shift to the state to send walruses to destroy the enemy carrier.
         Manta *m = findMantaByOrder(faction,DEFEND_CARRIER);
 
-        if (!m) {timeevent=timer;return 22;}
+        if (m) { m->dogfight(v->getPos()); }
+        else {timeevent=timer;return 22;}
     }
     return state;
 }
@@ -252,7 +253,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
         {
             std::cout << "FIRE!" << std::endl;
 
-            Missile *a = NULL;(Missile*) b->fire(world, space); //@FIME URGENT !
+            Missile *a = (Missile*) b->fire(world, space);
 
             size_t i = CONTROLLING_NONE;
             if (a)

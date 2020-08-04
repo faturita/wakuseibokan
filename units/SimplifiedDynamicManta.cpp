@@ -59,14 +59,12 @@ void SimplifiedDynamicManta::doControl()
     case LANDING:
         doControlLanding();
         break;
-    case DESTINATION:
+    default:case DESTINATION:
         //doControlDestination();// @FIXME
         doControlControl2(destination, 1000);
         break;
     case FREE:
         setDestination(getPos()+getForward().normalize()*100);
-        break;
-    default:
         break;
     }
 }
@@ -189,7 +187,6 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 3;
         break;
     case 3:
-        printf("Controlling...\n");
         doControlControl2(waypoint,10000);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 4;

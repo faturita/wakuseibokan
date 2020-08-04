@@ -775,6 +775,17 @@ void list()
 }
 
 
+/**
+ * @brief When a vehicle is COMM_RANGE away from the carrier or from a friendly island, it will loose the connection link.
+ * This imply that it will start getting damage points all the way up to destruction.
+ * If there is no carrier, only the nearest friendly island can work for connection.
+ * If a vehicle has a long range communication antenna his getSignal is 4 and is not affected.
+ * @TODO: This is the future purpose of the communication antenna.
+ *
+ * @param faction
+ * @param space
+ * @param world
+ */
 void commLink(int faction, dSpaceID space, dWorldID world)
 {
     Vehicle *carrier = findCarrier(faction);
@@ -795,32 +806,27 @@ void commLink(int faction, dSpaceID space, dWorldID world)
             {
                 if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
                 {
-                    if (entities[i]->getSignal()==3)
+                    // Check if there is a nearby command center. @FIXME This should be a communication link instead.
+                    Island *is = findNearestFriendlyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
+
+                    if (!is)
                     {
-                        char msg[256];
-                        Message mg;
-                        sprintf(msg, "Vehicle is loosing connection.");
-                        mg.faction = entities[i]->getFaction();
-                        mg.msg = std::string(msg);
-                        messages.insert(messages.begin(), mg);
+                        if (entities[i]->getSignal()==3)
+                        {
+                            char msg[256];
+                            Message mg;
+                            sprintf(msg, "Vehicle is loosing connection.");
+                            mg.faction = entities[i]->getFaction();
+                            mg.msg = std::string(msg);
+                            messages.insert(messages.begin(), mg);
+                        }
+                        entities[i]->setSignal(2);
+                        entities[i]->damage(1);
                     }
-                    entities[i]->setSignal(2);
-                    entities[i]->damage(1);
                 }
                 else
                 {
                     entities[i]->setSignal(3);                  // Put connection back to normal.
-                }
-            } else {
-                if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
-                {
-                    // Check if there is a nearby command center. @FIXME This should be a communication link instead.
-                    Island *is = findNearestEnemyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
-
-                    if (!is)
-                    {
-                        entities[i]->setSignal(3); //Downgrade the link.
-                    }
                 }
             }
         }
