@@ -342,7 +342,14 @@ void drawMap()
                         drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
                     } else if (entities[i]->getType() == MANTA)
                     {
-                        drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                        if (entities[i]->getSubType() == MEDUSA)
+                        {
+                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"S",0.1f,1.0f,0.9f,0.5f);
+
+                        } else
+                        {
+                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                        }
                     }
                 }
             }

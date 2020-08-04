@@ -90,7 +90,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     // @NOTE: Someone will give me, all the time, current target position.
     Vec3f target = destination;
     switch (flyingstate) {
-        case 0:// Approach
+        default:case 0:// Approach
         {
             doControlControl2(target,10000);
             std::cout << (destination-getPos()).magnitude() << std::endl;
@@ -154,7 +154,7 @@ void SimplifiedDynamicManta::doControlAttack()
 
     Vec3f target = destination;
     switch (flyingstate) {
-        case 0:
+        default:case 0:
         {
             target = Vec3f(destination[0],1000,destination[2]);
             doControlFlipping(target,500);
@@ -189,6 +189,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 3;
         break;
     case 3:
+        printf("Controlling...\n");
         doControlControl2(waypoint,10000);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 4;

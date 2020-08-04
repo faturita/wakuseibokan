@@ -24,6 +24,11 @@ int Structure::getType()
     return COLLISIONABLE;
 }
 
+int Structure::getSubType()
+{
+    return STRUCTURE;
+}
+
 void Structure::setPos(const Vec3f &newpos)
 {
     pos[0] = newpos[0];

@@ -551,7 +551,8 @@ void checktest15(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx = 0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == 320)
@@ -1277,7 +1278,8 @@ void checktest14(unsigned long timer)
 
     if (timer == 100)
     {
-        Manta *m = spawnManta(space,world,entities[0]);
+        size_t idx = 0;
+        Manta *m = spawnManta(space,world,entities[0],idx);
         m->setSignal(4);
     }
 
@@ -2474,7 +2476,8 @@ void checktest27(unsigned long timer)
     }
     if (timer == 500)
     {
-        spawnManta(space,world,b);
+        size_t idx = 0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 800)
@@ -2617,8 +2620,9 @@ void checktest29(unsigned long timer)
 
     if (timer == 200)
     {
+        size_t idx=0;
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -2651,7 +2655,8 @@ void checktest29(unsigned long timer)
     if (timer == 450)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -2679,7 +2684,8 @@ void checktest29(unsigned long timer)
     if (timer == 800)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -3023,8 +3029,8 @@ void checktest33(unsigned long timer)
     if (timer == 50)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
-        entities.push_back(m, m->getGeom());
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
     }
 
     if (timer == 100)
@@ -3412,8 +3418,8 @@ void checktest37(unsigned long timer)
     if (timer == 100)
     {
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
-
-        spawnManta(space,world,_b);
+        size_t idx=0;
+        spawnManta(space,world,_b,idx);
     }
 
     if (timer == 320)
@@ -3911,7 +3917,8 @@ void checktest43(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,b);
+        size_t idx=0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 320)
@@ -3939,7 +3946,8 @@ void checktest43(unsigned long timer)
 
     if (timer == 800)
     {
-        spawnManta(space,world,l);
+        size_t idx=0;
+        spawnManta(space,world,l,idx);
     }
 
     if (timer == 920)
@@ -4052,7 +4060,8 @@ void checktest44(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,b);
+        size_t idx=0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 320)
@@ -4170,7 +4179,8 @@ void checktest45(unsigned long timer)
 
     if (timer == starttime + 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx=0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == starttime + 320)
@@ -4458,7 +4468,8 @@ void checktest46(unsigned long timer)
 
     if (timer == starttime + 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx=0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == starttime + 320)
@@ -4533,7 +4544,7 @@ void test47()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,+16000.0f);
+    _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());

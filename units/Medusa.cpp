@@ -60,3 +60,8 @@ void Medusa::drawModel(float yRot, float xRot, float x, float y, float z)
         printf ("model is null\n");
     }
 }
+
+int Medusa::getSubType()
+{
+    return MEDUSA;
+}

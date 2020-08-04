@@ -23,7 +23,12 @@
  */
 enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEACTION = 6 ,COLLISIONABLE=7, LANDINGABLE = 8, CONTROL=9};
 
+enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, ARTILLERY = 10, COMMANDCENTER = 11, HANGAR = 12, WAREHOUSE = 13, RUNWAY = 14, LASERTURRET = 15, TURRET = 16, LAUNCHER = 17, STRUCTURE = 18 };
+
 enum AISTATUS { FREE, DESTINATION, LANDING, ATTACK, DOGFIGHT };
+
+
+enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND };
 
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
@@ -65,6 +70,7 @@ protected:
     int aistatus = FREE;
 
     int status=0;
+    int order=0;
 
     GLuint texture;
 
@@ -80,6 +86,7 @@ public:
     ~Vehicle();
     
     int virtual getType();
+    int virtual getSubType();
     
 	void virtual init();
 	void setSpeed(float speed);
@@ -175,6 +182,8 @@ public:
     Vec3f toBody(dBodyID body, Vec3f fw);
     int getSignal() const;
     void setSignal(int value);
+    int getOrder() const;
+    void setOrder(int value);
 };
 
 #endif /* VEHICLE_H_ */

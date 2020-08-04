@@ -47,6 +47,7 @@
 #include "structures/Warehouse.h"
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
+#include "structures/Launcher.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -565,6 +566,8 @@ void savegame()
                     subtype = 6;
                 else if (Turret *lb = dynamic_cast<Turret*>(entities[strs[i]]))
                     subtype = 7;
+                else if (Launcher *l = dynamic_cast<Launcher*>(entities[strs[i]]))
+                    subtype = 9;
                 else if(Structure* lb = dynamic_cast<Structure*>(entities[strs[i]]))
                     subtype = 8;
 
@@ -741,6 +744,9 @@ void loadgame()
                     break;
                 case 7:
                     v = new Turret(faction);
+                    break;
+                case 9:
+                    v = new Launcher(faction);
                     break;
                 case 8:
                     v = new Structure(faction);

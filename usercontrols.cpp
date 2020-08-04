@@ -489,7 +489,8 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
                 {
-                    spawnManta(space,world,entities[controller.controllingid]);
+                    size_t idx = 0;
+                    spawnManta(space,world,entities[controller.controllingid],idx);
                 }
             }
             }

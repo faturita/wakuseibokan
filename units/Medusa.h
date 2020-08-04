@@ -11,6 +11,8 @@ public:
 
     void  init();
 
+    int virtual getSubType();
+
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
 };

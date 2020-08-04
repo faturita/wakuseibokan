@@ -57,7 +57,12 @@ void Manta::init()
 
 int Manta::getType()
 {
-    return 3;
+    return MANTA;
+}
+
+int Manta::getSubType()
+{
+    return SIMPLEMANTA;
 }
 
 void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
