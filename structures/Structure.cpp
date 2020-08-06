@@ -24,6 +24,11 @@ int Structure::getType()
     return COLLISIONABLE;
 }
 
+int Structure::getSubType()
+{
+    return STRUCTURE;
+}
+
 void Structure::setPos(const Vec3f &newpos)
 {
     pos[0] = newpos[0];
@@ -107,7 +112,7 @@ void Structure::embody(dWorldID world, dSpaceID space)
 
 void Structure::embody(dBodyID myBodySelf)
 {
-
+    assert(!"Structures are fixed and do not have a movable body.");
 }
 
 

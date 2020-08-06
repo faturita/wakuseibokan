@@ -250,4 +250,9 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     return v;
 }
 
+int Beluga::getSubType()
+{
+    return BELUGA;
+}
+
 //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

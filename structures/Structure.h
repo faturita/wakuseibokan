@@ -38,6 +38,7 @@ public:
     void  doDynamics();
 
     int getType();
+    int virtual getSubType();
 
     void onIsland(Island* island);
 

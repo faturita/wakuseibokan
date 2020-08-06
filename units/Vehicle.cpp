@@ -194,6 +194,11 @@ int Vehicle::getType()
     return 0;
 }
 
+int Vehicle::getSubType()
+{
+    return 0;
+}
+
 void Vehicle::setVector(float* V, dVector3 v)
 {
     V[0] = v[0];
@@ -423,6 +428,16 @@ int Vehicle::getSignal() const
 void Vehicle::setSignal(int value)
 {
     signal = value;
+}
+
+int Vehicle::getOrder() const
+{
+    return order;
+}
+
+void Vehicle::setOrder(int value)
+{
+    order = value;
 }
 
 void Vehicle::setTtl(int ttlvalue)

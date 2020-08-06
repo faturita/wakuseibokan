@@ -486,16 +486,16 @@ void handleResize(int w, int h) {
     gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 }
 
-static bool did=false;
+static bool didODEInit=false;
 
 void update(int value)
 {
 	// Derive the control to the correct object
 
-    if (!did)
+    if (!didODEInit)
     {
         dAllocateODEDataForThread(dAllocateMaskAll);
-        did=true;
+        didODEInit=true;
     }
     
     if (controller.isInterrupted())
@@ -657,9 +657,11 @@ void update(int value)
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-    //srand (time(NULL));
 
-    srand(0);
+    if (isPresentCommandLineParameter(argc,argv,"-random"))
+        srand (time(NULL));
+    else
+        srand (0);
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)

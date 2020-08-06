@@ -42,6 +42,7 @@ public:
     float addd=0;
 	void virtual init();
     int  virtual getType();
+    int  virtual getSubType();
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 	void virtual drawModel();

@@ -201,7 +201,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Runways.
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                //printf("4\n");
+                //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
                 contact[i].surface.slip1 = 0.9f;
@@ -551,7 +551,8 @@ void checktest15(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx = 0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == 320)
@@ -1277,7 +1278,8 @@ void checktest14(unsigned long timer)
 
     if (timer == 100)
     {
-        Manta *m = spawnManta(space,world,entities[0]);
+        size_t idx = 0;
+        Manta *m = spawnManta(space,world,entities[0],idx);
         m->setSignal(4);
     }
 
@@ -2474,7 +2476,8 @@ void checktest27(unsigned long timer)
     }
     if (timer == 500)
     {
-        spawnManta(space,world,b);
+        size_t idx = 0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 800)
@@ -2617,8 +2620,9 @@ void checktest29(unsigned long timer)
 
     if (timer == 200)
     {
+        size_t idx=0;
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -2651,7 +2655,8 @@ void checktest29(unsigned long timer)
     if (timer == 450)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -2679,7 +2684,8 @@ void checktest29(unsigned long timer)
     if (timer == 800)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
 
     }
 
@@ -3023,8 +3029,8 @@ void checktest33(unsigned long timer)
     if (timer == 50)
     {
         Balaenidae *b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        Manta *m = spawnManta(space,world,b);
-        entities.push_back(m, m->getGeom());
+        size_t idx=0;
+        Manta *m = spawnManta(space,world,b,idx);
     }
 
     if (timer == 100)
@@ -3412,8 +3418,8 @@ void checktest37(unsigned long timer)
     if (timer == 100)
     {
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
-
-        spawnManta(space,world,_b);
+        size_t idx=0;
+        spawnManta(space,world,_b,idx);
     }
 
     if (timer == 320)
@@ -3911,7 +3917,8 @@ void checktest43(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,b);
+        size_t idx=0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 320)
@@ -3939,7 +3946,8 @@ void checktest43(unsigned long timer)
 
     if (timer == 800)
     {
-        spawnManta(space,world,l);
+        size_t idx=0;
+        spawnManta(space,world,l,idx);
     }
 
     if (timer == 920)
@@ -4052,7 +4060,8 @@ void checktest44(unsigned long timer)
 
     if (timer == 100)
     {
-        spawnManta(space,world,b);
+        size_t idx=0;
+        spawnManta(space,world,b,idx);
     }
 
     if (timer == 320)
@@ -4170,7 +4179,8 @@ void checktest45(unsigned long timer)
 
     if (timer == starttime + 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx=0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == starttime + 320)
@@ -4458,7 +4468,8 @@ void checktest46(unsigned long timer)
 
     if (timer == starttime + 100)
     {
-        spawnManta(space,world,entities[0]);
+        size_t idx=0;
+        spawnManta(space,world,entities[0],idx);
     }
 
     if (timer == starttime + 320)
@@ -4533,7 +4544,7 @@ void test47()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,+16000.0f);
+    _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
@@ -4573,6 +4584,76 @@ void checktest47(unsigned long timer)
         }
     }
 }
+
+
+void test48()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION)    ,       200.0f,    -100.0f,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(BLUE_FACTION)           ,         0.0f,    -650.0f,world);
+    Structure *t3 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)      ,         0.0f,    650.0f,world);
+    Structure *t4 = islands[0]->addStructure(new LaserTurret(BLUE_FACTION)        ,       100.0f,    -650.0f,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,world);
+    Structure *t6 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -60.0f,    -80.0f,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,world);
+    Structure *t8 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -230.0f,    230.0f,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest48(unsigned long timer)
+{
+    unsigned long starttime = 300;
+
+    if (timer == starttime + 500)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+        Walrus* w = spawnWalrus(space,world,b);
+
+        w->setDestination(Vec3f(0,0,0));
+        w->enableAuto();
+    }
+
+    // Walrus will approach the island, and hopefully will be destroyed
+
+    if (timer > starttime + 10000)
+    {
+        Manta *m = findMantaByOrder(BLUE_FACTION,DEFEND_ISLAND);
+
+
+        if (m && m->getStatus()==Manta::LANDED)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        } else {
+            printf("Test failed: Medusa has not landed correctly or at least is not registered as landed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+    }
+}
+
 
 static int testing=-1;
 
@@ -4673,6 +4754,7 @@ void initWorldModelling(int testcase)
     case 45:test45();break;                         // Introducing Medusa.  Airplanes defending the islands.  They attack enemy carrier.
     case 46:test46();break;                         // Test FPS
     case 47:test47();break;                         // Heavy fighting while attackng an island.
+    case 48:test48();break;                         // Medusas fighters land after a failed attack from a walrus.
     default:initIslands();test1();break;
     }
 
@@ -4738,6 +4820,7 @@ void worldStep(int value)
     case 45:checktest45(timer);break;
     case 46:checktest46(timer);break;
     case 47:checktest47(timer);break;
+    case 48:checktest48(timer);break;
     default: break;
     }
 

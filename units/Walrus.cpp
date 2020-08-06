@@ -75,6 +75,11 @@ int Walrus::getType()
     return WALRUS;
 }
 
+int Walrus::getSubType()
+{
+    return SIMPLEWALRUS;
+}
+
 void Walrus::doMaterial()
 {
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
@@ -483,7 +488,7 @@ void Walrus::doDynamics(dBodyID body)
 
     if (attitude>80 || attitude<-80)
     {
-        // Walrus has tumbled.
+        // Walrus has capsized.
         damage(1);
     }
 

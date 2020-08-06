@@ -37,7 +37,12 @@ void Balaenidae::init()
 
 int Balaenidae::getType()
 {
-    return 4;
+    return CARRIER;
+}
+
+int Balaenidae::getSubType()
+{
+    return BALAENIDAE;
 }
 
 void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)

@@ -21,6 +21,7 @@ public:
     void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void init();
     int getType();
+    int virtual getSubType();
     void virtual embody(dWorldID world, dSpaceID space);
     void virtual embody(dBodyID myBodySelf);
 

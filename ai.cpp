@@ -31,8 +31,10 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
     if (v && v->getType() == MANTA && state != 22 && state != 23)
     {
         // Shift to the state to send walruses to destroy the enemy carrier.
-        Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos(), DEFENSE_RANGE);
-        if (!m) {timeevent=timer;return 22;}
+        Manta *m = findMantaByOrder(faction,DEFEND_CARRIER);
+
+        if (m) { m->dogfight(v->getPos()); }
+        else {timeevent=timer;return 22;}
     }
     return state;
 }
@@ -48,7 +50,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
     if (!v) {
-        Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+        Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
 
         if (m)
         {
@@ -59,19 +61,25 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
 
     if (timer==(timeevent + 200))
     {
-        Manta *m = spawnManta(space,world,b);
+        Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+
+        if (!m)
+        {
+            size_t idx;
+            Manta *m = spawnManta(space,world,b,idx);
+            m->setOrder(DEFEND_CARRIER);
+        }
 
     }
 
     if (timer==(timeevent + 300))
     {
-        // @FIXME I need to register which manta is around.
         launchManta(b);
     }
 
     if (timer==(timeevent + 400))
     {
-        Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+        Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
 
         if (m)
         {
@@ -81,8 +89,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
     }
     if (timer>(timeevent + 405))
     {
-
-        Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+        Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
 
         if (m)
         {
@@ -159,7 +166,7 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 
     if (b)
     {
-        BoxIsland *is = findNearestIsland(b->getPos(),false, faction,100 kmf);
+        BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction,100 kmf);
 
         if (!is)
         {
@@ -185,7 +192,7 @@ int ApproachAnyEnemyIsland::apply(int state, int faction, unsigned long &timeeve
 
     if (b)
     {
-        BoxIsland *is = findNearestIsland(b->getPos(),false, faction,1000000 kmf);
+        BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction,1000000 kmf);
 
         if (!is)
         {
@@ -236,7 +243,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
     if (b)
     {
-        BoxIsland *is = findNearestIsland(b->getPos(),false, faction);
+        BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction);
 
         std::cout << "T-:" << (int)((timeevent+100)-timer) << std::endl;
 
@@ -272,15 +279,18 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
         // @NOTE: Should check how many missiles can the carrier shoot.
         if (timer==(timeevent + 1300))
         {
-            CommandCenter *c = (CommandCenter*)is->getCommandCenter();
+            if (is)
+            {
+                CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
-            if (c)
-            {
-                timeevent = timer;return 12;
-            }
-            else
-            {
-                timeevent=timer;return 0;
+                if (c)
+                {
+                    timeevent = timer;return 12;
+                }
+                else
+                {
+                    timeevent=timer;return 0;
+                }
             }
 
         }
@@ -299,34 +309,48 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
     {
         if (timer==(timeevent + 200))
         {
-            Manta *m = spawnManta(space,world,b);
+            Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
 
+            if (!m)
+            {
+                size_t idx = 0;
+                Manta *m = spawnManta(space,world,b, idx);
+
+                m->setOrder(ATTACK_ISLAND);
+            }
         }
 
         if (timer==(timeevent + 300))
         {
             // @FIXME I need to register which manta is around.
-            launchManta(b);
+            Manta *m = launchManta(b);              // This works because it launchs the manta on deck
         }
 
         if (timer==(timeevent + 400))
         {
             BoxIsland *i = findNearestIsland(b->getPos());
 
-            Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+            //Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
+
+            Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
+
+            assert ( m != NULL );
 
             CommandCenter *c = (CommandCenter*)i->getCommandCenter();
 
-            if (!c)
+            if (m)
             {
-                m->setDestination(b->getPos());
-                m->enableAuto() ;                    // @FIXME: This needs to be performed all the time while manta is landing.
-                return 0;
-            } else
-            {
+                if (!c)
+                {
+                    m->setDestination(b->getPos());
+                    m->enableAuto() ;                    // @FIXME: This needs to be performed all the time while manta is landing.
+                    return 0;
+                } else
+                {
 
-                m->attack(c->getPos());
-                m->enableAuto();
+                    m->attack(c->getPos());
+                    m->enableAuto();
+                }
             }
         }
 
@@ -335,7 +359,9 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
         {
             BoxIsland *i = findNearestIsland(b->getPos());
 
-            Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
+            //Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
+
+            Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
 
             if (!m)
             {
@@ -349,10 +375,6 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
             if (!c)
             {
                 // Command Center is destroyed.
-
-                // @FIXME: find the right manta, the one which is closer.
-                Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
-
 
                 if (m)
                 {

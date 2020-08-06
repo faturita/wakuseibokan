@@ -109,7 +109,7 @@ bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() == Manta::FLYING)
+        if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
         {
             char str[256];
             Message mg;
@@ -462,6 +462,19 @@ Manta* findNearestManta(int status, int faction, Vec3f l, float threshold)
 }
 
 
+Manta* findMantaByOrder(int faction, int order)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getOrder() == order && v->getFaction() == faction)
+        {
+            return (Manta*)v;
+        }
+    }
+    return NULL;
+}
+
 
 Manta* findManta(int faction, int status)
 {
@@ -676,22 +689,38 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
     return islands[nearesti];
 }
 
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction)
-{
-    return findNearestIsland(Po,empty,friendlyfaction,12000 kmf);
-}
 
-
-BoxIsland* findNearestIsland(Vec3f Po, bool empty)
-{
-    return findNearestIsland(Po,empty,-1);
-}
-
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = -1;
     float closest = 0;
     for(int i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if ((!d && empty) || (d && !empty && (d->getFaction()==friendlyfaction || friendlyfaction == -1)) )
+        {
+            if ( ((l-Po).magnitude()<closest || closest ==0)  && (l-Po).magnitude()<threshold) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+    }
+
+    if (nearesti<0)
+        return NULL;
+
+    return islands[nearesti];
+}
+
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
+{
+    int nearesti = -1;
+    float closest = 0;
+    for(size_t i=0;i<islands.size();i++)
     {
         BoxIsland *b = islands[i];
         Vec3f l(b->getX(),0.0f,b->getZ());
@@ -713,9 +742,20 @@ BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float th
     return islands[nearesti];
 }
 
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction)
+{
+    return findNearestEnemyIsland(Po,empty,friendlyfaction,12000 kmf);
+}
+
+
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty)
+{
+    return findNearestEnemyIsland(Po,empty,-1);
+}
+
 BoxIsland* findIslandByName(std::string islandname)
 {
-    for (int j=0;j<islands.size();j++)
+    for (size_t j=0;j<islands.size();j++)
     {
         if (islandname == islands[j]->getName())
         {
@@ -735,12 +775,26 @@ void list()
 }
 
 
+/**
+ * @brief When a vehicle is COMM_RANGE away from the carrier or from a friendly island, it will loose the connection link.
+ * This imply that it will start getting damage points all the way up to destruction.
+ * If there is no carrier, only the nearest friendly island can work for connection.
+ * If a vehicle has a long range communication antenna his getSignal is 4 and is not affected.
+ * @TODO: This is the future purpose of the communication antenna.
+ *
+ * @param faction
+ * @param space
+ * @param world
+ */
 void commLink(int faction, dSpaceID space, dWorldID world)
 {
-    Vehicle *b = findCarrier(faction);
+    Vehicle *carrier = findCarrier(faction);
+
+    Vec3f b(0,600 kmf, 0);
 
     // @NOTE We should decide here what to do.
-    if (!b) return;
+    if (carrier)
+        b = carrier->getPos();
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -750,19 +804,25 @@ void commLink(int faction, dSpaceID space, dWorldID world)
         {
             if (entities[i]->getSignal()!=4)
             {
-                if ((entities[i]->getPos() - b->getPos()).magnitude() > COMM_RANGE)
+                if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
                 {
-                    if (entities[i]->getSignal()==3)
+                    // Check if there is a nearby command center. @FIXME This should be a communication link instead.
+                    Island *is = findNearestFriendlyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
+
+                    if (!is)
                     {
-                        char msg[256];
-                        Message mg;
-                        sprintf(msg, "Vehicle is loosing connection.");
-                        mg.faction = entities[i]->getFaction();
-                        mg.msg = std::string(msg);
-                        messages.insert(messages.begin(), mg);
+                        if (entities[i]->getSignal()==3)
+                        {
+                            char msg[256];
+                            Message mg;
+                            sprintf(msg, "Vehicle is loosing connection.");
+                            mg.faction = entities[i]->getFaction();
+                            mg.msg = std::string(msg);
+                            messages.insert(messages.begin(), mg);
+                        }
+                        entities[i]->setSignal(2);
+                        entities[i]->damage(1);
                     }
-                    entities[i]->setSignal(2);
-                    entities[i]->damage(1);
                 }
                 else
                 {
@@ -778,9 +838,9 @@ void commLink(int faction, dSpaceID space, dWorldID world)
 
 void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 {
-    for (int i = 0; i < islands.size(); i++)
+    for (size_t j = 0; j < islands.size(); j++)
     {
-        BoxIsland *island = islands[i];
+        BoxIsland *island = islands[j];
 
         // First check whether the radar detect that there is some enemy vehicle close to the island center.
 
@@ -796,7 +856,41 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
             if (!b)
             {
-                sc->setUnderAttack(false);
+                if (sc->isUnderAttack())
+                {
+                    sc->setTimer(timer);
+                    sc->setUnderAttack(false);
+                }
+
+                // Find flying aircrafts and land them.
+                Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
+
+                if (m)
+                {
+                    if (timer==(sc->getTimer() + 10))
+                    {
+                        m->setDestination(island->getPos());
+                    }
+
+                    if (timer==(sc->getTimer() + 1000))
+                    {
+                        std::vector<size_t> str = island->getStructures();
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==sc->getFaction())
+                            {
+                                // RTTI Stuff
+                                if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
+                                {
+                                    landManta(lb, m) ;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
                 continue;
             }
             if (!sc->isUnderAttack())
@@ -807,9 +901,30 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
             // If here, this island is under attack.
 
+            {
+                if (timer>(sc->getTimer() + 500))                // Update position of the enemy.
+                {
+
+                    Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
+
+                    if (m && m->getStatus() != Manta::LANDED)
+                    {
+
+                        if (!m->isAuto())
+                        {
+                            m->dogfight(b->getPos());
+                            m->enableAuto();
+                        }
+
+                        m->dogfight(b->getPos());
+                    }
+                }
+            }
+
+
             std::vector<size_t> str = island->getStructures();
 
-            for(int i=0;i<str.size();i++)
+            for(size_t i=0;i<str.size();i++)
             {
                 if (entities[str[i]]->getFaction()==sc->getFaction())
                 {
@@ -930,7 +1045,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action,action->getGeom());
+                            size_t l = entities.push_back(action,action->getGeom());
                             gunshot();
 
                             action->setDestination(target->getPos());
@@ -947,10 +1062,18 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         if (timer==(timeevent + 200))
                         {
-                            int mantNumber = findNextNumber(MANTA);
-                            Vehicle *manta = (lb)->spawn(world,space,MANTA,mantNumber);
+                            Manta *m = findMantaByOrder(lb->getFaction(), DEFEND_ISLAND);
 
-                            size_t i = entities.push_back(manta, manta->getGeom());
+                            if (!m)
+                            {
+
+                                int mantNumber = findNextNumber(MANTA);
+                                Vehicle *manta = (lb)->spawn(world,space,MANTA,mantNumber);
+
+                                size_t l = entities.push_back(manta, manta->getGeom());
+
+                                manta->setOrder(DEFEND_ISLAND);
+                            }
 
 
                             // @FIXME: What should I do with mantas after the battle is finished?
@@ -964,26 +1087,6 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             printf ("Medusa: %p\n", m);
                         }
 
-                        if (timer>(timeevent + 500))                // Update position of the enemy.
-                        {
-
-                            Manta *m = findManta(sc->getFaction(),Manta::FLYING);
-
-                            if (m)
-                            {
-                                printf ("Medusa: %p\n", m);
-
-                                if (!found)
-                                {
-                                    m->dogfight(b->getPos());
-                                    m->enableAuto();
-                                    found=true;
-                                }
-
-                                m->dogfight(b->getPos());
-                            }
-                        }
-
                     }
                 }
             }
@@ -993,7 +1096,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
 void buildAndRepair(dSpaceID space, dWorldID world)
 {
-    for (int i = 0; i < islands.size(); i++)
+    for (size_t i = 0; i < islands.size(); i++)
     {
         BoxIsland *island = islands[i];
 
@@ -1054,13 +1157,13 @@ void buildAndRepair(dSpaceID space, dWorldID world)
     }
 }
 
-Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner)
+Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
 {
     int mantaNumber = findNextNumber(MANTA);
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
     if (manta != NULL)
     {
-        entities.push_back(manta, manta->getGeom());
+        idx = entities.push_back(manta, manta->getGeom());
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
@@ -1136,18 +1239,22 @@ void dockManta()
 }
 
 
-void landManta(Vehicle *carrier)
+void landManta(Vehicle *landplace)
 {
     // Auto control
-    if (carrier->getType() == CARRIER)
-    {
-        Balaenidae *b = (Balaenidae*)carrier;
-        Manta *m = findManta(carrier->getFaction(),Manta::HOLDING);
+    Manta *m = findManta(landplace->getFaction(),Manta::HOLDING);
 
+    landManta(landplace, m);
+}
+
+void landManta(Vehicle *landplace, Manta *m)
+{
+    if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
+    {
         if (m)
         {
-            m->setDestination(b->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
-            m->setAttitude(b->getForward());
+            m->setDestination(landplace->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
+            m->setAttitude(landplace->getForward());
             m->land();
             m->enableAuto();
         }
@@ -1180,7 +1287,7 @@ Manta* launchManta(Vehicle *v)
         if (m)
         {
             r->launch(m);
-            BoxIsland *is = findNearestIsland(r->getPos(),false, -1);
+            BoxIsland *is = findNearestEnemyIsland(r->getPos(),false, -1);
 
             assert( is != NULL || !"A Runway structure should be on an island.");
 
@@ -1206,7 +1313,7 @@ void wipeEnemyStructures(BoxIsland *island)
 
     int faction = island->getCommandCenter()->getFaction();
 
-    for(int i=0;i<strs.size();i++)
+    for(size_t i=0;i<strs.size();i++)
     {
         if (faction != entities[strs[i]]->getFaction())
         {
@@ -1231,442 +1338,4 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
 
         wipeEnemyStructures(island);
     }
-}
-
-
-// @FIXME: This code is no longer used, it has been replaced by ai.
-void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world)
-{
-    static int statuses[2] = {9,9};
-    static unsigned long timeevent = 0;
-
-    // @FIXME: This is SO wrong.
-    int status = statuses[faction-1];
-
-    int action=-1;
-
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (!b) return;
-
-        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
-
-        if (v && (v->getType() == CARRIER || v->getType() == WALRUS) && status != 20 && status != 21)
-        {
-            // Shift to the state to send walruses to destroy the enemy carrier.
-
-            status = 20;timeevent = timer;
-        }
-
-        if (v && v->getType() == MANTA && status != 22 && status != 23)
-        {
-            // Shift to the state to send walruses to destroy the enemy carrier.
-
-            status = 22;timeevent=timer;
-        }
-    }
-
-    switch (status) {
-    case 22:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (!b) return;
-        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
-
-        if (!v) {
-            Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
-
-            if (m)
-            {
-                landManta(b);
-            }
-            status=9;timeevent=timer;
-        }
-
-        if (timer==(timeevent + 200))
-        {
-            Manta *m = spawnManta(space,world,b);
-
-        }
-
-        if (timer==(timeevent + 300))
-        {
-            // @FIXME I need to register which manta is around.
-            launchManta(b);
-        }
-
-        if (timer>(timeevent + 400))
-        {
-
-            Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
-
-            if (m)
-            {
-                m->attack(v->getPos());
-                m->enableAuto();
-            } else {
-                timeevent = timer;
-            }
-        }
-
-
-
-        break;
-    }
-    case 20:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (!b) return;
-
-        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
-
-        Walrus* w1 = spawnWalrus(space,world,b);
-
-        Walrus* w2 = spawnWalrus(space,world,b);
-
-        w1->attack(v->getPos());
-        w1->enableAuto();
-
-        w2->attack(v->getPos());
-        w2->enableAuto();
-
-        status=21;timeevent=timer;
-
-        break;
-    }
-    case 21:
-    {
-        Vehicle *b = findCarrier(faction);
-        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),8000);
-
-        Walrus *w1 = findWalrus(Walrus::SAILING,faction);
-
-        if (v)
-        {
-            w1->attack(v->getPos());
-        }
-        else
-        {
-            if (w1) dockWalrus(b);
-            w1 = findWalrus(Walrus::SAILING, faction);
-            if (w1) dockWalrus(b);
-
-            status = 9;timeevent= timer;
-        }
-
-
-        break;
-    }
-    case 9:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            BoxIsland *is = findNearestIsland(b->getPos(),false, faction,100 kmf);
-
-            if (!is)
-            {
-                // Closest enemy island is not found, lets check for an empty island.
-                status=0;
-                break;
-            }
-
-            Vec3f vector = (b->getPos()) - (is->getPos());
-
-            vector = vector.normalize();
-
-            b->setDestination(is->getPos()+Vec3f(12500.0f * vector));
-            b->enableAuto();
-            status = 10;
-        }
-
-        break;
-    }
-    case 10:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            BoxIsland *is = findNearestIsland(b->getPos(),false, faction);
-
-            if (!b->isAuto())
-            {
-                printf("Carries has arrived to destination.\n");
-
-                //Walrus* w = spawnWalrus(space,world,b);
-                //w->setDestination(is->getPos());
-                //w->enableAuto();
-                status = 11;timeevent = timer;
-
-            }
-        }
-
-        break;
-    }
-    case 11:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            BoxIsland *is = findNearestIsland(b->getPos(),false, faction);
-
-            // If it has available missiles, then fire them.
-
-            if (timer==(timeevent + 100))
-            {
-                Missile *a = (Missile*) b->fire(world, space);
-
-                size_t i = CONTROLLING_NONE;
-                if (a)
-                {
-                    i = entities.push_back(a, a->getGeom());
-
-                    CommandCenter *c = (CommandCenter*)is->getCommandCenter();
-
-                    a->setDestination(c->getPos());
-
-                    a->enableAuto();
-
-                    if (a->getType()==CONTROLABLEACTION)
-                    {
-                        switchControl(entities.indexOf(i));
-
-                    }
-                }
-
-            }
-
-            if (timer==(timeevent + 600))
-            {
-                CommandCenter *c = (CommandCenter*)is->getCommandCenter();
-
-                if (c)
-                {
-                    status=12;timeevent = timer;
-                }
-                else
-                {
-                    status=0;timeevent=timer;
-                }
-
-            }
-
-        }
-
-        break;
-    }
-    case 12:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            if (timer==(timeevent + 200))
-            {
-                Manta *m = spawnManta(space,world,b);
-
-            }
-
-            if (timer==(timeevent + 300))
-            {
-                // @FIXME I need to register which manta is around.
-                launchManta(b);
-            }
-
-            if (timer==(timeevent + 400))
-            {
-                BoxIsland *i = findNearestIsland(b->getPos());
-
-                Manta *m = findNearestManta(Manta::FLYING,faction,b->getPos());
-
-                CommandCenter *c = (CommandCenter*)i->getCommandCenter();
-
-                if (!c)
-                {
-                    status = 0;
-                    dockManta();
-                } else
-                {
-
-                    m->attack(c->getPos());
-                    m->enableAuto();
-                }
-            }
-
-
-            if (timer>(timeevent + 400))
-            {
-                BoxIsland *i = findNearestIsland(b->getPos());
-
-                Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
-
-                if (!m)
-                {
-                    status = 11;
-                    timeevent = timer;
-                    break;
-                }
-
-                CommandCenter *c = (CommandCenter*)i->getCommandCenter();
-
-                if (!c)
-                {
-                    // Command Center is destroyed.
-
-                    // @FIXME: find the right manta, the one which is closer.
-                    Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
-
-
-                    if (m)
-                    {
-                        m->setDestination(Vec3f(i->getPos()[0],1000,i->getPos()[2]));
-                        m->enableAuto();
-                    }
-
-
-                    status = 0;
-                }
-            }
-        }
-
-        break;
-    }
-    case 0: //find nearest island.
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
-
-            BoxIsland *is = findNearestEmptyIsland(b->getPos());
-
-            Vec3f vector = (b->getPos()) - (is->getPos());
-
-            vector = vector.normalize();
-
-            b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
-            b->enableAuto();
-            status = 1;
-        }
-
-        break;
-    }
-    case 1:
-    {
-        Vehicle *b = findCarrier(faction);
-
-        if (b)
-        {
-            BoxIsland *is = findNearestEmptyIsland(b->getPos());
-
-            if (!b->isAuto())
-            {
-                printf("Carries has arrived to destination.\n");
-
-                Walrus* w = spawnWalrus(space,world,b);
-                w->setDestination(is->getPos());
-                w->enableAuto();
-                status = 2;timeevent = timer;
-
-                Manta *m = findNearestManta(Manta::HOLDING, faction,b->getPos());
-
-                if (m)
-                {
-                    landManta(b);
-                } else {
-                    m = findNearestManta(Manta::FLYING, faction,b->getPos());
-
-                    if (m)
-                    {
-                        landManta(b);
-                    }
-                }
-
-            }
-        }
-
-        break;
-    }
-    case 2:
-    {
-        // Need to check if walrus arrived to island.
-        Walrus *w = findWalrus(faction);
-
-        if (w)
-        {
-            BoxIsland *is = findNearestEmptyIsland(w->getPos());
-
-            // @FIXME: It may happen that the walrus is wandering do nothing never de-autopilot and this is endless.
-            if (!w->isAuto() || ( w->getIsland() == is && timer>(timeevent + 1000))  )
-            {
-                captureIsland(is,w->getFaction(),space, world);
-                status=3;
-            }
-        } else
-        {
-            // Walrus has been destroyed.
-            status = 1;
-        }
-
-        break;
-    }
-    case 3:
-    {
-        Vehicle *b = findCarrier(faction);
-        // @FIXME I should find the one that actually went to the island.
-        Walrus *w = findWalrus(faction);
-
-        if (w)
-        {
-            w->setDestination(b->getPos()+Vec3f(0.0f,0.0f,-50.0f));
-            w->enableAuto();
-            status = 4;
-        } else {
-            // There are no walrus so I can departure to the next island.
-            status = 9;
-        }
-        break;
-    }
-    case 4:
-    {
-        Vehicle *b = findCarrier(faction);
-        Walrus *w = findWalrus(faction);
-
-        Manta *m = findManta(faction,Manta::ON_DECK);
-
-        if (w)
-        {
-            if (b && w && !(w->isAuto()))
-            {
-                synchronized(entities.m_mutex)
-                {
-                    dockWalrus(b);
-                    if (m)
-                    {
-                        dockManta();
-                    }
-                }
-                status=9;
-            }
-        } else {
-            // There are no walrus so I can departure to the next island.
-            status = 9;
-        }
-
-        break;
-    }
-    default:
-        break;
-
-    }
-
-    statuses[faction-1] = status;
-
 }

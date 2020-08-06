@@ -136,6 +136,7 @@ void  groundcollisions(dGeomID body);
 void commLink(int faction, dSpaceID space, dWorldID world);
 
 CommandCenter* findCommandCenter(Island *island);
+Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByNumber(size_t &pos, int number);
 Manta* findManta(int faction, int status);
 Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);
@@ -153,7 +154,7 @@ void buildAndRepair(dSpaceID space, dWorldID world);
 
 void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
 
-Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
+Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 void dockWalrus(Vehicle *dock);
@@ -161,13 +162,14 @@ void dockManta();
 
 Manta* launchManta(Vehicle *v);
 void landManta(Vehicle *v);
+void landManta(Vehicle *landplace, Manta *m);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
 BoxIsland* findIslandByName(std::string islandname);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
@@ -176,7 +178,6 @@ Vehicle* findCarrier(int faction);
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
 void wipeEnemyStructures(BoxIsland *island);
 
-void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world);
 
 
 #endif // ENGINE_H
