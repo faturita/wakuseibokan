@@ -39,6 +39,7 @@
 #include "units/Balaenidae.h"
 #include "units/Beluga.h"
 #include "units/AdvancedWalrus.h"
+#include "units/Medusa.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -496,6 +497,8 @@ void savegame()
                 subtype = 1;
             else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
                 subtype = 2;
+            else if (Medusa *lb = dynamic_cast<Medusa*>(entities[i]))
+                subtype = 6;
             else if (SimplifiedDynamicManta *lb = dynamic_cast<SimplifiedDynamicManta*>(entities[i]))
                 subtype = 3;
             else if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
@@ -643,7 +646,13 @@ void loadgame()
             }
             case MANTA:
             {
-                SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(faction);
+                SimplifiedDynamicManta *_manta1 = NULL;
+
+                if (subtype == 6)
+                    _manta1 = new Medusa(faction);
+                else
+                    _manta1 = new SimplifiedDynamicManta(faction);
+
                 _manta1->init();
                 _manta1->setNumber(findNextNumber(MANTA));
                 _manta1->embody(world, space);

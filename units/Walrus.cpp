@@ -488,7 +488,7 @@ void Walrus::doDynamics(dBodyID body)
 
     if (attitude>80 || attitude<-80)
     {
-        // Walrus has tumbled.
+        // Walrus has capsized.
         damage(1);
     }
 

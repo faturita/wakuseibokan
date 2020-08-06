@@ -75,6 +75,7 @@ Vec3f mp(Vec3f pos)
 }
 
 
+
 void SimplifiedDynamicManta::doControlDogFight()
 {
 
@@ -558,7 +559,6 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 }
 
 
-
 void SimplifiedDynamicManta::doControlLanding()
 {
     Controller c;
@@ -580,13 +580,15 @@ void SimplifiedDynamicManta::doControlLanding()
     Vec3f T;
     float H=500, spspeed = 40.0f, TH = 200;
 
+    attitude[1]=0;
+
     switch (flyingstate) {
     case 0:default:
         T = (Pf - attitude.normalize()*(5 kmf)) - Po;
         H=450;spspeed = 40.0f;TH = 150;
         break;
     case 1:
-        H=180;spspeed = 37.0f; TH=250;
+        H=180;spspeed = 35.0f; TH=250;
         T = (Pf - attitude.normalize()*(0 kmf)) - Po;
         break;
     }
@@ -610,16 +612,19 @@ void SimplifiedDynamicManta::doControlLanding()
 
 
         eh = height-H;
-        c.registers.thrust = spspeed;
-        setThrottle(spspeed * 10.0f);
+        float spd = spspeed;
         midpointpitch = 2;
 
-        if ((abs(eh))>10.0f)
+        if ((abs(eh))>5.0f)
         {
-            c.registers.pitch = midpointpitch+1.0 * (eh>0 ? -1 : +1);
+            c.registers.pitch = midpointpitch+2.0 * (eh>0 ? -1 : +1);
+            spd = spspeed+5.0 * (eh>0 ? -1 : +1);
         } else {
             c.registers.pitch = midpointpitch;
+            spd = spspeed;
         }
+        setThrottle(spd * 10.0f);
+        c.registers.thrust = spd;
     } else
     {
         if (flyingstate<1)
@@ -838,6 +843,7 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 void SimplifiedDynamicManta::land()
 {
     aistatus = LANDING;
+    flyingstate=0;
 }
 
 void SimplifiedDynamicManta::attack(Vec3f target)

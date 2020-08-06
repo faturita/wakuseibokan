@@ -4636,15 +4636,18 @@ void checktest48(unsigned long timer)
 
     // Walrus will approach the island, and hopefully will be destroyed
 
-    if (timer > starttime + 30000)
+    if (timer > starttime + 10000)
     {
-        if (fps > 40)
+        Manta *m = findMantaByOrder(BLUE_FACTION,DEFEND_ISLAND);
+
+
+        if (m && m->getStatus()==Manta::LANDED)
         {
             printf("Test passed OK!\n");
             endWorldModelling();
             exit(1);
         } else {
-            printf("Test failed: FPS is too slow. \n");
+            printf("Test failed: Medusa has not landed correctly or at least is not registered as landed.\n");
             endWorldModelling();
             exit(0);
         }
