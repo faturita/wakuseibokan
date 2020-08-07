@@ -440,6 +440,11 @@ void Vehicle::setOrder(int value)
     order = value;
 }
 
+int Vehicle::getAistatus() const
+{
+    return aistatus;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;

@@ -51,12 +51,9 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
 
     if (!v) {
         Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+        m->doHold(m->getPos(),350);
 
-        if (m)
-        {
-            landManta(b);
-        }
-        timeevent=timer;return 9;
+        timeevent=timer;return 4;
     }
 
     if (timer==(timeevent + 200))
@@ -431,6 +428,12 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
     {
         BoxIsland *is = findNearestEmptyIsland(b->getPos());
 
+        // Check if the island is still free
+        if (is->getCommandCenter() && is->getCommandCenter()->getFaction()!=faction)
+        {
+            timeevent=timer;return 13;
+        }
+
         if (!b->isAuto())
         {
             printf("Carries has arrived to destination.\n");
@@ -439,20 +442,6 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
             w->setDestination(is->getPos());
             w->enableAuto();
 
-            // Land nearest manta.
-            Manta *m = findNearestManta(Manta::HOLDING, faction,b->getPos());
-
-            if (m)
-            {
-                landManta(b);
-            } else {
-                m = findNearestManta(Manta::FLYING, faction,b->getPos());
-
-                if (m)
-                {
-                    landManta(b);
-                }
-            }
             timeevent = timer;return 2;
 
         }
@@ -546,8 +535,10 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
 {
     Vehicle *b = findCarrier(faction);
 
-    bool done = true;
+    bool done1 = true;
+    bool done2 = true;
 
+    // Find walruses around and dock them.
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
@@ -555,7 +546,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
         {
             if ((v->getPos()-b->getPos()).magnitude()<10000)   {
 
-                done = false;
+                done1 = false;
                 Walrus *w = (Walrus*)v;
                 if (!w->isAuto())
                 {
@@ -569,28 +560,36 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
         }
     }
 
-    Manta *m = findManta(b->getFaction(),Manta::ON_DECK);
+    // Find all the mantas around, land them, and dock them.
+    Manta *m1 = findManta(b->getFaction(),Manta::ON_DECK);
+    Manta *m2 = findNearestManta(Manta::FLYING,b->getFaction(),b->getPos(),30000);
+    Manta *m3 = findNearestManta(Manta::HOLDING,b->getFaction(), b->getPos(),30000);
 
-    if (m)
+    if (m2)
+    {
+        // Updating the current carrier postion to Manta so that it improves landing.
+        //m2->setDestination(b->getPos());
+        //m2->setAttitude(b->getForward());
+        done2 = false;
+    } else
+    {
+        if (m3)
+        {
+            landManta(b,m3);
+            done2 = false;
+        }
+    }
+
+
+    if (m1)
     {
         synchronized(entities.m_mutex)
         {
             dockManta();
         }
     }
-    else
-    {
-        Manta *m = findManta(b->getFaction(),Manta::FLYING);
 
-        // Updating the current carrier postion to Manta so that it improves landing.
-        if (m)
-        {
-            m->setDestination(b->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
-            m->setAttitude(b->getForward());
-        }
-    }
-
-    if (done)
+    if (done1 && done2)
     {
         // There are no walrus so I can departure to the next island.
         timeevent=timer;return 9;

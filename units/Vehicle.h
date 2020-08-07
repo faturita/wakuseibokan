@@ -184,6 +184,7 @@ public:
     void setSignal(int value);
     int getOrder() const;
     void setOrder(int value);
+    int getAistatus() const;
 };
 
 #endif /* VEHICLE_H_ */

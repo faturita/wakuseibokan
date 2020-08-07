@@ -843,6 +843,7 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 void SimplifiedDynamicManta::land()
 {
     aistatus = LANDING;
+    setStatus(Manta::FLYING);
     flyingstate=0;
 }
 
