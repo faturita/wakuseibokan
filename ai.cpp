@@ -535,6 +535,9 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
 {
     Vehicle *b = findCarrier(faction);
 
+    if (!b)
+        return state;
+
     bool done1 = true;
     bool done2 = true;
 
@@ -561,7 +564,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     }
 
     // Find all the mantas around, land them, and dock them.
-    Manta *m1 = findManta(b->getFaction(),Manta::ON_DECK);
+    Manta *m1 = findManta(faction,Manta::ON_DECK);
     Manta *m2 = findNearestManta(Manta::FLYING,b->getFaction(),b->getPos(),30000);
     Manta *m3 = findNearestManta(Manta::HOLDING,b->getFaction(), b->getPos(),30000);
 

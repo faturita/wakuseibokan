@@ -4,7 +4,7 @@
 #include "engine.h"
 
 #define DEFENSE_RANGE   8000
-#define IN_RANGE        10000
+#define IN_RANGE        30000
 
 class QAction
 {
