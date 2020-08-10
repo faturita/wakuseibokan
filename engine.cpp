@@ -97,8 +97,9 @@ bool arrived(Vehicle *walrus, Island *island)
         w->setIsland((BoxIsland*)island);
         char str[256];
         Message mg;
+        sprintf(str, "Walrus %d has arrived to %s.", NUMBERING(w->getNumber()), island->getName().c_str());
+        mg.msg = std::string(str);
         mg.faction = w->getFaction();
-        sprintf(str, "Walrus has arrived to %s.", island->getName().c_str());
         messages.insert(messages.begin(), mg);
     }
     return true;

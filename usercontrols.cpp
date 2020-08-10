@@ -360,11 +360,17 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
-                Walrus *w = (Walrus*) entities[controller.controllingid];
-                // Check if walrus is on island.
-                BoxIsland *island = w->getIsland();
+                if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
+                {
+                    Walrus *w = (Walrus*) entities[controller.controllingid];
+                    // Check if walrus is on island.
+                    BoxIsland *island = w->getIsland();
 
-                captureIsland(island,w->getFaction(),space, world);
+                    if (island)
+                    {
+                        captureIsland(island,w->getFaction(),space, world);
+                    }
+                }
 
             } else
             if (controller.str.find("godmode") != std::string::npos)

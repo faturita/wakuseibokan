@@ -206,7 +206,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
         x = (rand() % 3550 + 1); x -= 1800;
         z = (rand() % 3550 + 1); z -= 1800;
 
-        assert ( _landmass != NULL);
+        assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
 
         // @FIXME Put this line in a different function and use it from there.  Repeated code here.
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
