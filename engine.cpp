@@ -112,13 +112,6 @@ bool landed(Vehicle *manta, Island *island)
     {
         if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
         {
-            char str[256];
-            Message mg;
-            mg.faction = manta->getFaction();
-            sprintf(str, "Manta has landed on Island %s.", island->getName().c_str());
-            mg.msg = std::string(str);
-            messages.insert(messages.begin(), mg);
-
             controller.reset();
             SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)manta;
             struct controlregister c;
@@ -127,6 +120,13 @@ bool landed(Vehicle *manta, Island *island)
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
             s->setStatus(Manta::LANDED);
+
+            char str[256];
+            Message mg;
+            mg.faction = manta->getFaction();
+            sprintf(str, "Manta %d has landed on Island %s.", NUMBERING(s->getNumber()), island->getName().c_str());
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
         }
     }
     return true;
@@ -1308,11 +1308,9 @@ Manta* launchManta(Vehicle *v)
     return NULL;
 }
 
-void wipeEnemyStructures(BoxIsland *island)
+void wipeEnemyStructures(BoxIsland *island, int faction)
 {
     std::vector<size_t> strs = island->getStructures();
-
-    int faction = island->getCommandCenter()->getFaction();
 
     for(size_t i=0;i<strs.size();i++)
     {
@@ -1325,8 +1323,24 @@ void wipeEnemyStructures(BoxIsland *island)
 
 void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
 {
+    captureIsland(NULL,island,faction,space,world);
+}
 
-    Structure *s = island->addStructure(new CommandCenter(faction),world);
+void captureIsland(Vehicle *b, BoxIsland *island, int faction, dSpaceID space, dWorldID world)
+{
+    Structure *s = NULL;
+    if (b)
+    {
+        Vec3f vector = b->getForward();
+        vector = vector.normalize();
+        Vec3f p = b->getPos()+Vec3f(70 * vector);       // Length of the command center and a little bit more.
+        s = island->addStructure(new CommandCenter(faction),p[0]-island->getX(),p[2]-island->getZ(),0,world);
+    }
+    else
+    {
+        // Just build the command center anywhere.
+        s = island->addStructure(new CommandCenter(faction),world);
+    }
 
     if (s)
     {
@@ -1337,6 +1351,6 @@ void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID worl
         mg.msg = std::string(msg);
         messages.insert(messages.begin(),  mg);
 
-        wipeEnemyStructures(island);
+        wipeEnemyStructures(island,faction);
     }
 }

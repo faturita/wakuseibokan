@@ -201,7 +201,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Runways.
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                //printf("4\n");
+                //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
                 contact[i].surface.slip1 = 0.9f;
@@ -216,7 +216,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             {
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                printf("Hit structure\n");
+                //printf("Hit structure\n");
 
                 contact[i].surface.mu = 0;
                 contact[i].surface.bounce = 0.2f;
@@ -250,6 +250,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
+                 if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
+                 if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
+
                  if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
                  if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
 
@@ -261,6 +264,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                  dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
+                 //printf("6\n");
                  contact[i].surface.mu = 0.0f;
                  contact[i].surface.slip1 = 0.1f;
                  contact[i].surface.slip2 = 0.1f;
@@ -279,9 +283,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             } else {
                 // Object against object collision.
-
-                if (v1 && isManta(v1) && groundcollisions(v1)) {}
-                if (v2 && isManta(v2) && groundcollisions(v2)) {}
+                 //printf("7\n");
+                if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
+                if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
             }
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
@@ -580,6 +584,8 @@ void savegame()
 
                 Vec3f p= entities[strs[i]]->getPos();
                 ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+                float orientation = getAzimuthRadians(entities[strs[i]]->getForward());
+                ss << orientation << std::endl;
                 ss << entities[strs[i]]->getHealth() << std::endl;
                 ss << entities[strs[i]]->getPower() << std::endl;
 
@@ -764,10 +770,11 @@ void loadgame()
 
                 Vec3f f(0,0,0);
                 ss >> f[0] >> f[1] >> f[2] ;
+                float orientation; ss >> orientation;
                 float health;ss >> health ;
                 float power; ss >> power ;
 
-                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],world);
+                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],orientation,world);
 
             }
         }

@@ -330,7 +330,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         char msg[256];
                         Message mg;
                         mg.faction = m->getFaction();
-                        sprintf(msg,"Manta %2d is ready for launch.",m->getNumber());
+                        sprintf(msg,"Manta %2d is ready for launch.",NUMBERING(m->getNumber()));
                         mg.msg = std::string(msg);
                         messages.insert(messages.begin(), mg);
                     }
@@ -368,7 +368,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                     if (island)
                     {
-                        captureIsland(island,w->getFaction(),space, world);
+                        captureIsland(w,island,w->getFaction(),space, world);
                     }
                 }
 

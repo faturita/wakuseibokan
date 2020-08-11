@@ -466,7 +466,7 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
         if (!w->isAuto() || ( w->getIsland() == is && timer>(timeevent + 1000))  )
         {
             assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-            captureIsland(is,w->getFaction(),space, world);
+            captureIsland(w,is,w->getFaction(),space, world);
             timeevent = timer; return 3;
         }
     } else

@@ -146,7 +146,7 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 
 void zoommapin()
 {
-    if (mapzoom < 6)
+    if (mapzoom < 11)
         mapzoom++;
 }
 

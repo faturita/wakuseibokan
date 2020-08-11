@@ -31,6 +31,8 @@ public:
 
     void embody(dBodyID myBodySelf);
 
+    void rotate(float yawangle);
+
     void virtual setPos(const Vec3f &newpos);
     void virtual setPos(float x, float y, float z);
 

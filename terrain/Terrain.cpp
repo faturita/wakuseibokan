@@ -200,11 +200,13 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
     float heightOffset = 0;
     float x = 0;
     float z = 0;
+    float angle = 0;
     do {
 
         // @NOTE Make a parameter out of the size of the island.
         x = (rand() % 3550 + 1); x -= 1800;
         z = (rand() % 3550 + 1); z -= 1800;
+        angle = (rand() % 360) * (2.0*PI/360);
 
         assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
 
@@ -214,7 +216,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
         printf("Height %10.5f\n", heightOffset);
     } while (heightOffset < 4);
 
-    return addStructure(structure,x,z,world);
+    return addStructure(structure,x,z,angle, world);
 
 }
 
@@ -229,17 +231,23 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
  * @param world
  * @return
  */
-Structure* BoxIsland::addStructure(Structure* structure, float x, float z, dWorldID world)
+Structure* BoxIsland::addStructure(Structure* structure, float x, float z, float angle, dWorldID world)
 {
     // This should be half the height of the structure. @FIXME
     float heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
     structure->init();
     structure->embody(world,islandspace);
     structure->setPos(X+x,heightOffset,Z+z);
+    structure->rotate(angle);
     structure->onIsland(this);
 
-    // @FIXME: when the structure is destroyed this pointer must be eliminated.
-    structures.push_back(entities->push_back(structure,structure->getGeom()));
+    // @NOTE:  Once structures are destroyed, this reference will be dangling.  However, checkstructures will verify that all the indeces
+    //    that are stored here are valid, and will delete those which are not.  Some form of prunning.
+    size_t structureId = entities->push_back(structure,structure->getGeom());
+    structures.push_back(structureId);
+
+    if (structure->getType() == CONTROL)
+        commandCenterId = structureId;
 
     return structure;
 }
@@ -248,9 +256,8 @@ void BoxIsland::checkStructures()
 {
     for(int i=0;i<structures.size();i++)
     {
-        // @FIMXE: This is wrong.  The index of container is not unique per object and what may happen is that it does not reference
-        // the same object.  Hence, this is a very ugly workaround so that I can check if there is still a valid pointer at that position
-        // I will retrieve it only when it is of type Structure.
+        // @NOTE:  once structuers are deleted, even if they are replaced by other vehicles, this will check if the structure yet belong
+        //    to the island and will delete it otherwise.  @FIXME: check if this is a structure but belongs to another island.
         if (!(entities->isValid(structures[i]) && entities->operator[](structures[i])->getType()>=COLLISIONABLE) )
         {
             structures.erase(structures.begin()+i);
@@ -265,8 +272,18 @@ std::vector<size_t> BoxIsland::getStructures()
     return structures;
 }
 
+
 Structure* BoxIsland::getCommandCenter()
 {
+    // Just a small improvement.  When the command center is there, it is accessed directly.
+    if (commandCenterId !=0 &&
+            (entities->isValid(commandCenterId)) &&
+            (entities->operator[](commandCenterId)->getType()==CONTROL)   )
+    {
+        Structure *s = (Structure*) entities->operator[](commandCenterId);
+        return s;
+    }
+
     checkStructures();
     for(int i=0;i<structures.size();i++)
     {
