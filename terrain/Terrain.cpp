@@ -247,7 +247,7 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, float
     structures.push_back(structureId);
 
     if (structure->getType() == CONTROL)
-        commandCenterId = structureId;
+        commandCenterId = structureId;          //@NOTE: commandCenterId is an index for entities !
 
     return structure;
 }

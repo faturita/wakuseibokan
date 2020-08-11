@@ -1,6 +1,7 @@
 #ifndef MISSILE_H
 #define MISSILE_H
 
+#include <vector>
 #include "Gunshot.h"
 
 
@@ -19,6 +20,7 @@ protected:
     float midpointpitch = -5;
 
     bool ond;                   // Used for runonce.
+
 public:
     Missile(int faction);
     ~Missile();

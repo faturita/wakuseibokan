@@ -3270,6 +3270,15 @@ void checktest35(unsigned long timer)
 
 void test36()
 {
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,-0.0f);
@@ -3281,14 +3290,7 @@ void test36()
     Structure *t9 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
 
 
-    // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-17000.0f);
-    _b->stop();
 
-    entities.push_back(_b, _b->getGeom());
 
 
     Vec3f pos(-230,1.32, 0);
@@ -3329,7 +3331,7 @@ void checktest36(unsigned long timer)
 
         std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-        action = (lb)->fire(world,space);
+        action = (lb)->fireGround(world,space);
 
         if (action != NULL)
         {
@@ -3369,7 +3371,7 @@ void checktest36(unsigned long timer)
 
     if (timer == 1200)
     {
-        Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
+        Beluga *bg = (Beluga*) findCarrier(GREEN_FACTION);
         if (!bg)
         {
             printf("Test passed OK!\n");
@@ -3389,6 +3391,15 @@ void checktest36(unsigned long timer)
 
 void test37()
 {
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-3000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,-0.0f);
@@ -3398,16 +3409,6 @@ void test37()
 
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
     Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
-
-
-    // Entities will be added later in time.
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-3000.0f);
-    _b->stop();
-
-    entities.push_back(_b, _b->getGeom());
 
 
     Vec3f pos(-230,1.32, 0);

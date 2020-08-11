@@ -1108,7 +1108,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
             {
                 if (c->getTtl()<=0)
                 {
-                    // @TODO Structures should be rotated also.  Now they all have the same orientation.
+                    // Structures can be rotated.  This is important for runways.
                     int which = (rand() % 30 + 1);
                     Structure *s;
 
