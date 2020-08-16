@@ -6,6 +6,8 @@
 
 #include "Structure.h"
 
+enum ISLANDTYPES { DEFENSE_ISLAND, FACTORY_ISLAND, LOGISTICS_ISLAND };
+
 class CommandCenter : public Structure
 {
 protected:
@@ -28,16 +30,19 @@ protected:
     bool isunderattack = false;
     unsigned long myTimer=0;
 
+    int islandType;
+
 public:
     static const int BUILDING_TIME = 400;
 
 
-    CommandCenter(int faction);
+    CommandCenter(int faction, int islandType);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 
     int getType();
+    int getSubType() override;
 
     void restart();
     void setUnderAttack(bool isunderattack);
@@ -45,6 +50,7 @@ public:
     void setTimer(unsigned long timer);
     unsigned long getTimer();
 
+    int getIslandType() const;
 };
 
 #endif // COMMANDCENTER_H

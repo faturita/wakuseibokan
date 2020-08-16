@@ -557,30 +557,14 @@ void savegame()
             {
                 ss << entities[strs[i]]->getFaction() << std::endl;
                 ss << entities[strs[i]]->getType() << std::endl;
-                int subtype = 0;
+                ss << entities[strs[i]]->getSubType() << std::endl;
 
-                if (Artillery *lb = dynamic_cast<Artillery*>(entities[strs[i]]))
-                    subtype = 1;
-                else if (CommandCenter *lb = dynamic_cast<CommandCenter*>(entities[strs[i]]))
-                    subtype = 2;
-                else if (Hangar *lb = dynamic_cast<Hangar*>(entities[strs[i]]))
-                    subtype = 3;
-                else if (Warehouse *lb = dynamic_cast<Warehouse*>(entities[strs[i]]))
-                    subtype = 4;
-                else if (Runway *lb = dynamic_cast<Runway*>(entities[strs[i]]))
-                    subtype = 5;
-                else if (LaserTurret *lb = dynamic_cast<LaserTurret*>(entities[strs[i]]))
-                    subtype = 6;
-                else if (Turret *lb = dynamic_cast<Turret*>(entities[strs[i]]))
-                    subtype = 7;
-                else if (Launcher *l = dynamic_cast<Launcher*>(entities[strs[i]]))
-                    subtype = 9;
-                else if(Structure* lb = dynamic_cast<Structure*>(entities[strs[i]]))
-                    subtype = 8;
+                int typeofisland = 0x4f;
 
-                ss << subtype << std::endl;
-                std::cout << "Subtype saving:" << subtype << std::endl;
+                if (entities[strs[i]]->getSubType() == VehicleSubTypes::COMMANDCENTER)
+                    typeofisland = ((CommandCenter*)entities[strs[i]])->getIslandType();
 
+                ss << typeofisland << std::endl;
 
                 Vec3f p= entities[strs[i]]->getPos();
                 ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
@@ -737,33 +721,47 @@ void loadgame()
                 ss >> type;
                 ss >> subtype;
                 std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+                int typeofisland = 0x4f;
+                ss >> typeofisland;
 
                 switch (subtype) {
-                case 1:
+                case 10:
                     v = new Artillery(faction);
                     break;
-                case 2:
-                    v = new CommandCenter(faction);
+                case 11:
+                    v = new CommandCenter(faction,typeofisland);
                     break;
-                case 3:
+                case 12:
                     v = new Hangar(faction);
                     break;
-                case 4:
+                case 13:
                     v = new Warehouse(faction);
                     break;
-                case 5:
+                case 14:
                     v = new Runway(faction);
                     break;
-                case 6:
+                case 15:
                     v = new LaserTurret(faction);
                     break;
-                case 7:
+                case 16:
                     v = new Turret(faction);
                     break;
-                case 9:
+                case 17:
                     v = new Launcher(faction);
                     break;
-                case 8:
+                case 18:
+                    v = new Factory(faction);
+                    break;
+                case 19:
+                    v = new Dock(faction);
+                    break;
+                case 20:
+                    v = new Antenna(faction);
+                    break;
+                case 21:
+                    v = new Radar(faction);
+                    break;
+                case 22:default:
                     v = new Structure(faction);
                     break;
                 }
@@ -840,10 +838,12 @@ void initWorldPopulation()
 
         for (int j=0;j<islands.size();j++)
         {
+            // @FIXME Decide which island to create.
+            int which = (rand() % 3);
             if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))   //@FIXME
-                captureIsland(islands[j],BLUE_FACTION,space,world);
+                captureIsland(islands[j],BLUE_FACTION,which, space,world);
             else if (islands[j]->getZ()< (200 kmf))
-                captureIsland(islands[j],GREEN_FACTION,space,world);
+                captureIsland(islands[j],GREEN_FACTION,which, space,world);
         }
     }
 

@@ -124,3 +124,7 @@ Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
     return v;
 }
 
+int Runway::getSubType()
+{
+    return RUNWAY;
+}

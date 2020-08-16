@@ -69,6 +69,10 @@
 #include "structures/Turret.h"
 #include "structures/Artillery.h"
 #include "structures/Launcher.h"
+#include "structures/Antenna.h"
+#include "structures/Dock.h"
+#include "structures/Radar.h"
+#include "structures/Factory.h"
 
 #include "map.h"
 
@@ -4699,6 +4703,44 @@ void checktest49(unsigned long timer)
 
 }
 
+void test50()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1800,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.usercontrolling = BOTH_FACTION;
+}
+
+void checktest50(unsigned long timer)
+{
+
+}
 
 static int testing=-1;
 
@@ -4801,6 +4843,7 @@ void initWorldModelling(int testcase)
     case 47:test47();break;                         // Heavy fighting while attackng an island.
     case 48:test48();break;                         // Medusas fighters land after a failed attack from a walrus.
     case 49:test49();break;                         // Check structure orientation (Runways).
+    case 50:test50();break;                         // Check new structures.
     default:initIslands();test1();break;
     }
 
@@ -4868,6 +4911,8 @@ void worldStep(int value)
     case 47:checktest47(timer);break;
     case 48:checktest48(timer);break;
     case 49:checktest49(timer);break;
+    case 50:checktest50(timer);break;
+
     default: break;
     }
 

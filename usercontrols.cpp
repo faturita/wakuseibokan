@@ -360,6 +360,11 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
+                int typeofisland = DEFEND_ISLAND;
+
+                if (controller.str.find("factory") != std::string::npos)
+                    typeofisland = FACTORY_ISLAND;
+
                 if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
                 {
                     Walrus *w = (Walrus*) entities[controller.controllingid];
@@ -368,7 +373,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                     if (island)
                     {
-                        captureIsland(w,island,w->getFaction(),space, world);
+                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
                     }
                 }
 

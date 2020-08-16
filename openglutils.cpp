@@ -10,7 +10,10 @@
 #include <iostream>
 #include <vector>
 
+
+// @FIXME: Oh My God, please fix textures.
 GLuint _textureIdSea;
+
 GLuint _textureBox;
 
 GLuint _textureSky;
@@ -336,6 +339,100 @@ void drawRectangularBox(float width, float height, float length)
     
 }
 
+
+void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
+{
+    float x=xx/2.0f, y=yy/2.0f, z=zz/2.0f;
+
+    //glLoadIdentity();
+    glPushMatrix();
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glBegin(GL_QUADS);
+
+    //Top face
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, z);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glNormal3f(0.0, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-x, y, z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, y, -z);
+
+    //Back face
+    glNormal3f(0.0, 0.0f, -1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-x, y, -z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, - z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, -y, -z);
+
+    //Bottom face
+    glColor3f(1.0f, 0.0f, 1.0f);
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y, - z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, -y, z);
+
+    //Left face
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(- x, - y, z);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, -z);
+
+    //Right face
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, y, -z);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, -y, z);
+
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+}
+
 void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
 {
     float x=xx/2.0f, y=yy/2.0f, z=zz/2.0f;
@@ -516,7 +613,7 @@ void initTextures()
 	_textureIdSea = loadTexture(image);
     delete image;
     
-    image = loadBMP("vtr.bmp");
+    image = loadBMP("structures/metal.bmp");
 	_textureBox = loadTexture(image);
     delete image;
     

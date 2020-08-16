@@ -272,3 +272,8 @@ void Launcher::air()
 {
     aistatus = AIR;
 }
+
+int Launcher::getSubType()
+{
+    return LAUNCHER;
+}

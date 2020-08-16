@@ -183,3 +183,9 @@ void Artillery::doControl(Controller controller)
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
 }
+
+
+int Artillery::getSubType()
+{
+    return ARTILLERY;
+}

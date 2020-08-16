@@ -187,11 +187,11 @@ bool hit(Structure* structure, Gunshot *g)
 
     if (structure)
     {
-        if (b && structure && structure->island && b != structure->island)
+        if (structure && structure->island && b != structure->island)
         {
             char str[256];
             Message mg;
-            mg.faction = structure->getFaction();
+            mg.faction = BOTH_FACTION;
             sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
@@ -1101,7 +1101,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
     {
         BoxIsland *island = islands[i];
 
-        if (island->getStructures().size()<8)
+        if (island->getStructures().size()<14)
         {
             CommandCenter *c = findCommandCenter(island);
             if (c)
@@ -1109,32 +1109,117 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                 if (c->getTtl()<=0)
                 {
                     // Structures can be rotated.  This is important for runways.
-                    int which = (rand() % 30 + 1);
+                    float prob = ((int)(rand() % 100 + 1))/100.0f;
                     Structure *s;
 
+                    struct templatestructure
+                    {
+                        int subType=VehicleSubTypes::STRUCTURE;
+                        float chance=0;
+                        bool onlyonce=false;
+                    };
 
-                    if (1<=which && which<=5)
-                        s = new LaserTurret(c->getFaction());
-                    else if (6<=which && which<=7)
-                        s = new Structure(c->getFaction());
-                    else if (8<=which && which<=10)
-                        s = new Runway(c->getFaction());
-                    else if (11<=which && which<=13)
-                        s = new Warehouse(c->getFaction());
-                    else if (14<=which && which<=20)
-                        s = new Turret(c->getFaction());
-                    else if (21<=which && which<=23)
-                        s = new Artillery(c->getFaction());
-                    else if (24<=which && which<=26)
-                        s = new Launcher(c->getFaction());
-                    else
-                        s = new Warehouse(c->getFaction());
+                    std::vector<struct templatestructure> islandstructs;
+
+                    if (c->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
+                    {
+                        // Softmax, boltzman decay.
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.85;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.4;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.6;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
+                    } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
+
+                        // Factory island
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::FACTORY;tp.chance = 0.2;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.1;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.45;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
+                    } else {
+                        // Logistics island
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
+
+                    }
+
+                    int which = (rand() % islandstructs.size());
+
+                    printf ("Which %d prob %10.5f vs chances %10.5f  \n", which, prob, islandstructs[which].chance );
+                    if (prob<islandstructs[which].chance)
+                    {
+
+
+                        bool ispresent = false;
+                        std::vector<size_t> strs = island->getStructures();
+                        for(size_t i=0;i<strs.size();i++)
+                        {
+                            if (entities[strs[i]]->getSubType() == islandstructs[which].subType)
+                                ispresent = true;
+                        }
+
+                        if (!islandstructs[which].onlyonce || (islandstructs[which].onlyonce && !ispresent))
+                        {
+
+                            Structure *s = NULL;
+                            switch (islandstructs[which].subType) {
+                            case VehicleSubTypes::HANGAR:
+                                    s = new Hangar(c->getFaction());
+                                    break;
+                            case VehicleSubTypes::WAREHOUSE:
+                                s = new Warehouse(c->getFaction());
+                                break;
+                            case VehicleSubTypes::RUNWAY:
+                                s = new Runway(c->getFaction());
+                                break;
+                            case VehicleSubTypes::LASERTURRET:
+                                s = new LaserTurret(c->getFaction());
+                                break;
+                            case VehicleSubTypes::TURRET:
+                                s = new Turret(c->getFaction());
+                                break;
+                            case VehicleSubTypes::LAUNCHER:
+                                s = new Launcher(c->getFaction());
+                                break;
+                            case VehicleSubTypes::FACTORY:
+                                s = new Factory(c->getFaction());
+                                break;
+                            case VehicleSubTypes::DOCK:
+                                s = new Dock(c->getFaction());
+                                break;
+                            case VehicleSubTypes::ANTENNA:
+                                s = new Antenna(c->getFaction());
+                                break;
+                            case VehicleSubTypes::RADAR:
+                                s = new Radar(c->getFaction());
+                                break;
+                            case VehicleSubTypes::STRUCTURE:default:
+                                s = new Structure(c->getFaction());
+                                break;
+
+                            }
+                            island->addStructure(s,world);
+                        }
+                    }
 
 
                     //int x = (rand() % 2000 + 1); x -= 1000;
                     //int z = (rand() % 2000 + 1); z -= 1000;
 
-                    island->addStructure(s,world);
+
 
                     //island->addStructure(s,x,z,space,world);
 
@@ -1228,7 +1313,7 @@ void dockManta()
             char str[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(str, "Manta %2d is now on bay.",((Manta*)entities[i])->getNumber());
+            sprintf(str, "Manta %2d is now on bay.",NUMBERING(((Manta*)entities[i])->getNumber()));
             mg.msg = std::string(str);
 
             messages.insert(messages.begin(), mg);
@@ -1321,12 +1406,12 @@ void wipeEnemyStructures(BoxIsland *island, int faction)
     }
 }
 
-void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world)
+void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world)
 {
-    captureIsland(NULL,island,faction,space,world);
+    captureIsland(NULL,island,faction,typeofisland,space,world);
 }
 
-void captureIsland(Vehicle *b, BoxIsland *island, int faction, dSpaceID space, dWorldID world)
+void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world)
 {
     Structure *s = NULL;
     if (b)
@@ -1334,12 +1419,12 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, dSpaceID space, d
         Vec3f vector = b->getForward();
         vector = vector.normalize();
         Vec3f p = b->getPos()+Vec3f(70 * vector);       // Length of the command center and a little bit more.
-        s = island->addStructure(new CommandCenter(faction),p[0]-island->getX(),p[2]-island->getZ(),0,world);
+        s = island->addStructure(new CommandCenter(faction,typeofisland),p[0]-island->getX(),p[2]-island->getZ(),0,world);
     }
     else
     {
         // Just build the command center anywhere.
-        s = island->addStructure(new CommandCenter(faction),world);
+        s = island->addStructure(new CommandCenter(faction,typeofisland),world);
     }
 
     if (s)

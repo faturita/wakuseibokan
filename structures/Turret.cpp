@@ -196,3 +196,8 @@ void Turret::doControl(Controller controller)
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 }
+
+int Turret::getSubType()
+{
+    return TURRET;
+}

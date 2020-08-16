@@ -2,10 +2,16 @@
 
 extern std::vector<Structure*> structures;
 
-CommandCenter::CommandCenter(int faction)
+int CommandCenter::getIslandType() const
+{
+    return islandType;
+}
+
+CommandCenter::CommandCenter(int faction, int islandType)
 {
     setTtl(CommandCenter::BUILDING_TIME);
     setFaction(faction);
+    CommandCenter::islandType = islandType;
 }
 
 
@@ -67,6 +73,11 @@ void CommandCenter::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 int CommandCenter::getType()
 {
     return CONTROL;
+}
+
+int CommandCenter::getSubType()
+{
+    return COMMANDCENTER;
 }
 
 void CommandCenter::restart()
