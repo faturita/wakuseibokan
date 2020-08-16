@@ -691,6 +691,22 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
 }
 
 
+Antenna* findAntennaFromIsland(BoxIsland *is)
+{
+    std::vector<size_t> strs = is->getStructures();
+
+    for(size_t i;i<strs.size();i++)
+    {
+        Structure *s = (Structure*)entities[strs[i]];
+        if (s->getSubType()==VehicleSubTypes::ANTENNA)
+        {
+            return (Antenna*)s;
+        }
+    }
+
+    return NULL;
+}
+
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = -1;
@@ -781,7 +797,8 @@ void list()
  * This imply that it will start getting damage points all the way up to destruction.
  * If there is no carrier, only the nearest friendly island can work for connection.
  * If a vehicle has a long range communication antenna his getSignal is 4 and is not affected.
- * @TODO: This is the future purpose of the communication antenna.
+ *
+ * @TODO: This is the future purpose of the communication antenna...> Done !
  *
  * @param faction
  * @param space
@@ -808,9 +825,11 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                 if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
                 {
                     // Check if there is a nearby command center. @FIXME This should be a communication link instead.
-                    Island *is = findNearestFriendlyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
+                    BoxIsland *is = findNearestFriendlyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
 
-                    if (!is)
+                    Antenna *a = findAntennaFromIsland(is);
+
+                    if (!is || (is && !a))
                     {
                         if (entities[i]->getSignal()==3)
                         {
