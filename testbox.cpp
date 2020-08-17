@@ -4739,6 +4739,24 @@ void test50()
 
 void checktest50(unsigned long timer)
 {
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer > starttime + 5000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
 
 }
 
