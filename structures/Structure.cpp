@@ -177,3 +177,9 @@ void Structure::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
     position = position - 5*fwd + Up;
     fwd = orig-position;
 }
+
+bool Structure::checkHeightOffset(int heightOffset)
+{
+    // Return TRUE if the height is valid for this structure
+    return (heightOffset >= 4);
+}

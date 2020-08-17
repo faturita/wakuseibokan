@@ -52,6 +52,8 @@ public:
     Vec3f getForward();
 
     void setTexture(GLuint texture);
+
+    bool virtual checkHeightOffset(int heightOffset);
 };
 
 #endif // STRUCTURE_H

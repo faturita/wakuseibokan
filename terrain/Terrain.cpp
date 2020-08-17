@@ -201,6 +201,10 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
     float x = 0;
     float z = 0;
     float angle = 0;
+
+    int breakcounter = 0;
+
+    // @FIXME: While putting docks I need to calculate the heightmap gradient and use that orientation.
     do {
 
         // @NOTE Make a parameter out of the size of the island.
@@ -214,7 +218,10 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
 
         printf("Height %10.5f\n", heightOffset);
-    } while (heightOffset < 4);
+
+        if (breakcounter++==10) break;
+
+    } while (!structure->checkHeightOffset(heightOffset));
 
     return addStructure(structure,x,z,angle, world);
 

@@ -24,6 +24,8 @@ GLuint _textureMetal;
 
 GLuint _textureRoad;
 
+GLuint _textureMilitary;
+
 std::vector<GLuint*> textures;
 
 extern float horizon;
@@ -627,6 +629,10 @@ void initTextures()
 
     image = loadBMP("terrain/road.bmp");
     _textureRoad = loadTexture(image);
+    delete image;
+
+    image = loadBMP("structures/military.bmp");
+    _textureMilitary = loadTexture(image);
     delete image;
 }
 

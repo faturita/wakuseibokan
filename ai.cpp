@@ -439,7 +439,12 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
         {
             printf("Carries has arrived to destination.\n");
 
-            Walrus* w = spawnWalrus(space,world,b);
+            Walrus *w = findWalrus(faction);
+
+            if (!w)
+            {
+                w = spawnWalrus(space,world,b);
+            }
             w->setDestination(is->getPos());
             w->enableAuto();
 
@@ -469,7 +474,7 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
 
             assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
             int which = (rand() % 3);
-            captureIsland(w,is,w->getFaction(),which,space, world);
+            captureIsland(is,w->getFaction(),which,space, world);
             timeevent = timer; return 3;
         }
     } else

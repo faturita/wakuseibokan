@@ -695,7 +695,7 @@ Antenna* findAntennaFromIsland(BoxIsland *is)
 {
     std::vector<size_t> strs = is->getStructures();
 
-    for(size_t i;i<strs.size();i++)
+    for(size_t i=0;i<strs.size();i++)
     {
         Structure *s = (Structure*)entities[strs[i]];
         if (s->getSubType()==VehicleSubTypes::ANTENNA)
@@ -1307,11 +1307,10 @@ void dockWalrus(Vehicle *dock)
         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
-            int walrusNumber = ((Walrus*)entities[i])->getNumber()+1;
             char msg[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(msg, "Walrus %d is now back on deck.",walrusNumber+1);
+            sprintf(msg, "Walrus %d is now back on deck.",NUMBERING((Walrus*)entities[i])->getNumber());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
 
@@ -1379,7 +1378,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = b->getFaction();
-            sprintf(msg, "Manta %2d has been launched.", m->getNumber()+1);
+            sprintf(msg, "Manta %2d has been launched.", NUMBERING(m->getNumber()));
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
             takeoff();
@@ -1399,7 +1398,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = r->getFaction();
-            sprintf(msg, "Medusa %2d is departing from %s.", m->getNumber()+1, is->getName().c_str());
+            sprintf(msg, "Medusa %2d is departing from %s.", NUMBERING(m->getNumber()), is->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
             takeoff();
@@ -1438,6 +1437,14 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
         Vec3f vector = b->getForward();
         vector = vector.normalize();
         Vec3f p = b->getPos()+Vec3f(70 * vector);       // Length of the command center and a little bit more.
+
+        // @FIXME: Check if size do not goes beyond island boundaries.
+        if ((p[0]-island->getX())>1800 || (p[0]-island->getX())<-1800 || (p[2]-island->getZ())>1800 || (p[2]-island->getZ())<-1800 )
+        {
+            printf("Not enough room for command center.");
+            return;  // Cancel the commandcenter creation, there is no room.
+        }
+
         s = island->addStructure(new CommandCenter(faction,typeofisland),p[0]-island->getX(),p[2]-island->getZ(),0,world);
     }
     else

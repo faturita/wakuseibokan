@@ -1,5 +1,7 @@
 #include "CommandCenter.h"
 
+extern GLuint _textureMilitary;
+
 extern std::vector<Structure*> structures;
 
 int CommandCenter::getIslandType() const
@@ -45,7 +47,7 @@ void CommandCenter::drawModel(float yRot, float xRot, float x, float y, float z)
         glScalef(1.0f,1.0f,1.0f);
 
         //_model->draw(Structure::texture);
-        drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(_textureMilitary,Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

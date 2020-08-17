@@ -11,6 +11,8 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getSubType() override;
+
+    bool checkHeightOffset(int heightOffset) override;
 };
 
 #endif // DOCK_H

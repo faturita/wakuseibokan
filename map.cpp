@@ -336,7 +336,7 @@ void drawMap()
                 {
                     if (entities[i]->getType() == CARRIER)
                     {
-                        drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"B",0.1f,1.0f,1.0f,0.0f);
+                        placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,10,"units/carriertarget.bmp");
                     } else if (entities[i]->getType() == WALRUS)
                     {
                         drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);

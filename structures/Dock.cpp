@@ -54,3 +54,8 @@ int Dock::getSubType()
 {
     return DOCK;
 }
+
+bool Dock::checkHeightOffset(int heightOffset)
+{
+    return (heightOffset < 1) ;
+}
