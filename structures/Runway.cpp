@@ -38,6 +38,8 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
+        doTransform(f,R);
+
         //_model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length, _textureRoad);
         drawTheRectangularBox(_textureRoad,Structure::width, Structure::height, Structure::length);
@@ -50,19 +52,20 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void Runway::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+void Runway::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
 {
     position = getPos();
-    forward = getForward();
+    fwd = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,Structure::elevation);
+
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
 
-    forward = forward.normalize();
+    fwd = fwd.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=15;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position - 100*forward + Up;
-    forward = orig-position;
+    position = position - 100*fwd + Up;
+    fwd = orig-position;
 }
 
 int Runway::getType()
@@ -91,8 +94,8 @@ void Runway::launch(Manta* m)
     m->setPos(p);
     dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
 
-    //m->release(getForward());
-    //m->setForward(getForward());
+    m->release(getForward());
+    m->setForward(getForward());
 
     Vec3f f;
     f = m->getForward();
@@ -114,10 +117,14 @@ Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
         _manta1->setStatus(Manta::LANDED);
         _manta1->inert = true;
-        //alignToMe(_manta1->getBodyID());
+        alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;
     }
 
     return v;
 }
 
+int Runway::getSubType()
+{
+    return RUNWAY;
+}

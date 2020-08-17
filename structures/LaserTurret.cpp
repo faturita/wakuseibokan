@@ -105,3 +105,8 @@ void LaserTurret::doControl(Controller cr)
     Turret::doControl(cr);
     if (LaserTurret::ls) locateLaserRay(LaserTurret::ls);
 }
+
+int LaserTurret::getSubType()
+{
+    return LASERTURRET;
+}

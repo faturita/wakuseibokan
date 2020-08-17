@@ -439,7 +439,12 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
         {
             printf("Carries has arrived to destination.\n");
 
-            Walrus* w = spawnWalrus(space,world,b);
+            Walrus *w = findWalrus(faction);
+
+            if (!w)
+            {
+                w = spawnWalrus(space,world,b);
+            }
             w->setDestination(is->getPos());
             w->enableAuto();
 
@@ -465,8 +470,11 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
         // @FIXME: It may happen that the walrus is wandering do nothing never de-autopilot and this is endless.
         if (!w->isAuto() || ( w->getIsland() == is && timer>(timeevent + 1000))  )
         {
+            // @FIXME: Decide which island to create.
+
             assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-            captureIsland(is,w->getFaction(),space, world);
+            int which = (rand() % 3);
+            captureIsland(is,w->getFaction(),which,space, world);
             timeevent = timer; return 3;
         }
     } else

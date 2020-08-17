@@ -1,12 +1,15 @@
-#include "Warehouse.h"
+#include "Dock.h"
 
-Warehouse::Warehouse(int faction)
+extern GLuint _textureSky;
+extern GLuint _textureMetal;
+
+Dock::Dock(int faction)
 {
     setFaction(faction);
 }
 
 
-void Warehouse::init()
+void Dock::init()
 {
     //Load the model
     _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
@@ -15,14 +18,14 @@ void Warehouse::init()
 
     }
 
-    Structure::height=50;
-    Structure::length=70;
-    Structure::width=40;
+    Structure::height=2;
+    Structure::length=500;
+    Structure::width=20;
 
     setForward(0,0,1);
 }
 
-void Warehouse::drawModel(float yRot, float xRot, float x, float y, float z)
+void Dock::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
@@ -36,7 +39,8 @@ void Warehouse::drawModel(float yRot, float xRot, float x, float y, float z)
         glScalef(1.0f,1.0f,1.0f);
 
         //_model->draw(Structure::texture);
-        drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(_textureMetal,20,50,40);
+        drawTexturedBox(_textureMetal,Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }
@@ -46,7 +50,12 @@ void Warehouse::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-int Warehouse::getSubType()
+int Dock::getSubType()
 {
-    return WAREHOUSE;
+    return DOCK;
+}
+
+bool Dock::checkHeightOffset(int heightOffset)
+{
+    return (heightOffset < 1) ;
 }

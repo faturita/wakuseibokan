@@ -201,7 +201,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 // Manta landing on Runways.
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                //printf("4\n");
+                //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
                 contact[i].surface.slip1 = 0.9f;
@@ -216,7 +216,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             {
                 contact[i].surface.mode = dContactBounce |
                 dContactApprox1;
-                printf("Hit structure\n");
+                //printf("Hit structure\n");
 
                 contact[i].surface.mu = 0;
                 contact[i].surface.bounce = 0.2f;
@@ -250,6 +250,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
+                 if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
+                 if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
+
                  if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
                  if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
 
@@ -261,6 +264,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
                  dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
+                 //printf("6\n");
                  contact[i].surface.mu = 0.0f;
                  contact[i].surface.slip1 = 0.1f;
                  contact[i].surface.slip2 = 0.1f;
@@ -279,9 +283,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             } else {
                 // Object against object collision.
-
-                if (v1 && isManta(v1) && groundcollisions(v1)) {}
-                if (v2 && isManta(v2) && groundcollisions(v2)) {}
+                 //printf("7\n");
+                if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
+                if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
             }
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
@@ -553,33 +557,19 @@ void savegame()
             {
                 ss << entities[strs[i]]->getFaction() << std::endl;
                 ss << entities[strs[i]]->getType() << std::endl;
-                int subtype = 0;
+                ss << entities[strs[i]]->getSubType() << std::endl;
 
-                if (Artillery *lb = dynamic_cast<Artillery*>(entities[strs[i]]))
-                    subtype = 1;
-                else if (CommandCenter *lb = dynamic_cast<CommandCenter*>(entities[strs[i]]))
-                    subtype = 2;
-                else if (Hangar *lb = dynamic_cast<Hangar*>(entities[strs[i]]))
-                    subtype = 3;
-                else if (Warehouse *lb = dynamic_cast<Warehouse*>(entities[strs[i]]))
-                    subtype = 4;
-                else if (Runway *lb = dynamic_cast<Runway*>(entities[strs[i]]))
-                    subtype = 5;
-                else if (LaserTurret *lb = dynamic_cast<LaserTurret*>(entities[strs[i]]))
-                    subtype = 6;
-                else if (Turret *lb = dynamic_cast<Turret*>(entities[strs[i]]))
-                    subtype = 7;
-                else if (Launcher *l = dynamic_cast<Launcher*>(entities[strs[i]]))
-                    subtype = 9;
-                else if(Structure* lb = dynamic_cast<Structure*>(entities[strs[i]]))
-                    subtype = 8;
+                int typeofisland = 0x4f;
 
-                ss << subtype << std::endl;
-                std::cout << "Subtype saving:" << subtype << std::endl;
+                if (entities[strs[i]]->getSubType() == VehicleSubTypes::COMMANDCENTER)
+                    typeofisland = ((CommandCenter*)entities[strs[i]])->getIslandType();
 
+                ss << typeofisland << std::endl;
 
                 Vec3f p= entities[strs[i]]->getPos();
                 ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+                float orientation = getAzimuthRadians(entities[strs[i]]->getForward());
+                ss << orientation << std::endl;
                 ss << entities[strs[i]]->getHealth() << std::endl;
                 ss << entities[strs[i]]->getPower() << std::endl;
 
@@ -731,43 +721,58 @@ void loadgame()
                 ss >> type;
                 ss >> subtype;
                 std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+                int typeofisland = 0x4f;
+                ss >> typeofisland;
 
                 switch (subtype) {
-                case 1:
+                case 10:
                     v = new Artillery(faction);
                     break;
-                case 2:
-                    v = new CommandCenter(faction);
+                case 11:
+                    v = new CommandCenter(faction,typeofisland);
                     break;
-                case 3:
+                case 12:
                     v = new Hangar(faction);
                     break;
-                case 4:
+                case 13:
                     v = new Warehouse(faction);
                     break;
-                case 5:
+                case 14:
                     v = new Runway(faction);
                     break;
-                case 6:
+                case 15:
                     v = new LaserTurret(faction);
                     break;
-                case 7:
+                case 16:
                     v = new Turret(faction);
                     break;
-                case 9:
+                case 17:
                     v = new Launcher(faction);
                     break;
-                case 8:
+                case 18:
+                    v = new Factory(faction);
+                    break;
+                case 19:
+                    v = new Dock(faction);
+                    break;
+                case 20:
+                    v = new Antenna(faction);
+                    break;
+                case 21:
+                    v = new Radar(faction);
+                    break;
+                case 22:default:
                     v = new Structure(faction);
                     break;
                 }
 
                 Vec3f f(0,0,0);
                 ss >> f[0] >> f[1] >> f[2] ;
+                float orientation; ss >> orientation;
                 float health;ss >> health ;
                 float power; ss >> power ;
 
-                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],world);
+                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],orientation,world);
 
             }
         }
@@ -833,10 +838,12 @@ void initWorldPopulation()
 
         for (int j=0;j<islands.size();j++)
         {
+            // @FIXME Decide which island to create.
+            int which = (rand() % 3);
             if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))   //@FIXME
-                captureIsland(islands[j],BLUE_FACTION,space,world);
+                captureIsland(islands[j],BLUE_FACTION,which, space,world);
             else if (islands[j]->getZ()< (200 kmf))
-                captureIsland(islands[j],GREEN_FACTION,space,world);
+                captureIsland(islands[j],GREEN_FACTION,which, space,world);
         }
     }
 

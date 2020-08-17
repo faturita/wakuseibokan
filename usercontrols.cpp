@@ -330,7 +330,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         char msg[256];
                         Message mg;
                         mg.faction = m->getFaction();
-                        sprintf(msg,"Manta %2d is ready for launch.",m->getNumber());
+                        sprintf(msg,"Manta %2d is ready for launch.",NUMBERING(m->getNumber()));
                         mg.msg = std::string(msg);
                         messages.insert(messages.begin(), mg);
                     }
@@ -360,6 +360,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
+                int typeofisland = DEFEND_ISLAND;
+
+                if (controller.str.find("factory") != std::string::npos)
+                    typeofisland = FACTORY_ISLAND;
+
+                if (controller.str.find("logistics") != std::string::npos)
+                    typeofisland = LOGISTICS_ISLAND;
+
                 if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
                 {
                     Walrus *w = (Walrus*) entities[controller.controllingid];
@@ -368,7 +376,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                     if (island)
                     {
-                        captureIsland(island,w->getFaction(),space, world);
+                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
                     }
                 }
 

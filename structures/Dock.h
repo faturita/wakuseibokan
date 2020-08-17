@@ -1,16 +1,18 @@
-#ifndef HANGAR_H
-#define HANGAR_H
+#ifndef DOCK_H
+#define DOCK_H
 
 #include "Structure.h"
 
-class Hangar : public Structure
+class Dock : public Structure
 {
 public:
-    Hangar(int faction);
+    Dock(int faction);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getSubType() override;
+
+    bool checkHeightOffset(int heightOffset) override;
 };
 
-#endif // HANGAR_H
+#endif // DOCK_H

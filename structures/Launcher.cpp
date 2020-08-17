@@ -187,7 +187,7 @@ Vehicle* Launcher::fireGround(dWorldID world, dSpaceID space)
     if (getTtl()>0)
         return NULL;
 
-    AAM *action = new AAM(getFaction());
+    Missile *action = new Missile(getFaction());
     // Need axis conversion.
     action->init();
     action->setOrigin(me);
@@ -271,4 +271,9 @@ void Launcher::ground()
 void Launcher::air()
 {
     aistatus = AIR;
+}
+
+int Launcher::getSubType()
+{
+    return LAUNCHER;
 }

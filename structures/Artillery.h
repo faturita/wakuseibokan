@@ -27,6 +27,8 @@ public:
 
     void virtual doControl(Controller);
     void virtual doControl();
+
+    int getSubType() override;
 };
 
 #endif // ARTILLERY_H

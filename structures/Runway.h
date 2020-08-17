@@ -15,6 +15,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getType();
+    int getSubType() override;
 
     void taxi(Manta *m);
     void launch(Manta* m);

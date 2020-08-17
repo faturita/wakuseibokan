@@ -1,16 +1,16 @@
-#ifndef HANGAR_H
-#define HANGAR_H
+#ifndef FACTORY_H
+#define FACTORY_H
 
 #include "Structure.h"
 
-class Hangar : public Structure
+class Factory : public Structure
 {
 public:
-    Hangar(int faction);
+    Factory(int faction);
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getSubType() override;
 };
 
-#endif // HANGAR_H
+#endif // FACTORY_H

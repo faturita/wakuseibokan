@@ -35,6 +35,10 @@
 #include "structures/CommandCenter.h"
 #include "structures/Artillery.h"
 #include "structures/Launcher.h"
+#include "structures/Dock.h"
+#include "structures/Antenna.h"
+#include "structures/Factory.h"
+#include "structures/Radar.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -171,12 +175,15 @@ BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 
+Antenna* findAntennaFromIsland(BoxIsland *is);
+
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 
-void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
-void wipeEnemyStructures(BoxIsland *island);
+void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
+void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
+void wipeEnemyStructures(BoxIsland *island, int faction);
 
 
 

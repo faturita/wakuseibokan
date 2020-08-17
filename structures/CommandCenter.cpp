@@ -1,11 +1,19 @@
 #include "CommandCenter.h"
 
+extern GLuint _textureMilitary;
+
 extern std::vector<Structure*> structures;
 
-CommandCenter::CommandCenter(int faction)
+int CommandCenter::getIslandType() const
+{
+    return islandType;
+}
+
+CommandCenter::CommandCenter(int faction, int islandType)
 {
     setTtl(CommandCenter::BUILDING_TIME);
     setFaction(faction);
+    CommandCenter::islandType = islandType;
 }
 
 
@@ -39,7 +47,7 @@ void CommandCenter::drawModel(float yRot, float xRot, float x, float y, float z)
         glScalef(1.0f,1.0f,1.0f);
 
         //_model->draw(Structure::texture);
-        drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(_textureMilitary,Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }
@@ -67,6 +75,11 @@ void CommandCenter::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 int CommandCenter::getType()
 {
     return CONTROL;
+}
+
+int CommandCenter::getSubType()
+{
+    return COMMANDCENTER;
 }
 
 void CommandCenter::restart()

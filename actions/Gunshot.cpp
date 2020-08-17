@@ -68,7 +68,7 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 
         Vec3f v = dBodyGetLinearVelVec(me);
 
-        v = v*1;
+        v = v*1.0/10.0;
 
         drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
         //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
