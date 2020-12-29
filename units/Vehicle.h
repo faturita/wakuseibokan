@@ -185,6 +185,8 @@ public:
     int getOrder() const;
     void setOrder(int value);
     int getAistatus() const;
+
+    std::string subTypeText(int code);
 };
 
 #endif /* VEHICLE_H_ */

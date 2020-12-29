@@ -10,6 +10,31 @@
 #include <assert.h>
 #include "../md2model.h"
 
+
+
+std::string Vehicle::subTypeText(int code)
+{
+    switch (code) {
+    case VehicleSubTypes::DOCK:return std::string("Dock");break;
+    case VehicleSubTypes::RADAR:return std::string("Radar");break;
+    case VehicleSubTypes::BELUGA:return std::string("Beluga Carrier");break;
+    case VehicleSubTypes::HANGAR:return std::string("Hangar");break;
+    case VehicleSubTypes::MEDUSA:return std::string("Medusa Fighter");break;
+    case VehicleSubTypes::RUNWAY:return std::string("Runway");break;
+    case VehicleSubTypes::TURRET:return std::string("Gunlet Turret");break;
+    case VehicleSubTypes::ANTENNA:return std::string("Comm Antenna");break;
+    case VehicleSubTypes::FACTORY:return std::string("Factory");break;
+    case VehicleSubTypes::LAUNCHER:return std::string("Missile Launcher");break;
+    case VehicleSubTypes::ARTILLERY:return std::string("Artillery");break;
+    case VehicleSubTypes::STRUCTURE:return std::string("Basic Structure Building");break;
+    case VehicleSubTypes::WAREHOUSE:return std::string("Warehouse");break;
+    case VehicleSubTypes::BALAENIDAE:return std::string("Balaenidae Carrier");break;
+    case VehicleSubTypes::LASERTURRET:return std::string("Laser Turret");break;
+    case VehicleSubTypes::COMMANDCENTER:return std::string("CommandCenter");break;
+    default:return std::string("Unit");break;
+    }
+}
+
 int Vehicle::getStatus() const
 {
     return status;

@@ -3916,7 +3916,7 @@ void test43()
     Camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest43(unsigned long timer)
@@ -4060,7 +4060,7 @@ void test44()
     Camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest44(unsigned long timer)
@@ -4177,7 +4177,7 @@ void test45()
     Camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest45(unsigned long timer)
@@ -4572,7 +4572,7 @@ void test47()
     Camera.setPos(pos);
 
     aiplayer = BOTH_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest47(unsigned long timer)
@@ -4627,7 +4627,7 @@ void test48()
     Camera.setPos(pos);
 
     aiplayer = BLUE_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest48(unsigned long timer)
@@ -4695,7 +4695,7 @@ void test49()
     Camera.setPos(pos);
 
     aiplayer = BLUE_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest49(unsigned long timer)
@@ -4734,7 +4734,7 @@ void test50()
     Camera.setPos(pos);
 
     aiplayer = BLUE_AI;
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 }
 
 void checktest50(unsigned long timer)
@@ -4867,7 +4867,7 @@ void initWorldModelling(int testcase)
 
     testing = testcase;
 
-    controller.usercontrolling = BOTH_FACTION;
+    controller.faction = BOTH_FACTION;
 
 }
 

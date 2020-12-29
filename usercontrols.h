@@ -75,7 +75,7 @@ public:
         return teletype;
     };
 
-    int usercontrolling;
+    int faction;
 };
 
 

@@ -827,7 +827,12 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                     // Check if there is a nearby command center. @FIXME This should be a communication link instead.
                     BoxIsland *is = findNearestFriendlyIsland(entities[i]->getPos(),false,entities[i]->getFaction(),COMM_RANGE);
 
-                    Antenna *a = findAntennaFromIsland(is);
+                    Antenna *a = NULL;
+
+                    if (is)
+                    {
+                        a = findAntennaFromIsland(is);
+                    }
 
                     if (!is || (is && !a))
                     {
@@ -843,6 +848,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         entities[i]->setSignal(2);
                         entities[i]->damage(1);
                     }
+
                 }
                 else
                 {
@@ -1310,7 +1316,8 @@ void dockWalrus(Vehicle *dock)
             char msg[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(msg, "Walrus %d is now back on deck.",NUMBERING((Walrus*)entities[i])->getNumber());
+            int numb = ((Walrus*)entities[i])->getNumber();
+            sprintf(msg, "Walrus %d is now back on deck.",NUMBERING(numb));
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
 

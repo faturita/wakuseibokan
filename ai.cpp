@@ -427,7 +427,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
 
     if (b)
     {
-        BoxIsland *is = findNearestEmptyIsland(b->getPos());
+        BoxIsland *is = findNearestIsland(b->getPos());
 
         // Check if the island is still free
         if (is->getCommandCenter() && is->getCommandCenter()->getFaction()!=faction)
@@ -437,7 +437,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
 
         if (!b->isAuto())
         {
-            printf("Carries has arrived to destination.\n");
+            printf("Carrier has arrived to destination.\n");
 
             Walrus *w = findWalrus(faction);
 

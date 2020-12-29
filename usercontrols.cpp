@@ -129,6 +129,8 @@ void processMouse(int button, int state, int x, int y) {
 
                 } else {
                     centermap(x,y);
+                    Vec3f lo = setLocationOnMap(x,y);
+                    printf("Set location on map (%10.5f, %10.5f)\n", lo[0], lo[2]);
                     zoommapin();
                 }
             }
@@ -232,7 +234,7 @@ void switchControl(int controlposition)
     }
 
     // Check if it is from users faction
-    if (!(entities[id]->getFaction() == controller.usercontrolling || controller.usercontrolling == BOTH_FACTION))
+    if (!(entities[id]->getFaction() == controller.faction || controller.faction == BOTH_FACTION))
     {
         controller.controllingid = CONTROLLING_NONE;
         return;
@@ -318,6 +320,42 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(pos);
 
             } else
+            if (controller.str.find("info") != std::string::npos)
+            {
+                std::string islandcode = controller.str.substr(4+controller.str.substr(4).find(" "));
+                std::string islandname = islandcode.substr(1);
+
+                std::cout << "Island-" << islandname << std::endl;
+
+                for (int j=0;j<islands.size();j++)
+                {
+                    if (islandname == islands[j]->getName())
+                    {
+                        std::vector<size_t> str = islands[j]->getStructures();
+
+                        CommandCenter *cc = (CommandCenter*)islands[j]->getCommandCenter();
+
+                        if (cc)
+                        {
+                            if (cc->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
+                                std::cout << "Defense Island" << std::endl;
+                            else if (cc->getIslandType() == ISLANDTYPES::FACTORY_ISLAND)
+                                std::cout << "Factory Island" << std::endl;
+                            else if (cc->getIslandType() == ISLANDTYPES::LOGISTICS_ISLAND)
+                                std::cout << "Logistic Island" << std::endl;
+                        }
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==controller.faction)
+                            {
+                                std::cout << entities[str[i]]->subTypeText(entities[str[i]]->getSubType()) << "-"
+                                          << entities[str[i]]->getHealth() << std::endl;
+                            }
+                        }
+                    }
+                }
+            } else
             if (controller.str.find("taxi") != std::string::npos)
             {
                 if (entities[controller.controllingid]->getType()==CARRIER)
@@ -383,15 +421,15 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("godmode") != std::string::npos)
             {
-                controller.usercontrolling = BOTH_FACTION;
+                controller.faction = BOTH_FACTION;
             } else
             if (controller.str.find("greenmode") != std::string::npos)
             {
-                controller.usercontrolling = GREEN_FACTION;
+                controller.faction = GREEN_FACTION;
             } else
             if (controller.str.find("bluemode") != std::string::npos)
             {
-                controller.usercontrolling = BLUE_FACTION;
+                controller.faction = BLUE_FACTION;
             } else
             if (controller.str.find("save") != std::string::npos)
             {

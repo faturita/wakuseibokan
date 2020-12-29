@@ -179,7 +179,7 @@ void drawHUD()
         int msgonboard=0;
         for(int i=0;i<messages.size();i++)
         {
-            if (messages[i].faction == controller.usercontrolling || messages[i].faction == BOTH_FACTION || controller.usercontrolling == BOTH_FACTION)
+            if (messages[i].faction == controller.faction || messages[i].faction == BOTH_FACTION || controller.faction == BOTH_FACTION)
             {
                 std::string line = messages[i].msg;
                 if (msgonboard==0)
@@ -698,13 +698,13 @@ int main(int argc, char** argv) {
 
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        controller.usercontrolling = BLUE_FACTION;
+        controller.faction = BLUE_FACTION;
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        controller.usercontrolling = GREEN_FACTION;
+        controller.faction = GREEN_FACTION;
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
-        controller.usercontrolling = BOTH_FACTION;
+        controller.faction = BOTH_FACTION;
     else
-        controller.usercontrolling = GREEN_FACTION;
+        controller.faction = GREEN_FACTION;
 
 
 
