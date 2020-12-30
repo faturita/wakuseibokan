@@ -661,19 +661,26 @@ void loadgame()
                 _walrus->setNumber(findNextNumber(WALRUS));
                 _walrus->embody(world, space);
                 _walrus->setStatus(Walrus::SAILING);
-                _walrus->inert = true;
+                //_walrus->inert = true;
                 v = _walrus;
 
             }
             Vec3f f(0,0,0);
             ss >> f[0] >> f[1] >> f[2] ;
             v->setPos(f);
-            float health;ss >> health ;
-            float power; ss >> power ;
+            float health;ss >> health ;v->damage(1000-health);
+            float power; ss >> power ;v->setPower(power);
 
             float R[12];
             for(int j=0;j<12;j++) ss >> R[j];
-            v->setR(R);
+            v->setRotation(R);
+
+
+            if (type == MANTA)
+            {
+                Manta *m = (Manta*) v;
+                m->release(v->getForward());
+            }
 
             // Destination and auto
             bool isauto;
@@ -772,7 +779,7 @@ void loadgame()
                 float health;ss >> health ;
                 float power; ss >> power ;
 
-                is->addStructure(v   ,       is->getX()-f[0],    is->getZ()-f[2],orientation,world);
+                is->addStructure(v   ,       -is->getX()+f[0],    -is->getZ()+f[2],orientation,world);
 
             }
         }

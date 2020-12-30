@@ -52,9 +52,13 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
 
     if (!v) {
         Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
-        m->doHold(m->getPos(),350);
 
-        timeevent=timer;return 4;
+        if (m)
+        {
+            m->doHold(m->getPos(),350);
+
+            timeevent=timer;return 4;
+        }
     }
 
     if (timer==(timeevent + 200))
@@ -79,7 +83,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
     {
         Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
 
-        if (m)
+        if (m && v)
         {
             m->dogfight(v->getPos());
             m->enableAuto();
@@ -89,7 +93,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
     {
         Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
 
-        if (m)
+        if (m && v)
         {
             m->dogfight(v->getPos());
         } else {

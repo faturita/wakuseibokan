@@ -50,6 +50,7 @@ enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 #define DOCK_RANGE      600
 #define COMM_RANGE      50000
+#define CLOSE_RANGE     1000
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom);
@@ -143,6 +144,7 @@ CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByNumber(size_t &pos, int number);
 Manta* findManta(int faction, int status);
+Manta* findManta(int faction, int status, Vec3f around);
 Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
@@ -167,6 +169,7 @@ void dockManta();
 Manta* launchManta(Vehicle *v);
 void landManta(Vehicle *v);
 void landManta(Vehicle *landplace, Manta *m);
+Manta* taxiManta(Vehicle *v);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);

@@ -358,30 +358,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("taxi") != std::string::npos)
             {
-                if (entities[controller.controllingid]->getType()==CARRIER)
-                {
-                    Balaenidae *r = (Balaenidae*)entities[controller.controllingid];
-                    Manta *m = findManta(r->getFaction(),Manta::ON_DECK);
-                    if (m)
-                    {
-                        r->taxi(m);
-                        char msg[256];
-                        Message mg;
-                        mg.faction = m->getFaction();
-                        sprintf(msg,"Manta %2d is ready for launch.",NUMBERING(m->getNumber()));
-                        mg.msg = std::string(msg);
-                        messages.insert(messages.begin(), mg);
-                    }
-                } else if (entities[controller.controllingid]->getType()==LANDINGABLE )
-                {
-                    Runway *r = (Runway*)entities[controller.controllingid];
-                    Manta *m = findManta(r->getFaction(),Manta::LANDED);
-                    if (m)
-                    {
-                        r->taxi(m);
-
-                    }
-                }
+                taxiManta(entities[controller.controllingid]);
             }
             else
             if (controller.str.find("launch") != std::string::npos)

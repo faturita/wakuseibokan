@@ -119,6 +119,20 @@ void Vehicle::setPos(float x, float y, float z)
     assert( me != NULL || !"Setting position without setting the body!");
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
+
+void Vehicle::setRotation(float *newR)
+{
+    setR(newR);
+
+    assert( me != NULL || !"Setting position without setting the body!");
+    if (me) dBodySetRotation(me, newR);
+
+    dVector3 result;
+    dBodyVectorToWorld(me, 0,0,1,result);       //@NOTE: Every vehicle forward position in their own coordinate system is 0,0,1.
+    setForward(result[0],result[1],result[2]);
+}
+
+
 Vec3f Vehicle::getPos()
 {
 	return pos;

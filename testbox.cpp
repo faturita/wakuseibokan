@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <mutex>
+#include <regex>
 
 #include "ThreeMaxLoader.h"
 
@@ -56,6 +57,7 @@
 #include "units/AdvancedWalrus.h"
 #include "units/Balaenidae.h"
 #include "units/SimplifiedDynamicManta.h"
+#include "units/Medusa.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -4757,6 +4759,114 @@ void checktest50(unsigned long timer)
         endWorldModelling();
         exit(1);
     }
+}
+
+
+void test51()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, DEFENSE_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void message(char* mms)
+{
+    char msg[256];
+    Message mg;
+    sprintf(msg, "%s",mms);
+    mg.faction = BOTH_FACTION;
+    mg.msg = std::string(msg);
+    messages.insert(messages.begin(), mg);
+}
+
+
+void checktest51(unsigned long timer)
+{
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Initiating islands configuration");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == starttime + 400)
+    {
+
+        Runway *r = (Runway*)entities[islands[0]->getStructures()[1]];
+
+        int mantNumber = findNextNumber(MANTA);
+        Vehicle *manta = (r)->spawn(world,space,MANTA,mantNumber);
+        size_t l = entities.push_back(manta, manta->getGeom());
+        manta->setOrder(DEFEND_ISLAND);
+
+        message("Medusa airplane has been spawned");
+
+    }
+
+    if (timer == starttime + 500)
+    {
+        savegame();
+        message("Game saved.");
+    }
+
+
+    if (timer == starttime + 505)
+    {
+        islands.clear();
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            entities[i]->damage(100000);
+        }
+
+    }
+
+
+    if (timer == starttime + 1200)
+    {
+        loadgame();
+    }
+
+
+
+
+    if (timer > starttime + 5000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
 
 }
 
@@ -4764,12 +4874,328 @@ static int testing=-1;
 
 void savegame()
 {
-    assert(!"This should not be called in test mode.");
+    std::ofstream ss("savegame.w", std::ios_base::binary);
+
+    // Version
+    ss << 0x01 << std::endl;
+
+    int entitiessize = 0;
+    // Get flying entities.
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        if (entities[i]->getType() == CARRIER || entities[i]->getType() == MANTA || entities[i]->getType() == WALRUS)
+        {
+            entitiessize++;
+        }
+    }
+
+    ss << entitiessize << std::endl;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        if (entities[i]->getType() == CARRIER || entities[i]->getType() == MANTA || entities[i]->getType() == WALRUS)
+        {
+            ss << entities[i]->getFaction() << std::endl;
+            ss << entities[i]->getType() << std::endl;
+
+            int subtype = 0;
+
+
+            if (AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
+                subtype = 1;
+            else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
+                subtype = 2;
+            else if (Medusa *lb = dynamic_cast<Medusa*>(entities[i]))
+                subtype = 6;
+            else if (SimplifiedDynamicManta *lb = dynamic_cast<SimplifiedDynamicManta*>(entities[i]))
+                subtype = 3;
+            else if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
+                subtype = 4;
+            else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
+                subtype = 5;
+
+            ss << subtype << std::endl;
+
+            std::cout << "Subtype saving:" << subtype << std::endl;
+
+            Vec3f p= entities[i]->getPos();
+            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+            ss << entities[i]->getHealth() << std::endl;
+            ss << entities[i]->getPower() << std::endl;
+
+
+            float R[12];
+            entities[i]->getR(R);
+            for(int j=0;j<12;j++) ss << R[j] << std::endl;
+
+            ss << entities[i]->isAuto() << std::endl;
+            p = entities[i]->getDestination();
+            ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+
+
+        }
+    }
+
+
+    ss << islands.size() << std::endl;
+    for (int j=0;j<islands.size();j++)
+    {
+        std::string s;
+        s = islands[j]->getName();
+
+        s = std::regex_replace(s, std::regex(" "), "-");
+        ss << s << std::endl;
+        ss << islands[j]->getX() << std::endl;
+        ss << islands[j]->getZ() << std::endl;
+        ss << islands[j]->getModelName() << std::endl;
+        std::cout << "Name:" << islands[j]->getName() << std::endl;
+
+        Structure *c =  islands[j]->getCommandCenter();
+
+        if (c)
+        {
+            std::vector<size_t> strs = islands[j]->getStructures();
+            ss << 0x3f << std::endl;
+            ss << strs.size() << std::endl;
+            for(int i=0;i<strs.size();i++)
+            {
+                ss << entities[strs[i]]->getFaction() << std::endl;
+                ss << entities[strs[i]]->getType() << std::endl;
+                ss << entities[strs[i]]->getSubType() << std::endl;
+
+                int typeofisland = 0x4f;
+
+                if (entities[strs[i]]->getSubType() == VehicleSubTypes::COMMANDCENTER)
+                    typeofisland = ((CommandCenter*)entities[strs[i]])->getIslandType();
+
+                ss << typeofisland << std::endl;
+
+                Vec3f p= entities[strs[i]]->getPos();
+                ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
+                float orientation = getAzimuthRadians(entities[strs[i]]->getForward());
+                ss << orientation << std::endl;
+                ss << entities[strs[i]]->getHealth() << std::endl;
+                ss << entities[strs[i]]->getPower() << std::endl;
+
+            }
+        } else {
+            ss << 0x4f << std::endl;
+        }
+
+
+    }
+
+    ss.flush();
+    ss.close();
+
+
 }
+
+
 
 void loadgame()
 {
-    assert(!"This should not be called in test mode.");
+    /**std::ifstream ss("savegame.w", std::ios_base::binary);
+
+    Vec3f f(0,0,0);
+    ss >> f[0] >> f[1] >> f[2] ;
+
+    std::cout << f << std::endl;
+
+    ss.close();**/
+
+    std::ifstream ss("savegame.w", std::ios_base::binary);
+
+    int version;
+    ss >> version;
+
+    int size;
+    ss >> size;
+    std::cout << "Size:" << size << std::endl;
+    for(int i=0;i<size;i++)
+    {
+        Vehicle *v = NULL;
+        int faction;
+        ss >> faction;
+        int type, subtype;
+        ss >> type;
+        ss >> subtype;
+        std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+
+        if (type == CARRIER || type == MANTA || type == WALRUS)
+        {
+            switch (type) {
+            case CARRIER:
+            {
+                Balaenidae *b = NULL;
+                if (subtype==5)
+                    b = new Balaenidae(faction);
+                else if (subtype==4)
+                    b = new Beluga(faction);
+
+                b->init();
+                b->embody(world,space);
+                v = b;
+                break;
+            }
+            case MANTA:
+            {
+                SimplifiedDynamicManta *_manta1 = NULL;
+
+                if (subtype == 6)
+                    _manta1 = new Medusa(faction);
+                else
+                    _manta1 = new SimplifiedDynamicManta(faction);
+
+                _manta1->init();
+                _manta1->setNumber(findNextNumber(MANTA));
+                _manta1->embody(world, space);
+                _manta1->setStatus(Manta::ON_DECK);
+                _manta1->inert = true;
+                v = _manta1;
+                break;
+            }
+            case WALRUS:
+                Walrus *_walrus = NULL;
+                if (subtype == 1)
+                    _walrus = new AdvancedWalrus(faction);
+                else if (subtype == 2)
+                    _walrus = new Walrus(faction);
+                _walrus->init();
+                _walrus->setNumber(findNextNumber(WALRUS));
+                _walrus->embody(world, space);
+                _walrus->setStatus(Walrus::SAILING);
+                _walrus->inert = true;
+                v = _walrus;
+
+            }
+            Vec3f f(0,0,0);
+            ss >> f[0] >> f[1] >> f[2] ;
+            v->setPos(f);
+            float health;ss >> health ;
+            float power; ss >> power ;
+
+            float R[12];
+            for(int j=0;j<12;j++) ss >> R[j];
+            v->setRotation(R);
+
+
+            if (type == MANTA)
+            {
+                Manta *m = (Manta*) v;
+                m->release(v->getForward());
+                //m->setForward(v->getForward());
+            }
+
+
+            // Destination and auto
+            bool isauto;
+            ss >> isauto;
+            ( isauto ? v->enableAuto() : v->disableAuto());
+
+            ss >> f[0] >> f[1] >> f[2] ;
+            v->setDestination(f);
+
+            entities.push_back(v, v->getGeom());
+        }
+    }
+
+    ss >> size;
+    std::cout << "Size:" << size << std::endl;
+    for (int j=0;j<size;j++)
+    {
+        BoxIsland *is = new BoxIsland(&entities);
+        std::string name,modelname;
+        Vec3f loc;
+        ss >> name;is->setName(name);
+        ss >> loc[0];
+        ss >> loc[2];
+        is->setLocation(loc[0],-1,loc[2]);
+        ss >> modelname;
+        std::cout << "Reading Island:" << name << "\t" << modelname << std::endl;
+        is->buildTerrainModel(space,modelname.c_str());
+
+        islands.push_back(is);
+
+        int moredata;
+
+        ss >> moredata;
+
+        if (moredata == 0x3f)
+        {
+            int sze;
+            ss >> sze;
+            for (int i=0;i<sze;i++)
+            {
+                Structure *v = NULL;
+                int faction;
+                ss >> faction;
+                int type, subtype;
+                ss >> type;
+                ss >> subtype;
+                std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+                int typeofisland = 0x4f;
+                ss >> typeofisland;
+
+                switch (subtype) {
+                case 10:
+                    v = new Artillery(faction);
+                    break;
+                case 11:
+                    v = new CommandCenter(faction,typeofisland);
+                    break;
+                case 12:
+                    v = new Hangar(faction);
+                    break;
+                case 13:
+                    v = new Warehouse(faction);
+                    break;
+                case 14:
+                    v = new Runway(faction);
+                    break;
+                case 15:
+                    v = new LaserTurret(faction);
+                    break;
+                case 16:
+                    v = new Turret(faction);
+                    break;
+                case 17:
+                    v = new Launcher(faction);
+                    break;
+                case 18:
+                    v = new Factory(faction);
+                    break;
+                case 19:
+                    v = new Dock(faction);
+                    break;
+                case 20:
+                    v = new Antenna(faction);
+                    break;
+                case 21:
+                    v = new Radar(faction);
+                    break;
+                case 22:default:
+                    v = new Structure(faction);
+                    break;
+                }
+
+                Vec3f f(0,0,0);
+                ss >> f[0] >> f[1] >> f[2] ;
+                float orientation; ss >> orientation;
+                float health;ss >> health ;
+                float power; ss >> power ;
+
+                std::cout << "Location:" << f[0] << "'" << f[2] << ":" << is->getX()-f[0] << "," << is->getZ()-f[2] << std::endl;
+
+                is->addStructure(v   ,       -is->getX()+f[0],    -is->getZ()+f[2],orientation,world);
+
+            }
+        }
+
+    }
+
+
+    ss.close();
+
 }
 
 
@@ -4862,6 +5288,7 @@ void initWorldModelling(int testcase)
     case 48:test48();break;                         // Medusas fighters land after a failed attack from a walrus.
     case 49:test49();break;                         // Check structure orientation (Runways).
     case 50:test50();break;                         // Check new structures.
+    case 51:test51();break;
     default:initIslands();test1();break;
     }
 
@@ -4930,6 +5357,7 @@ void worldStep(int value)
     case 48:checktest48(timer);break;
     case 49:checktest49(timer);break;
     case 50:checktest50(timer);break;
+    case 51:checktest51(timer);break;
 
     default: break;
     }

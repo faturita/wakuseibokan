@@ -104,6 +104,8 @@ public:
     void setR(float newR[12]);
     void alignToMe(dBodyID fBodyID);
 
+    void setRotation(float newR[12]);
+
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void virtual drawModel();
     

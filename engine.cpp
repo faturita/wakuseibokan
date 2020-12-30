@@ -476,6 +476,18 @@ Manta* findMantaByOrder(int faction, int order)
     return NULL;
 }
 
+Manta* findManta(int faction, int status, Vec3f around)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getStatus() == status && v->getFaction() == faction && (around-v->getPos()).magnitude() < CLOSE_RANGE)
+        {
+            return (Manta*)v;
+        }
+    }
+    return NULL;
+}
 
 Manta* findManta(int faction, int status)
 {
@@ -1090,7 +1102,9 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         {
                             Manta *m = findMantaByOrder(lb->getFaction(), DEFEND_ISLAND);
 
-                            if (!m)
+                            Manta *ml = findManta(lb->getFaction(), Manta::LANDED, lb->getPos());
+
+                            if (!m && !ml)
                             {
 
                                 int mantNumber = findNextNumber(MANTA);
@@ -1372,6 +1386,35 @@ void landManta(Vehicle *landplace, Manta *m)
     }
 }
 
+Manta* taxiManta(Vehicle *v)
+{
+    Manta* m = NULL;
+    if (v->getType()==CARRIER)
+    {
+        Balaenidae *r = (Balaenidae*)v;
+        m = findManta(r->getFaction(),Manta::ON_DECK, v->getPos());
+        if (m)
+        {
+            r->taxi(m);
+            char msg[256];
+            Message mg;
+            mg.faction = m->getFaction();
+            sprintf(msg,"Manta %2d is ready for launch.",NUMBERING(m->getNumber()));
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
+        }
+    } else if (v->getType()==LANDINGABLE )
+    {
+        Runway *r = (Runway*)v;
+        m = findManta(r->getFaction(),Manta::LANDED, v->getPos());
+        if (m)
+        {
+            r->taxi(m);
+
+        }
+    }
+    return m;
+}
 
 Manta* launchManta(Vehicle *v)
 {
@@ -1394,7 +1437,9 @@ Manta* launchManta(Vehicle *v)
     } else if (v->getType() == LANDINGABLE)
     {
         Runway *r = (Runway*)v;
-        Manta *m = findManta(v->getFaction(),Manta::LANDED);
+
+        // Need to find the manta that is actually in this island.
+        Manta *m = findManta(v->getFaction(), Manta::LANDED, r->getPos());
         if (m)
         {
             r->launch(m);
