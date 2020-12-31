@@ -17,6 +17,7 @@
 #include <fstream>
 #include <regex>
 
+#include "profiling.h"
 #include "container.h"
 
 #include "odeutils.h"
@@ -512,7 +513,7 @@ void savegame()
 
             ss << subtype << std::endl;
 
-            std::cout << "Subtype saving:" << subtype << std::endl;
+            dout << "Subtype saving:" << subtype << std::endl;
 
             Vec3f p= entities[i]->getPos();
             ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
@@ -544,7 +545,7 @@ void savegame()
         ss << islands[j]->getX() << std::endl;
         ss << islands[j]->getZ() << std::endl;
         ss << islands[j]->getModelName() << std::endl;
-        std::cout << "Name:" << islands[j]->getName() << std::endl;
+        dout << "Name:" << islands[j]->getName() << std::endl;
 
         Structure *c =  islands[j]->getCommandCenter();
 
@@ -596,7 +597,7 @@ void loadgame()
     Vec3f f(0,0,0);
     ss >> f[0] >> f[1] >> f[2] ;
 
-    std::cout << f << std::endl;
+    dout << f << std::endl;
 
     ss.close();**/
 
@@ -607,7 +608,7 @@ void loadgame()
 
     int size;
     ss >> size;
-    std::cout << "Size:" << size << std::endl;
+    dout << "Size:" << size << std::endl;
     for(int i=0;i<size;i++)
     {
         Vehicle *v = NULL;
@@ -616,7 +617,7 @@ void loadgame()
         int type, subtype;
         ss >> type;
         ss >> subtype;
-        std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+        dout << "Type:" << type << " subtype:" << subtype << std::endl;
 
         if (type == CARRIER || type == MANTA || type == WALRUS)
         {
@@ -695,7 +696,7 @@ void loadgame()
     }
 
     ss >> size;
-    std::cout << "Size:" << size << std::endl;
+    dout << "Size:" << size << std::endl;
     for (int j=0;j<size;j++)
     {
         BoxIsland *is = new BoxIsland(&entities);
@@ -706,7 +707,7 @@ void loadgame()
         ss >> loc[2];
         is->setLocation(loc[0],-1,loc[2]);
         ss >> modelname;
-        std::cout << "Reading Island:" << name << "\t" << modelname << std::endl;
+        dout << "Reading Island:" << name << "\t" << modelname << std::endl;
         is->buildTerrainModel(space,modelname.c_str());
 
         islands.push_back(is);
@@ -727,7 +728,7 @@ void loadgame()
                 int type, subtype;
                 ss >> type;
                 ss >> subtype;
-                std::cout << "Type:" << type << " subtype:" << subtype << std::endl;
+                dout << "Type:" << type << " subtype:" << subtype << std::endl;
                 int typeofisland = 0x4f;
                 ss >> typeofisland;
 
@@ -912,8 +913,8 @@ void endWorldModelling()
     dWorldDestroy (world);
     dCloseODE();
     
-    printf("God knows his rules and he has determined that this world must be terminated.\n");
-    printf("The World has been terminated.\n");
+    CLog::Write(CLog::Debug,"God knows his rules and he has determined that this world must be terminated.\n");
+    CLog::Write(CLog::Debug,"The World has been terminated.\n");
 }
 
 

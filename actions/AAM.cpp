@@ -7,6 +7,8 @@
 
 #include "../math/yamathutil.h"
 
+#include "../profiling.h"
+
 extern GLuint _textureRoad;
 
 AAM::AAM(int faction)
@@ -110,7 +112,7 @@ void AAM::rotateBody(dBodyID body)
 
     float x = getAzimuthRadians(getForward());
 
-    //std::cout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
+    //dout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
 
     //if (!Vehicle::inert)
         dBodySetQuaternion(body,q);
@@ -224,7 +226,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
     setForward(T);
     release(T);
 
-    std::cout << "T:Az:"
+    dout << "T:Az:"
               << std::setw(10) << getAzimuth(getForward())
               << std::setw(10) << getAzimuth(T)
               << "(" << std::setw(12) << e1 << ")"

@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "profiling.h"
 
 extern  Controller controller;
 
@@ -799,7 +800,7 @@ void list()
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
-        printf("[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
+        CLog::Write(CLog::Debug,"[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
     }
 }
 
@@ -888,7 +889,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
         {
             target = findNearestEnemyVehicle(sc->getFaction(),island->getPos(), 3 * 3.6 kmf);
 
-            //printf("Found target %p\n",  target);
+            //CLog::Write(CLog::Debug,"Found target %p\n",  target);
 
             Vehicle *b = target;
 
@@ -983,7 +984,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             lb->setControlRegisters(c);
                             lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
 
-                            std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                            dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                             Vehicle *action = (lb)->fire(world,space);
 
@@ -1008,7 +1009,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         c.roll = 0.0;
                         lb->setControlRegisters(c);
 
-                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                         lb->setForward((b->getPos())-(firingloc));
 
@@ -1034,7 +1035,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         c.roll = 0.0;
                         lb->setControlRegisters(c);
 
-                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                         lb->setForward((b->getPos())-(firingloc));
 
@@ -1058,7 +1059,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         Vec3f firingloc = lb->getPos();
 
-                        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
+                        dout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
 
                         lb->elevation = -5; // A little bit up.
                         lb->azimuth = getAzimuth((b->getPos())-(firingloc));
@@ -1069,7 +1070,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         //lb->setControlRegisters(c);
                         lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
 
-                        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                         if (target->getType() == MANTA || target->getType() == WALRUS)
                         {
@@ -1197,7 +1198,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
                     int which = (rand() % islandstructs.size());
 
-                    printf ("Which %d prob %10.5f vs chances %10.5f  \n", which, prob, islandstructs[which].chance );
+                    CLog::Write(CLog::Debug,"Which %d prob %10.5f vs chances %10.5f  \n", which, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
@@ -1323,7 +1324,7 @@ void dockWalrus(Vehicle *dock)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         // @FIXME: Only put back the walrus that is close to the carrier.
-        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
@@ -1346,7 +1347,7 @@ void dockManta()
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
-        //printf("Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
         if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
         {
             char str[256];
@@ -1356,7 +1357,7 @@ void dockManta()
             mg.msg = std::string(str);
 
             messages.insert(messages.begin(), mg);
-            //printf("Eliminating....\n");
+            //CLog::Write(CLog::Debug,"Eliminating....\n");
             dBodyDisable(entities[i]->getBodyID());
             entities.erase(entities[i]->getGeom());
         }
@@ -1493,7 +1494,7 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
         // @FIXME: Check if size do not goes beyond island boundaries.
         if ((p[0]-island->getX())>1800 || (p[0]-island->getX())<-1800 || (p[2]-island->getZ())>1800 || (p[2]-island->getZ())<-1800 )
         {
-            printf("Not enough room for command center.");
+            CLog::Write(CLog::Debug,"Not enough room for command center.");
             return;  // Cancel the commandcenter creation, there is no room.
         }
 

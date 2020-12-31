@@ -17,6 +17,8 @@ extern dSpaceID space;
 #include "../container.h"
 #include "../sounds/sounds.h"
 
+#include "../profiling.h"
+
 extern container<Vehicle*> entities;
 
 extern GLuint _textureSky;
@@ -199,7 +201,7 @@ void Walrus::doControlAttack()
         float signn = T.cross(F) [1];
 
 
-        //printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -231,7 +233,7 @@ void Walrus::doControlAttack()
         float signn = T.cross(F) [1];
 
 
-        //printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.2f)
             c.registers.roll = 400.0 * (signn>0?+1:-1) ;
@@ -309,7 +311,7 @@ void Walrus::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        //printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -332,7 +334,7 @@ void Walrus::doControlDestination()
             char str[256];
             sprintf(str, "Walrus has arrived to destination.");
             //messages.insert(messages.begin(), str);
-            printf("Walrus has reached its destination.\n");
+            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
             reached = true;
             aistatus = FREE;
             c.registers.thrust = 0.0f;
@@ -480,11 +482,11 @@ void Walrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
-    //std::cout << "Attitude:" << attitude << std::endl;
+    //dout << "Attitude:" << attitude << std::endl;
 
     if (attitude>80 || attitude<-80)
     {

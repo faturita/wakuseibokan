@@ -99,7 +99,7 @@ void Launcher::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     forward = getForward();
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
-    //std::cout << "Forward:" << forward << std::endl;
+    //dout << "Forward:" << forward << std::endl;
 
     Vec3f orig;
 

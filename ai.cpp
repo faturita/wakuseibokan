@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "profiling.h"
 #include "engine.h"
 #include "ai.h"
 
@@ -114,7 +115,7 @@ int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsig
 
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
-    std::cout << "read" << v->getPos() << std::endl;
+    dout << "read" << v->getPos() << std::endl;
     Walrus* w1 = spawnWalrus(space,world,b);
 
     Walrus* w2 = spawnWalrus(space,world,b);
@@ -224,7 +225,7 @@ int ApproachingEnemyIsland::apply(int state, int faction, unsigned long &timeeve
     {
         if (!b->isAuto())
         {
-            printf("Carries has arrived to destination.\n");
+            CLog::Write(CLog::Debug,"Carries has arrived to destination.\n");
 
             //Walrus* w = spawnWalrus(space,world,b);
             //w->setDestination(is->getPos());
@@ -247,13 +248,13 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
     {
         BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction);
 
-        std::cout << "T-:" << (int)((timeevent+100)-timer) << std::endl;
+        dout << "T-:" << (int)((timeevent+100)-timer) << std::endl;
 
         // @FIXME If it has available missiles, then fire them.
 
         if (timer==(timeevent + 100))
         {
-            std::cout << "FIRE!" << std::endl;
+            dout << "FIRE!" << std::endl;
 
             Missile *a = (Missile*) b->fire(world, space);
 
@@ -441,7 +442,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
 
         if (!b->isAuto())
         {
-            printf("Carrier has arrived to destination.\n");
+            CLog::Write(CLog::Debug,"Carrier has arrived to destination.\n");
 
             Walrus *w = findWalrus(faction);
 
@@ -658,7 +659,7 @@ void Player::playFaction(unsigned long timer)
     // Check for enemies nearby and shift strategy if they are present.
     state = interruption->apply(state,faction,timeevent,timer);
 
-    //std::cout << "Status:" << state << std::endl;
+    //dout << "Status:" << state << std::endl;
 
     // Fire the action according to the state.
     state = qactions[state]->apply(state,faction,timeevent,timer);

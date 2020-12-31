@@ -1,6 +1,8 @@
 
 #include "AdvancedWalrus.h"
 
+#include "../profiling.h"
+
 #include "../actions/ArtilleryAmmo.h"
 
 #include "../engine.h"
@@ -197,11 +199,11 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
-    //std::cout << "Attitude:" << attitude << std::endl;
+    //dout << "Attitude:" << attitude << std::endl;
 
     if (attitude>80 || attitude<-80)
     {
@@ -306,7 +308,7 @@ void AdvancedWalrus::doControlAttack()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -329,7 +331,7 @@ void AdvancedWalrus::doControlAttack()
         Vec3f target = destination - getPos();
         Vec3f aim = toBody(me,target);
 
-        std::cout << "Target:" << aim <<  ":Loc: " << getPos() << " Target: " << destination<< std::endl;
+        dout << "Target:" << aim <<  ":Loc: " << getPos() << " Target: " << destination<< std::endl;
 
 
         float azimuth=getAzimuth(aim);
@@ -443,9 +445,9 @@ Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
 
     Vec3f d = action->getPos() - getPos();
 
-    //std::cout << d << std::endl;
+    //dout << d << std::endl;
 
-    std::cout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);

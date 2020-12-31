@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 
+#include "profiling.h"
+
 
 // @FIXME: Oh My God, please fix textures.
 GLuint _textureIdSea;
@@ -712,7 +714,7 @@ void drawSky (float posX, float posY, float posZ)
     
     float view_xyz[3];
     
-    //printf("%10.8f - %10.8f - %10.8f \n", posX, posY, posZ);
+    //CLog::Write(CLog::Debug,"%10.8f - %10.8f - %10.8f \n", posX, posY, posZ);
     
     posX=0;
     posY=30;

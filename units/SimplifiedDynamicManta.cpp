@@ -2,6 +2,8 @@
 
 #include "SimplifiedDynamicManta.h"
 
+#include "../profiling.h"
+
 #include "../control.h"
 
 #include "../actions/Gunshot.h"
@@ -84,7 +86,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     // When in range, Aim with flipping increasing speed, shooting with all you have.
     // If starts to trail behind go 2
     // Fly away and restarts going to 1.
-    std::cout << "DF:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    dout << "DF:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     // @NOTE: Someone will give me, all the time, current target position.
     Vec3f target = destination;
@@ -92,7 +94,7 @@ void SimplifiedDynamicManta::doControlDogFight()
         default:case 0:// Approach
         {
             doControlControl2(target,10000);
-            std::cout << (destination-getPos()).magnitude() << std::endl;
+            dout << (destination-getPos()).magnitude() << std::endl;
             if ((destination-getPos()).magnitude()<9000)
                 flyingstate = 1;
         }
@@ -141,7 +143,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     }
 
 
-    //std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
+    //dout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
 
 
 }
@@ -149,7 +151,7 @@ void SimplifiedDynamicManta::doControlDogFight()
 void SimplifiedDynamicManta::doControlAttack()
 {
 
-    std::cout << "A:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    dout << "A:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     Vec3f target = destination;
     switch (flyingstate) {
@@ -206,7 +208,7 @@ void SimplifiedDynamicManta::doControlAttack()
     }
 
 
-    //std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
+    //dout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << (destination-getPos()).magnitude() << std::endl;
 
 
 }
@@ -235,7 +237,7 @@ void SimplifiedDynamicManta::doControlForced(Vec3f target)
     setForward(T);
     release(T);
 
-    std::cout << "Number:" << getNumber() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
+    dout << "Number:" << getNumber() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
 
     c.registers.thrust = 400/(10.0);
     c.registers.pitch = pitch;
@@ -308,7 +310,7 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
     setForward(T);
     release(T);
 
-    std::cout << "T:Az:"
+    dout << "T:Az:"
               << std::setw(10) << getAzimuth(getForward())
               << std::setw(10) << getAzimuth(T)
               << "(" << std::setw(12) << e1 << ")"
@@ -389,7 +391,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
     Vec3f T = (target - Po);
 
 
-    std::cout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
+    dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
 
 
     if (!(!reached && map(T).magnitude()>1000))
@@ -433,7 +435,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    std::cout << "T:Az:"
+    dout << "T:Az:"
               << std::setw(10) << getAzimuth(getForward())
               << std::setw(10) << getAzimuth(T)
               << "(" << std::setw(12) << e1 << ")"
@@ -536,7 +538,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
     float error2 =  Kp2 * (e2)        + Ki2 * (In[1]) + Kd2 * (  (e2)-et2);
     float error3 =  Kp3 * (e3)        + Ki3 * (In[1]) + Kd3 * (  (e3)-et3);
 
-    std::cout << "Azimuth:" << getAzimuth(getForward()) << "/" << error1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+    dout << "Azimuth:" << getAzimuth(getForward()) << "/" << error1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
 
     float roll = -error1;
     float pitch = -error2 + error3*0;
@@ -608,7 +610,7 @@ void SimplifiedDynamicManta::doControlLanding()
         release(T);
 
 
-        printf("Landing:T: %10.3f %10.3f %10.3f\n", distance, val, c.registers.roll);
+        CLog::Write(CLog::Debug,"Landing:T: %10.3f %10.3f %10.3f\n", distance, val, c.registers.roll);
 
 
         eh = height-H;
@@ -690,7 +692,7 @@ void SimplifiedDynamicManta::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f\n", distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -726,7 +728,7 @@ void SimplifiedDynamicManta::doControlDestination()
 
     } else
     {
-        printf("Manta arrived to destination...\n");
+        CLog::Write(CLog::Debug,"Manta arrived to destination...\n");
 
         elevator = 35;
 
@@ -886,7 +888,7 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     float x = getAzimuthRadians(getForward());
 
-    //std::cout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
+    //dout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);
@@ -938,7 +940,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Manta::alpha = Manta::beta = 0;
 
         float gamma = 0;
-//std::cout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward()) << std::endl;
+//dout << "Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward()) << std::endl;
 
         if (linearVel[2]!=0 && speed > 2)
         {
@@ -998,8 +1000,8 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         dBodyAddTorque(body, 0.0f, Ml, 0.0f);
 
-        //printf("%8.4f\t%8.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI);
-        //std::cout << Ft << std::endl;
+        //CLog::Write(CLog::Debug,"%8.4f\t%8.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI);
+        //dout << Ft << std::endl;
     }
 
     wrapDynamics(body);
@@ -1091,9 +1093,9 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         dBodyAddRelTorque(body, rot[0],rot[1],rot[2]);
 
-        printf("%8.4f\t%8.4f\t%6.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI, gamma*180.0/PI);
-        //std::cout << Ft << std::endl;
-        std::cout << std::endl;
+        CLog::Write(CLog::Debug,"%8.4f\t%8.4f\t%6.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI, gamma*180.0/PI);
+        //dout << Ft << std::endl;
+        dout << std::endl;
     }
 
     wrapDynamics(body);

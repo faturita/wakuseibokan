@@ -30,6 +30,7 @@
 #include <GL/glut.h>
 #endif
 
+#include "../profiling.h"
 #include "../imageloader.h"
 #include "../math/vec3f.h"
 #include "Terrain.h"
@@ -65,7 +66,7 @@ Terrain* loadTerrain(const char* filename, float height)
             //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
             //if (color == 0) h =  -70.0f;
             t->setHeight(x, y, h+height/2.0);
-            //printf("%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+            //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
         }
     }
     
@@ -89,7 +90,7 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
     
     h = _landmass->getHeight(x, z);
        
-    //printf("%4d,%4d,%10.5f\n", x,z,h);
+    //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,z,h);
     
     return h;
 }
@@ -107,9 +108,9 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
     islandspace = dHashSpaceCreate(space);
     //islandspace = space;
 
-    printf("Island: %s\n", model);
-    printf("Landmass width: %d\n", _landmass->width());
-    printf("Landmass heigth: %d\n",_landmass->length());
+    CLog::Write(CLog::Debug,"Island: %s\n", model);
+    CLog::Write(CLog::Debug,"Landmass width: %d\n", _landmass->width());
+    CLog::Write(CLog::Debug,"Landmass heigth: %d\n",_landmass->length());
     
     dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
     
@@ -217,7 +218,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
         // @FIXME Put this line in a different function and use it from there.  Repeated code here.
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
 
-        printf("Height %10.5f\n", heightOffset);
+        CLog::Write(CLog::Debug,"Height %10.5f\n", heightOffset);
 
         if (breakcounter++==10) break;
 

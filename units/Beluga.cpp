@@ -1,6 +1,7 @@
 #include "Beluga.h"
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
+#include "../profiling.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
 #include "../keplerivworld.h"
@@ -104,7 +105,7 @@ void Beluga::doControl()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {

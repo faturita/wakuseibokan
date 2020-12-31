@@ -8,6 +8,7 @@
 
 #include "Vehicle.h"
 #include <assert.h>
+#include "../profiling.h"
 #include "../md2model.h"
 
 
@@ -73,7 +74,7 @@ Vehicle::~Vehicle()
 {
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
-    //printf("Vehicle Good bye....\n");
+    //CLog::Write(CLog::Debug,"Vehicle Good bye....\n");
 }
 
 void Vehicle::getR(float retR[12])
@@ -530,13 +531,13 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     /**
     if (getType()==WALRUS)
-        printf("Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
     if (getType()==MANTA)
-        printf("Manta    %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Manta    %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
     if (getType()==CARRIER)
-        printf("Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
     // @NOTE:  Uncomment the following line if you want the game to be more stable.

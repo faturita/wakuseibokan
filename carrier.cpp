@@ -25,6 +25,7 @@
 #include <vector>
 #include <mutex>
 
+#include "profiling.h"
 #include "commandline.h"
 
 #include "ThreeMaxLoader.h"
@@ -474,7 +475,7 @@ void initRendering() {
 }
 
 void handleResize(int w, int h) {
-    printf("Handling Resize: %d, %d \n", w, h);
+    CLog::Write(CLog::Debug,"Handling Resize: %d, %d \n", w, h);
 	glViewport(0, 0, w, h);
     
     // ADDED
@@ -540,7 +541,7 @@ void update(int value)
 
 
 
-        //printf("Elements alive now: %d\n", vehicles.size());
+        //CLog::Write(CLog::Debug,"Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
@@ -560,7 +561,7 @@ void update(int value)
         {
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
-                //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
+                //CLog::Write(CLog::Debug,"Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()<=0)
                 {
                     if (controller.controllingid == i)
@@ -657,6 +658,11 @@ void update(int value)
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
+#ifdef DEBUG
+    CLog::SetLevel(CLog::All);
+#else
+    CLog::SetLevel(CLog::None);
+#endif
 
     if (isPresentCommandLineParameter(argc,argv,"-random"))
         srand (time(NULL));
@@ -728,22 +734,22 @@ int main(int argc, char** argv) {
 
     const char *conf = dGetConfiguration ();
 
-    printf("ODE Configuration: %s\n", conf);
+    CLog::Write(CLog::Debug,"ODE Configuration: %s\n", conf);
 
     // Draw vehicles and objects
-    printf("Size %d\n", entities.size());
+    CLog::Write(CLog::Debug,"Size %d\n", entities.size());
     synchronized(entities.m_mutex)
     {
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
-            printf("Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
+            CLog::Write(CLog::Debug,"Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
         }
 
     }
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
-    //printf("Manta is located in %lu\n",*a);
+    //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
     
     //Initialize all the models and structures.
     initRendering();

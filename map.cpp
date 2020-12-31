@@ -20,6 +20,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "profiling.h"
 #include "container.h"
 #include "ThreeMaxLoader.h"
 
@@ -74,7 +75,6 @@ void placeMark(int x, int y, int size, const char* modelName)
 
         maptextures[std::string(modelName)]=_textureBox;
 
-        printf("Texture loaded...\n");
     } else {
         _textureBox = maptextures[std::string(modelName)];
     }
@@ -118,7 +118,6 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 
         maptextures[std::string(modelName)]=_textureBox;
 
-        printf("Texture loaded...\n");
     } else {
         _textureBox = maptextures[std::string(modelName)];
     }

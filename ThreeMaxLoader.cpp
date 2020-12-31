@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ThreeMaxLoader.h"
+#include "profiling.h"
 
 int get_file_size(std::string filename) // path to file
 {
@@ -33,7 +34,7 @@ void draw3DSModel(obj_type object, float x, float y, float z, float scale)
 
     glBegin(GL_TRIANGLES); // glBegin and glEnd delimit the vertices that define a primitive (in our case triangles)
 
-    printf("%d\n",object.polygons_qty);
+    CLog::Write(CLog::Debug,"%d\n",object.polygons_qty);
 
     for (l_index=0;l_index<object.polygons_qty;l_index++)
     {
@@ -85,9 +86,9 @@ char Load3DS (obj_type_ptr p_object, char *p_filename)
         //getche(); //Insert this command for debug (to wait for keypress for each chuck reading)
 
         fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
-        //printf("ChunkID: %x\n",l_chunk_id);
+        //CLog::Write(CLog::Debug,"ChunkID: %x\n",l_chunk_id);
         fread (&l_chunk_lenght, 4, 1, l_file); //Read the lenght of the chunk
-        //printf("ChunkLenght: %x\n",l_chunk_lenght);
+        //CLog::Write(CLog::Debug,"ChunkLenght: %x\n",l_chunk_lenght);
 
         switch (l_chunk_id)
         {
@@ -140,18 +141,18 @@ char Load3DS (obj_type_ptr p_object, char *p_filename)
             case 0x4110:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->vertices_qty = l_qty;
-                //printf("Number of vertices: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of vertices: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
 
                     fread (&p_object->vertex[i].x, sizeof(float), 1, l_file);
-                    //printf("Vertices list x: %f\n",p_object->vertex[i].x);
+                    //CLog::Write(CLog::Debug,"Vertices list x: %f\n",p_object->vertex[i].x);
 
                     fread (&p_object->vertex[i].y, sizeof(float), 1, l_file);
-                    //printf("Vertices list y: %f\n",p_object->vertex[i].y);
+                    //CLog::Write(CLog::Debug,"Vertices list y: %f\n",p_object->vertex[i].y);
 
                     fread (&p_object->vertex[i].z, sizeof(float), 1, l_file);
-                    //printf("Vertices list z: %f\n",p_object->vertex[i].z);
+                    //CLog::Write(CLog::Debug,"Vertices list z: %f\n",p_object->vertex[i].z);
 
                     //Insert into the database
 
@@ -168,17 +169,17 @@ char Load3DS (obj_type_ptr p_object, char *p_filename)
             case 0x4120:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->polygons_qty = l_qty;
-                //printf("Number of polygons: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of polygons: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
                     fread (&p_object->polygon[i].a, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point a: %d\n",p_object->polygon[i].a);
+                    //CLog::Write(CLog::Debug,"Polygon point a: %d\n",p_object->polygon[i].a);
                     fread (&p_object->polygon[i].b, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point b: %d\n",p_object->polygon[i].b);
+                    //CLog::Write(CLog::Debug,"Polygon point b: %d\n",p_object->polygon[i].b);
                     fread (&p_object->polygon[i].c, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point c: %d\n",p_object->polygon[i].c);
+                    //CLog::Write(CLog::Debug,"Polygon point c: %d\n",p_object->polygon[i].c);
                     fread (&l_face_flags, sizeof (unsigned short), 1, l_file);
-                    //printf("Face flags: %x\n",l_face_flags);
+                    //CLog::Write(CLog::Debug,"Face flags: %x\n",l_face_flags);
                 }
                 break;
 
@@ -226,7 +227,7 @@ obj_type load3DSModel(const char *p_filename)
 
     if ((l_file=fopen (p_filename, "rb"))== NULL)
     {
-        printf("Model not found: %s\n",p_filename);
+        CLog::Write(CLog::Debug,"Model not found: %s\n",p_filename);
         return object;
     } //Open the file
 
@@ -235,9 +236,9 @@ obj_type load3DSModel(const char *p_filename)
         //getche(); //Insert this command for debug (to wait for keypress for each chuck reading)
 
         fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
-        //printf("ChunkID: %x\n",l_chunk_id);
+        //CLog::Write(CLog::Debug,"ChunkID: %x\n",l_chunk_id);
         fread (&l_chunk_lenght, 4, 1, l_file); //Read the lenght of the chunk
-        //printf("ChunkLenght: %x\n",l_chunk_lenght);
+        //CLog::Write(CLog::Debug,"ChunkLenght: %x\n",l_chunk_lenght);
 
         switch (l_chunk_id)
         {
@@ -290,18 +291,18 @@ obj_type load3DSModel(const char *p_filename)
             case 0x4110:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->vertices_qty = l_qty;
-                //printf("Number of vertices: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of vertices: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
 
                     fread (&p_object->vertex[i].x, sizeof(float), 1, l_file);
-                    //printf("Vertices list x: %f\n",p_object->vertex[i].x);
+                    //CLog::Write(CLog::Debug,"Vertices list x: %f\n",p_object->vertex[i].x);
 
                     fread (&p_object->vertex[i].y, sizeof(float), 1, l_file);
-                    //printf("Vertices list y: %f\n",p_object->vertex[i].y);
+                    //CLog::Write(CLog::Debug,"Vertices list y: %f\n",p_object->vertex[i].y);
 
                     fread (&p_object->vertex[i].z, sizeof(float), 1, l_file);
-                    //printf("Vertices list z: %f\n",p_object->vertex[i].z);
+                    //CLog::Write(CLog::Debug,"Vertices list z: %f\n",p_object->vertex[i].z);
 
                     //Insert into the database
 
@@ -318,17 +319,17 @@ obj_type load3DSModel(const char *p_filename)
             case 0x4120:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->polygons_qty = l_qty;
-                //printf("Number of polygons: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of polygons: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
                     fread (&p_object->polygon[i].a, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point a: %d\n",p_object->polygon[i].a);
+                    //CLog::Write(CLog::Debug,"Polygon point a: %d\n",p_object->polygon[i].a);
                     fread (&p_object->polygon[i].b, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point b: %d\n",p_object->polygon[i].b);
+                    //CLog::Write(CLog::Debug,"Polygon point b: %d\n",p_object->polygon[i].b);
                     fread (&p_object->polygon[i].c, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point c: %d\n",p_object->polygon[i].c);
+                    //CLog::Write(CLog::Debug,"Polygon point c: %d\n",p_object->polygon[i].c);
                     fread (&l_face_flags, sizeof (unsigned short), 1, l_file);
-                    //printf("Face flags: %x\n",l_face_flags);
+                    //CLog::Write(CLog::Debug,"Face flags: %x\n",l_face_flags);
                 }
                 break;
 
@@ -447,7 +448,7 @@ void calculateCenterOfMass(obj_type &object)
     centerOfMass[1] = centerOfMass[1]/(3*((float)object.polygons_qty));
     centerOfMass[2] = centerOfMass[2]/(3*((float)object.polygons_qty));
 
-    printf("Offset: %10.5f\t%10.5f\t%10.5f\n",(centerOfMass[0]),(centerOfMass[1]),(centerOfMass[2]));
+    CLog::Write(CLog::Debug,"Offset: %10.5f\t%10.5f\t%10.5f\n",(centerOfMass[0]),(centerOfMass[1]),(centerOfMass[2]));
 
     for (l_index=0;l_index<object.polygons_qty;l_index++)
     {
@@ -497,9 +498,9 @@ void calculateCenterOfMass(obj_type &object)
             max[2]=object.vertex[ object.polygon[l_index].c ].z;
     }
 
-    printf("Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
+    CLog::Write(CLog::Debug,"Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
 
-    printf("Geometrical offset: %10.5f\t%10.5f\t%10.5f\n",(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2);
+    CLog::Write(CLog::Debug,"Geometrical offset: %10.5f\t%10.5f\t%10.5f\n",(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2);
 }
 
 int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _texture)
@@ -528,9 +529,9 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
         //getche(); //Insert this command for debug (to wait for keypress for each chuck reading)
 
         fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
-        //printf("ChunkID: %x\n",l_chunk_id);
+        //CLog::Write(CLog::Debug,"ChunkID: %x\n",l_chunk_id);
         fread (&l_chunk_lenght, 4, 1, l_file); //Read the lenght of the chunk
-        //printf("ChunkLenght: %x\n",l_chunk_lenght);
+        //CLog::Write(CLog::Debug,"ChunkLenght: %x\n",l_chunk_lenght);
 
         switch (l_chunk_id)
         {
@@ -583,18 +584,18 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
             case 0x4110:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->vertices_qty = l_qty;
-                //printf("Number of vertices: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of vertices: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
 
                     fread (&p_object->vertex[i].x, sizeof(float), 1, l_file);
-                    //printf("Vertices list x: %f\n",p_object->vertex[i].x);
+                    //CLog::Write(CLog::Debug,"Vertices list x: %f\n",p_object->vertex[i].x);
 
                     fread (&p_object->vertex[i].y, sizeof(float), 1, l_file);
-                    //printf("Vertices list y: %f\n",p_object->vertex[i].y);
+                    //CLog::Write(CLog::Debug,"Vertices list y: %f\n",p_object->vertex[i].y);
 
                     fread (&p_object->vertex[i].z, sizeof(float), 1, l_file);
-                    //printf("Vertices list z: %f\n",p_object->vertex[i].z);
+                    //CLog::Write(CLog::Debug,"Vertices list z: %f\n",p_object->vertex[i].z);
 
                     //Insert into the database
 
@@ -611,17 +612,17 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
             case 0x4120:
                 fread (&l_qty, sizeof (unsigned short), 1, l_file);
                 p_object->polygons_qty = l_qty;
-                //printf("Number of polygons: %d\n",l_qty);
+                //CLog::Write(CLog::Debug,"Number of polygons: %d\n",l_qty);
                 for (i=0; i<l_qty; i++)
                 {
                     fread (&p_object->polygon[i].a, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point a: %d\n",p_object->polygon[i].a);
+                    //CLog::Write(CLog::Debug,"Polygon point a: %d\n",p_object->polygon[i].a);
                     fread (&p_object->polygon[i].b, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point b: %d\n",p_object->polygon[i].b);
+                    //CLog::Write(CLog::Debug,"Polygon point b: %d\n",p_object->polygon[i].b);
                     fread (&p_object->polygon[i].c, sizeof (unsigned short), 1, l_file);
-                    //printf("Polygon point c: %d\n",p_object->polygon[i].c);
+                    //CLog::Write(CLog::Debug,"Polygon point c: %d\n",p_object->polygon[i].c);
                     fread (&l_face_flags, sizeof (unsigned short), 1, l_file);
-                    //printf("Face flags: %x\n",l_face_flags);
+                    //CLog::Write(CLog::Debug,"Face flags: %x\n",l_face_flags);
                 }
                 break;
 
@@ -775,7 +776,7 @@ T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z
 T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scalex, float scaley, float scalez,GLuint texture)
 {
     T3DSModel* td = new T3DSModel();
-    printf("Model:%s\n",p_filename);
+    CLog::Write(CLog::Debug,"Model:%s\n",p_filename);
     td->setFilename(p_filename);
     td->setLocation(x,y,z);
     td->setScale(scalex,scaley,scalez);

@@ -16,6 +16,8 @@
 
 #include "math/yamathutil.h"
 
+#include "profiling.h"
+
 #include "container.h"
 
 #include "camera.h"
@@ -83,7 +85,7 @@ void processMouse(int button, int state, int x, int y) {
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
                 ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || entities[controller.controllingid]->getType() == CONTROLABLEACTION) )
         {
-            printf("Active control\n");
+            CLog::Write(CLog::Debug,"Active control\n");
             // Activate airplane controller.
             if (buttonState != 1)
             {
@@ -115,7 +117,7 @@ void processMouse(int button, int state, int x, int y) {
         // set the color to pure red for the left button
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
-            printf("Mouse down %d,%d\n",x,y);
+            CLog::Write(CLog::Debug,"Mouse down %d,%d\n",x,y);
             if (controller.view == 2)
             {
                 if (specialKey == GLUT_ACTIVE_SHIFT)
@@ -124,13 +126,13 @@ void processMouse(int button, int state, int x, int y) {
                     //@FIXME
                     entities[controller.controllingid]->setDestination(target);
 
-                    printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
+                    CLog::Write(CLog::Debug,"Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
 
 
                 } else {
                     centermap(x,y);
                     Vec3f lo = setLocationOnMap(x,y);
-                    printf("Set location on map (%10.5f, %10.5f)\n", lo[0], lo[2]);
+                    CLog::Write(CLog::Debug,"Set location on map (%10.5f, %10.5f)\n", lo[0], lo[2]);
                     zoommapin();
                 }
             }
@@ -271,7 +273,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME input data should be verified.
                 const char *content = controller.str.substr(7).c_str();
 
-                printf("Controlling %s\n", content);
+                CLog::Write(CLog::Debug,"Controlling %s\n", content);
 
                 switchControl(atoi(content));
 
@@ -305,7 +307,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
                 const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
 
-                std::cout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
+                dout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
 
                 size_t pos = CONTROLLING_NONE;
 
@@ -313,7 +315,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
                     {
-                        std::cout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
+                        dout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
                         pos = entities.indexOf(islands[j]->getStructures()[atoi(structurenumber)]);
                     }
                 }
@@ -325,7 +327,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 std::string islandcode = controller.str.substr(4+controller.str.substr(4).find(" "));
                 std::string islandname = islandcode.substr(1);
 
-                std::cout << "Island-" << islandname << std::endl;
+                dout << "Island-" << islandname << std::endl;
 
                 for (int j=0;j<islands.size();j++)
                 {
@@ -338,18 +340,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (cc)
                         {
                             if (cc->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
-                                std::cout << "Defense Island" << std::endl;
+                                dout << "Defense Island" << std::endl;
                             else if (cc->getIslandType() == ISLANDTYPES::FACTORY_ISLAND)
-                                std::cout << "Factory Island" << std::endl;
+                                dout << "Factory Island" << std::endl;
                             else if (cc->getIslandType() == ISLANDTYPES::LOGISTICS_ISLAND)
-                                std::cout << "Logistic Island" << std::endl;
+                                dout << "Logistic Island" << std::endl;
                         }
 
                         for(size_t i=0;i<str.size();i++)
                         {
                             if (entities[str[i]]->getFaction()==controller.faction)
                             {
-                                std::cout << entities[str[i]]->subTypeText(entities[str[i]]->getSubType()) << "-"
+                                dout << entities[str[i]]->subTypeText(entities[str[i]]->getSubType()) << "-"
                                           << entities[str[i]]->getHealth() << std::endl;
                             }
                         }
@@ -497,8 +499,8 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'i':
             {
             int param = 0;
-            std::cout << "Param:" << std::endl; std::cin >> param;
-            std::cout << "Value:" << std::endl; std::cin >> controller.param[param] ;
+            dout << "Param:" << std::endl; std::cin >> param;
+            dout << "Value:" << std::endl; std::cin >> controller.param[param] ;
             }
         break;
         case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;

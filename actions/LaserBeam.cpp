@@ -1,4 +1,5 @@
 #include "LaserBeam.h"
+#include "../profiling.h"
 
 LaserBeam::LaserBeam()
 {
@@ -10,8 +11,6 @@ LaserBeam::~LaserBeam()
 {
     dGeomDestroy(geom);
     dBodyDestroy(me);
-
-    printf("Good bye....\n");
 }
 
 void LaserBeam::init()
