@@ -29,7 +29,6 @@
 
 #include "usercontrols.h"
 #include "map.h"
-
 #include "units/Vehicle.h"
 #include "units/Balaenidae.h"
 #include "units/Manta.h"

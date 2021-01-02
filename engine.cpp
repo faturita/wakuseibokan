@@ -1285,6 +1285,20 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
 {
+    Manta* m = findManta(spawner->getFaction(),Manta::ON_DECK, spawner->getPos());
+
+    if (m)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "%s","There is another aircraft on deck.");
+        mg.faction = spawner->getFaction();
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+        return NULL;
+    }
+
+
     int mantaNumber = findNextNumber(MANTA);
     Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
     if (manta != NULL)

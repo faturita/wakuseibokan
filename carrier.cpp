@@ -86,6 +86,7 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
+std::ofstream msgboardfile;
 extern std::vector<Message> messages;
 
 int aiplayer = FREE_AI;
@@ -172,6 +173,8 @@ void drawHUD()
         drawString(0,-180,1,str,0.2f);
     }
 
+    // Message Board (@TODO: At least, put this in a different function)
+
     // This is the amount of ticks that are used to refresh the message board.
     static int mbrefresher = 1000;
     // Message board
@@ -193,6 +196,8 @@ void drawHUD()
 
         if (mbrefresher--<=0)
         {
+            msgboardfile << timer << ":" << messages.back().msg <<  std::endl ;
+            msgboardfile.flush();
             messages.pop_back();
             mbrefresher = 1000;
         }
@@ -502,6 +507,8 @@ void update(int value)
     if (controller.isInterrupted())
     {
         endWorldModelling();
+        // Do extra wrap up
+        msgboardfile.close();
         exit(0);
     }
     if (!controller.pause)
@@ -755,6 +762,8 @@ int main(int argc, char** argv) {
     initRendering();
 
     //intro();
+
+    msgboardfile.open ("messageboard.dat");
     
 	// OpenGL callback functions.
 	glutDisplayFunc(drawScene);
