@@ -2,6 +2,7 @@
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
 #include "AdvancedWalrus.h"
+#include "AdvancedManta.h"
 #include "../profiling.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
@@ -346,7 +347,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
     if (type == MANTA)
     {
-        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
+        AdvancedManta *_manta1 = new AdvancedManta(getFaction());
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);

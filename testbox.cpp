@@ -59,6 +59,7 @@
 #include "units/SimplifiedDynamicManta.h"
 #include "units/Medusa.h"
 #include "units/Cephalopod.h"
+#include "units/AdvancedManta.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -395,7 +396,7 @@ void test1()
 
 void test2()
 {
-    SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(GREEN_FACTION);
+    SimplifiedDynamicManta *_manta1 = new AdvancedManta(GREEN_FACTION);
 
     _manta1->init();
     _manta1->embody(world, space);

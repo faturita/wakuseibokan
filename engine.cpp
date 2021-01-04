@@ -113,8 +113,9 @@ bool landed(Vehicle *manta, Island *island)
     {
         if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
         {
-            controller.reset();
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)manta;
+            if (entities[controller.controllingid] == manta)
+                controller.reset();
+            AdvancedManta *s = (AdvancedManta*)manta;
             struct controlregister c;
             c.thrust = 0.0f;
             c.pitch = 0.0f;
@@ -214,7 +215,7 @@ bool releasecontrol(Vehicle* vehicle)
         {
             controller.reset();
 
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
+            AdvancedManta *s = (AdvancedManta*)vehicle;
             struct controlregister c;
             c.thrust = 0.0f;
             c.pitch = 0.0f;
@@ -403,7 +404,7 @@ bool  groundcollisions(Vehicle *vehicle)
         if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
         {
             //explosion();
-            SimplifiedDynamicManta *s = (SimplifiedDynamicManta*)vehicle;
+            AdvancedManta *s = (AdvancedManta*)vehicle;
             struct controlregister c;
             c.thrust = 0.0f;
             c.pitch = 0.0f;

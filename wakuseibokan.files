@@ -105,6 +105,8 @@ terrain/vec3f.h
 testall.cpp
 testbed.cpp
 testbox.cpp
+units/AdvancedManta.cpp
+units/AdvancedManta.h
 units/AdvancedWalrus.cpp
 units/AdvancedWalrus.h
 units/Balaenidae.cpp

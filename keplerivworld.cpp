@@ -41,6 +41,7 @@
 #include "units/Beluga.h"
 #include "units/AdvancedWalrus.h"
 #include "units/Medusa.h"
+#include "units/AdvancedManta.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -504,7 +505,7 @@ void savegame()
                 subtype = 2;
             else if (Medusa *lb = dynamic_cast<Medusa*>(entities[i]))
                 subtype = 6;
-            else if (SimplifiedDynamicManta *lb = dynamic_cast<SimplifiedDynamicManta*>(entities[i]))
+            else if (AdvancedManta *lb = dynamic_cast<AdvancedManta*>(entities[i]))
                 subtype = 3;
             else if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
                 subtype = 4;
@@ -637,12 +638,12 @@ void loadgame()
             }
             case MANTA:
             {
-                SimplifiedDynamicManta *_manta1 = NULL;
+                Manta *_manta1 = NULL;
 
                 if (subtype == 6)
                     _manta1 = new Medusa(faction);
                 else
-                    _manta1 = new SimplifiedDynamicManta(faction);
+                    _manta1 = new AdvancedManta(faction);
 
                 _manta1->init();
                 _manta1->setNumber(findNextNumber(MANTA));

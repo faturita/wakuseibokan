@@ -170,9 +170,9 @@ void Cephalopod::doDynamics(dBodyID body)
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
 
-            dBodyAddRelTorque(body, 0, -aileron*2, 0);
-            Vec3f p1(-rudder*2, getThrottle(),-elevator*3);
-            Vec3f p2(-rudder*2, getThrottle(),-elevator*3);
+            dBodyAddRelTorque(body, 0, -aileron*4, 0);
+            Vec3f p1(-rudder*2, getThrottle(),-elevator*5);
+            Vec3f p2(-rudder*2, getThrottle(),-elevator*5);
 
             //p = toVectorInFixedSystem(p[0],p[1],p[2],aileron*10,elevator*10);
 

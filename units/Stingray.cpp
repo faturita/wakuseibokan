@@ -12,7 +12,7 @@ Stingray::Stingray(int newfaction) : SimplifiedDynamicManta(newfaction)
 void Stingray::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/medusa.3ds",0,0,0,1,1,1,0);
+    _model = (Model*)T3DSModel::loadModel("units/stingray.3ds",0,0,0,1,1,1,0);
     if (_model != NULL)
     {
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
@@ -39,7 +39,7 @@ void Stingray::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(2.0f,2.0f,2.0f);
+        glScalef(2.5f,2.5f,2.5f);
 
         doTransform(f, R);
 
