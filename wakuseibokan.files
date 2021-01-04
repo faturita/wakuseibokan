@@ -115,7 +115,10 @@ units/BoxVehicle.cpp
 units/BoxVehicle.h
 units/Buggy.cpp
 units/Buggy.h
+units/Cephalopod.cpp
+units/Cephalopod.h
 units/Cephalopodo.cpp
+units/Cephalopodo.h
 units/Cephalopodo.h
 units/Manta.cpp
 units/Manta.h
@@ -127,6 +130,8 @@ units/SimplifiedDynamicManta.cpp
 units/SimplifiedDynamicManta.h
 units/SimplifiedManta.cpp
 units/SimplifiedManta.h
+units/Stingray.cpp
+units/Stingray.h
 units/Vehicle.cpp
 units/Vehicle.h
 units/Walrus.cpp

@@ -1,5 +1,6 @@
 #include "Beluga.h"
 #include "SimplifiedDynamicManta.h"
+#include "Stingray.h"
 #include "Walrus.h"
 #include "../profiling.h"
 #include "../ThreeMaxLoader.h"
@@ -221,7 +222,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
     if (type == MANTA)
     {
-        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
+        Stingray *_manta1 = new Stingray(getFaction());
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);

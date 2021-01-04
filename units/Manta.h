@@ -12,7 +12,11 @@
 
 class Manta : public Vehicle
 {
+
 protected:
+    float height = 10;
+    float width = 10;
+    float length = 10;
     int number=0;
 
 public:

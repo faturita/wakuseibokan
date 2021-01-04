@@ -58,6 +58,7 @@
 #include "units/Balaenidae.h"
 #include "units/SimplifiedDynamicManta.h"
 #include "units/Medusa.h"
+#include "units/Cephalopod.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -4870,6 +4871,82 @@ void checktest51(unsigned long timer)
 
 }
 
+
+void test52()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, DEFENSE_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = FREE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+
+
+void checktest52(unsigned long timer)
+{
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Checking Stingray aircraft");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == starttime + 50)
+    {
+        Cephalopod *c = new Cephalopod(GREEN_FACTION);
+        c->init();
+        c->setNumber(9);
+        c->embody(world, space);
+        c->setPos(-10,0+28,-20);
+        //c->setStatus(Manta::ON_DECK);
+        c->inert = false;
+        //alignToMe(_manta1->getBodyID());
+        int idx = entities.push_back(c, c->getGeom());
+
+        controller.controllingid = idx;
+    }
+
+
+    if (timer > starttime + 50000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+}
+
 static int testing=-1;
 
 void savegame()
@@ -5288,7 +5365,8 @@ void initWorldModelling(int testcase)
     case 48:test48();break;                         // Medusas fighters land after a failed attack from a walrus.
     case 49:test49();break;                         // Check structure orientation (Runways).
     case 50:test50();break;                         // Check new structures.
-    case 51:test51();break;
+    case 51:test51();break;                         // Check savegame
+    case 52:test52();break;                         // Test Stingrey aircraft
     default:initIslands();test1();break;
     }
 
@@ -5358,6 +5436,7 @@ void worldStep(int value)
     case 49:checktest49(timer);break;
     case 50:checktest50(timer);break;
     case 51:checktest51(timer);break;
+    case 52:checktest52(timer);break;
 
     default: break;
     }
