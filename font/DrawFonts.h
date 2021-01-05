@@ -8,7 +8,11 @@
 #ifndef DRAWFONTS_H_
 #define DRAWFONTS_H_
 
+#ifdef __linux
+#include <GL/glut.h>
+#elif __APPLE__
 #include <GLUT/glut.h>
+#endif
 
 void drawString(float x, float y , float xz, char *string, GLfloat stroke_scale);
 

@@ -12,7 +12,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <GLUT/glut.h>
+#include <string.h>
+#include <GL/glut.h>
 #include "model.h"
 
 

@@ -5,7 +5,7 @@
  *      Author: faturita
  */
 
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,3 +1,4 @@
+#include <string.h>
 #include "control.h"
 
 void  getIntegrativeTerm(std::vector<std::vector<float> > accerr,float integrative[3],float e[3])

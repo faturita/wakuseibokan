@@ -213,7 +213,7 @@ template<class T> void container<T>::erase(dBodyID body)
 {
     size_t i = bodyidmap[body];
 
-    bodyidmap.erase(i);
+    //bodyidmap.erase(i);
 
     erase(i);
 }
@@ -223,7 +223,7 @@ template<class T> void container<T>::erase(dGeomID geom)
 {
     size_t i = geomidmap[geom];
 
-    geomidmap.erase(i);
+    //geomidmap.erase(i);
 
     erase(i);
 }
