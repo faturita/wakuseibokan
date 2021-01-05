@@ -25,6 +25,7 @@
 #include <vector>
 #include <mutex>
 
+#include "profiling.h"
 #include "commandline.h"
 
 #include "ThreeMaxLoader.h"
@@ -64,6 +65,8 @@
 
 #include "map.h"
 
+#include "ai.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -83,7 +86,8 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
-extern std::vector<std::string> messages;
+std::ofstream msgboardfile;
+extern std::vector<Message> messages;
 
 int aiplayer = FREE_AI;
 
@@ -123,6 +127,8 @@ void drawHUD()
 	glDisable(GL_DEPTH_TEST);
 	glRotatef(180.0f,0,0,1);
 	glRotatef(180.0f,0,1,0);
+
+    int aimc=50,crossc=0;
     
     char str[256];
 
@@ -146,11 +152,19 @@ void drawHUD()
         speed = entities[controller.controllingid]->getSpeed();
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
+
+        if (entities[controller.controllingid]->getType() == MANTA)
+        {
+            aimc = 240;
+            crossc = 195;
+        }
+
+
     }
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", entities.indexOf(controller.controllingid),controller.registers.thrust, health, power);
+    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -159,22 +173,31 @@ void drawHUD()
         drawString(0,-180,1,str,0.2f);
     }
 
+    // Message Board (@TODO: At least, put this in a different function)
+
     // This is the amount of ticks that are used to refresh the message board.
     static int mbrefresher = 1000;
     // Message board
     if (messages.size()>0)
     {
+        int msgonboard=0;
         for(int i=0;i<messages.size();i++)
         {
-            std::string line = messages[i];
-            if (i==0)
-                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
-            else
-                drawString(0,-700-i*25,1,(char*)line.c_str(),0.2f);
+            if (messages[i].faction == controller.faction || messages[i].faction == BOTH_FACTION || controller.faction == BOTH_FACTION)
+            {
+                std::string line = messages[i].msg;
+                if (msgonboard==0)
+                    drawString(0,-700-msgonboard*25,1,(char*)line.c_str(),0.2f,1.0f,1.0f,0.0f);
+                else
+                    drawString(0,-700-msgonboard*25,1,(char*)line.c_str(),0.2f);
+                msgonboard++;
+            }
         }
 
         if (mbrefresher--<=0)
         {
+            msgboardfile << timer << ":" << messages.back().msg <<  std::endl ;
+            msgboardfile.flush();
             messages.pop_back();
             mbrefresher = 1000;
         }
@@ -197,8 +220,8 @@ void drawHUD()
         
         glLineWidth(2.5);
 
-        int uc=550;
-        int lc=0+50;
+        int uc=550;                     // Horizontal center, screen is 1100 pixels.
+        int lc=0+aimc;                   // Center is at 50.
         int w=40;
         int h=40;
 
@@ -245,31 +268,33 @@ void drawHUD()
 
 
         // Center cross
+        int cc = crossc;
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle-10, Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle-2, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle-10, cc + Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle-2, cc + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle+2, Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle+10, + Camera.yAngle, 0);
+        glVertex3f(uc+50+Camera.xAngle+2, cc + Camera.yAngle, 0.0);
+        glVertex3f(uc+50+Camera.xAngle+10, cc + Camera.yAngle, 0);
         glEnd();
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle-10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle-2, 0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-2, 0);
         glEnd();        
 
         glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, Camera.yAngle+10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, + Camera.yAngle+2, 0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+10, 0.0);
+        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+2, 0);
         glEnd();
 
         // Bearing arrow
 
         int cx=1150, cy=350;
 
+        // Borders
         glBegin(GL_LINES);
         glVertex3f(cx-50,  +cy+50, 0.0);
         glVertex3f(cx-50,  +cy-50, 0.0);
@@ -290,10 +315,13 @@ void drawHUD()
         glVertex3f(cx+50,  +cy-50, 0.0);
         glEnd();
 
+        // Arrow.
         glBegin(GL_LINES);
         glVertex3f(cx,           +cy, 0.0);
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
+
+        // Nearby units. @NOTE DO IT
 
         
     } glPopMatrix();
@@ -324,6 +352,10 @@ void drawScene() {
     
     int ctrling = 0;
     
+    // @FIXME Safe code.  Destroy something and see what happens here.
+    if (!entities.isValid(controller.controllingid))
+        controller.controllingid = CONTROLLING_NONE;
+
     if (controller.controllingid != CONTROLLING_NONE )
     {
         ctrling = controller.controllingid;
@@ -351,6 +383,7 @@ void drawScene() {
             //pos[2]+=(forward[2]);
             
             pos[2]+=controller.registers.pitch;
+            pos[1]+=controller.registers.precesion;
             pos[0]+=controller.registers.roll;
         }
     }
@@ -447,7 +480,7 @@ void initRendering() {
 }
 
 void handleResize(int w, int h) {
-    printf("Handling Resize: %d, %d \n", w, h);
+    CLog::Write(CLog::Debug,"Handling Resize: %d, %d \n", w, h);
 	glViewport(0, 0, w, h);
     
     // ADDED
@@ -459,31 +492,34 @@ void handleResize(int w, int h) {
     gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 }
 
-static bool did=false;
+static bool didODEInit=false;
 
 void update(int value)
 {
 	// Derive the control to the correct object
 
-    if (!did)
+    if (!didODEInit)
     {
         dAllocateODEDataForThread(dAllocateMaskAll);
-        did=true;
+        didODEInit=true;
     }
     
     if (controller.isInterrupted())
     {
         endWorldModelling();
+        // Do extra wrap up
+        msgboardfile.close();
         exit(0);
     }
     if (!controller.pause)
 	{
+        static Player pg(GREEN_FACTION);
+        static Player pb(BLUE_FACTION);
 
-        // @FIXME: Check some parameter to see who control each faction. Either AI assisted or some user.
         if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
-            playFaction(timer, BLUE_FACTION,space,world);
+            pb.playFaction(timer);
         if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
-            playFaction(timer, GREEN_FACTION, space, world);
+            pg.playFaction(timer);
 
 
         // Auto Control: The controller can be controlled by the user or by the AI
@@ -505,10 +541,14 @@ void update(int value)
         // Build island structures, international water structures and repair carriers.
         buildAndRepair(space,world);
 
-        defendIsland(space,world);
+        defendIsland(timer,space,world);
+
+        commLink(GREEN_FACTION, space,world);
+        commLink(BLUE_FACTION, space, world);
 
 
-        //printf("Elements alive now: %d\n", vehicles.size());
+
+        //CLog::Write(CLog::Debug,"Elements alive now: %d\n", vehicles.size());
         // As the sync problem only arises when you delete something, there's no problem here.
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
@@ -528,7 +568,7 @@ void update(int value)
         {
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
-                //printf("Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
+                //CLog::Write(CLog::Debug,"Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
                 if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()<=0)
                 {
                     if (controller.controllingid == i)
@@ -536,7 +576,7 @@ void update(int value)
 
                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+                    entities.erase(entities[i]->getGeom());
                     //delete vehicles[i];
                     //dBodyDestroy(vehicles[i]->getBodyID());
                 } else if (entities[i]->getHealth()<=0)
@@ -548,39 +588,52 @@ void update(int value)
                     if (entities[i]->getType() == CARRIER)
                     {
                         char str[256];
-                        sprintf(str, "Balaenidae Carrier has been destroyed !");
-                        messages.insert(messages.begin(), str);
+                        Message m;
+                        m.faction = BOTH_FACTION;
+                        sprintf(str, "%s Carrier has been destroyed !", FACTION(entities[i]->getFaction()));
+                        m.msg = std::string(str);
+                        messages.insert(messages.begin(), m);
                     }
 
                     if (entities[i]->getType() == CONTROL)
                     {
                         CommandCenter *c = (CommandCenter*)entities[i];
                         char str[256];
+                        Message m;
+                        m.faction = BOTH_FACTION;
                         sprintf(str, "Island %s is now a free island.", c->island->getName().c_str());
-                        messages.insert(messages.begin(), str);
+                        m.msg = std::string(str);
+                        messages.insert(messages.begin(), m);
                     }
 
                     if (entities[i]->getType() == VehicleTypes::MANTA)
                     {
                         Manta *m = (Manta*)entities[i];
                         char str[256];
+                        Message mg;
+                        mg.faction = BOTH_FACTION;
                         sprintf(str, "Manta %2d has been destroyed.", NUMBERING(m->getNumber()));
-                        messages.insert(messages.begin(), str);
+                        mg.msg = std::string(str);
+                        messages.insert(messages.begin(), mg);
                     }
 
                     if (entities[i]->getType() == VehicleTypes::WALRUS)
                     {
                         Walrus *m = (Walrus*)entities[i];
                         char str[256];
+                        Message mg;
+                        mg.faction = BOTH_FACTION;
                         sprintf(str, "Walrus %2d has been destroyed.", NUMBERING(m->getNumber()));
-                        messages.insert(messages.begin(), str);
+                        mg.msg = std::string(str);
+                        messages.insert(messages.begin(), mg);
                     }
 
 
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
                     if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
                     if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
-                    entities.erase(i);
+
+                    entities.erase(entities[i]->getGeom());
 
                     explosion();
                 }
@@ -612,9 +665,16 @@ void update(int value)
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-    //srand (time(NULL));
+#ifdef DEBUG
+    CLog::SetLevel(CLog::All);
+#else
+    CLog::SetLevel(CLog::None);
+#endif
 
-    srand(0);
+    if (isPresentCommandLineParameter(argc,argv,"-random"))
+        srand (time(NULL));
+    else
+        srand (0);
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)
@@ -650,6 +710,17 @@ int main(int argc, char** argv) {
         aiplayer = BOTH_AI;
 
 
+    if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
+        controller.faction = BLUE_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
+        controller.faction = GREEN_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
+        controller.faction = BOTH_FACTION;
+    else
+        controller.faction = GREEN_FACTION;
+
+
+
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
         gamemode = STRATEGYGAME;
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
@@ -670,27 +741,29 @@ int main(int argc, char** argv) {
 
     const char *conf = dGetConfiguration ();
 
-    printf("ODE Configuration: %s\n", conf);
+    CLog::Write(CLog::Debug,"ODE Configuration: %s\n", conf);
 
     // Draw vehicles and objects
-    printf("Size %d\n", entities.size());
+    CLog::Write(CLog::Debug,"Size %d\n", entities.size());
     synchronized(entities.m_mutex)
     {
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
-            printf("Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
+            CLog::Write(CLog::Debug,"Body ID (%p) Index (%d) %d - %d\n", (void*)entities[i]->getBodyID(), i, entities[i]->getType(), entities[i]->getTtl());
         }
 
     }
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
-    //printf("Manta is located in %lu\n",*a);
+    //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
     
     //Initialize all the models and structures.
     initRendering();
 
     //intro();
+
+    msgboardfile.open ("messageboard.dat");
     
 	// OpenGL callback functions.
 	glutDisplayFunc(drawScene);

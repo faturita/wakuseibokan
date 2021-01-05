@@ -197,11 +197,14 @@ private:
     std::vector<size_t> structures;
     container<Vehicle*> *entities;
 
+    size_t commandCenterId=0;
+
     std::string name;
 
     std::string modelname;
     
 public:
+
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
     
@@ -211,7 +214,7 @@ public:
 
     dGeomID getGeom();
 
-    Structure* addStructure(Structure* structure, float x, float z,  dWorldID world);
+    Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
 
     float getX();

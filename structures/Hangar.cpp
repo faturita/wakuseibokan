@@ -47,3 +47,7 @@ void Hangar::drawModel(float yRot, float xRot, float x, float y, float z)
         printf ("model is null\n");
     }
 }
+int Hangar::getSubType()
+{
+    return HANGAR;
+}

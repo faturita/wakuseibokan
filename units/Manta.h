@@ -42,6 +42,7 @@ public:
     float addd=0;
 	void virtual init();
     int  virtual getType();
+    int  virtual getSubType();
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 	void virtual drawModel();
@@ -49,7 +50,9 @@ public:
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);
     void virtual land();
+    void virtual doHold(Vec3f target, float thrust);
     void virtual attack(Vec3f target);
+    void virtual dogfight(Vec3f target);
     void doDynamics();
     void doControl();
 

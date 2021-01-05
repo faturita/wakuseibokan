@@ -20,6 +20,8 @@
 
 #include "openglutils.h"
 
+#include "profiling.h"
+
 
 void processMouseEntry(int state) {
 
@@ -170,7 +172,7 @@ void initRendering() {
 
 
 void handleResize(int w, int h) {
-    printf("Handling Resize: %d, %d \n", w, h);
+    CLog::Write(CLog::Debug,"Handling Resize: %d, %d \n", w, h);
     glViewport(0, 0, w, h);
     
     // ADDED

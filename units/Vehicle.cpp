@@ -8,7 +8,33 @@
 
 #include "Vehicle.h"
 #include <assert.h>
+#include "../profiling.h"
 #include "../md2model.h"
+
+
+
+std::string Vehicle::subTypeText(int code)
+{
+    switch (code) {
+    case VehicleSubTypes::DOCK:return std::string("Dock");break;
+    case VehicleSubTypes::RADAR:return std::string("Radar");break;
+    case VehicleSubTypes::BELUGA:return std::string("Beluga Carrier");break;
+    case VehicleSubTypes::HANGAR:return std::string("Hangar");break;
+    case VehicleSubTypes::MEDUSA:return std::string("Medusa Fighter");break;
+    case VehicleSubTypes::RUNWAY:return std::string("Runway");break;
+    case VehicleSubTypes::TURRET:return std::string("Gunlet Turret");break;
+    case VehicleSubTypes::ANTENNA:return std::string("Comm Antenna");break;
+    case VehicleSubTypes::FACTORY:return std::string("Factory");break;
+    case VehicleSubTypes::LAUNCHER:return std::string("Missile Launcher");break;
+    case VehicleSubTypes::ARTILLERY:return std::string("Artillery");break;
+    case VehicleSubTypes::STRUCTURE:return std::string("Basic Structure Building");break;
+    case VehicleSubTypes::WAREHOUSE:return std::string("Warehouse");break;
+    case VehicleSubTypes::BALAENIDAE:return std::string("Balaenidae Carrier");break;
+    case VehicleSubTypes::LASERTURRET:return std::string("Laser Turret");break;
+    case VehicleSubTypes::COMMANDCENTER:return std::string("CommandCenter");break;
+    default:return std::string("Unit");break;
+    }
+}
 
 int Vehicle::getStatus() const
 {
@@ -48,7 +74,7 @@ Vehicle::~Vehicle()
 {
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
-    //printf("Vehicle Good bye....\n");
+    //CLog::Write(CLog::Debug,"Vehicle Good bye....\n");
 }
 
 void Vehicle::getR(float retR[12])
@@ -94,6 +120,20 @@ void Vehicle::setPos(float x, float y, float z)
     assert( me != NULL || !"Setting position without setting the body!");
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
+
+void Vehicle::setRotation(float *newR)
+{
+    setR(newR);
+
+    assert( me != NULL || !"Setting position without setting the body!");
+    if (me) dBodySetRotation(me, newR);
+
+    dVector3 result;
+    dBodyVectorToWorld(me, 0,0,1,result);       //@NOTE: Every vehicle forward position in their own coordinate system is 0,0,1.
+    setForward(result[0],result[1],result[2]);
+}
+
+
 Vec3f Vehicle::getPos()
 {
 	return pos;
@@ -190,6 +230,11 @@ void Vehicle::init()
 }
 
 int Vehicle::getType()
+{
+    return 0;
+}
+
+int Vehicle::getSubType()
 {
     return 0;
 }
@@ -415,6 +460,31 @@ void Vehicle::setPower(int value)
     power = value;
 }
 
+int Vehicle::getSignal() const
+{
+    return signal;
+}
+
+void Vehicle::setSignal(int value)
+{
+    signal = value;
+}
+
+int Vehicle::getOrder() const
+{
+    return order;
+}
+
+void Vehicle::setOrder(int value)
+{
+    order = value;
+}
+
+int Vehicle::getAistatus() const
+{
+    return aistatus;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;
@@ -430,6 +500,18 @@ struct controlregister Vehicle::getControlRegisters()
     return myCopy;
 }
 
+/**
+ * This is the key of the the binding between ODE and OpenGL to make this engine work.
+ * Get the speed.
+ * Get the forward direction in global coordinates (setForward is in global coordinates).
+ * Get the position and rotation from ODE, and set the position with setPos and with setLocation, it updates the R matrix of rotation
+ *  that is used by OpenGL to reorient the model.
+ *
+ * Additionally, the stability of ODE is verified and somehow hacked trying to shift the position or orientation a little bit to avoid the unstability issues.
+ *
+ * @brief Vehicle::wrapDynamics
+ * @param body
+ */
 void Vehicle::wrapDynamics(dBodyID body)
 {
     Vec3f linearVel = dBodyGetLinearVelVec(body);
@@ -449,13 +531,13 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     /**
     if (getType()==WALRUS)
-        printf("Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
     if (getType()==MANTA)
-        printf("Manta    %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Manta    %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
 
     if (getType()==CARRIER)
-        printf("Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
+        CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
     // @NOTE:  Uncomment the following line if you want the game to be more stable.
@@ -515,6 +597,11 @@ void Vehicle::setDestination(Vec3f dest)
 Vec3f Vehicle::getDestination() const
 {
     return Vehicle::destination;
+}
+
+void Vehicle::attack(Vec3f target)
+{
+    assert(!"Not implemented.");
 }
 
 void Vehicle::setAttitude(Vec3f attit)
@@ -600,4 +687,9 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
     dVector3 result;
     dBodyVectorFromWorld(body, fw[0],fw[1],fw[2],result);
     return Vec3f(result[0],result[1],result[2]);
+}
+
+bool Vehicle::arrived()
+{
+    return reached;
 }

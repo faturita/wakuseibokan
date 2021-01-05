@@ -1,6 +1,7 @@
 #ifndef MISSILE_H
 #define MISSILE_H
 
+#include <vector>
 #include "Gunshot.h"
 
 
@@ -17,8 +18,11 @@ protected:
     float r1=0, r2=0, r3=0;
     float rt1=0, rt2=0, rt3=0;
     float midpointpitch = -5;
+
+    bool ond;                   // Used for runonce.
+
 public:
-    Missile();
+    Missile(int faction);
     ~Missile();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);

@@ -9,9 +9,17 @@
 #include "../md2model.h"
 
 #include "../actions/Gunshot.h"
-#include "../sounds/sounds.h"
 
 #include "../engine.h"
+
+extern dWorldID world;
+extern dSpaceID space;
+#include "../container.h"
+#include "../sounds/sounds.h"
+
+#include "../profiling.h"
+
+extern container<Vehicle*> entities;
 
 extern GLuint _textureSky;
 
@@ -67,6 +75,11 @@ void Walrus::init()
 int Walrus::getType()
 {
     return WALRUS;
+}
+
+int Walrus::getSubType()
+{
+    return SIMPLEWALRUS;
 }
 
 void Walrus::doMaterial()
@@ -129,93 +142,204 @@ void Walrus::drawModel()
 
 void Walrus::doControl()
 {
+    switch (aistatus) {
+        case ATTACK: doControlAttack();break;
+        case DESTINATION: doControlDestination();break;
+        default: break;
+    }
+
+}
+
+void Walrus::doControlAttack()
+{
     Controller c;
 
     c.registers = myCopy;
 
-    if (aistatus == DESTINATION)
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    if (T.magnitude()>1000)
     {
+        float distance = T.magnitude();
 
-        Vec3f Po = getPos();
+        Vec3f F = getForward();
 
-        Po[1] = 0.0f;
-
-        Vec3f Pf(145 kmf, -1.0f, 89 kmf - 3.5 kmf);
-
-        Pf = destination;
-
-        Vec3f T = Pf - Po;
-
-        float eh, midpointpitch;
+        F = F.normalize();
+        T = T.normalize();
 
 
-        if (!reached && T.magnitude()>500)
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 400.0f;
+
+        if (distance<10000.0f)
         {
-            float distance = T.magnitude();
+            c.registers.thrust = 200.0f;
+        }
 
-            Vec3f F = getForward();
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 100.0f;
+        }
 
-            F = F.normalize();
-            T = T.normalize();
-
-
-            // Potential fields from the islands (to slow down Walrus)
-
-            c.registers.thrust = 400.0f;
-
-            if (distance<10000.0f)
-            {
-                c.registers.thrust = 200.0f;
-            }
-
-            if (distance<2000.0f)
-            {
-                c.registers.thrust = 100.0f;
-            }
-
-            BoxIsland *b = findNearestIsland(Po);
-            float closest = (b->getPos() - Po).magnitude();
-            if (closest > 1800 && closest < 1900)
-            {
-                c.registers.thrust = 15.0f;
-            }
+        BoxIsland *b = findNearestIsland(Po);
+        float closest = (b->getPos() - Po).magnitude();
+        if (closest > 1800 && closest < 1900)
+        {
+            c.registers.thrust = 15.0f;
+        }
 
 
-            float e = acos(  T.dot(F) );
+        float e = acos(  T.dot(F) );
 
-            float signn = T.cross(F) [1];
-
-
-            //printf("T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
-
-            if (abs(e)>=0.5f)
-            {
-                c.registers.roll = 30.0 * (signn>0?+1:-1) ;
-            } else
-            if (abs(e)>=0.4f)
-            {
-                c.registers.roll = 20.0 * (signn>0?+1:-1) ;
-            } else
-            if (abs(e)>=0.2f)
-                c.registers.roll = 10.0 * (signn>0?+1:-1) ;
-            else {
-                c.registers.roll = 0.0f;
-            }
+        float signn = T.cross(F) [1];
 
 
-        } else {
-            if (!reached)
-            {
-                char str[256];
-                sprintf(str, "Walrus has arrived to destination.");
-                //messages.insert(messages.begin(), str);
-                printf("Walrus has reached its destination.\n");
-                reached = true;
-                aistatus = FREE;
-                c.registers.thrust = 0.0f;
-                c.registers.roll = 0.0f;
-                disableAuto();
-            }
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else
+    if (T.magnitude()<1000)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+        if (abs(e)>=0.2f)
+            c.registers.roll = 400.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+        c.registers.thrust = 2.0;
+
+        Vehicle *action = fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action, action->getGeom());
+            gunshot();
+            setTtl(5);
+        }
+
+
+    }
+
+    doControl(c);
+
+}
+
+void Walrus::doControlDestination()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    if (!reached && T.magnitude()>500)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 400.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 200.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 100.0f;
+        }
+
+        BoxIsland *b = findNearestIsland(Po);
+        float closest = (b->getPos() - Po).magnitude();
+        if (closest > 1800 && closest < 1900)
+        {
+            c.registers.thrust = 15.0f;
+        }
+
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else {
+        if (!reached)
+        {
+            char str[256];
+            sprintf(str, "Walrus has arrived to destination.");
+            //messages.insert(messages.begin(), str);
+            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            reached = true;
+            aistatus = FREE;
+            c.registers.thrust = 0.0f;
+            c.registers.roll = 0.0f;
+            disableAuto();
         }
     }
 
@@ -358,15 +482,15 @@ void Walrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
-    //std::cout << "Attitude:" << attitude << std::endl;
+    //dout << "Attitude:" << attitude << std::endl;
 
     if (attitude>80 || attitude<-80)
     {
-        // Walrus has tumbled.
+        // Walrus has capsized.
         damage(1);
     }
 
@@ -392,6 +516,8 @@ void Walrus::doDynamics(dBodyID body)
 
 Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
 {
+    if (getTtl()>0)
+        return NULL;
     Gunshot *action = new Gunshot();
     // Need axis conversion.
     action->init();
@@ -439,3 +565,9 @@ void Walrus::setStatus(int status)
     Vehicle::status = status;
 }
 
+
+void Walrus::attack(Vec3f target)
+{
+    aistatus = ATTACK;
+    destination = target;
+}

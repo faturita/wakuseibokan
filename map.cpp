@@ -20,6 +20,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "profiling.h"
 #include "container.h"
 #include "ThreeMaxLoader.h"
 
@@ -67,13 +68,13 @@ void placeMark(int x, int y, int size, const char* modelName)
 
     if (maptextures.find(std::string(modelName)) == maptextures.end())
     {
+        // @FIXME: This means that the image is loaded every time this mark is rendered, which is wrong.
         Image* image = loadBMP(modelName);
         _textureBox = loadTexture(image);
         delete image;
 
         maptextures[std::string(modelName)]=_textureBox;
 
-        printf("Texture loaded...\n");
     } else {
         _textureBox = maptextures[std::string(modelName)];
     }
@@ -98,6 +99,9 @@ void placeMark(int x, int y, int size, const char* modelName)
     glVertex3f(-size / 2 + x, size / 2 + y, 0);
 
     glEnd();
+
+    // @NOTE: This is very important.
+    glDisable(GL_TEXTURE_2D);
 }
 
 void placeIsland(int x, int y, int size, const char* modelName, const char *name)
@@ -114,7 +118,6 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 
         maptextures[std::string(modelName)]=_textureBox;
 
-        printf("Texture loaded...\n");
     } else {
         _textureBox = maptextures[std::string(modelName)];
     }
@@ -146,7 +149,7 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 
 void zoommapin()
 {
-    if (mapzoom < 6)
+    if (mapzoom < 11)
         mapzoom++;
 }
 
@@ -326,21 +329,35 @@ void drawMap()
             drawString(600-(b->getX()/1000)-10,(b->getZ()/1000)-20,0,(char*)b->getName().c_str(),0.1f,color[0],color[1],color[2]);
         }
 
+        int iconsize = 10;
+
+        if (mapzoom>5)
+            iconsize = 4;
 
         // Now show all the available units.
         synchronized(entities.m_mutex)
         {
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
-                if (entities[i]->getType() == CARRIER)
+                if (entities[i]->getFaction() == controller.faction || controller.faction == BOTH_FACTION)
                 {
-                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"B",0.1f,1.0f,1.0f,0.0f);
-                } else if (entities[i]->getType() == WALRUS)
-                {
-                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
-                } else if (entities[i]->getType() == MANTA)
-                {
-                    drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                    if (entities[i]->getType() == CARRIER)
+                    {
+                        placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,iconsize,"units/carriertarget.bmp");
+                    } else if (entities[i]->getType() == WALRUS)
+                    {
+                        drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
+                    } else if (entities[i]->getType() == MANTA)
+                    {
+                        if (entities[i]->getSubType() == MEDUSA)
+                        {
+                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"S",0.1f,1.0f,0.9f,0.5f);
+
+                        } else
+                        {
+                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                        }
+                    }
                 }
             }
         }
@@ -355,7 +372,7 @@ void drawMap()
 
             if (target.magnitude()>=1)
             {
-                placeMark(600-target[0]/1000.0,0+target[2]/1000.0,10,"units/target.bmp");
+                placeMark(600-target[0]/1000.0,0+target[2]/1000.0,iconsize,"units/target.bmp");
             }
         }
 
@@ -363,7 +380,8 @@ void drawMap()
         {
             BoxIsland *b = islands[i];
 
-            placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),10, b->getModelName().c_str(), b->getName().c_str());
+            // The size '5' is 4000x4000 (instead of 3600x3600) which is the real size of every island.
+            placeIsland(600-(b->getX()/1000),0+(b->getZ()/1000),iconsize, b->getModelName().c_str(), b->getName().c_str());
         }
 
 

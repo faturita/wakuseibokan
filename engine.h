@@ -35,25 +35,27 @@
 #include "structures/CommandCenter.h"
 #include "structures/Artillery.h"
 #include "structures/Launcher.h"
+#include "structures/Dock.h"
+#include "structures/Antenna.h"
+#include "structures/Factory.h"
+#include "structures/Radar.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
 
-enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2};
+enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 
-#define NUMBERING(m) (m + 1)
-#define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
-
-// SYNC
-Vehicle* gVehicle(dBodyID body);
+#define DOCK_RANGE      600
+#define COMM_RANGE      50000
+#define CLOSE_RANGE     1000
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom);
 
-void gVehicle(Vehicle* &v1, Vehicle* &v2, dBodyID b1, dBodyID b2, Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
+void gVehicle(Vehicle* &v1, Vehicle* &v2,Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
 
 // SYNC
@@ -89,24 +91,24 @@ bool rayHit(Vehicle *vehicle, LaserRay *l);
 bool releasecontrol(Vehicle* vehicle);
 
 
-void  releasecontrol(dBodyID body);
+void  releasecontrol(dGeomID geom);
 
 
 // SYNC
 bool  isType(Vehicle *vehicle, int type);
 
-bool isType(dBodyID body, int types[], int length);
+bool isType(dGeomID geom, int types[], int length);
 
-bool  isType(dBodyID body, int type);
+bool  isType(dGeomID geom, int type);
 
 
-bool  isManta(dBodyID body);
+bool  isManta(dGeomID body);
 
 
 bool  isManta(Vehicle* vehicle);
 
 
-bool  isCarrier(dBodyID body);
+bool  isCarrier(dGeomID body);
 
 
 bool  isCarrier(Vehicle* vehicle);
@@ -115,7 +117,7 @@ bool  isCarrier(Vehicle* vehicle);
 bool  isWalrus(Vehicle* vehicle);
 
 
-bool  isAction(dBodyID body);
+bool  isAction(dGeomID body);
 
 
 bool  isAction(Vehicle* vehicle);
@@ -134,46 +136,58 @@ bool  isIsland(dGeomID candidate);
 // SYNC
 bool  groundcollisions(Vehicle *vehicle);
 
-void  groundcollisions(dBodyID body);
+void  groundcollisions(dGeomID body);
+
+void commLink(int faction, dSpaceID space, dWorldID world);
 
 CommandCenter* findCommandCenter(Island *island);
+Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByNumber(size_t &pos, int number);
-Manta* findManta(int status);
-Manta* findNearestManta(int status, Vec3f l);
+Manta* findManta(int faction, int status);
+Manta* findManta(int faction, int status, Vec3f around);
+Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);
 Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
+Walrus* findWalrus(int status, int faction, int order);
+Walrus* findWalrusByOrder(int faction, int order);
 Walrus* findWalrusByNumber(size_t &pos, int number);
+Walrus* findNearestWalrus(int faction, Vec3f l, float threshold);
 void list();
 
 int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
 
-void defendIsland(dSpaceID space, dWorldID world);
+void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
 
-Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner);
+Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 void dockWalrus(Vehicle *dock);
 void dockManta();
 
-void launchManta(Vehicle *v);
+Manta* launchManta(Vehicle *v);
 void landManta(Vehicle *v);
+void landManta(Vehicle *landplace, Manta *m);
+Manta* taxiManta(Vehicle *v);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);
 BoxIsland* findIslandByName(std::string islandname);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction);
-BoxIsland* findNearestIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
+BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+
+Antenna* findAntennaFromIsland(BoxIsland *is);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 
-void captureIsland(BoxIsland *island, int faction, dSpaceID space, dWorldID world);
-void wipeEnemyStructures(BoxIsland *island);
+void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
+void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
+void wipeEnemyStructures(BoxIsland *island, int faction);
 
-void playFaction(unsigned long timer, int faction, dSpaceID space, dWorldID world);
 
 
 #endif // ENGINE_H

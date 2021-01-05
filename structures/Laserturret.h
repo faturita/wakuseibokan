@@ -23,6 +23,8 @@ public:
     void locateLaserRay(LaserRay *action);
     void setForward(Vec3f forw);
     void tick();
+
+    int getSubType() override;
 };
 
 #endif // LASERTURRET_H

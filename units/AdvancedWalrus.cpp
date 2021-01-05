@@ -1,8 +1,17 @@
 
 #include "AdvancedWalrus.h"
 
+#include "../profiling.h"
+
 #include "../actions/ArtilleryAmmo.h"
+
+#include "../engine.h"
+extern dWorldID world;
+extern dSpaceID space;
+#include "../container.h"
 #include "../sounds/sounds.h"
+
+extern container<Vehicle*> entities;
 
 extern GLuint _textureSky;
 
@@ -190,11 +199,11 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //printf("Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
     float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
-    //std::cout << "Attitude:" << attitude << std::endl;
+    //dout << "Attitude:" << attitude << std::endl;
 
     if (attitude>80 || attitude<-80)
     {
@@ -226,7 +235,11 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
 void AdvancedWalrus::doControl()
 {
-    Walrus::doControl();
+    switch (aistatus) {
+        case ATTACK: doControlAttack();break;
+        case DESTINATION: doControlDestination();break;
+        default: break;
+    }
 }
 
 void AdvancedWalrus::doControl(Controller controller)
@@ -243,6 +256,107 @@ void AdvancedWalrus::doControl(struct controlregister conts)
     elevation = conts.pitch;
 
     setAim(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+}
+
+
+void AdvancedWalrus::doControlAttack()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    if (T.magnitude()>1000)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 400.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 200.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 100.0f;
+        }
+
+        BoxIsland *b = findNearestIsland(Po);
+        float closest = (b->getPos() - Po).magnitude();
+        if (closest > 1800 && closest < 1900)
+        {
+            c.registers.thrust = 15.0f;
+        }
+
+
+        float e = acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else
+    if (T.magnitude()<1000)
+    {
+        Vec3f target = destination - getPos();
+        Vec3f aim = toBody(me,target);
+
+        dout << "Target:" << aim <<  ":Loc: " << getPos() << " Target: " << destination<< std::endl;
+
+
+        float azimuth=getAzimuth(aim);
+        float declination=getDeclination(aim);
+
+        struct controlregister c;
+        c = getControlRegisters();
+        c.precesion = azimuth;
+        c.pitch = declination;
+        setControlRegisters(c);
+
+        Vehicle *action = fire(world,space);
+
+        if (action != NULL)
+        {
+            entities.push_back(action, action->getGeom());
+            //gunshot();
+            setTtl(100);
+        }
+
+
+    }
+
+    doControl(c);
+
 }
 
 Vec3f AdvancedWalrus::getAim()
@@ -331,9 +445,9 @@ Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
 
     Vec3f d = action->getPos() - getPos();
 
-    //std::cout << d << std::endl;
+    //dout << d << std::endl;
 
-    std::cout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);

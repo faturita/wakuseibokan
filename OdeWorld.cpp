@@ -14,6 +14,8 @@
 
 #include <vector>
 
+#include "profiling.h"
+
 
 #import <OpenAL/al.h>
 #import <OpenAL/alc.h>
@@ -485,7 +487,7 @@ void drawScene() {
     const dReal *pos = dGeomGetPosition (Object.Geom[0]);
     
     
-    printf("%10.8f, %10.8f, %10.8f\n",pos[0],pos[1],pos[2]);
+    CLog::Write(CLog::Debug,"%10.8f, %10.8f, %10.8f\n",pos[0],pos[1],pos[2]);
     
     drawBox(pos[0],pos[1],pos[2]);
     //drawBox(0.0, 3.0, 5.0);
@@ -535,7 +537,7 @@ void initRendering() {
 }
 
 void handleResize(int w, int h) {
-    printf("Handling Resize: %d, %d \n", w, h);
+    CLog::Write(CLog::Debug,"Handling Resize: %d, %d \n", w, h);
     glViewport(0, 0, w, h);
     
     // ADDED
@@ -602,7 +604,7 @@ int main(int argc, char** argv) {
     //dAllocateODEDataForThread(dAllocateMaskAll);
     InitWorldModelling();
     
-    printf ("World Modelling completed...\n");
+    CLog::Write(CLog::Debug,"World Modelling completed...\n");
     
     //Initialize all the models and structures.
     initRendering();
@@ -620,7 +622,7 @@ int main(int argc, char** argv) {
     // this is the first time to call to update.
     glutTimerFunc(25, update, 0);
     
-    printf ("Ready for main loop\n");
+    CLog::Write(CLog::Debug,"Ready for main loop\n");
     
     // main loop, hang here.
     glutMainLoop();

@@ -2,15 +2,18 @@
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
 #include "AdvancedWalrus.h"
+#include "../profiling.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
 #include "../actions/Missile.h"
+#include "../actions/AAM.h"
+#include "../keplerivworld.h"
 
 extern GLuint _textureMetal;
 
 extern GLuint _textureRoad;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
@@ -35,7 +38,12 @@ void Balaenidae::init()
 
 int Balaenidae::getType()
 {
-    return 4;
+    return CARRIER;
+}
+
+int Balaenidae::getSubType()
+{
+    return BALAENIDAE;
 }
 
 void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
@@ -186,7 +194,7 @@ void Balaenidae::doControl()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -207,8 +215,11 @@ void Balaenidae::doControl()
         if (!reached)
         {
             char str[256];
+            Message mg;
+            mg.faction = getFaction();
             sprintf(str, "Balaenidae has arrived to destination.");
-            messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
@@ -281,7 +292,7 @@ void Balaenidae::doDynamics(dBodyID body)
 
         Vec3f V = ap*(-10000);
 
-        dBodyAddRelForce(body,V[0],V[1],V[2]);
+        dBodyAddForce(body,V[0],V[1],V[2]);
         offshoring--;
     }
 
@@ -325,7 +336,7 @@ void Balaenidae::doDynamics(dBodyID body)
 void Balaenidae::offshore()
 {
     Balaenidae::offshoring = 100;
-    Balaenidae::ap = dBodyGetLinearVelInBody(me);
+    Balaenidae::ap =getForward();
     Balaenidae::ap = Balaenidae::ap.normalize();
 }
 
@@ -352,7 +363,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _walrus->embody(world,space);
         Vec3f p;
         p = p.normalize();
-        p = getForward()*450;
+        p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
@@ -404,7 +415,7 @@ void Balaenidae::launch(Manta* m)
 
 Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
 {
-    Missile *action = new Missile();
+    Missile *action = new Missile(getFaction());
     // Need axis conversion.
     action->init();
     action->setOrigin(me);

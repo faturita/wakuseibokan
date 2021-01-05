@@ -30,6 +30,7 @@ public:
 
 	void virtual init();
     int  virtual getType();
+    int  virtual getSubType();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 	void virtual drawModel();
 	void virtual drawDirectModel();
@@ -37,9 +38,12 @@ public:
 	void virtual doDynamics(dBodyID);
     void doDynamics();
 
-    void doControl(Controller controller);
-    void doControl();
-    void doControl(struct controlregister cons);
+    void virtual doControl(Controller controller);
+    void virtual doControl();
+    void virtual doControl(struct controlregister cons);
+
+    void virtual doControlAttack();
+    void virtual doControlDestination();
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
@@ -52,6 +56,8 @@ public:
     void setIsland(BoxIsland *value);
 
     void virtual setStatus(int status);
+
+    void attack(Vec3f target);
 };
 
 #endif /* WALRUS_H_ */

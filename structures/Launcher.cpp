@@ -1,5 +1,6 @@
 #include "Launcher.h"
 #include "../actions/Missile.h"
+#include "../actions/AAM.h"
 
 #include "../sounds/sounds.h"
 
@@ -23,6 +24,8 @@ void Launcher::init()
     Structure::width=11.68;
 
     Launcher::firingpos = Vec3f(0.0f,16.0f,0.0f);
+
+    aistatus = GROUND;
 
     setForward(Vec3f(0,0,1));
 }
@@ -96,7 +99,7 @@ void Launcher::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     forward = getForward();
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
-    //std::cout << "Forward:" << forward << std::endl;
+    //dout << "Forward:" << forward << std::endl;
 
     Vec3f orig;
 
@@ -110,13 +113,12 @@ void Launcher::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 }
 
 
-
-Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
+Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 {
     if (getTtl()>0)
         return NULL;
 
-    Missile *action = new Missile();
+    AAM *action = new AAM(getFaction());
     // Need axis conversion.
     action->init();
     action->setOrigin(me);
@@ -156,7 +158,76 @@ Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 
 
     Vec3f Ft=fw + Vec3f(0,20,0);
-    Ft=Ft*220;
+    Ft=Ft*1;
+
+    dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
+    dBodySetQuaternion(action->getBodyID(),q3);
+
+    setTtl(1000);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+
+Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
+{
+
+    switch (aistatus) {
+    case GROUND:return fireGround(world,space);
+        break;
+    case AIR:return fireAir(world, space);
+        break;
+    }
+
+    return NULL;
+}
+
+Vehicle* Launcher::fireGround(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    Missile *action = new Missile(getFaction());
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    Vec3f fw = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    position = position + 60.0f*fw;
+    fw = -orig+position;
+
+
+    position = orig;
+    position[1] += 40;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, 0,0,
+                      0);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+
+    dQfromR(q2,R2);
+
+
+    dQMultiply0(q3,q2,q1);
+
+
+    Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft=Ft*250;
 
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
@@ -190,4 +261,19 @@ void Launcher::doControl(Controller controller)
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
+}
+
+void Launcher::ground()
+{
+    aistatus = GROUND;
+}
+
+void Launcher::air()
+{
+    aistatus = AIR;
+}
+
+int Launcher::getSubType()
+{
+    return LAUNCHER;
 }

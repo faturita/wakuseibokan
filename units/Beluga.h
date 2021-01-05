@@ -13,6 +13,8 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
+    int virtual getSubType();
+
     void doControl();
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };

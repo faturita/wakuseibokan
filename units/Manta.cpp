@@ -38,6 +38,11 @@ void Manta::attack(Vec3f target)
     assert(!"Not implemented");
 }
 
+void Manta::dogfight(Vec3f target)
+{
+    assert(!"Not implemented");
+}
+
 void Manta::init()
 {
     //Load the model
@@ -52,7 +57,17 @@ void Manta::init()
 
 int Manta::getType()
 {
-    return 3;
+    return MANTA;
+}
+
+int Manta::getSubType()
+{
+    return SIMPLEMANTA;
+}
+
+void Manta::doHold(Vec3f target, float thrust)
+{
+    assert(!"Method not implemented in Manta.");
 }
 
 void Manta::drawModel(float yRot, float xRot, float x, float y, float z)

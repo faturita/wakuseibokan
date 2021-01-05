@@ -31,6 +31,8 @@ public:
 
     void embody(dBodyID myBodySelf);
 
+    void rotate(float yawangle);
+
     void virtual setPos(const Vec3f &newpos);
     void virtual setPos(float x, float y, float z);
 
@@ -38,6 +40,7 @@ public:
     void  doDynamics();
 
     int getType();
+    int virtual getSubType();
 
     void onIsland(Island* island);
 
@@ -49,6 +52,8 @@ public:
     Vec3f getForward();
 
     void setTexture(GLuint texture);
+
+    bool virtual checkHeightOffset(int heightOffset);
 };
 
 #endif // STRUCTURE_H

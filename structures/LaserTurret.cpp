@@ -1,5 +1,7 @@
 #include "Laserturret.h"
 
+#include "../profiling.h"
+
 #include "../actions/LaserBeam.h"
 #include "../actions/LaserRay.h"
 
@@ -84,7 +86,7 @@ void LaserTurret::tick()
         setTtl(LASER_RECHARGING);
         LaserTurret::ls->disable();
         LaserTurret::ls = NULL;
-        printf("Shutting off laser\n");
+        CLog::Write(CLog::Debug,"Shutting off laser\n");
     }
 
     Vehicle::tick();
@@ -104,4 +106,9 @@ void LaserTurret::doControl(Controller cr)
     // Let's move the ODE RayClass with me.  When firing is disabled, it will be finally destroyed (by setting ttl).
     Turret::doControl(cr);
     if (LaserTurret::ls) locateLaserRay(LaserTurret::ls);
+}
+
+int LaserTurret::getSubType()
+{
+    return LASERTURRET;
 }

@@ -3,6 +3,8 @@
 
 #include "../sounds/sounds.h"
 
+#include "../profiling.h"
+
 Artillery::Artillery(int faction)
 {
     Artillery::zoom = 20.0f;
@@ -90,7 +92,7 @@ void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
     fw = toVectorInFixedSystem(0, 0, 1,azimuth,-elevation);
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
-    //std::cout << "Forward:" << forward << std::endl;
+    //dout << "Forward:" << forward << std::endl;
 
     Vec3f orig;
 
@@ -144,9 +146,9 @@ Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
 
     Vec3f d = action->getPos() - getPos();
 
-    //std::cout << d << std::endl;
+    //dout << d << std::endl;
 
-    std::cout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
 
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
@@ -182,4 +184,10 @@ void Artillery::doControl(Controller controller)
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
+}
+
+
+int Artillery::getSubType()
+{
+    return ARTILLERY;
 }

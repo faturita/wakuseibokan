@@ -1,5 +1,6 @@
 #include "Turret.h"
 #include "../actions/Gunshot.h"
+#include "../profiling.h"
 
 Turret::Turret(int faction)
 {
@@ -157,7 +158,7 @@ Vehicle* Turret::fire(dWorldID world, dSpaceID space)
 
     Vec3f d = action->getPos() - getPos();
 
-    //std::cout << d << std::endl;
+    //dout << d << std::endl;
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
@@ -192,7 +193,12 @@ void Turret::doControl(Controller controller)
     elevation -= controller.registers.pitch * (20.0f/abs(zoom)) ;
     azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
 
-    //std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+    //dout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+}
+
+int Turret::getSubType()
+{
+    return TURRET;
 }

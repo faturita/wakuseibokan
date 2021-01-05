@@ -1,12 +1,14 @@
 #include "Beluga.h"
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
+#include "../profiling.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
+#include "../keplerivworld.h"
 
 extern GLuint _textureRoad;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
 
@@ -103,7 +105,7 @@ void Beluga::doControl()
         float signn = T.cross(F) [1];
 
 
-        printf("T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
         if (abs(e)>=0.5f)
         {
@@ -124,8 +126,12 @@ void Beluga::doControl()
         if (!reached)
         {
             char str[256];
-            sprintf(str, "Balaenidae has arrived to destination.");
-            messages.insert(messages.begin(), str);
+            Message mg;
+            mg.faction = getFaction();
+            sprintf(str, "Beluga has arrived to destination.");
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
+
             reached = true;
             c.registers.thrust = 0.0f;
             c.registers.roll = 0.0f;
@@ -231,8 +237,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _walrus->setNumber(number);
         _walrus->embody(world,space);
         Vec3f p;
-        p = p.normalize();
-        p = getForward()*450;
+        p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->setStatus(Walrus::SAILING);
         _walrus->stop();
@@ -244,6 +249,11 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     }
 
     return v;
+}
+
+int Beluga::getSubType()
+{
+    return BELUGA;
 }
 
 //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

@@ -1,11 +1,13 @@
 #include "Missile.h"
 #include "../ThreeMaxLoader.h"
+#include "../profiling.h"
 
 extern GLuint _textureRoad;
 
-Missile::Missile()
+Missile::Missile(int faction)
 {
     Vehicle::setTtl(1000);
+    setFaction(faction);
 }
 
 Missile::~Missile()
@@ -153,10 +155,10 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
-    // Set the sign of e1 in relation to rolling encoding.
-    if (getAzimuth(fwd)>270 && getAzimuth(T)<(getAzimuth(fwd)-180))
+    // Set the sign of e1 in relation to rolling encoding (@NOTE Check Manta control is basically the same code).
+    if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
         e1 = e1 * (-1);
-    else if (getAzimuth(fwd) < getAzimuth(T))
+    else if (getAzimuth(getForward()) < getAzimuth(T) && (getAzimuth(T) - getAzimuth(getForward()))<180)
         e1 = e1 * (-1);
 
 
@@ -168,12 +170,12 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    std::cout << "Azimuth:" << getAzimuth(fwd) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+    dout << "Azimuth:" << getAzimuth(fwd) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
 
 
     if (abs((getAzimuth(fwd)-getAzimuth(T)))<0.1) {
         dBodySetAngularVel(me,0,0,0);
-        runonce { std::cout << "Locked in target!" << std::endl; dBodySetLinearVel(me,0,0,0); }
+        runonceinclass { dout << "Locked in target!" << std::endl; dBodySetLinearVel(me,0,0,0); }
         r1=0;}
     //if (abs((getDeclination(getForward())-getDeclination(T)))<0.1) { //dBodySetAngularVel(me,0,0,0);
     //    r2=0;}
@@ -228,7 +230,7 @@ void Missile::doControl()
 
     //Vec3f p = getPos() - destination;
 
-    //std::cout << "Destination:" << p.magnitude() << std::endl;
+    //dout << "Destination:" << p.magnitude() << std::endl;
 
     //c.registers.roll = 0;
     //c.registers.pitch = 0;
@@ -268,7 +270,7 @@ void Missile::doControl(Controller controller)
         e1 = e1 * (-1);
 
 
-    std::cout << "Destination:" << T.magnitude() << " Azimuth:" << getAzimuth(T) << " vs " << getAzimuth(getForward()) << "("<< e1 << ")" << std::endl;
+    dout << "Destination:" << T.magnitude() << " Azimuth:" << getAzimuth(T) << " vs " << getAzimuth(getForward()) << "("<< e1 << ")" << std::endl;
 **/
 
 }
@@ -290,5 +292,6 @@ void Missile::setVisible(bool val)
     Gunshot::visible = val;
     setTtl(50);
 }
+
 
 //draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

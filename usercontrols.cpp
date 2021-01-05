@@ -16,6 +16,8 @@
 
 #include "math/yamathutil.h"
 
+#include "profiling.h"
+
 #include "container.h"
 
 #include "camera.h"
@@ -27,7 +29,6 @@
 
 #include "usercontrols.h"
 #include "map.h"
-
 #include "units/Vehicle.h"
 #include "units/Balaenidae.h"
 #include "units/Manta.h"
@@ -45,7 +46,7 @@ extern dSpaceID space;
 
 Controller controller;
 
-extern std::vector<std::string> messages;
+extern std::vector<Message> messages;
 
 extern container<Vehicle*> entities;
 
@@ -83,7 +84,7 @@ void processMouse(int button, int state, int x, int y) {
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
                 ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || entities[controller.controllingid]->getType() == CONTROLABLEACTION) )
         {
-            printf("Active control\n");
+            CLog::Write(CLog::Debug,"Active control\n");
             // Activate airplane controller.
             if (buttonState != 1)
             {
@@ -115,7 +116,7 @@ void processMouse(int button, int state, int x, int y) {
         // set the color to pure red for the left button
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
-            printf("Mouse down %d,%d\n",x,y);
+            CLog::Write(CLog::Debug,"Mouse down %d,%d\n",x,y);
             if (controller.view == 2)
             {
                 if (specialKey == GLUT_ACTIVE_SHIFT)
@@ -124,11 +125,13 @@ void processMouse(int button, int state, int x, int y) {
                     //@FIXME
                     entities[controller.controllingid]->setDestination(target);
 
-                    printf("Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
+                    CLog::Write(CLog::Debug,"Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
 
 
                 } else {
                     centermap(x,y);
+                    Vec3f lo = setLocationOnMap(x,y);
+                    CLog::Write(CLog::Debug,"Set location on map (%10.5f, %10.5f)\n", lo[0], lo[2]);
                     zoommapin();
                 }
             }
@@ -231,6 +234,13 @@ void switchControl(int controlposition)
         return;
     }
 
+    // Check if it is from users faction
+    if (!(entities[id]->getFaction() == controller.faction || controller.faction == BOTH_FACTION))
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        return;
+    }
+
     if (controller.controllingid != CONTROLLING_NONE)
     {
         if (!entities[controller.controllingid]->isAuto())
@@ -262,7 +272,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME input data should be verified.
                 const char *content = controller.str.substr(7).c_str();
 
-                printf("Controlling %s\n", content);
+                CLog::Write(CLog::Debug,"Controlling %s\n", content);
 
                 switchControl(atoi(content));
 
@@ -296,7 +306,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
                 const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
 
-                std::cout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
+                dout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
 
                 size_t pos = CONTROLLING_NONE;
 
@@ -304,24 +314,52 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
                     {
-                        std::cout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
+                        dout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
                         pos = entities.indexOf(islands[j]->getStructures()[atoi(structurenumber)]);
                     }
                 }
                 switchControl(pos);
 
             } else
+            if (controller.str.find("info") != std::string::npos)
+            {
+                std::string islandcode = controller.str.substr(4+controller.str.substr(4).find(" "));
+                std::string islandname = islandcode.substr(1);
+
+                dout << "Island-" << islandname << std::endl;
+
+                for (int j=0;j<islands.size();j++)
+                {
+                    if (islandname == islands[j]->getName())
+                    {
+                        std::vector<size_t> str = islands[j]->getStructures();
+
+                        CommandCenter *cc = (CommandCenter*)islands[j]->getCommandCenter();
+
+                        if (cc)
+                        {
+                            if (cc->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
+                                dout << "Defense Island" << std::endl;
+                            else if (cc->getIslandType() == ISLANDTYPES::FACTORY_ISLAND)
+                                dout << "Factory Island" << std::endl;
+                            else if (cc->getIslandType() == ISLANDTYPES::LOGISTICS_ISLAND)
+                                dout << "Logistic Island" << std::endl;
+                        }
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==controller.faction)
+                            {
+                                dout << entities[str[i]]->subTypeText(entities[str[i]]->getSubType()) << "-"
+                                          << entities[str[i]]->getHealth() << std::endl;
+                            }
+                        }
+                    }
+                }
+            } else
             if (controller.str.find("taxi") != std::string::npos)
             {
-                Balaenidae *r = (Balaenidae*)entities[controller.controllingid];
-                Manta *m = findManta(Manta::ON_DECK);
-                if (m)
-                {
-                    r->taxi(m);
-                    char msg[256];
-                    sprintf(msg,"Manta %2d is ready for launch.",m->getNumber());
-                    messages.insert(messages.begin(), std::string(msg));
-                }
+                taxiManta(entities[controller.controllingid]);
             }
             else
             if (controller.str.find("launch") != std::string::npos)
@@ -338,12 +376,38 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
-                Walrus *w = (Walrus*) entities[controller.controllingid];
-                // Check if walrus is on island.
-                BoxIsland *island = w->getIsland();
+                int typeofisland = DEFEND_ISLAND;
 
-                captureIsland(island,w->getFaction(),space, world);
+                if (controller.str.find("factory") != std::string::npos)
+                    typeofisland = FACTORY_ISLAND;
 
+                if (controller.str.find("logistics") != std::string::npos)
+                    typeofisland = LOGISTICS_ISLAND;
+
+                if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
+                {
+                    Walrus *w = (Walrus*) entities[controller.controllingid];
+                    // Check if walrus is on island.
+                    BoxIsland *island = w->getIsland();
+
+                    if (island)
+                    {
+                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
+                    }
+                }
+
+            } else
+            if (controller.str.find("godmode") != std::string::npos)
+            {
+                controller.faction = BOTH_FACTION;
+            } else
+            if (controller.str.find("greenmode") != std::string::npos)
+            {
+                controller.faction = GREEN_FACTION;
+            } else
+            if (controller.str.find("bluemode") != std::string::npos)
+            {
+                controller.faction = BLUE_FACTION;
             } else
             if (controller.str.find("save") != std::string::npos)
             {
@@ -358,7 +422,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.view = 2;
             else {
                 // Send message to message board
-                messages.insert(messages.begin(),controller.str);
+                Message mg;
+                mg.faction = BOTH_FACTION;
+                mg.msg = std::string(controller.str);
+                messages.insert(messages.begin(),mg);
 
             }
 
@@ -417,8 +484,6 @@ void handleKeypress(unsigned char key, int x, int y) {
             size_t pos = CONTROLLING_NONE;
             findMantaByNumber(pos,(int)(key-48)-2);
 
-            printf ("Manta %d\n", pos);
-
             switchControl(pos);
         }
         break;
@@ -427,16 +492,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             size_t pos = CONTROLLING_NONE;
             findWalrusByNumber(pos,(int)(key-48)-5);
 
-            printf ("Manta %d\n", pos);
-
             switchControl(pos);
         }
         break;
         case 'i':
             {
             int param = 0;
-            std::cout << "Param:" << std::endl; std::cin >> param;
-            std::cout << "Value:" << std::endl; std::cin >> controller.param[param] ;
+            dout << "Param:" << std::endl; std::cin >> param;
+            dout << "Value:" << std::endl; std::cin >> controller.param[param] ;
             }
         break;
         case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;
@@ -454,9 +517,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
             synchronized(entities.m_mutex)
             {
-                if (entities[controller.controllingid]->getType()==CARRIER)
+                if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
                 {
-                    spawnManta(space,world,entities[controller.controllingid]);
+                    size_t idx = 0;
+                    spawnManta(space,world,entities[controller.controllingid],idx);
                 }
             }
             }
@@ -495,7 +559,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         //dBodySetData( action->getBodyID(), (void*)idx);
                         if (action != NULL)
                         {
-                            size_t i = entities.push_back(action);
+                            size_t i = entities.push_back(action, action->getGeom());
                             gunshot();
 
                             if (action->getType()==CONTROLABLEACTION)
