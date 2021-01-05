@@ -23,6 +23,8 @@ struct controlregister
 
     // ModAngleP
     float precesion=0;
+
+    float bank=0;
 };
 
 

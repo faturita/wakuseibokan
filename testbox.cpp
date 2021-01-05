@@ -4929,7 +4929,7 @@ void checktest52(unsigned long timer)
         c->init();
         c->setNumber(9);
         c->embody(world, space);
-        c->setPos(-10,0+28,-20);
+        c->setPos(-50,0+28,-20);
         //c->setStatus(Manta::ON_DECK);
         c->inert = false;
         //alignToMe(_manta1->getBodyID());

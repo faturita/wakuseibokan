@@ -5,6 +5,9 @@
 
 class Cephalopod : public SimplifiedDynamicManta
 {
+protected:
+    float pan;
+    float tilt;
 public:
     Cephalopod(int newfaction);
 
@@ -24,6 +27,7 @@ public:
 
     void doDynamics(dBodyID body);
 
+    void doControl(controlregister regs);
 };
 
 #endif // CEPHALOPOD_H

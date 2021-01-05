@@ -93,20 +93,33 @@ void Cephalopod::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+void  Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
 {
     position = getPos();
-    forward = getForward();
+    viewforward = toVectorInFixedSystem(0,0,1,pan, tilt);                         // I dont care the declination for the viewport
+
+    // ViewForward is in body coordinates, I need to convert it to global coordinates.
+    viewforward = toWorld(me, viewforward);
+
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
 
 
-    forward = forward.normalize();
+    viewforward = viewforward.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=20;// poner en 4 si queres que este un toque arriba desde atras.
-    position = position - 100*forward + Up;
-    forward = orig-position;
+    Up[0]=Up[2]=0;Up[1]=10;
+    position = position - 120*viewforward + Up;
+    viewforward = orig-position;
+}
+
+
+void Cephalopod::doControl(struct controlregister regs)
+{
+    Manta::doControl(regs);
+
+    Cephalopod::pan = regs.yaw;
+    Cephalopod::tilt = regs.bank;
 }
 
 int Cephalopod::getSubType()
@@ -170,7 +183,7 @@ void Cephalopod::doDynamics(dBodyID body)
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
 
-            dBodyAddRelTorque(body, 0, -aileron*4, 0);
+            dBodyAddRelTorque(body, 0, -aileron*8, 0);
             Vec3f p1(-rudder*2, getThrottle(),-elevator*5);
             Vec3f p2(-rudder*2, getThrottle(),-elevator*5);
 
