@@ -13,7 +13,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#elif __linux
 #include <GL/glut.h>
+#endif
 #include "model.h"
 
 
