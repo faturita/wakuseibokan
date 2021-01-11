@@ -153,7 +153,12 @@ void drawHUD()
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
 
-        if (entities[controller.controllingid]->getType() == MANTA)
+        if (entities[controller.controllingid]->getType() == CEPHALOPOD)
+        {
+            aimc = 170;
+            crossc = 195;
+        }
+        else if (entities[controller.controllingid]->getType() == MANTA)
         {
             aimc = 240;
             crossc = 195;

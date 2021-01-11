@@ -58,9 +58,14 @@ public:
     
     void reset()
     {
-        registers.roll=registers.pitch=registers.precesion=registers.yaw=0;
+        registers.roll=registers.pitch=registers.precesion=registers.bank=0;registers.yaw=0;
         registers.thrust=0;
     };
+
+    void stabilize()
+    {
+        registers.roll=registers.pitch=registers.precesion=registers.bank=registers.yaw=0;
+    }
     
     void interrupt()
     {

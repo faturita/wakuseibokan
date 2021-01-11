@@ -1,5 +1,7 @@
 #include "../profiling.h"
+#include "../sounds/sounds.h"
 #include "../ThreeMaxLoader.h"
+#include "../actions/Gunshot.h"
 #include "Cephalopod.h"
 
 Cephalopod::Cephalopod(int newfaction) : SimplifiedDynamicManta(newfaction)
@@ -43,7 +45,7 @@ void Cephalopod::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 10.0f;
+    float myMass = 20.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,width,height,length);
@@ -108,8 +110,8 @@ void  Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
 
     viewforward = viewforward.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=10;
-    position = position - 120*viewforward + Up;
+    Up[0]=Up[2]=0;Up[1]=30;
+    position = position - 90*viewforward + Up;
     viewforward = orig-position;
 }
 
@@ -175,6 +177,11 @@ void Cephalopod::doDynamics(dBodyID body)
         //damage(1);
     }
 
+    if (speed > 10 && speed <32 )
+    {
+        droneflying();
+
+    }
 
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
@@ -182,12 +189,24 @@ void Cephalopod::doDynamics(dBodyID body)
         {
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
-
-            dBodyAddRelTorque(body, 0, -aileron*8, 0);
-            Vec3f p1(-rudder*2, getThrottle(),-elevator*5);
-            Vec3f p2(-rudder*2, getThrottle(),-elevator*5);
+            dBodyAddRelTorque(body, 0, -aileron*16, 0);
+            //Vec3f p1(-rudder*4, getThrottle(),-elevator*10);
+            //Vec3f p2(-rudder*4, getThrottle(),-elevator*10);
 
             //p = toVectorInFixedSystem(p[0],p[1],p[2],aileron*10,elevator*10);
+
+
+            Vec3f p1(0, 1,0);
+            Vec3f p2(0,1,0);
+
+            p1 = toVectorInFixedSystem(p1[0],p1[1],p1[2],aileron*10,elevator*10);
+            p2 = toVectorInFixedSystem(p2[0],p2[1],p2[2],aileron*10,elevator*10);
+
+            p1 = p1.normalize();
+            p2 = p2.normalize();
+
+            p1 = p1*getThrottle();
+            p2 = p2*getThrottle();
 
             dBodyAddRelForceAtRelPos(body,p1[0], p1[1], p1[2], 0.0, +35, 0.0);
             dBodyAddRelForceAtRelPos(body,p2[0], p2[1], p2[2], 0.0, -35, 0.0);
@@ -197,3 +216,121 @@ void Cephalopod::doDynamics(dBodyID body)
     wrapDynamics(body);
 }
 
+
+
+Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
+{
+    Gunshot *action = new Gunshot();
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+
+    Vec3f position = getPos();
+    position[1] += 0.0f; // Move upwards to the center of the real rotation.
+    // Check where are we aiming in body coordinates.
+    forward = toVectorInFixedSystem(0,0,1,pan, tilt);
+    dVector3 result;
+    dBodyVectorToWorld(me, forward[0],forward[1],forward[2],result);
+
+    forward = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    position = position + 60.0f*forward;
+    forward = -orig+position;
+
+    Vec3f Ft = forward*100;
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+
+
+/**
+Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    ArtilleryAmmo *action = new ArtilleryAmmo();
+    // Need axis conversion.
+    action->init();
+
+    Vec3f position = getPos();
+
+    // Check where are we aiming in body coordinates.
+    forward = toVectorInFixedSystem(0,0,1,azimuth, elevation);
+    dVector3 result;
+    dBodyVectorToWorld(me, forward[0],forward[1],forward[2],result);
+
+    forward = Vec3f(result[0],result[1],result[2]);
+
+
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    // Calculates bullet initial position (trying to avoid hitting myself).
+    forward = forward.normalize();
+    orig = position;
+    position = position + 40*forward;
+    forward = -orig+position;
+
+    // Bullet energy
+    Vec3f Ft = forward*15;
+
+    // Bullet rotation (alignment with forward direction)
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+    // Shift origin up towards where the turret is located.
+    position = orig;
+    position[1] += firingpos[1];
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+    Vec3f d = action->getPos() - getPos();
+
+    //dout << d << std::endl;
+
+    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+
+    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // Recoil (excellent for the simulation, cumbersome for playing...)
+    Ft = Ft.normalize();  Ft=Ft * 0.2;
+
+    //dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
+    artilleryshot();
+    //setTtl(200);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}**/

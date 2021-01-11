@@ -4925,15 +4925,11 @@ void checktest52(unsigned long timer)
 
     if (timer == starttime + 50)
     {
-        Cephalopod *c = new Cephalopod(GREEN_FACTION);
-        c->init();
-        c->setNumber(9);
-        c->embody(world, space);
-        c->setPos(-50,0+28,-20);
-        //c->setStatus(Manta::ON_DECK);
-        c->inert = false;
-        //alignToMe(_manta1->getBodyID());
-        int idx = entities.push_back(c, c->getGeom());
+        Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
+        size_t idx=0;
+        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+
+        idx = entities.push_back(m, m->getGeom());
 
         controller.controllingid = idx;
     }

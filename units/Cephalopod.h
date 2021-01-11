@@ -28,6 +28,7 @@ public:
     void doDynamics(dBodyID body);
 
     void doControl(controlregister regs);
+    Vehicle *fire(dWorldID world, dSpaceID space);
 };
 
 #endif // CEPHALOPOD_H

@@ -467,7 +467,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'f':controller.registers.thrust-=0.05;break;
         case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
-        case 'Q':controller.registers.thrust = 0.0;break;
+        case 'Q':controller.stabilize();break;
         case 'j':entities[controller.controllingid]->enableAuto();break;
         case 'J':entities[controller.controllingid]->disableAuto();break;
 
