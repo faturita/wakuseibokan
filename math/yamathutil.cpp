@@ -169,3 +169,13 @@ float max(float val, float defval)
         return defval;
     return val;
 }
+
+float clipped(float val, float minval, float maxval)
+{
+    if (val < minval)
+        return minval;
+    else if (val > maxval)
+        return maxval;
+    else
+        return val;
+}

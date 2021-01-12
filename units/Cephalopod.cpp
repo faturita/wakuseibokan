@@ -1,4 +1,5 @@
 #include "../profiling.h"
+#include "../math/yamathutil.h"
 #include "../sounds/sounds.h"
 #include "../ThreeMaxLoader.h"
 #include "../actions/Gunshot.h"
@@ -110,7 +111,7 @@ void  Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
 
     viewforward = viewforward.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=30;
+    Up[0]=Up[2]=0;Up[1]=20;
     position = position - 90*viewforward + Up;
     viewforward = orig-position;
 }
@@ -160,22 +161,31 @@ void Cephalopod::doDynamics(dBodyID body)
     dVector3 result;
     dBodyVectorFromWorld(body, 0,1,0,result);
 
-    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
-    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+    Vec3f upInTheWorld = Vec3f(result[0],result[1],result[2]);
+    Vec3f upInTheBody = Vec3f(0.0f,1.0f,0.0f);
 
-    upInBody = upInBody.normalize();
+    upInTheWorld = upInTheWorld.normalize();
 
     //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+    float attitude = acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
 
-    dout << "Attitude:" << attitude << std::endl;
+    //dout << "Attitude:" << attitude << std::endl;
 
-    if (attitude>80 || attitude<-80)
-    {
-        // Walrus has tumbled.
-        //damage(1);
-    }
+    Vec3f upInTheWorldProjection1 = Vec3f(0.0,upInTheWorld[1],upInTheWorld[2]);
+
+    upInTheWorldProjection1 = upInTheWorldProjection1.normalize();
+
+    float pitchattitude = acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
+
+
+
+    Vec3f upInTheWorldProjection2 = Vec3f(upInTheWorld[0], upInTheWorld[1], 0.0);
+
+    upInTheWorldProjection2 = upInTheWorldProjection2.normalize();
+
+    float rollattitude = acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
+
 
     if (speed > 10 && speed <32 )
     {
@@ -185,22 +195,60 @@ void Cephalopod::doDynamics(dBodyID body)
 
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
+        // Drone stability
+        float e1 = pitchattitude;
+        float e2 = rollattitude;
+
+
+        float pitchtorque = 0;
+        if ((abs(e1))>10.0f)
+        {
+            pitchtorque =  0.0+1.0 * (upInTheWorldProjection1[2]>0 ? +5 : -5);
+        }
+
+        float rolltorque = 0;
+        if ((abs(e2))>10.0f)
+        {
+            rolltorque =  0.0+1.0 * (upInTheWorldProjection2[0]>0 ? -5 : +5);
+        }
+
+        dBodyAddRelTorque(body,pitchtorque, 0,0);
+        dBodyAddRelTorque(body,0, 0,rolltorque);
+
+        dout << "Pitch Deviation:" << pitchattitude << "(" << pitchtorque << ")" <<
+                ":" << " roll deviation:" << rollattitude << "(" << rolltorque << ")" <<
+                std::endl;
+
+
         if (attitude < 45)
         {
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
             dBodyAddRelTorque(body, 0, -aileron*16, 0);
+
+
+
             //Vec3f p1(-rudder*4, getThrottle(),-elevator*10);
             //Vec3f p2(-rudder*4, getThrottle(),-elevator*10);
 
             //p = toVectorInFixedSystem(p[0],p[1],p[2],aileron*10,elevator*10);
 
+            //dBodyAddRelTorque(body,rudder, 0,0);
 
-            Vec3f p1(0, 1,0);
+            // Roll
+            //dBodyAddRelTorque(body, 0,0, aileron);
+
+
+            Vec3f p1(0,1,0);
             Vec3f p2(0,1,0);
 
-            p1 = toVectorInFixedSystem(p1[0],p1[1],p1[2],aileron*10,elevator*10);
-            p2 = toVectorInFixedSystem(p2[0],p2[1],p2[2],aileron*10,elevator*10);
+            // In degrees.  The max value of the rotor axis inclination is 90 degrees (body coordinates)
+            float inclination = clipped(elevator*10, -90, +90);
+
+            //CLog::Write(CLog::Debug,"Inclination %10.5f\n", inclination);
+
+            p1 = toVectorInFixedSystem(p1[0],p1[1],p1[2],0*10,inclination);
+            p2 = toVectorInFixedSystem(p2[0],p2[1],p2[2],0*10,inclination);
 
             p1 = p1.normalize();
             p2 = p2.normalize();

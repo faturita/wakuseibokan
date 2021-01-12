@@ -155,7 +155,7 @@ void drawHUD()
 
         if (entities[controller.controllingid]->getType() == CEPHALOPOD)
         {
-            aimc = 170;
+            aimc = 10;
             crossc = 195;
         }
         else if (entities[controller.controllingid]->getType() == MANTA)
