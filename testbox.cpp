@@ -5086,7 +5086,7 @@ void checktest53(unsigned long timer)
 
     if (timer > starttime + 15000)
     {
-        Cephalopod *m = (Cephalopod*)findManta(BLUE_FACTION,Manta::HOLDING);
+        Cephalopod *m = (Cephalopod*)findManta(BLUE_FACTION);
 
         if (!m)
         {
@@ -5107,7 +5107,89 @@ void checktest53(unsigned long timer)
 
 }
 
+
+void test54()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    //Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+
+
+void checktest54(unsigned long timer)
+{
+    long unsigned starttime = 150;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC54: Stop aircraft from departing if the island is already free.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == starttime + 1300)
+    {
+        CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
+
+        if (c)
+        {
+            // This is in case the missile do not destroy the command center.
+            c->damage(10000);
+        }
+    }
+
+    if (timer > starttime + 2500)
+    {
+        Manta *m = (Manta*)findManta(BLUE_FACTION);
+
+        if (m)
+        {
+            printf("Test failed: Manta should have not been launched.\n");
+            endWorldModelling();
+            exit(0);
+        } else
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
 static int testing=-1;
+
 
 void savegame()
 {
@@ -5226,8 +5308,6 @@ void savegame()
 
 
 }
-
-
 
 void loadgame()
 {
@@ -5528,6 +5608,7 @@ void initWorldModelling(int testcase)
     case 51:test51();break;                         // Check savegame
     case 52:test52();break;                         // Test Cephalopod aircraft stability, flying and basic destination.
     case 53:test53();break;                         // Test Cephalopod attacking command center.
+    case 54:test54();break;                         // Stop aircraft from departing if the island is already free.
     default:initIslands();test1();break;
     }
 
@@ -5599,6 +5680,7 @@ void worldStep(int value)
     case 51:checktest51(timer);break;
     case 52:checktest52(timer);break;
     case 53:checktest53(timer);break;
+    case 54:checktest54(timer);break;
 
     default: break;
     }

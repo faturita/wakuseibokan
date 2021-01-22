@@ -144,6 +144,7 @@ void commLink(int faction, dSpaceID space, dWorldID world);
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByNumber(size_t &pos, int number);
+Manta* findManta(int faction);
 Manta* findManta(int faction, int status);
 Manta* findManta(int faction, int status, Vec3f around);
 Manta* findNearestManta(int status, int faction, Vec3f l, float threshold = 100000 kmf);

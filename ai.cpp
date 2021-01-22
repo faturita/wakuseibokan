@@ -246,7 +246,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
     if (b)
     {
-        BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction);
+        BoxIsland *is = findNearestIsland(b->getPos());
 
         dout << "T-:" << (int)((timeevent+100)-timer) << std::endl;
 
@@ -271,7 +271,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
                 if (a->getType()==CONTROLABLEACTION)
                 {
-                    // @FIXME: Shoot only if the faction of the user controlling is the same as this one.
+                    // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
                     switchControl(entities.indexOf(i));
 
                 }
@@ -280,6 +280,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
         }
 
         // @NOTE: Should check how many missiles can the carrier shoot.
+        // @FIXME: Parametrize the magic number
         if (timer==(timeevent + 1300))
         {
             if (is)

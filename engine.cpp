@@ -504,6 +504,19 @@ Manta* findManta(int faction, int status)
     return NULL;
 }
 
+Manta* findManta(int faction)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getFaction() == faction)
+        {
+            return (Manta*)v;
+        }
+    }
+    return NULL;
+}
+
 Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
 {
     int nearesti=-1;
