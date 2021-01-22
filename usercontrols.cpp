@@ -448,10 +448,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '-':Camera.dx-=0.1;break;
         case 32 :Camera.dx=0.00001; controller.registers.thrust = 0;break;
         case '^':pp = !(pp);break;
-        case 'a':case 'k':controller.registers.roll-=1.0f;break;
-        case 'A':case 'K':controller.registers.roll-=50.0f;break;
-        case 'd':case 'l':controller.registers.roll+=1.0f;break;
-        case 'D':case 'L':controller.registers.roll+=50.0f;break;
+        case 'a':controller.registers.roll-=1.0f;break;
+        case 'A':controller.registers.roll-=50.0f;break;
+        case 'd':controller.registers.roll+=1.0f;break;
+        case 'D':controller.registers.roll+=50.0f;break;
         case '`':controller.registers.roll=0;break;
         case 'w':controller.registers.pitch-=1.0f;break;
         case 's':controller.registers.pitch+=1.0f;break;
@@ -459,13 +459,15 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'c':controller.registers.yaw+=1.0f;break;
         case 'v':controller.registers.precesion-=1.0f;break;
         case 'b':controller.registers.precesion+=1.0f;break;
+        case 'i':controller.registers.bank-=1.0f;break;
+        case 'k':controller.registers.bank+=1.0f;break;
         case 'p':controller.pause = !controller.pause;break;
         case 'r':controller.registers.thrust+=0.05;break;
         case 'R':controller.registers.thrust+=10.00;break;
         case 'f':controller.registers.thrust-=0.05;break;
         case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
-        case 'Q':controller.registers.thrust = 0.0;break;
+        case 'Q':controller.stabilize();break;
         case 'j':entities[controller.controllingid]->enableAuto();break;
         case 'J':entities[controller.controllingid]->disableAuto();break;
 
@@ -495,7 +497,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             switchControl(pos);
         }
         break;
-        case 'i':
+        case 'I':
             {
             int param = 0;
             dout << "Param:" << std::endl; std::cin >> param;

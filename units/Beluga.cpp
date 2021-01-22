@@ -1,6 +1,8 @@
 #include "Beluga.h"
 #include "SimplifiedDynamicManta.h"
+#include "Stingray.h"
 #include "Walrus.h"
+#include "Cephalopod.h"
 #include "../profiling.h"
 #include "../ThreeMaxLoader.h"
 #include "../sounds/sounds.h"
@@ -217,11 +219,23 @@ void Beluga::drawModel(float yRot, float xRot, float x, float y, float z)
 
 Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
 {
-    Vehicle *v;
+    Vehicle *v = NULL;
 
-    if (type == MANTA)
+    if (type == CEPHALOPOD)
     {
-        SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(getFaction());
+        Cephalopod *c = new Cephalopod(getFaction());
+        c->init();
+        c->setNumber(number);
+        c->embody(world, space);
+        c->setPos(pos[0],pos[1]+38, pos[2]);
+        c->setStatus(Manta::ON_DECK);
+        c->inert = false;
+        alignToMe(c->getBodyID());
+        v = (Vehicle*)c;
+
+    } else if (type == MANTA)
+    {
+        Stingray *_manta1 = new Stingray(getFaction());
         _manta1->init();
         _manta1->setNumber(number);
         _manta1->embody(world, space);

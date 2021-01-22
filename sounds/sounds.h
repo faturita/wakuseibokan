@@ -11,6 +11,7 @@ void artilleryshot();
 void smallenginestart();
 void soaring();
 void bullethit();
+void droneflying();
 
 void intro();
 

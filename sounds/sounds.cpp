@@ -62,6 +62,11 @@ void artilleryshot()
     system("afplay sounds/Artillery.wav &");
 }
 
+void droneflying()
+{
+    system("afplay sounds/Cephalopod.m4a &");
+}
+
 void intro()
 {
     system("afplay sounds/intro.mp3 &");

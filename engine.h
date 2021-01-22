@@ -23,6 +23,7 @@
 #include "units/MultiBodyVehicle.h"
 #include "units/Balaenidae.h"
 #include "units/Beluga.h"
+#include "units/AdvancedManta.h"
 
 #include "terrain/Terrain.h"
 
