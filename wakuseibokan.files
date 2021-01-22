@@ -54,6 +54,7 @@ math/yamathutil.cpp
 math/yamathutil.h
 md2model.cpp
 md2model.h
+messages.h
 model.h
 observable.h
 odeutils.cpp

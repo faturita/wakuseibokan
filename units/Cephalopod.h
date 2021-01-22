@@ -8,6 +8,9 @@ class Cephalopod : public SimplifiedDynamicManta
 protected:
     float pan;
     float tilt;
+    float getVerticalAttitude();
+    float getRollAngle();
+    float getPitchAngle();
 public:
     Cephalopod(int newfaction);
 
@@ -29,6 +32,11 @@ public:
 
     void doControl(controlregister regs);
     Vehicle *fire(dWorldID world, dSpaceID space);
+    void doControl();
+    void hoover(float sp3);
+    void doControlDestination(Vec3f target, float threshold);
+    void doControlAttack();
+    void doControlLanding();
 };
 
 #endif // CEPHALOPOD_H

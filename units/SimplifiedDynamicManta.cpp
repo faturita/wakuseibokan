@@ -859,6 +859,7 @@ void SimplifiedDynamicManta::enableAuto()
 {
     Vehicle::enableAuto();
     flyingstate=0;
+    reached=false;
 }
 
 void SimplifiedDynamicManta::dogfight(Vec3f target)

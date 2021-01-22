@@ -3,7 +3,18 @@
 #include "../sounds/sounds.h"
 #include "../ThreeMaxLoader.h"
 #include "../actions/Gunshot.h"
+#include <vector>
+#include "../messages.h"
 #include "Cephalopod.h"
+
+extern dWorldID world;
+extern dSpaceID space;
+#include "../container.h"
+#include "../sounds/sounds.h"
+
+extern container<Vehicle*> entities;
+
+extern std::vector<Message> messages;
 
 Cephalopod::Cephalopod(int newfaction) : SimplifiedDynamicManta(newfaction)
 {
@@ -135,6 +146,61 @@ void Cephalopod::doDynamics()
     doDynamics(getBodyID());
 }
 
+float Cephalopod::getVerticalAttitude()
+{
+    dVector3 result;
+    dBodyVectorFromWorld(me, 0,1,0,result);
+
+    Vec3f upInTheWorld = Vec3f(result[0],result[1],result[2]);
+    Vec3f upInTheBody = Vec3f(0.0f,1.0f,0.0f);
+
+    upInTheWorld = upInTheWorld.normalize();
+
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float verattitude = acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
+
+    return verattitude;
+}
+
+float Cephalopod::getRollAngle()
+{
+    dVector3 result;
+    dBodyVectorFromWorld(me, 0,1,0,result);
+
+    Vec3f upInTheWorld = Vec3f(result[0],result[1],result[2]);
+    Vec3f upInTheBody = Vec3f(0.0f,1.0f,0.0f);
+
+    upInTheWorld = upInTheWorld.normalize();
+
+    Vec3f upInTheWorldProjection2 = Vec3f(upInTheWorld[0], upInTheWorld[1], 0.0);
+
+    upInTheWorldProjection2 = upInTheWorldProjection2.normalize();
+
+    float rollattitude = acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
+
+    return rollattitude * sgn(upInTheWorldProjection2[0]);
+}
+
+float Cephalopod::getPitchAngle()
+{
+    dVector3 result;
+    dBodyVectorFromWorld(me, 0,1,0,result);
+
+    Vec3f upInTheWorld = Vec3f(result[0],result[1],result[2]);
+    Vec3f upInTheBody = Vec3f(0.0f,1.0f,0.0f);
+
+    upInTheWorld = upInTheWorld.normalize();
+
+    Vec3f upInTheWorldProjection1 = Vec3f(0.0,upInTheWorld[1],upInTheWorld[2]);
+
+    upInTheWorldProjection1 = upInTheWorldProjection1.normalize();
+
+    float pitchattitude = acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
+
+    return pitchattitude * sgn(upInTheWorldProjection1[2]);
+}
+
 void Cephalopod::doDynamics(dBodyID body)
 {
     dReal *v = (dReal *)dBodyGetLinearVel(body);
@@ -227,7 +293,6 @@ void Cephalopod::doDynamics(dBodyID body)
             dBodyAddRelTorque(body, 0, -aileron*16, 0);
 
 
-
             //Vec3f p1(-rudder*4, getThrottle(),-elevator*10);
             //Vec3f p2(-rudder*4, getThrottle(),-elevator*10);
 
@@ -238,14 +303,13 @@ void Cephalopod::doDynamics(dBodyID body)
             // Roll
             //dBodyAddRelTorque(body, 0,0, aileron);
 
-
             Vec3f p1(0,1,0);
             Vec3f p2(0,1,0);
 
             // In degrees.  The max value of the rotor axis inclination is 90 degrees (body coordinates)
             float inclination = clipped(elevator*10, -90, +90);
 
-            //CLog::Write(CLog::Debug,"Inclination %10.5f\n", inclination);
+            CLog::Write(CLog::Debug,"Inclination %10.5f\n", inclination);
 
             p1 = toVectorInFixedSystem(p1[0],p1[1],p1[2],0*10,inclination);
             p2 = toVectorInFixedSystem(p2[0],p2[1],p2[2],0*10,inclination);
@@ -313,72 +377,209 @@ Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
-
-/**
-Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
+void Cephalopod::hoover(float sp3)
 {
-    if (getTtl()>0)
-        return NULL;
+    Controller c;
 
-    ArtilleryAmmo *action = new ArtilleryAmmo();
-    // Need axis conversion.
-    action->init();
+    c.registers = myCopy;
 
-    Vec3f position = getPos();
+    Vec3f Po = getPos();
 
-    // Check where are we aiming in body coordinates.
-    forward = toVectorInFixedSystem(0,0,1,azimuth, elevation);
-    dVector3 result;
-    dBodyVectorToWorld(me, forward[0],forward[1],forward[2],result);
+    float height = Po[1];
 
-    forward = Vec3f(result[0],result[1],result[2]);
+    if (!reached)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Cephalopod %d has arrived to destination.", getNumber()+1);
+        mg.faction = getFaction();
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+        reached = true;
+        setStatus(Manta::HOLDING);
+    }
+    // Hoover
+    float thrust = 200;
+
+    if (height > (sp3 - 10))
+    {
+        thrust = 98.1;
+    }
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.yaw = 0;
+    c.registers.roll = 0;
+    setThrottle(thrust);
+
+    Manta::doControl(c);
+}
+
+void Cephalopod::doControl()
+{
+    switch (aistatus) {
+    case DOGFIGHT:
+        doControlDogFight();
+        break;
+    case ATTACK:
+        doControlAttack();
+        break;
+    case LANDING:
+        doControlLanding();
+        break;
+    default:case DESTINATION:
+        doControlDestination(destination,1000);
+        break;
+    case FREE:
+        setDestination(getPos()+getForward().normalize()*100);
+        break;
+    }
+
+}
+
+void Cephalopod::doControlAttack()
+{
+    dout << "A:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+
+    Vec3f target = destination;
+    switch (flyingstate) {
+        default:case 0:
+        {
+            target = Vec3f(destination[0],400,destination[2]);
+            doControlDestination(target,1000);
+            Vec3f loc(destination[0],400,destination[2]);
+            Vec3f ploc(getPos()[0],400,getPos()[2]);
+            if ((loc-ploc).magnitude()<2500)
+                flyingstate = 1;
+        }
+        break;
+        case 1:
+        {
+            Vec3f target = destination - getPos();
+            Vec3f aim = toBody(me,target);
+
+            dout << "Attack Target:" << aim <<  ":Loc: " << getPos() << " Target: " << destination<< std::endl;
 
 
-    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+            float azimuth=getAzimuth(aim);
+            float declination=getDeclination(aim);
 
-    Vec3f orig;
+            struct controlregister c;
+            c = getControlRegisters();
+            c.yaw = azimuth;
+            c.bank = -declination;
+            c.precesion = c.roll = c.pitch = 0;
+            c.thrust = 10;
+            setControlRegisters(c);
+            if (getTtl() % 23 == 0)
+            {
 
-    // Calculates bullet initial position (trying to avoid hitting myself).
-    forward = forward.normalize();
-    orig = position;
-    position = position + 40*forward;
-    forward = -orig+position;
+                Vehicle *action = fire(world,space);
 
-    // Bullet energy
-    Vec3f Ft = forward*15;
+                if (action != NULL)
+                {
+                    entities.push_back(action,action->getGeom());
+                    gunshot();
+                }
 
-    // Bullet rotation (alignment with forward direction)
-    Vec3f f1(0.0,0.0,1.0);
-    Vec3f f2 = forward.cross(f1);
-    f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+            }
+            doControl(c);
+        }
+        break;
+    }
 
-    dMatrix3 Re;
-    dRSetIdentity(Re);
-    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+}
 
-    // Shift origin up towards where the turret is located.
-    position = orig;
-    position[1] += firingpos[1];
-    action->embody(world,space);
-    action->setPos(position[0],position[1],position[2]);
+void Cephalopod::doControlLanding()
+{
+    doControlDestination(destination, 350);
 
-    Vec3f d = action->getPos() - getPos();
+    if (reached)
+    {
+        Controller c;
 
-    //dout << d << std::endl;
+        c.registers = myCopy;
+        float thrust = 0;
 
-    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+        c.registers.thrust = thrust/(10.0);
+        c.registers.yaw = 0;
+        c.registers.roll = 0;
+        setThrottle(thrust);
 
-    dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
-    dBodySetRotation(action->getBodyID(),Re);
+        Manta::doControl(c);
+    }
+}
+void Cephalopod::doControlDestination(Vec3f target, float threshold)
+{
+    Controller c;
 
-    // Recoil (excellent for the simulation, cumbersome for playing...)
-    Ft = Ft.normalize();  Ft=Ft * 0.2;
+    c.registers = myCopy;
 
-    //dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
-    artilleryshot();
-    //setTtl(200);
+    Vec3f Po = getPos();
 
-    // I can set power or something here.
-    return (Vehicle*)action;
-}**/
+    float height = Po[1];
+
+    float declination = getDeclination(getForward());
+
+    float sp2=-0,        sp3 = 300;
+
+    Vec3f T = (target - Po);
+
+    sp2 = getDeclination(T);
+
+    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e2 = sp2 - declination;
+    float e3 = sp3 - height;
+
+    dout << "T:Az:"
+              << std::setw(10) << getAzimuth(getForward())
+              << std::setw(10) << getAzimuth(T)
+              << "(" << std::setw(12) << e1 << ")"
+              << std::setw(10) << declination
+              << std::setw(10) << sp2
+              << " Destination:"
+              << std::setw(10) << T.magnitude() << std::endl;
+
+    et1 = e1;
+    et2 = e2;
+    et3 = e3;
+
+
+    dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
+
+    c.registers.roll = 0;
+    if (height > 200)
+    {
+        if (!(!reached && map(T).magnitude()>threshold))
+        {
+            hoover(sp3);
+            return;
+        }
+        c.registers.pitch = -4.5;
+
+        if (map(T).magnitude()<3500) c.registers.pitch = -4.5;
+
+        if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))
+            e1 = e1 * (-1);
+        else if (getAzimuth(getForward()) < getAzimuth(T) && (getAzimuth(T) - getAzimuth(getForward()))<180)
+            e1 = e1 * (-1);
+
+        if ((abs(e1))>0.2f)
+        {
+            c.registers.roll =  (e1>0 ? -5 : +5);
+        }
+    }
+
+    // Add Hoovering
+    float thrust = 200;
+
+    if (height > (sp3 - 10))
+    {
+        thrust = 98.1;
+    }
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.yaw = 0;
+    setThrottle(thrust);
+
+    Manta::doControl(c);
+}

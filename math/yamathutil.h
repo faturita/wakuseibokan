@@ -32,5 +32,6 @@ float getDeclination(Vec3f aim);
 float min(float val, float defval);
 float max(float val, float defval);
 float clipped(float val, float min, float max);
+float sgn(float val);
 
 #endif /* YAMATHUTIL_H_ */

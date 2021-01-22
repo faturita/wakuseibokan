@@ -388,29 +388,35 @@ void Balaenidae::taxi(Manta *m)
 
 void Balaenidae::launch(Manta* m)
 {
-    m->inert = false;
-    m->setStatus(Manta::FLYING);
-    m->elevator = +12;
-    struct controlregister c;
-    c.thrust = 600.0f/(10.0);
-    c.pitch = 12;
-    m->setControlRegisters(c);
-    m->setThrottle(600.0f);
-    Vec3f p = m->getPos();
-    p[1] += 20;
-    m->setPos(p);
-    dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
-    // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
+    if (m->getSubType() == CEPHALOPOD)
+    {
+        m->enableAuto();
+    } else
+    {
+        m->inert = false;
+        m->setStatus(Manta::FLYING);
+        m->elevator = +12;
+        struct controlregister c;
+        c.thrust = 600.0f/(10.0);
+        c.pitch = 12;
+        m->setControlRegisters(c);
+        m->setThrottle(600.0f);
+        Vec3f p = m->getPos();
+        p[1] += 20;
+        m->setPos(p);
+        dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
+        // @FIXME: Fix the rotation of Manta after it is launched (due to the existence of angularPos in Manta).
 
-    //((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
-    m->release(getForward());
-    m->setForward(getForward());
+        //((SimplifiedDynamicManta*)m)->angularPos[0] = 0;
+        m->release(getForward());
+        m->setForward(getForward());
 
-    Vec3f f;
-    f = m->getForward();
-    //f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
-    //f = f*200;
-    dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
+        Vec3f f;
+        f = m->getForward();
+        //f= Vec3f(0.0f, 0.0f, 1.0f);  // @Hack to avoid the issue of the alignment of manta with the carrier.
+        //f = f*200;
+        dBodySetLinearVel(m->getBodyID(),f[0],f[1],f[2]);
+    }
 }
 
 

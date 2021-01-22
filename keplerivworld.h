@@ -41,11 +41,7 @@ void loadgame();
 
 enum gamemodes { ACTIONGAME, STRATEGYGAME };
 
-struct Message
-{
-    std::string msg;
-    int faction;
-};
+#include "messages.h"
 
 
 #endif /* defined(__mycarrier__keplerivworld__) */
