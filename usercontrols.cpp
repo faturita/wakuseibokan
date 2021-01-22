@@ -5,7 +5,11 @@
  *      Author: faturita
  */
 
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#elif __linux
+#include <GL/glut.h>
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>

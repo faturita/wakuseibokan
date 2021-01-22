@@ -8,7 +8,11 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#ifdef __linux
+#include <GL/glut.h>
+#elif __APPLE__
 #include <GLUT/glut.h>
+#endif
 #include "math/yamathutil.h"
 #include "observable.h"
 

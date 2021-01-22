@@ -5,6 +5,7 @@
 // In Mac Sierra, if you change this 10000 value to something different, the mutex from bellow does not work and generates a core dump :O
 #define MAX 10000
 
+#include <cassert>
 #include <vector>
 #include <mutex>
 #include <unordered_map>

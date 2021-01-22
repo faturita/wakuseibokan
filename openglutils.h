@@ -8,7 +8,13 @@
 #ifndef OPENGLUTILS_H_
 #define OPENGLUTILS_H_
 
+
+#include <cassert>
+#ifdef __linux
+#include <GL/glut.h>
+#elif __APPLE__
 #include <GLUT/glut.h>
+#endif
 
 #include "imageloader.h"
 

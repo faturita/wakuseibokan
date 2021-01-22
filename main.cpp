@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 
 
 #include <ode/ode.h>

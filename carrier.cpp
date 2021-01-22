@@ -18,7 +18,11 @@
 #include <stdarg.h>
 #include <math.h>
 
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#elif __linux
+#include <GL/glut.h>
+#endif
 
 #include <ode/ode.h>
 
@@ -684,8 +688,8 @@ int main(int argc, char** argv) {
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    else
-        glutInitDisplayMode (GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+    //else
+        //glutInitDisplayMode (GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     
     disclaimer();
 	glutCreateWindow("Wakuseibokan");
