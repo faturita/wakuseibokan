@@ -430,3 +430,4 @@ Vehicle* Manta::fire(dWorldID world, dSpaceID space)
     // I can set power or something here.
     return (Vehicle*)action;
 }
+

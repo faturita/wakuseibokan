@@ -148,6 +148,8 @@ void drawHUD()
 	//glPrint(1,10,10,"HUD");
     
 	//glRectf(400.0f,400.0f,450.0f,400.0f);
+
+    bool lostsignal = false;
     
     float speed=0, health=0, power = 0;
     
@@ -166,6 +168,11 @@ void drawHUD()
         {
             aimc = 240;
             crossc = 195;
+        }
+
+        if (entities[controller.controllingid]->getSignal()<3)
+        {
+            lostsignal = true;
         }
 
 
@@ -220,6 +227,31 @@ void drawHUD()
 
     sprintf (str, "%5.2f", Camera.getBearing());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
+
+    // Add typical noisy signal when the aircraft has lost their signal.
+    if (lostsignal)
+    {
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix(); {
+            glTranslatef(0, -400, 1);
+
+            glLineWidth(10.5);
+
+            for(int i=0;i<1200;i++)
+                for (int j=240-500;j<240+200;j++)
+                {
+                    float prob = ((int)(rand() % 100 + 1))/100.0f;
+                    if (prob<0.01)
+                    {
+                        glBegin(GL_LINES);
+                        glVertex3f(i,     j, 0);
+                        glVertex3f(i+1,   j+1, 0);
+                        glEnd();
+                    }
+                }
+
+        } glPopMatrix();
+    }
 
     
     // Displays the target mark at the center. The position of the center cross depends on camera angles.

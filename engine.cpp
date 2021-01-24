@@ -867,7 +867,17 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         {
                             char msg[256];
                             Message mg;
-                            sprintf(msg, "Vehicle is loosing connection.");
+                            switch (entities[i]->getType()) {
+                                    case WALRUS:
+                                    sprintf(msg, "Walrus %d is loosing connection.", NUMBERING(((Walrus*)entities[i])->getNumber()));
+                                break;
+                                    case MANTA:
+                                    sprintf(msg, "Manta %d is loosing connection.", NUMBERING(((Walrus*)entities[i])->getNumber()));
+                                    break;
+                                    default:
+                                    sprintf(msg, "Vehicle is loosing connection.");
+                            }
+
                             mg.faction = entities[i]->getFaction();
                             mg.msg = std::string(msg);
                             messages.insert(messages.begin(), mg);

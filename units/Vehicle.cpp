@@ -693,3 +693,4 @@ bool Vehicle::arrived()
 {
     return reached;
 }
+

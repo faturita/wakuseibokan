@@ -5188,6 +5188,118 @@ void checktest54(unsigned long timer)
 
 }
 
+
+void test55()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    //Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = FREE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+
+
+void checktest55(unsigned long timer)
+{
+    long unsigned starttime = 150;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC55: Checking comm link interruption.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == starttime + 300)
+    {
+        Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
+        size_t idx = 0;
+        spawnManta(space,world,b,idx);
+    }
+
+    if (timer == starttime + 500)
+    {
+        Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
+        launchManta(b);
+
+    }
+
+    if (timer == starttime + 800)
+    {
+        Manta *m = (Manta*)findManta(BLUE_FACTION);
+
+        m->setDestination(Vec3f(100 kmf, 0, 100 kmf));
+        m->enableAuto();
+
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC55: Manta will be flying far away.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+
+    }
+
+
+    if (timer == starttime + 1300)
+    {
+        CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
+
+        if (c)
+        {
+            // This is in case the missile do not destroy the command center.
+            c->damage(10000);
+        }
+    }
+
+    if (timer > starttime + 12500)
+    {
+        Manta *m = (Manta*)findManta(BLUE_FACTION);
+
+        if (m)
+        {
+            printf("Test failed: Manta should be destroyed\n");
+            endWorldModelling();
+            exit(0);
+        } else
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
 static int testing=-1;
 
 
@@ -5609,6 +5721,7 @@ void initWorldModelling(int testcase)
     case 52:test52();break;                         // Test Cephalopod aircraft stability, flying and basic destination.
     case 53:test53();break;                         // Test Cephalopod attacking command center.
     case 54:test54();break;                         // Stop aircraft from departing if the island is already free.
+    case 55:test55();break;                         // Comm Link interrupted for a Manta when the Command Center is destroyed.
     default:initIslands();test1();break;
     }
 
@@ -5681,6 +5794,7 @@ void worldStep(int value)
     case 52:checktest52(timer);break;
     case 53:checktest53(timer);break;
     case 54:checktest54(timer);break;
+    case 55:checktest55(timer);break;
 
     default: break;
     }
