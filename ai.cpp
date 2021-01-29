@@ -369,7 +369,7 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
 
             if (!m)
             {
-
+                // Launch a new airplane.
                 timeevent = timer;
                 return 11;
             }
@@ -382,8 +382,7 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
 
                 if (m)
                 {
-                    m->setDestination(Vec3f(i->getPos()[0],1000,i->getPos()[2]));
-                    m->enableAuto();
+                    ((SimplifiedDynamicManta*)m)->hold();
                 }
 
 
@@ -588,7 +587,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     {
         // Updating the current carrier postion to Manta so that it improves landing.
         //m2->setDestination(b->getPos());
-        //m2->setAttitude(b->getForward());
+        m2->setAttitude(b->getForward());
         done2 = false;
     } else
     {
