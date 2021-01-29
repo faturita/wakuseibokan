@@ -610,7 +610,7 @@ void SimplifiedDynamicManta::doControlLanding()
         release(T);
 
 
-        CLog::Write(CLog::Debug,"Landing:T: %10.3f %10.3f %10.3f\n", distance, val, c.registers.roll);
+        CLog::Write(CLog::Debug,"Landing:T: %10.3f %10.3f %10.3f %10.3f vs %10.3f: %10.3f\n", distance, val, c.registers.roll, getAzimuth(attitude), getAzimuth(getForward()),acos(  attitude.normalize().dot(getForward().normalize()) ));
 
 
         eh = height-H;
@@ -633,6 +633,14 @@ void SimplifiedDynamicManta::doControlLanding()
             flyingstate += 1;
         else
         {
+            float e1 = acos(  attitude.normalize().dot(getForward().normalize()) );
+            if (e1>0.2)
+            {
+                // Pull back, wrong attitude.
+                flyingstate = 0;
+                doControl(c);
+                return;
+            }
             //stop();
             elevator = 0;
 
@@ -853,6 +861,11 @@ void SimplifiedDynamicManta::attack(Vec3f target)
 {
     aistatus = ATTACK;
     destination = target;
+}
+
+void SimplifiedDynamicManta::hold()
+{
+    aistatus = FREE;
 }
 
 void SimplifiedDynamicManta::enableAuto()

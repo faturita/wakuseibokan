@@ -54,6 +54,7 @@ public:
     void attack(Vec3f target);
     void dogfight(Vec3f target);
 
+    void hold();
 };
 
 #endif // SIMPLIFIEDMANTA_H

@@ -5300,6 +5300,217 @@ void checktest55(unsigned long timer)
 
 }
 
+void test56()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-9000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+}
+
+void checktest56(unsigned long timer)
+{
+    static bool reached = false;
+
+
+    if (timer == 100)
+    {
+        size_t idx = 0;
+        spawnManta(space,world,entities[0],idx);
+    }
+
+    if (timer == 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,Manta::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(Manta::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+
+    if (timer == 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        _manta1->setDestination(_b->getPos()-_b->getForward().normalize()*(10 kmf));
+        _manta1->setAttitude(_b->getForward());
+        _manta1->enableAuto();
+    }
+
+    if (timer > 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        if (_manta1)
+           _manta1->setAttitude( _b->getForward());
+
+    }
+
+
+    if (timer > 700)
+    {
+        // Auto control
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::HOLDING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        {
+            runonce {
+                _b->setDestination(_b->getPos()+Vec3f(-1000,0,0));
+                _b->enableAuto();
+            }
+        }
+
+        if (_manta1)
+        {
+            {
+                runonce {
+                    _manta1->setDestination(_b->getPos());
+                    _manta1->setAttitude( _b->getForward());
+                    _manta1->land();
+                    _manta1->enableAuto();
+                }
+            }
+        }
+    }
+
+
+    if (timer>1000)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(GREEN_FACTION,Manta::ON_DECK);
+
+        if (_manta1)
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+    if (timer>8000)
+    {
+        // Timeout
+        printf("Test failed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
+void test57()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    //Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
+    Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest57(unsigned long timer)
+{
+    long unsigned starttime = 150;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC57: Check landing after command the command center is destroyed.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer > 2000)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(BLUE_FACTION);
+
+        {
+            runonce {
+                _b->setDestination(_b->getPos()+Vec3f(-1000,0,0));
+                _b->enableAuto();
+            }
+        }
+
+    }
+
+    if (timer == starttime + 3300)
+    {
+        CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
+
+        if (c)
+        {
+            // This is in case the missile do not destroy the command center.
+            c->damage(10000);
+        }
+    }
+
+    if (timer > starttime + 15400)
+    {
+        Manta *m = (Manta*)findManta(BLUE_FACTION);
+
+        if (m)
+        {
+            printf("Test failed: Manta should have not been launched.\n");
+            endWorldModelling();
+            exit(0);
+        } else
+        {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
+
 static int testing=-1;
 
 
@@ -5722,6 +5933,8 @@ void initWorldModelling(int testcase)
     case 53:test53();break;                         // Test Cephalopod attacking command center.
     case 54:test54();break;                         // Stop aircraft from departing if the island is already free.
     case 55:test55();break;                         // Comm Link interrupted for a Manta when the Command Center is destroyed.
+    case 56:test56();break;                         // Check a more complex manta landing.
+    case 57:test57();break;                         // Check landing after successfully attacking an island
     default:initIslands();test1();break;
     }
 
@@ -5795,6 +6008,8 @@ void worldStep(int value)
     case 53:checktest53(timer);break;
     case 54:checktest54(timer);break;
     case 55:checktest55(timer);break;
+    case 56:checktest56(timer);break;
+    case 57:checktest57(timer);break;
 
     default: break;
     }
