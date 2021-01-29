@@ -4,7 +4,7 @@ Excited warfare on the seas of a Kepler IV.
 
 The time has come to conquer Kepler IV.   Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU). 
 
-![Manta taking off](screenshot1.png)
+![Manta taking off](images/screenshot1.png)
 
 Compiling and Installation
 --------------------------
