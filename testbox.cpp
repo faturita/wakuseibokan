@@ -5510,6 +5510,65 @@ void checktest57(unsigned long timer)
 
 }
 
+void test58()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Gaijin-Shima");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+
+
+}
+
+void checktest58(unsigned int timer)
+{
+    long unsigned starttime = 150;
+
+
+    if (timer > starttime + 12000)
+    {
+        Walrus *w = (Walrus*)findWalrus(BLUE_FACTION);
+
+        if (w)
+        {
+            if (w->getHealth()<1000)
+            {
+                printf("Test failed: It seems like Walrus is stumbled.\n");
+                endWorldModelling();
+                exit(0);
+            } else {
+                printf("Test passed OK!\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+    }
+
+    if (timer > starttime + 20000)
+    {
+        printf("Test failed: It seems like Walrus has been destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
 
 static int testing=-1;
 
@@ -5947,6 +6006,7 @@ void initWorldModelling(int testcase)
     case 55:test55();break;                         // Comm Link interrupted for a Manta when the Command Center is destroyed.
     case 56:test56();break;                         // Check a more complex manta landing.
     case 57:test57();break;                         // Check landing after successfully attacking an island
+    case 58:test58();break;                         // Walrus landing on bumpy islands.
     default:initIslands();test1();break;
     }
 
@@ -6022,6 +6082,7 @@ void worldStep(int value)
     case 55:checktest55(timer);break;
     case 56:checktest56(timer);break;
     case 57:checktest57(timer);break;
+    case 58:checktest58(timer);break;
 
     default: break;
     }
