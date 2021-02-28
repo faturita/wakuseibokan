@@ -78,6 +78,8 @@ std::vector<Message> messages;
 
 int gamemode;
 
+int aiplayer;
+
 
 /**
  * Collision detection function.
@@ -478,6 +480,12 @@ void savegame()
     // Version
     ss << 0x01 << std::endl;
 
+    ss << aiplayer << std::endl;
+
+    ss << controller.faction << std::endl;
+
+    ss << gamemode << std::endl;
+
     int entitiessize = 0;
     // Get flying entities.
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
@@ -606,6 +614,12 @@ void loadgame()
 
     int version;
     ss >> version;
+
+    ss >> aiplayer;
+
+    ss >> controller.faction;
+
+    ss >> gamemode;
 
     int size;
     ss >> size;

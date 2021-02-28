@@ -93,7 +93,7 @@ extern std::vector<BoxIsland*> islands;
 std::ofstream msgboardfile;
 extern std::vector<Message> messages;
 
-int aiplayer = FREE_AI;
+extern int aiplayer;
 
 extern int gamemode;
 
@@ -759,7 +759,6 @@ int main(int argc, char** argv) {
         controller.faction = BOTH_FACTION;
     else
         controller.faction = GREEN_FACTION;
-
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
