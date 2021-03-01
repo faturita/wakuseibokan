@@ -38,6 +38,8 @@ void Dock::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
+        doTransform(f,R);
+
         //_model->draw(Structure::texture);
         drawTexturedBox(_textureMetal,20,50,40);
         drawTexturedBox(_textureMetal,Structure::width, Structure::height, Structure::length);

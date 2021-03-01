@@ -38,6 +38,8 @@ void Radar::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(50.0f,50.0f,50.0f);
 
+        doTransform(f,R);
+
         _model->draw(_textureSky);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 

@@ -39,6 +39,8 @@ void Antenna::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(180,1,0,0);
         glScalef(3.0f,3.0f,3.0f);
 
+        doTransform(f,R);
+
         _model->draw(_textureSky);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 

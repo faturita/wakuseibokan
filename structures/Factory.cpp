@@ -40,6 +40,8 @@ void Factory::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
+        doTransform(f,R);
+
         //_model->draw(Structure::texture);
         drawTexturedBox(_textureBox, Structure::width, Structure::height, Structure::length);
 

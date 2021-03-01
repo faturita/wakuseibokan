@@ -1222,7 +1222,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
                     int which = (rand() % islandstructs.size());
 
-                    CLog::Write(CLog::Debug,"Which %d prob %10.5f vs chances %10.5f  \n", which, prob, islandstructs[which].chance );
+                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f<%10.5f.\n", which, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
@@ -1242,52 +1242,56 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                             switch (islandstructs[which].subType) {
                             case VehicleSubTypes::HANGAR:
                                     s = new Hangar(c->getFaction());
+                                    island->addStructure(s,world);
                                     break;
                             case VehicleSubTypes::WAREHOUSE:
                                 s = new Warehouse(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::RUNWAY:
                                 s = new Runway(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::LASERTURRET:
                                 s = new LaserTurret(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::TURRET:
-                                s = new Turret(c->getFaction());
+                                s = new Turret(c->getFaction());island->addStructure(s,world);
+
                                 break;
                             case VehicleSubTypes::LAUNCHER:
                                 s = new Launcher(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::FACTORY:
                                 s = new Factory(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::DOCK:
                                 s = new Dock(c->getFaction());
+
+                                island->addStructureAtDesiredHeight(s,world,0);
+
                                 break;
                             case VehicleSubTypes::ANTENNA:
                                 s = new Antenna(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::RADAR:
                                 s = new Radar(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::STRUCTURE:default:
                                 s = new Structure(c->getFaction());
+                                island->addStructure(s,world);
                                 break;
 
                             }
-                            island->addStructure(s,world);
+
                         }
                     }
 
-
-                    //int x = (rand() % 2000 + 1); x -= 1000;
-                    //int z = (rand() % 2000 + 1); z -= 1000;
-
-
-
-                    //island->addStructure(s,x,z,space,world);
-
-                    //entities.push_back(s);
 
                     if (8<=which && which<=10)
                     {

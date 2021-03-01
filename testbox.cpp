@@ -5570,6 +5570,59 @@ void checktest58(unsigned int timer)
     }
 }
 
+void test59()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest59(unsigned long timer)
+{
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == starttime + 100)
+    {
+        Structure *t2 = islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION), world, 0);
+    }
+
+    if (timer > starttime + 9000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+}
 
 static int testing=-1;
 
@@ -5670,6 +5723,7 @@ void initWorldModelling(int testcase)
     case 56:test56();break;                         // Check a more complex manta landing.
     case 57:test57();break;                         // Check landing after successfully attacking an island
     case 58:test58();break;                         // Walrus landing on bumpy islands.
+    case 59:test59();break;                         // Check placement of dock
     default:initIslands();test1();break;
     }
 
@@ -5746,6 +5800,7 @@ void worldStep(int value)
     case 56:checktest56(timer);break;
     case 57:checktest57(timer);break;
     case 58:checktest58(timer);break;
+    case 59:checktest59(timer);break;
 
     default: break;
     }

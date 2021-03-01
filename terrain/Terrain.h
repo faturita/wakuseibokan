@@ -216,6 +216,7 @@ public:
 
     Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
+    Structure* addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight);
 
     float getX();
     float getZ();

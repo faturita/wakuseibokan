@@ -187,6 +187,61 @@ void BoxIsland::draw()
 }
 
 /**
+ * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinate.  After that start
+ * from the center and try to find the closed height to the desired one.  As all the islands fit into the 36x36, there should be one height that matches.
+ *
+ * @brief BoxIsland::addStructureAtDesiredHeight
+ * @param structure
+ * @param world
+ * @param desiredHeight
+ * @return
+ */
+Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight)
+{
+    float heightOffset = 0;
+    float x = 0;
+    float z = 0;
+    float angle = 0;
+
+    float t = (rand() % 360 + 1);
+
+    t = t * PI/180.0f;
+    float adjusted = t * 4.0/(2.0*PI);
+    int rounded = round(adjusted);
+    adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
+
+
+    for(int radius = 0;radius<2500;radius++)
+    {
+        x = cos(t);
+        z = sin(t);
+
+        x = x * radius;
+        z = z * radius;
+
+        if (x>1799) x = 1799;
+        if (x<-1799) x = -1799;
+        if (z>1800) z = 1800;
+        if (z<-1800) z = -1800;
+
+        assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
+
+        // @FIXME Put this line in a different function and use it from there.  Repeated code here.
+        heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+        CLog::Write(CLog::Debug,"(%10.5f - %10.5f  %d: %10.5f,%10.5f) Desired %10.5f vs Height %10.5f\n", t*180.0/PI, adjusted, radius,x,z,desiredHeight, heightOffset);
+
+        if (  abs(heightOffset-desiredHeight)<0.5 )
+        {
+            return addStructure(structure,x,z,adjusted, world);
+        }
+    }
+
+    return addStructure(structure,x,z,adjusted, world);
+}
+
+
+/**
  * x, z values are SCALED.  They are relative to the island center in 3600x3600 dimensions (3.6 km)
  * This function generates x,z.  Only values that are above certain height are used to generate the structure.
  *
