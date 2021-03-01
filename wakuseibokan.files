@@ -65,6 +65,8 @@ openglutils.h
 profiling.cpp
 profiling.h
 reinforcement.cpp
+savegame.cpp
+savegame.h
 sounds.h
 sounds/sounds.cpp
 sounds/sounds.h
