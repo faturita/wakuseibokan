@@ -174,6 +174,7 @@ void Balaenidae::doControl()
             c.registers.thrust = 150.0f;
         }
 
+        // Potential fields to avoid islands (works great).
         if (closest > 1800 && closest < 4000)
         {
             BoxIsland *b = islands[nearesti];

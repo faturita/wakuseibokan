@@ -717,6 +717,20 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
     return islands[nearesti];
 }
 
+Structure* findStructureFromIsland(BoxIsland *is, int subtype)
+{
+    std::vector<size_t> strs = is->getStructures();
+
+    for(size_t i=0;i<strs.size();i++)
+    {
+        Structure *s = (Structure*)entities[strs[i]];
+        if (s->getSubType()==subtype)
+        {
+            return s;
+        }
+    }
+    return NULL;
+}
 
 Antenna* findAntennaFromIsland(BoxIsland *is)
 {

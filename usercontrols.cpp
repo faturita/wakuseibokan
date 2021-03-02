@@ -399,7 +399,24 @@ void handleKeypress(unsigned char key, int x, int y) {
                         captureIsland(w,island,w->getFaction(),typeofisland,space, world);
                     }
                 }
+            } else
+            if (controller.str.find("goback") != std::string::npos)
+            {
+                if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
+                {
+                    Walrus *w = (Walrus*) entities[controller.controllingid];
+                    Vehicle *b = findCarrier(w->getFaction());
+                    Vec3f t = b->getPos() - w->getPos();
+                    t = t.normalize();
 
+                    Vec3f up = Vec3f(0,1,0);
+
+                    t = t.cross(up);
+                    t = t.normalize();
+
+                    w->setDestination(b->getPos()+t*300);
+                    w->enableAuto();
+                }
             } else
             if (controller.str.find("godmode") != std::string::npos)
             {

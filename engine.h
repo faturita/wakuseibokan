@@ -181,6 +181,7 @@ BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 
 Antenna* findAntennaFromIsland(BoxIsland *is);
+Structure* findStructureFromIsland(BoxIsland *is, int subtype);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
