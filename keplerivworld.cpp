@@ -254,6 +254,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
+                 if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
                  if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
                  if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
 

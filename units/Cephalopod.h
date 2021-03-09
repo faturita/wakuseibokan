@@ -2,6 +2,7 @@
 #define CEPHALOPOD_H
 
 #include "SimplifiedDynamicManta.h"
+#include "../terrain/Terrain.h"
 
 class Cephalopod : public SimplifiedDynamicManta
 {
@@ -11,6 +12,8 @@ protected:
     float getVerticalAttitude();
     float getRollAngle();
     float getPitchAngle();
+
+    BoxIsland *island;
 public:
     Cephalopod(int newfaction);
 
@@ -37,6 +40,9 @@ public:
     void doControlDestination(Vec3f target, float threshold);
     void doControlAttack();
     void doControlLanding();
+
+    BoxIsland *getIsland() const;
+    void setIsland(BoxIsland *value);
 };
 
 #endif // CEPHALOPOD_H

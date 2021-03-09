@@ -88,11 +88,11 @@ bool departed(Vehicle *walrus)
 }
 
 // SYNC
-bool arrived(Vehicle *walrus, Island *island)
+bool arrived(Vehicle *invadingunit, Island *island)
 {
-    if (island && walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::SAILING)
+    if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == Walrus::SAILING)
     {
-        Walrus *w = (Walrus*)walrus;
+        Walrus *w = (Walrus*)invadingunit;
 
         w->setStatus(Walrus::INSHORING);
         w->setIsland((BoxIsland*)island);
@@ -103,6 +103,25 @@ bool arrived(Vehicle *walrus, Island *island)
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
     }
+
+    if (island && invadingunit && invadingunit->getSubType() == CEPHALOPOD)
+    {
+        Cephalopod *c = (Cephalopod*)invadingunit;
+
+        if (c->getStatus()!=Manta::LANDED)
+        {
+            c->setStatus(Manta::LANDED);
+            c->setIsland((BoxIsland*)island);
+            char str[256];
+            Message mg;
+            sprintf(str, "Cephalopod Unit %d has landed to %s.", NUMBERING(c->getNumber()), island->getName().c_str());
+            mg.msg = std::string(str);
+            mg.faction = c->getFaction();
+            messages.insert(messages.begin(), mg);
+        }
+    }
+
+
     return true;
 }
 
@@ -113,7 +132,8 @@ bool landed(Vehicle *manta, Island *island)
     {
         if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
         {
-            if (entities[controller.controllingid] == manta)
+            if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid)
+                && entities[controller.controllingid] == manta)
                 controller.reset();
             AdvancedManta *s = (AdvancedManta*)manta;
             struct controlregister c;
@@ -259,6 +279,19 @@ bool  isType(Vehicle *vehicle, int type)
     return result;
 }
 
+bool isSubType(Vehicle *vehicle, int subtype)
+{
+    bool result = false;
+    if (vehicle)
+    {
+        if (vehicle->getSubType() == subtype)
+        {
+            result = true;
+        }
+    }
+    return result;
+}
+
 
 bool  isType(dGeomID geom, int type)
 {
@@ -283,7 +316,17 @@ bool isType(dGeomID geom, int types[], int length)
             if (isType(vehicle,types[s])) result=true;
     }
     return result;
+}
 
+bool isSubType(dGeomID geom, int subtype)
+{
+    bool result = false;
+    synchronized(entities.m_mutex)
+    {
+        Vehicle *v = gVehicle(geom);
+        result = isSubType(v,subtype);
+    }
+    return result;
 }
 
 

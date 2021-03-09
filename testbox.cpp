@@ -5513,10 +5513,12 @@ void checktest57(unsigned long timer)
 
 void test58()
 {
+    srand (time(NULL));
+
     BoxIsland *nemesis = new BoxIsland(&entities);
-    nemesis->setName("Goku");
+    nemesis->setName("Baltimore");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+    nemesis->buildTerrainModel(space,"terrain/parentum.bmp");
 
     islands.push_back(nemesis);
 
@@ -5524,7 +5526,7 @@ void test58()
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->setPos(getRandomCircularSpot(Vec3f(0.0f,20.5f,0),16000.0f));
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
@@ -5670,21 +5672,34 @@ void test60()
     _walrus->setPos(0.0f,20.5f,-5000.0f);
     _walrus->setStatus(Walrus::SAILING);
 
-    entities.push_back(_walrus, _walrus->getGeom());
+    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(0.0,1.32, - 3500);
     Camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
+
+    controller.controllingid = idx;
 }
 
 void checktest60(unsigned int timer)
 {
     long unsigned starttime = 150;
+    static long unsigned steptime1 = -1;
 
 
-    if (timer > starttime + 8000)
+    if (timer > starttime + 1000 && steptime1==-1)
+    {
+        Structure *t = islands[0]->getCommandCenter();
+        if (t)
+        {
+            steptime1 = timer;
+        }
+    }
+
+
+    if (steptime1>0 && timer > steptime1 + 500)
     {
         Structure *t = islands[0]->getCommandCenter();
         if (t)
@@ -5695,7 +5710,7 @@ void checktest60(unsigned int timer)
             {
                 if (w->getHealth()<1000)
                 {
-                    printf("Test failed: It seems like Walrus is stumbled.\n");
+                    printf("Test failed: It seems like Walrus has stumbled.\n");
                     endWorldModelling();
                     exit(0);
                 } else {
@@ -5707,6 +5722,75 @@ void checktest60(unsigned int timer)
         }
     }
 }
+
+
+
+void test61()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("North Sentinel");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4600.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    aiplayer = BLUE_AI;
+    controller.faction = BOTH_FACTION;
+
+}
+
+void checktest61(unsigned int timer)
+{
+    long unsigned starttime = 150;
+    static long unsigned steptime1 = -1;
+
+
+    if (timer > starttime + 1000 && steptime1==-1)
+    {
+        Structure *t = islands[0]->getCommandCenter();
+        if (t)
+        {
+            steptime1 = timer;
+        }
+    }
+
+
+    if (steptime1>0 && timer > steptime1 + 500)
+    {
+        Structure *t = islands[0]->getCommandCenter();
+        if (t)
+        {
+            Walrus *w = (Walrus*)findWalrus(BLUE_FACTION);
+
+            if (w)
+            {
+                if (w->getHealth()<1000)
+                {
+                    printf("Test failed: It seems like Walrus has stumbled.\n");
+                    endWorldModelling();
+                    exit(0);
+                } else {
+                    printf("Test passed OK!\n");
+                    endWorldModelling();
+                    exit(1);
+                }
+            }
+        }
+    }
+}
+
 
 static int testing=-1;
 
@@ -5808,7 +5892,8 @@ void initWorldModelling(int testcase)
     case 57:test57();break;                         // Check landing after successfully attacking an island
     case 58:test58();break;                         // Walrus landing on bumpy islands.
     case 59:test59();break;                         // Check placement of dock
-    case 60:test60();break;
+    case 60:test60();break;                         // Walrus evades Carrier using potential fields.
+    case 61:test61();break;                         // Using Cephalopod to build the command center.
     default:initIslands();test1();break;
     }
 
@@ -5887,6 +5972,7 @@ void worldStep(int value)
     case 58:checktest58(timer);break;
     case 59:checktest59(timer);break;
     case 60:checktest60(timer);break;
+    case 61:checktest61(timer);break;
 
     default: break;
     }

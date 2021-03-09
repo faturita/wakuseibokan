@@ -187,3 +187,27 @@ float sgn(float val)
     else
         return -1;
 }
+
+Vec3f getRandomCircularSpot(Vec3f origin, float radius)
+{
+    float t = (rand() % 360 + 1);
+
+    t = t * PI/180.0f;
+
+
+    float x = cos(t);
+    float z = sin(t);
+
+    x = x * radius;
+    z = z * radius;
+
+    return origin+Vec3f(x,0,z);
+}
+
+int getRandomInteger(int min, int max)
+{
+    int val = (rand() % (max+1) + min);
+    return val;
+}
+
+

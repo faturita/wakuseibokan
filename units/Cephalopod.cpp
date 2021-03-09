@@ -583,3 +583,13 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
 
     Manta::doControl(c);
 }
+
+BoxIsland *Cephalopod::getIsland() const
+{
+    return island;
+}
+
+void Cephalopod::setIsland(BoxIsland *value)
+{
+    island = value;
+}

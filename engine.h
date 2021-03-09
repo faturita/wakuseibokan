@@ -24,6 +24,7 @@
 #include "units/Balaenidae.h"
 #include "units/Beluga.h"
 #include "units/AdvancedManta.h"
+#include "units/Cephalopod.h"
 
 #include "terrain/Terrain.h"
 
@@ -126,6 +127,9 @@ bool  isAction(Vehicle* vehicle);
 bool isRay(dGeomID o);
 
 bool  isRunway(Structure* s);
+
+bool isSubType(dGeomID geom, int subtype);
+bool isSubType(Vehicle *v, int subtype);
 
 
 Island* getIsland(dGeomID candidate);

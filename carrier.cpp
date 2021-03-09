@@ -105,6 +105,8 @@ float fps=0;
 extern unsigned long timer;
 clock_t elapsedtime;
 
+bool wincondition=false;
+
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -187,6 +189,15 @@ void drawHUD()
     {
         sprintf(str, ">>>%s",controller.str.c_str());
         drawString(0,-180,1,str,0.2f);
+    }
+
+    if (wincondition)
+    {
+        sprintf(str, "You have won!");
+        if (getRandomInteger(1,2)==1)
+            drawString(75,-270,1,str,1.0f,1.0f,1.0f,0.0f);
+        else
+            drawString(75,-270,1,str,1.0f,1.0f,0.0f,1.0f);
     }
 
     // Message Board (@TODO: At least, put this in a different function)
@@ -634,6 +645,12 @@ void update(int value)
                         sprintf(str, "%s Carrier has been destroyed !", FACTION(entities[i]->getFaction()));
                         m.msg = std::string(str);
                         messages.insert(messages.begin(), m);
+
+                        // Check winning condition (if the destroyed carrier is not yours).
+                        if (controller.faction != entities[i]->getFaction())
+                        {
+                            wincondition = true;
+                        }
                     }
 
                     if (entities[i]->getType() == CONTROL)

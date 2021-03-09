@@ -642,7 +642,7 @@ Player::Player(int faction)
     qactions[3] = new ReturnToCarrier();
     qactions[4] = new DockBack();
 
-    state = 9;
+    state = 4;
     timeevent = 0;
 
 }

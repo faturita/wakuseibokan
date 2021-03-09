@@ -38,6 +38,7 @@
 #include "units/Manta.h"
 #include "units/Walrus.h"
 #include "units/AdvancedWalrus.h"
+#include "units/Cephalopod.h"
 
 #include "structures/Runway.h"
 #include "structures/CommandCenter.h"
@@ -62,6 +63,12 @@ int _yoffset = 0;
 
 // Right, left or middle button pressed.
 int buttonState;
+
+
+enum COMMAND_MODES {ATTACK_MODE, DESTINATION_MODE};
+
+int commandmode=DESTINATION_MODE;
+
 
 void processMouseEntry(int state) {
     /**if (state == GLUT_LEFT)
@@ -123,7 +130,22 @@ void processMouse(int button, int state, int x, int y) {
             CLog::Write(CLog::Debug,"Mouse down %d,%d\n",x,y);
             if (controller.view == 2)
             {
-                if (specialKey == GLUT_ACTIVE_SHIFT)
+                if (specialKey == GLUT_ACTIVE_SHIFT && commandmode == ATTACK_MODE)
+                {
+                    Vec3f target = setLocationOnMap(x,y);
+
+
+                    Vehicle *s = findNearestEnemyVehicle(entities[controller.controllingid]->getFaction(),target,2000);
+
+                    if (s)
+                    {
+                        entities[controller.controllingid]->attack(s->getPos());
+                        entities[controller.controllingid]->enableAuto();
+                    }
+
+                    CLog::Write(CLog::Debug,"Attack set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
+                } else
+                if (specialKey == GLUT_ACTIVE_SHIFT && commandmode == DESTINATION_MODE)
                 {
                     Vec3f target = setLocationOnMap(x,y);
                     //@FIXME
@@ -325,6 +347,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(pos);
 
             } else
+            if (controller.str.find("attack") != std::string::npos)
+            {
+                commandmode = ATTACK_MODE;
+
+            } else
+            if (controller.str.find("destination") != std::string::npos)
+            {
+                commandmode = DESTINATION_MODE;
+            } else
             if (controller.str.find("info") != std::string::npos)
             {
                 std::string islandcode = controller.str.substr(4+controller.str.substr(4).find(" "));
@@ -399,6 +430,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                         captureIsland(w,island,w->getFaction(),typeofisland,space, world);
                     }
                 }
+
+                if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getSubType()==CEPHALOPOD)
+                {
+                    Cephalopod *w = (Cephalopod*) entities[controller.controllingid];
+                    // Check if this invading unit is already on the island
+                    BoxIsland *island = w->getIsland();
+
+                    if (island)
+                    {
+                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
+                    }
+                }
             } else
             if (controller.str.find("goback") != std::string::npos)
             {
@@ -414,7 +457,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->setDestination(b->getPos()+t*300);
+                    w->setDestination(b->getPos()+(b->getForward().normalize()*300));
                     w->enableAuto();
                 }
             } else
@@ -535,6 +578,16 @@ void handleKeypress(unsigned char key, int x, int y) {
             Vehicle *v = entities[controller.controllingid];
             v->stop();
             break;
+            }
+        case 'l':
+            synchronized(entities.m_mutex)
+            {
+                if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
+                {
+                    Cephalopod* m = (Cephalopod*)(entities[controller.controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+
+                    size_t idx = entities.push_back(m, m->getGeom());
+                }
             }
         case 'm':
             {

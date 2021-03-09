@@ -221,8 +221,8 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
 
         if (x>1799) x = 1799;
         if (x<-1799) x = -1799;
-        if (z>1800) z = 1800;
-        if (z<-1800) z = -1800;
+        if (z>1799) z = 1799;
+        if (z<-1799) z = -1799;
 
         assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
 

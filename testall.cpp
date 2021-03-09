@@ -14,7 +14,7 @@
 int main(int argc, char *argv[])
 {
     char cmd[256];
-    int nTests = 46;
+    int nTests = 59;
     int tests[nTests];
     memset(tests,-1,sizeof(int));
 

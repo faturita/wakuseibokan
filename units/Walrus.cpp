@@ -295,25 +295,28 @@ void Walrus::doControlDestination()
 
         BoxIsland *b = findNearestIsland(Po);
         float closest = (b->getPos() - Po).magnitude();
-        if (closest > 1400 && closest < 2100)
+        if (closest > 1600 && closest < 2100)
         {
             c.registers.thrust = 15.0f;
         }
 
         // Potential fields from Carrier
         Vehicle *cd = findCarrier(getFaction());
-        closest = (cd->getPos() - Po).magnitude();
-        if (closest < 600) // check the size
+        if (cd)
         {
-            Vec3f l = cd->getPos();
-            Vec3f d = Po-l;
+            float obstacle = (cd->getPos() - Po).magnitude();
+            if (obstacle < 650) // check the size
+            {
+                Vec3f l = cd->getPos();
+                Vec3f d = Po-l;
 
-            d = d.normalize();
+                d = d.normalize();
 
-            T = T+d;
-            T = T.normalize();
+                T = T+d;
+                T = T.normalize();
 
-            c.registers.thrust = 15.0f;
+                c.registers.thrust = 100.0f;
+            }
         }
 
 
@@ -324,6 +327,8 @@ void Walrus::doControlDestination()
 
         CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
+
+        /**
         if (abs(e)>=0.5f)
         {
             c.registers.roll = 30.0 * (signn>0?+1:-1) ;
@@ -336,7 +341,10 @@ void Walrus::doControlDestination()
             c.registers.roll = 10.0 * (signn>0?+1:-1) ;
         else {
             c.registers.roll = 0.0f;
-        }
+        }**/
+
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
 
 
     } else {
