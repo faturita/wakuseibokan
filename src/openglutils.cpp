@@ -613,7 +613,7 @@ void initTextures()
     _textureMetal = loadTexture(image);
     delete image;
 
-    image = loadBMP("reflection.bmp");
+    image = loadBMP("water/reflection.bmp");
 	_textureIdSea = loadTexture(image);
     delete image;
     
@@ -621,7 +621,7 @@ void initTextures()
 	_textureBox = loadTexture(image);
     delete image;
     
-    image = loadBMP("clouds.bmp");
+    image = loadBMP("sky/clouds.bmp");
 	_textureSky = loadTexture(image);
     delete image;
     

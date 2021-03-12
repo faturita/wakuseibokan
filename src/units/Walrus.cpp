@@ -51,9 +51,9 @@ void Walrus::setIsland(BoxIsland *value)
 void Walrus::init()
 {
     if (getFaction()==GREEN_FACTION)
-        _model = (Model*)MD2Model::loadModel("walrusgood.md2");
+        _model = (Model*)MD2Model::loadModel("units/walrusgood.md2");
     else {
-        _model = (Model*)MD2Model::loadModel("walrus.md2");
+        _model = (Model*)MD2Model::loadModel("units/walrus.md2");
     }
 
     if (_model != NULL)

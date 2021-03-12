@@ -1,7 +1,5 @@
 
 
-
-
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,12 +13,14 @@
 #include <ode/ode.h>
 
 #include "FractalNoise.h"
-#include "imageloader.h"
+#include "terrain/imageloader.h"
 #include "md2model.h"
 #include "terrain/Terrain.h"
 #include "font/DrawFonts.h"
 
-#include "carrier/yamathutil.cpp"
+#include "math/yamathutil.h"
+
+#include "openglutils.h"
 
 using namespace std;
 
@@ -511,7 +511,7 @@ void drawSea(float x, float y, float z)
 
 float boxangle = 0;
 
-void drawArrow()
+void drawhArrow()
 {
     glPushMatrix();
     glLineWidth(3.0f);
@@ -873,12 +873,13 @@ void drawScene() {
     drawWalrus(0.0f,10.0f,0.0f);
     drawManta(0.0f,-0.6f,0.0f);
     
+    /**
     float islandCenter = 900.0f;
     coneIsland(30,15.0f, islandCenter+20.0f,islandCenter+0.0f,islandCenter+230.0f,islandCenter+32.0f);
     islandCenter = -200.0f;
-    coneIsland(97.0f, 30.0f, islandCenter+70.0f, islandCenter+0.0f, islandCenter+270.0f, islandCenter+32.0f);
+    coneIsland(97.0f, 30.0f, islandCenter+70.0f, islandCenter+0.0f, islandCenter+270.0f, islandCenter+32.0f);**/
 
-    drawTerrain(600.0f);
+    //drawTerrain(600.0f);
     
     drawHUD();
 
@@ -909,11 +910,11 @@ void initRendering() {
 	glEnable(GL_CULL_FACE);
 
 	//Load the model
-	_modelManta = MD2Model::load("manta.md2");
+    _modelManta = MD2Model::load("units/manta.md2");
     if (_modelManta != NULL)
         _modelManta->setAnimation("run");
 
-    _modelWalrus = MD2Model::load("walrus.md2");
+    _modelWalrus = MD2Model::load("units/walrus.md2");
     if (_modelWalrus != NULL)
         _modelWalrus->setAnimation("run");
 
@@ -976,9 +977,6 @@ void update(int value) {
 	  const dReal *dr = dBodyGetPosition(body[0]);
 
 	  printf ("(%10.6f,%10.6f,%10.6f)\n", dr[0],dr[1],dr[2]);
-
-      
-
     
 	glutPostRedisplay();
 	glutTimerFunc(25, update, 0);

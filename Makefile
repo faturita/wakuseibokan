@@ -4,16 +4,16 @@ CC = g++
 CFLAGS = -w -g -Wall $(ODEF) -I/usr/include -I/usr/include/GL -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
-SCS = usercontrols.cpp savegame.cpp camera.cpp odeutils.cpp map.cpp terrain/imageloader.cpp ThreeMaxLoader.cpp md2model.cpp math/vec3f.cpp math/yamathutil.cpp openglutils.cpp FractalNoise.cpp terrain/Terrain.cpp font/DrawFonts.cpp $(shell ls units/*.cpp) $(shell ls structures/*.cpp) $(shell ls actions/*.cpp) sounds/sounds.cpp engine.cpp commandline.cpp control.cpp ai.cpp profiling.cpp
-SRCS = $(SCS) keplerivworld.cpp testbox.cpp carrier.cpp
+SCS = src/usercontrols.cpp src/savegame.cpp src/camera.cpp src/odeutils.cpp src/map.cpp src/terrain/imageloader.cpp src/ThreeMaxLoader.cpp src/md2model.cpp src/math/vec3f.cpp src/math/yamathutil.cpp src/openglutils.cpp src/FractalNoise.cpp src/terrain/Terrain.cpp src/font/DrawFonts.cpp $(shell ls src/units/*.cpp) $(shell ls src/structures/*.cpp) $(shell ls src/actions/*.cpp) src/sounds/sounds.cpp src/engine.cpp src/commandline.cpp src/control.cpp src/ai.cpp src/profiling.cpp
+SRCS = $(SCS) src/keplerivworld.cpp src/testbox.cpp src/carrier.cpp
 
-TSRCS = $(SCS) testbox.cpp carrier.cpp
+TSRCS = $(SCS) src/testbox.cpp src/carrier.cpp
 TOBJS = $(TSRCS:.cpp=.o)
 
-SSRC = $(SCS) keplerivworld.cpp carrier.cpp 
+SSRC = $(SCS) src/keplerivworld.cpp src/carrier.cpp 
 OBJS = $(SSRC:.cpp=.o)
 
-TESTSRCS = opengltemplate.cpp openglutils.cpp imageloader.cpp
+TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
@@ -26,7 +26,7 @@ endif
 all: $(PROG)
 
 testall:
-	g++ testall.cpp -otestall
+	g++ src/testall.cpp -otestall
 
 OdeWorld:
 	$(CC) $(CFLAGS) -o OdeWorld OdeWorld.cpp $(LIBS)
