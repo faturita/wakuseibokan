@@ -13,7 +13,7 @@ protected:
     float getRollAngle();
     float getPitchAngle();
 
-    BoxIsland *island;
+    BoxIsland *island = NULL;
 public:
     Cephalopod(int newfaction);
 
@@ -43,6 +43,9 @@ public:
 
     BoxIsland *getIsland() const;
     void setIsland(BoxIsland *value);
+    void doControlDrop();
+
+    void drop();
 };
 
 #endif // CEPHALOPOD_H

@@ -27,6 +27,7 @@ public:
     static const int TACKINGOFF = 3;
     static const int FLYING = 4;
     static const int HOLDING = 5;
+    static const int DOCKING = 6;
 
     bool antigravity=false;
 

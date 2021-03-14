@@ -255,8 +255,27 @@ void Cephalopod::doDynamics(dBodyID body)
 
     if (speed > 10 && speed <32 )
     {
-        droneflying();
+        //droneflying();
+        island = NULL;
 
+    }
+
+    if (height > 30 && getStatus() == Manta::LANDED)
+        setStatus(Manta::FLYING);
+
+    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+
+    upInBody = upInBody.normalize();
+
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float attitudes = acos(upInBody.dot(Up))*180.0/PI;
+
+    if (attitudes>70 || attitudes<-70)
+    {
+        // Cephalopod has tumbled.
+        damage(1);
     }
 
     if (VERIFY(pos,me) && !Vehicle::inert)
@@ -377,6 +396,34 @@ Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
+
+void Cephalopod::drop()
+{
+    aistatus = DROP;
+}
+
+void Cephalopod::doControlDrop()
+{
+    Controller c;
+
+    c.registers = myCopy;
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+
+    float thrust = 0;
+
+    c.registers.thrust = thrust/(10.0);
+    c.registers.yaw = 0;
+    c.registers.roll = 0;
+    setThrottle(thrust);
+
+    Manta::doControl(c);
+}
+
+
+
 void Cephalopod::hoover(float sp3)
 {
     Controller c;
@@ -425,6 +472,9 @@ void Cephalopod::doControl()
         break;
     case LANDING:
         doControlLanding();
+        break;
+    case DROP:
+        doControlDrop();
         break;
     default:case DESTINATION:
         doControlDestination(destination,1000);
@@ -504,6 +554,8 @@ void Cephalopod::doControlLanding()
         c.registers.yaw = 0;
         c.registers.roll = 0;
         setThrottle(thrust);
+
+        setStatus(Manta::DOCKING);
 
         Manta::doControl(c);
     }

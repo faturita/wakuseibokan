@@ -93,6 +93,14 @@ public:
     InvadeIsland() { }
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
+
+class AirborneInvadeIsland : public QAction
+{
+public:
+    AirborneInvadeIsland() { }
+    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
+};
+
 class CaptureIsland : public QAction
 {
 public:
