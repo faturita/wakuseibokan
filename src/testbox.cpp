@@ -111,6 +111,27 @@ extern clock_t elapsedtime;
 int gamemode;
 int aiplayer;
 
+/**
+ * Collision detection function.
+ *
+ * This is one of the most important pieces of code of this program.  It handles too many things.
+ * vTC26: Islands now contain their own ODE Space, which depends on the world space.
+ * The heightmap associated with each island is constructed on that space.  All the structures are associated with each
+ * space from each island.
+ *
+ * All the units are generated in the world space.  Hence this function first check both geoms and calls dSpaceCollid2 which
+ * verifies if some moving object may be colliding with some space (i.e. island).  If there is a collition this callback is called
+ * again and those collisions are handled.
+ *
+ * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
+ * the highest possible in this platform.
+ *
+ *
+ * @brief nearCallback
+ * @param data
+ * @param o1
+ * @param o2
+ */
 void nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
@@ -263,6 +284,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
+                 if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
                  if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
                  if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
 
@@ -308,8 +332,6 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
         }
     }
 }
-
-
 
 void __nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -5772,22 +5794,22 @@ void checktest61(unsigned int timer)
         Structure *t = islands[0]->getCommandCenter();
         if (t)
         {
-            Walrus *w = (Walrus*)findWalrus(BLUE_FACTION);
+            Cephalopod *c = (Cephalopod*)findMantaByOrder(BLUE_FACTION, CONQUEST_ISLAND);
 
-            if (w)
+            if (c)
             {
-                if (w->getHealth()<1000)
-                {
-                    printf("Test failed: It seems like Walrus has stumbled.\n");
-                    endWorldModelling();
-                    exit(0);
-                } else {
-                    printf("Test passed OK!\n");
-                    endWorldModelling();
-                    exit(1);
-                }
+                printf("Test passed OK!\n");
+                endWorldModelling();
+                exit(1);
             }
         }
+    }
+
+    if (timer>20000)
+    {
+        printf("Test failed: For some reason, Cephalopod didn't return.\n");
+        endWorldModelling();
+        exit(0);
     }
 }
 

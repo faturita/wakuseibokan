@@ -1,12 +1,4 @@
 .
-font
-math
-terrain
-units
-water
-structures
-actions
-sounds
 src/terrain
 src/math
 src/structures
@@ -16,3 +8,4 @@ src/font
 src/sounds
 src/water
 src
+/usr/local/include

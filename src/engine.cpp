@@ -1399,6 +1399,26 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
     return (Manta*)manta;
 }
 
+Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
+{
+    Cephalopod* m = (Cephalopod*)(spawner->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+
+    if (m != NULL)
+    {
+        entities.push_back(m,m->getGeom());
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "Cephalopod %2d has been deployed.",NUMBERING(m->getNumber()));
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+    return (Manta*)m;
+}
+
+
+
+
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
 {
     int walrusNumber = findNextNumber(WALRUS);

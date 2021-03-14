@@ -426,6 +426,93 @@ int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, 
 
 
 
+int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+{
+    Vehicle *b = findCarrier(faction);
+
+    if (b)
+    {
+        BoxIsland *is = findNearestIsland(b->getPos());
+
+        // Check if the island is still free
+        if (is->getCommandCenter() && is->getCommandCenter()->getFaction()!=faction)
+        {
+            timeevent=timer;return 13;
+        }
+
+        if (!b->isAuto() && timer==(timeevent + 800))
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (!m)
+            {
+                m = spawnCephalopod(space,world,b);
+            }
+            //m->setDestination(is->getPos());
+            //m->enableAuto();
+
+            m->setOrder(CONQUEST_ISLAND);
+
+        }
+
+
+        if (timer==(timeevent + 1200))
+        {
+            Manta *m = launchManta(b);              // This works because it launchs the manta on deck
+        }
+
+        if (timer==(timeevent + 1600))
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (m)
+            {
+                m->setDestination(is->getPos());
+                m->enableAuto();
+            }
+        }
+
+        if (timer>(timeevent + 1600))
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (!m)
+            {
+                timeevent = timer;
+                return state;
+            }
+
+            Vec3f d = m->getPos() - is->getPos();
+            CLog::Write(CLog::Debug,"Magnitude: %10.5f\n", d.magnitude());
+
+            Cephalopod *c = (Cephalopod*)m;
+            if (d.magnitude()<800)
+            {
+                // The drone is instructed to drop to the floor.
+                c->drop();
+
+            }
+
+
+            if (c->getIsland() != NULL)
+            {
+                captureIsland(c,is,m->getFaction(),DEFENSE_ISLAND,space, world);
+                //landManta(b,c);
+
+                m->setDestination(b->getPos());
+                m->enableAuto();
+
+                timeevent = timer;
+                return 4;
+            }
+        }
+
+
+    }
+
+    return state;
+}
+
 int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -583,6 +670,14 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     Manta *m2 = findNearestManta(Manta::FLYING,b->getFaction(),b->getPos(),30000);
     Manta *m3 = findNearestManta(Manta::HOLDING,b->getFaction(), b->getPos(),30000);
 
+    Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+    if (m)
+    {
+        done2=false;
+    }
+
+
     if (m2)
     {
         // Updating the current carrier postion to Manta so that it improves landing.
@@ -637,7 +732,12 @@ Player::Player(int faction)
     qactions[12] = new AirborneAttack();
     qactions[13] = new ApproachAnyEnemyIsland();
     qactions[0] = new ApproachFreeIsland();
-    qactions[1] = new InvadeIsland();
+
+    if (faction == BLUE_FACTION)
+        qactions[1] = new AirborneInvadeIsland();
+    else
+        qactions[1] = new InvadeIsland();
+
     qactions[2] = new CaptureIsland();
     qactions[3] = new ReturnToCarrier();
     qactions[4] = new DockBack();
