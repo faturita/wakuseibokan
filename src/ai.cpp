@@ -490,13 +490,14 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
             {
                 // The drone is instructed to drop to the floor.
                 c->drop();
-
             }
 
 
             if (c->getIsland() != NULL)
             {
-                captureIsland(c,is,m->getFaction(),DEFENSE_ISLAND,space, world);
+                // @FIXME: Decide which island to create
+                int which = (arc4random() % 3);
+                captureIsland(c,is,m->getFaction(),which,space, world);
                 //landManta(b,c);
 
                 m->setDestination(b->getPos());

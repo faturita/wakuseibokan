@@ -263,6 +263,21 @@ void Cephalopod::doDynamics(dBodyID body)
     if (height > 30 && getStatus() == Manta::LANDED)
         setStatus(Manta::FLYING);
 
+    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+
+    upInBody = upInBody.normalize();
+
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float attitudes = acos(upInBody.dot(Up))*180.0/PI;
+
+    if (attitudes>70 || attitudes<-70)
+    {
+        // Cephalopod has tumbled.
+        damage(1);
+    }
+
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
         // Drone stability
