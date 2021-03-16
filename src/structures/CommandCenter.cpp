@@ -1,6 +1,7 @@
+#include <unordered_map>
 #include "CommandCenter.h"
 
-extern GLuint _textureMilitary;
+extern std::unordered_map<std::string, GLuint> textures;
 
 extern std::vector<Structure*> structures;
 
@@ -49,7 +50,7 @@ void CommandCenter::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f,R);
 
         //_model->draw(Structure::texture);
-        drawTexturedBox(_textureMilitary,Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(textures["military"],Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

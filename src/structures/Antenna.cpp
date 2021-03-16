@@ -1,7 +1,7 @@
+#include <unordered_map>
 #include "Antenna.h"
 
-extern GLuint _textureSky;
-extern GLuint _textureMetal;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Antenna::Antenna(int faction)
 {
@@ -41,7 +41,7 @@ void Antenna::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f,R);
 
-        _model->draw(_textureSky);
+        _model->draw(textures["sky"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();

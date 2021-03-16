@@ -1,7 +1,7 @@
+#include <unordered_map>
 #include "Radar.h"
 
-extern GLuint _textureSky;
-extern GLuint _textureMetal;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Radar::Radar(int faction)
 {
@@ -40,7 +40,7 @@ void Radar::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f,R);
 
-        _model->draw(_textureSky);
+        _model->draw(textures["sky"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();

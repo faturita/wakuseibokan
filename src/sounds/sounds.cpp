@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+extern bool mute;
+
 void bullethit()
 {
-    system("afplay sounds/bullethit.wav &");
+    if (!mute) system("afplay sounds/bullethit.wav &");
 }
 
 void firesound(int times)
@@ -19,55 +21,55 @@ void firesound(int times)
 
 void smallenginestart()
 {
-    system("afplay sounds/boozing.m4a &");
+    if (!mute) system("afplay sounds/boozing.m4a &");
 }
 
 void enginestart()
 {
-    system("afplay sounds/cruise.m4a &");
+    if (!mute) system("afplay sounds/cruise.m4a &");
 }
 
 void takeoff()
 {
-    system("afplay sounds/takeoff.mp3 &");
+    if (!mute) system("afplay sounds/takeoff.mp3 &");
 }
 
 void explosion()
 {
-    system("afplay sounds/explosion.mp3 &");
+    if (!mute) system("afplay sounds/explosion.mp3 &");
 }
 
 void coast()
 {
-    system("afplay sounds/Coast.m4a &");
+    if (!mute) system("afplay sounds/Coast.m4a &");
 }
 
 void honk()
 {
-    system("afplay sounds/BoatHonk.m4a &");
+    if (!mute) system("afplay sounds/BoatHonk.m4a &");
 }
 
 void soaring()
 {
-    system("afplay sounds/soaring.m4a &");
+    if (!mute) system("afplay sounds/soaring.m4a &");
 }
 
 void gunshot()
 {
-    system("afplay sounds/Gunshot.m4a &");
+    if (!mute) system("afplay sounds/Gunshot.m4a &");
 }
 
 void artilleryshot()
 {
-    system("afplay sounds/Artillery.wav &");
+    if (!mute) system("afplay sounds/Artillery.wav &");
 }
 
 void droneflying()
 {
-    system("afplay sounds/Cephalopod.m4a &");
+    if (!mute) system("afplay sounds/Cephalopod.m4a &");
 }
 
 void intro()
 {
-    system("afplay sounds/intro.mp3 &");
+    if (!mute) system("afplay sounds/intro.mp3 &");
 }

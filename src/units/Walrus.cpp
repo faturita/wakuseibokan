@@ -21,7 +21,7 @@ extern dSpaceID space;
 
 extern container<Vehicle*> entities;
 
-extern GLuint _textureSky;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Walrus::Walrus(int newfaction)
 {
@@ -118,13 +118,13 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
         //drawRectangularBox(width, height, length);
 
-        _model->setTexture(_textureSky);
+        _model->setTexture(textures["sky"]);
         glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 
         glRotatef(90.0f,0.0f,1.0f,0.0f);
         //glScalef(0.4f,0.4f,0.4f);
-        _topModel->setTexture(_textureSky);
+        _topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
         glPopMatrix();

@@ -111,6 +111,8 @@ extern clock_t elapsedtime;
 int gamemode;
 int aiplayer;
 
+extern bool wincondition;
+
 /**
  * Collision detection function.
  *
@@ -5814,6 +5816,143 @@ void checktest61(unsigned int timer)
 }
 
 
+
+void test62()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("North Sentinel");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Beluga *_b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4600.0f);
+    _b->stop();
+    _b->damage(-9000);
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    // Entities will be added later in time.
+    Balaenidae *_b2 = new Balaenidae(GREEN_FACTION);
+    _b2->init();
+    _b2->embody(world,space);
+    _b2->setPos(-5000.0f,20.5,-4600.0f);
+    _b2->stop();
+    _b2->damage(-9000);
+
+    entities.push_back(_b2, _b2->getGeom());
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+
+}
+
+void checktest62(unsigned int timer)
+{
+    static std::ofstream fpsfile;
+    if (timer == 1)
+    {
+        fpsfile.open ("fps.dat");
+    }
+
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile.flush();
+
+    long unsigned starttime = 150;
+    static long unsigned steptime1 = -1;
+
+    if (timer % 50 == 0 && timer > 200 && timer < 4000)
+    {
+        if (getRandomInteger(1,2)==1)
+        {
+            Vehicle *b = findCarrier(BLUE_FACTION);
+
+            if (b)
+            {
+            SimplifiedDynamicManta *_manta1 = new AdvancedManta(GREEN_FACTION);
+
+            _manta1->init();
+            _manta1->embody(world, space);
+            _manta1->setPos(getRandomInteger(1,9)*1000.0,2000.5f,-2000.0f);
+            _manta1->setStatus(0);
+            _manta1->inert = false;
+            _manta1->setStatus(Manta::FLYING);
+            _manta1->elevator = +12;
+            struct controlregister c;
+            c.thrust = 1000.0f/(10.0);
+            c.pitch = 12;
+            _manta1->setControlRegisters(c);
+            _manta1->setThrottle(1000.0f);
+            _manta1->enableAuto();
+            _manta1->attack(b->getPos());
+            _manta1->setOrder(ATTACK);
+
+            entities.push_back(_manta1, _manta1->getGeom());
+            }
+        } else
+        {
+            Vehicle *b = findCarrier(GREEN_FACTION);
+
+            if (b)
+            {
+            SimplifiedDynamicManta *_manta1 = new AdvancedManta(BLUE_FACTION);
+
+            _manta1->init();
+            _manta1->embody(world, space);
+            _manta1->setPos(0.0f,2000.5f,getRandomInteger(1,9)*1000.0);
+            _manta1->setStatus(0);
+            _manta1->inert = false;
+            _manta1->setStatus(Manta::FLYING);
+            _manta1->elevator = +12;
+            struct controlregister c;
+            c.thrust = 1000.0f/(10.0);
+            c.pitch = 12;
+            _manta1->setControlRegisters(c);
+            _manta1->setThrottle(1000.0f);
+            _manta1->enableAuto();
+            _manta1->attack(b->getPos());
+            _manta1->setOrder(ATTACK);
+
+            entities.push_back(_manta1, _manta1->getGeom());
+
+            }
+        }
+    }
+
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        if (entities[i]->getOrder() == ATTACK)
+        {
+            Manta *m = (Manta*)entities[i];
+            Vehicle *b = findNearestEnemyVehicle(entities[i]->getFaction(),entities[i]->getPos(),5000.0);
+            if (b)
+            {
+                if (b->getStatus() == VehicleTypes::MANTA)
+                    m->dogfight(b->getPos());
+                else
+                    m->attack(b->getPos());
+            }
+        }
+    }
+
+    if (timer > 10000)
+    {
+        printf("Test passed OK!\n");
+        endWorldModelling();
+        exit(1);
+    }
+
+}
+
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -5916,6 +6055,7 @@ void initWorldModelling(int testcase)
     case 59:test59();break;                         // Check placement of dock
     case 60:test60();break;                         // Walrus evades Carrier using potential fields.
     case 61:test61();break;                         // Using Cephalopod to build the command center.
+    case 62:test62();break;                         // Performance measurement (several carriers, Mantas and walruses)
     default:initIslands();test1();break;
     }
 
@@ -5995,6 +6135,7 @@ void worldStep(int value)
     case 59:checktest59(timer);break;
     case 60:checktest60(timer);break;
     case 61:checktest61(timer);break;
+    case 62:checktest62(timer);break;
 
     default: break;
     }

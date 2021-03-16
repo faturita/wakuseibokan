@@ -68,23 +68,23 @@ int cx=1200/2,cy=800/2;
 
 void placeMark(int x, int y, int size, const char* modelName)
 {
-    GLuint _textureBox;
+    GLuint _texture;
 
     if (maptextures.find(std::string(modelName)) == maptextures.end())
     {
         // @FIXME: This means that the image is loaded every time this mark is rendered, which is wrong.
         Image* image = loadBMP(modelName);
-        _textureBox = loadTexture(image);
+        _texture = loadTexture(image);
         delete image;
 
-        maptextures[std::string(modelName)]=_textureBox;
+        maptextures[std::string(modelName)]=_texture;
 
     } else {
-        _textureBox = maptextures[std::string(modelName)];
+        _texture = maptextures[std::string(modelName)];
     }
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureBox);
+    glBindTexture(GL_TEXTURE_2D, _texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 0.0f);
@@ -112,22 +112,22 @@ void placeIsland(int x, int y, int size, const char* modelName, const char *name
 {
     char str[256];
 
-    GLuint _textureBox;
+    GLuint _texture;
 
     if (maptextures.find(std::string(modelName)) == maptextures.end())
     {
         Image* image = loadBMP(modelName);
-        _textureBox = loadTexture(image);
+        _texture = loadTexture(image);
         delete image;
 
-        maptextures[std::string(modelName)]=_textureBox;
+        maptextures[std::string(modelName)]=_texture;
 
     } else {
-        _textureBox = maptextures[std::string(modelName)];
+        _texture = maptextures[std::string(modelName)];
     }
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureBox);
+    glBindTexture(GL_TEXTURE_2D, _texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 0.0f);

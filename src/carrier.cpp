@@ -97,15 +97,15 @@ extern int aiplayer;
 
 extern int gamemode;
 
-// @FIXME Change
-extern GLuint _textureBox;
-extern GLuint _textureMetal;
+extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
 extern unsigned long timer;
 clock_t elapsedtime;
 
 bool wincondition=false;
+
+bool mute=false;
 
 void disclaimer()
 {
@@ -474,7 +474,7 @@ void drawScene() {
         {
             if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
             {
-                (entities[i]->setTexture(_textureMetal));
+                (entities[i]->setTexture(textures["metal"]));
                 (entities[i]->drawModel());
             }
         }
@@ -733,6 +733,11 @@ int main(int argc, char** argv) {
         srand (time(NULL));
     else
         srand (0);
+
+    if (isPresentCommandLineParameter(argc,argv,"-mute"))
+        mute = true;
+    else
+        mute = false;
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)

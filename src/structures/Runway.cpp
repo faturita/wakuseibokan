@@ -1,8 +1,9 @@
+#include <unordered_map>
 #include "Runway.h"
 #include "../units/Medusa.h"
 
 
-extern GLuint _textureRoad;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Runway::Runway(int faction)
 {
@@ -42,7 +43,7 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //_model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length, _textureRoad);
-        drawTheRectangularBox(_textureRoad,Structure::width, Structure::height, Structure::length);
+        drawTheRectangularBox(textures["road"],Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

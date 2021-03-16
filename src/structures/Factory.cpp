@@ -1,8 +1,7 @@
+#include <unordered_map>
 #include "Factory.h"
 
-extern GLuint _textureSky;
-extern GLuint _textureMetal;
-extern GLuint _textureBox;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Factory::Factory(int faction)
 {
@@ -43,7 +42,7 @@ void Factory::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f,R);
 
         //_model->draw(Structure::texture);
-        drawTexturedBox(_textureBox, Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(textures["metal"], Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

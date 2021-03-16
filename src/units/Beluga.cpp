@@ -8,8 +8,7 @@
 #include "../sounds/sounds.h"
 #include "../keplerivworld.h"
 
-extern GLuint _textureRoad;
-
+extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
@@ -22,7 +21,7 @@ Beluga::Beluga(int faction) : Balaenidae(faction)
 void Beluga::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,_textureRoad);
+    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,textures["road"]);
 
     setForward(0,0,1);
 

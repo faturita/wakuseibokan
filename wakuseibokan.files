@@ -63,6 +63,7 @@ src/actions/actions.h
 src/ai.cpp
 src/ai.h
 src/anothermain.cpp
+src/boilerplate.cpp
 src/camera.cpp
 src/camera.h
 src/carrier.cpp

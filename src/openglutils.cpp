@@ -9,29 +9,13 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 #include "profiling.h"
 
-
-// @FIXME: Oh My God, please fix textures.
-GLuint _textureIdSea;
-
-GLuint _textureBox;
-
-GLuint _textureSky;
-
-GLuint _textureLand;
-
-GLuint _textureMetal;
-
-GLuint _textureRoad;
-
-GLuint _textureMilitary;
-
-std::vector<GLuint*> textures;
+std::unordered_map<std::string, GLuint> textures;
 
 extern float horizon;
-
 
 void CheckGLError() {
 	GLuint err = glGetError();
@@ -199,7 +183,7 @@ float boxangle = 0;
 
 void drawBoxIsland(float xx, float yy, float zz, float side, float height)
 {
-    drawBoxIsland(_textureBox,xx,yy,zz,side, height);
+    drawBoxIsland(textures["metal"],xx,yy,zz,side, height);
 }
 
 void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side, float height)
@@ -609,32 +593,36 @@ void drawBox(GLuint _textureId, float xx, float yy, float zz)
 void initTextures()
 {
 
+    GLuint _texture;
+
     Image* image = loadBMP("units/metal.bmp");
-    _textureMetal = loadTexture(image);
+    _texture = loadTexture(image);              // Box
+    textures["metal"] = _texture;
     delete image;
 
     image = loadBMP("water/reflection.bmp");
-	_textureIdSea = loadTexture(image);
-    delete image;
-    
-    image = loadBMP("structures/metal.bmp");
-	_textureBox = loadTexture(image);
+    _texture = loadTexture(image);
+    textures["sea"] = _texture;
     delete image;
     
     image = loadBMP("sky/clouds.bmp");
-	_textureSky = loadTexture(image);
+    _texture = loadTexture(image);
+    textures["sky"] = _texture;
     delete image;
     
     image = loadBMP("terrain/grass.bmp");
-    _textureLand = loadTexture(image);
+    _texture = loadTexture(image);
+    textures["land"] = _texture;
     delete image;
 
     image = loadBMP("terrain/road.bmp");
-    _textureRoad = loadTexture(image);
+    _texture = loadTexture(image);
+    textures["road"] = _texture;
     delete image;
 
     image = loadBMP("structures/military.bmp");
-    _textureMilitary = loadTexture(image);
+    _texture = loadTexture(image);
+    textures["military"] = _texture;
     delete image;
 }
 
@@ -657,7 +645,7 @@ void drawFloor(float x, float y, float z)
     
     glTranslatef(x,0.0f,z);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureIdSea);
+    glBindTexture(GL_TEXTURE_2D, textures["sea"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
@@ -690,7 +678,7 @@ void drawSky (float posX, float posY, float posZ)
     glDisable (GL_LIGHTING);
     
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureSky);
+    glBindTexture(GL_TEXTURE_2D, textures["sky"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -810,7 +798,7 @@ void drawBox(float xx, float yy, float zz)
     const float BOX_SIZE = 7.0f; //The length of each side of the cube
     static float boxangle = 0;            //The rotation of the box
     
-    drawBox(_textureBox,xx,yy,zz);
+    drawBox(textures["metal"],xx,yy,zz);
 }
 
 float getFPS()

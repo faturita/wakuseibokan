@@ -1,7 +1,7 @@
+#include <unordered_map>
 #include "Dock.h"
 
-extern GLuint _textureSky;
-extern GLuint _textureMetal;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Dock::Dock(int faction)
 {
@@ -41,8 +41,8 @@ void Dock::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f,R);
 
         //_model->draw(Structure::texture);
-        drawTexturedBox(_textureMetal,20,50,40);
-        drawTexturedBox(_textureMetal,Structure::width, Structure::height, Structure::length);
+        drawTexturedBox(textures["metal"],20,50,40);
+        drawTexturedBox(textures["metal"],Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }

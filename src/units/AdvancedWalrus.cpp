@@ -1,4 +1,4 @@
-
+#include <unordered_map>
 #include "AdvancedWalrus.h"
 
 #include "../profiling.h"
@@ -13,7 +13,7 @@ extern dSpaceID space;
 
 extern container<Vehicle*> entities;
 
-extern GLuint _textureSky;
+extern std::unordered_map<std::string, GLuint> textures;
 
 AdvancedWalrus::AdvancedWalrus(int newfaction) : Walrus(newfaction)
 {
@@ -80,7 +80,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
 
-        _model->setTexture(_textureSky);
+        _model->setTexture(textures["sky"]);
         _model->draw();
 
 
@@ -96,7 +96,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
         // Rotate the turret cannon so that it is aligned properly.
         glRotatef(90.0f,0.0f,1.0f,0.0f);
 
-        _topModel->setTexture(_textureSky);
+        _topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
         glPopMatrix();

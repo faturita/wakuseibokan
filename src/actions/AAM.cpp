@@ -9,7 +9,7 @@
 
 #include "../profiling.h"
 
-extern GLuint _textureRoad;
+extern std::unordered_map<std::string, GLuint> textures;
 
 AAM::AAM(int faction)
 {
@@ -68,7 +68,7 @@ void AAM::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
 
         //drawRectangularBox(width, height, length);
-        _model->setTexture(_textureRoad);
+        _model->setTexture(textures["road"]);
         _model->draw();
 
         glPopMatrix();

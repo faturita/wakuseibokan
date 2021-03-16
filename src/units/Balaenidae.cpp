@@ -10,10 +10,7 @@
 #include "../actions/AAM.h"
 #include "../keplerivworld.h"
 
-extern GLuint _textureMetal;
-
-extern GLuint _textureRoad;
-
+extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
@@ -31,7 +28,7 @@ Balaenidae::Balaenidae(int newfaction)
 void Balaenidae::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,_textureMetal);
+    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,textures["metal"]);
 
     setForward(0,0,1);
 
