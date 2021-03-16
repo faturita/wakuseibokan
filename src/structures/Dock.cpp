@@ -40,7 +40,6 @@ void Dock::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f,R);
 
-        //_model->draw(Structure::texture);
         drawTexturedBox(textures["metal"],20,50,40);
         drawTexturedBox(textures["metal"],Structure::width, Structure::height, Structure::length);
 

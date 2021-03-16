@@ -12,6 +12,7 @@
 #include <unordered_map>
 
 #include "profiling.h"
+#include "math/yamathutil.h"
 
 std::unordered_map<std::string, GLuint> textures;
 
@@ -115,6 +116,7 @@ void drawArrow(float x, float y, float z,float red, float green, float blue, flo
     glRotatef(90.0f,0.0f,1.0f,0.0f);
     glutSolidCone(0.100,0.5f,10,10);
 
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 
@@ -339,12 +341,12 @@ void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
     glBindTexture(GL_TEXTURE_2D, _textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    //glColor3f(1.0f, 1.0f, 1.0f);
 
     glBegin(GL_QUADS);
 
     //Top face
-    glColor3f(1.0f, 1.0f, 0.0f);
+    //glColor3f(1.0f, 1.0f, 0.0f);
     glNormal3f(0.0, 0.0f, 1.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, -y, z);
@@ -355,7 +357,7 @@ void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(-x, y, z);
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    //glColor3f(1.0f, 1.0f, 1.0f);
     glNormal3f(0.0, 1.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, y, -z);
@@ -378,7 +380,7 @@ void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
     glVertex3f(x, -y, -z);
 
     //Bottom face
-    glColor3f(1.0f, 0.0f, 1.0f);
+    //glColor3f(1.0f, 0.0f, 1.0f);
     glNormal3f(0.0, -1.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, -y, -z);
@@ -391,12 +393,12 @@ void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
 
     //Left face
     glNormal3f(-1.0, 0.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 1.0f);
+    //glColor3f(0.0f, 1.0f, 1.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, -y, -z);
     glTexCoord2f(1.0f, 0.0f);
     glVertex3f(- x, - y, z);
-    glColor3f(0.0f, 0.0f, 1.0f);
+    //glColor3f(0.0f, 0.0f, 1.0f);
     glTexCoord2f(1.0f, 1.0f);
     glVertex3f(-x, y, z);
     glTexCoord2f(0.0f, 1.0f);
@@ -404,12 +406,12 @@ void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz)
 
     //Right face
     glNormal3f(1.0, 0.0f, 0.0f);
-    glColor3f(1.0f, 0.0f, 0.0f);
+    //glColor3f(1.0f, 0.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(x, -y, -z);
     glTexCoord2f(1.0f, 0.0f);
     glVertex3f(x, y, -z);
-    glColor3f(0.0f, 1.0f, 0.0f);
+    //glColor3f(0.0f, 1.0f, 0.0f);
     glTexCoord2f(1.0f, 1.0f);
     glVertex3f(x, y, z);
     glTexCoord2f(0.0f, 1.0f);
@@ -621,9 +623,21 @@ void initTextures()
     delete image;
 
     image = loadBMP("structures/military.bmp");
+    assert( image != NULL || !"Something went wrong." );
     _texture = loadTexture(image);
     textures["military"] = _texture;
     delete image;
+
+    image = loadBMP("sky/saturn.bmp");
+    _texture = loadTexture(image);
+    textures["saturn"] = _texture;
+    delete image;
+
+    image = loadBMP("sky/solar.bmp");
+    _texture = loadTexture(image);
+    textures["solar"] = _texture;
+    delete image;
+
 }
 
 
@@ -678,18 +692,9 @@ void drawSky (float posX, float posY, float posZ)
     glDisable (GL_LIGHTING);
     
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures["sky"]);
+    glBindTexture(GL_TEXTURE_2D, textures["saturn"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    /**if (use_textures) {
-     glEnable (GL_TEXTURE_2D);
-     sky_texture->bind (0);
-     }**/
-    //else {
-    //glDisable (GL_TEXTURE_2D);
-    //glColor3f (0,0.5,1.0);
-    //}
     
     // make sure sky depth is as far back as possible
     glShadeModel (GL_FLAT);
@@ -697,40 +702,142 @@ void drawSky (float posX, float posY, float posZ)
     glDepthFunc (GL_LEQUAL);
     glDepthRange (1,1);
     
-    const float ssize = 100.0f;
-    float offset = 0.0f;
+    const float ssize = 1000.0f;
+    static float offset_h = 0.0f;
+    static float offset_v = 0.0f;
     
     float view_xyz[3];
     
     //CLog::Write(CLog::Debug,"%10.8f - %10.8f - %10.8f \n", posX, posY, posZ);
     
-    posX=0;
-    posY=30;
-    posZ=-58;
+
+    offset_h = getAzimuth(Vec3f(posX, posY, posZ))*(1/360.0) * 20;//6
+    offset_v = getDeclination(Vec3f(posX, posY, posZ))*(-1/360.0) * 20;
+
     
-    view_xyz[0] = posX;
-    view_xyz[1] = posY;
-    view_xyz[2] = posZ;
+    view_xyz[0] = 0;
+    view_xyz[1] = 30;
+    view_xyz[2] = -58;
     
 
     
     float x = ssize*sky_scale;
     float z = view_xyz[2] + sky_height;
     
+//    glBegin (GL_QUADS);
+//    glNormal3f (0,0,-1);
+//    glTexCoord2f (-x+offset,-x+offset);
+//    glVertex3f (-ssize+view_xyz[0],-ssize+view_xyz[1],z);
+//    glTexCoord2f (-x+offset,x+offset);
+//    glVertex3f (-ssize+view_xyz[0],ssize+view_xyz[1],z);
+//    glTexCoord2f (x+offset,x+offset);
+//    glVertex3f (ssize+view_xyz[0],ssize+view_xyz[1],z);
+//    glTexCoord2f (x+offset,-x+offset);
+//    glVertex3f (ssize+view_xyz[0],-ssize+view_xyz[1],z);
+//    glEnd();
+
     glBegin (GL_QUADS);
     glNormal3f (0,0,-1);
-    glTexCoord2f (-x+offset,-x+offset);
+    glTexCoord2f (-x+offset_h,-x+offset_v);
     glVertex3f (-ssize+view_xyz[0],-ssize+view_xyz[1],z);
-    glTexCoord2f (-x+offset,x+offset);
+    glTexCoord2f (-x+offset_h,x+offset_v);
     glVertex3f (-ssize+view_xyz[0],ssize+view_xyz[1],z);
-    glTexCoord2f (x+offset,x+offset);
+    glTexCoord2f (x+offset_h,x+offset_v);
     glVertex3f (ssize+view_xyz[0],ssize+view_xyz[1],z);
-    glTexCoord2f (x+offset,-x+offset);
+    glTexCoord2f (x+offset_h,-x+offset_v);
     glVertex3f (ssize+view_xyz[0],-ssize+view_xyz[1],z);
     glEnd();
+
+
+//    const float BOX_SIZE = 0.3f; //The length of each side of the cube
+
+//    x=0;
+//    float y=0.0;
+
+//    //glLoadIdentity();
+//    glPushMatrix();
+//    glTranslatef(0,0,0);
+//    //glRotatef(boxangle, 0.0f, 0.0f, 1.0f);
+//    glRotatef(-offset_v,1.0f,0.0f,0.0f);
+//    glRotatef(-offset_h,0.0f,1.0f,0.0f);
+//    glBegin(GL_QUADS);
+
+//    //Top face
+//    //glColor3f(1.0f, 1.0f, 0.0f);
+//    glNormal3f(0.0, 1.0f, 0.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+
+//    //Bottom face
+//    //glColor3f(1.0f, 0.0f, 1.0f);
+//    glNormal3f(0.0, -1.0f, 0.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE /2 + z);
+//    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+
+//    //Left face
+//    glNormal3f(-1.0, 0.0f, 0.0f);
+//    //glColor3f(0.0f, 1.0f, 1.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    //glColor3f(0.0f, 0.0f, 1.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+
+//    //Right face
+//    glNormal3f(1.0, 0.0f, 0.0f);
+//    //glColor3f(1.0f, 0.0f, 0.0f);
+//    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
+//    //glColor3f(0.0f, 1.0f, 0.0f);
+//    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+
+//    glEnd();
+
+//    //glEnable(GL_TEXTURE_2D);
+//    //glBindTexture(GL_TEXTURE_2D, _textureId);
+//    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    //glColor3f(1.0f, 1.0f, 1.0f);
+
+//    glBegin(GL_QUADS);
+
+//    //Front face
+//    glNormal3f(0.0, 0.0f, 1.0f);
+//    glTexCoord2f(0.0f, 0.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glTexCoord2f(1.0f, 0.0f);
+//    glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glTexCoord2f(1.0f, 1.0f);
+//    glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+//    glTexCoord2f(0.0f, 1.0f);
+//    glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
+
+//    //Back face
+//    glNormal3f(0.0, 0.0f, -1.0f);
+//    glTexCoord2f(0.0f, 0.0f);
+//    glVertex3f(-BOX_SIZE / 2+ x, -BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
+//    glTexCoord2f(1.0f, 0.0f);
+//    glVertex3f(-BOX_SIZE / 2+ x, BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
+//    glTexCoord2f(1.0f, 1.0f);
+//    glVertex3f(BOX_SIZE / 2+ x, BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
+//    glTexCoord2f(0.0f, 1.0f);
+//    glVertex3f(BOX_SIZE / 2+ x, -BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
+
+//    glEnd();
+//    glPopMatrix();
+
+//    boxangle += 0.1f;
+
+//    if (boxangle >= 360.f)
+//        boxangle = 0.0f;
     
-    offset = offset + 0.002f;
-    if (offset > 1) offset -= 1;
+    //offset = offset + 0.002f;
+    //if (offset > 1) offset -= 1;
     
     glDepthFunc (GL_LESS);
     glDepthRange (0,1);

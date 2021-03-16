@@ -129,6 +129,8 @@ void drawHUD()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+
+    glPushAttrib(GL_CURRENT_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1);
 	glDisable(GL_DEPTH_TEST);
 	glRotatef(180.0f,0,0,1);
@@ -378,7 +380,7 @@ void drawHUD()
         
     } glPopMatrix();
     
-    
+    glPopAttrib();
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -390,15 +392,15 @@ void drawHUD()
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+        //glMatrixMode(GL_PROJECTION);
+        //glLoadIdentity();
+        //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
     
-    //drawLightning();
+    drawLightning();
 
     Vec3f up,pos,forward;
     
@@ -441,7 +443,9 @@ void drawScene() {
     }
     
     // If you comment the drawsky it will go dark (night).
-    //drawSky(pos[0],pos[1],pos[2]);
+    glPushAttrib(GL_CURRENT_BIT);
+    drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
+    glPopAttrib();
     
     Camera.lookAtFrom(up, pos, forward);
     
@@ -457,6 +461,7 @@ void drawScene() {
     glPushAttrib(GL_CURRENT_BIT);
     drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
+
 
     // Draw islands.
     for (int i=0; i<islands.size(); i++) {
@@ -474,11 +479,20 @@ void drawScene() {
         {
             if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
             {
-                (entities[i]->setTexture(textures["metal"]));
+                //(entities[i]->setTexture(textures["metal"]));
+                glPushAttrib(GL_CURRENT_BIT);
                 (entities[i]->drawModel());
+                glPopAttrib();
             }
         }
     }
+
+    // Daylight frequency.  The "sol" in this world lasts for 10000 cicles.  At 60 fps, 2.7 minutes.
+    float daylight_frequency = 1.0/10000.0;
+    float daylight =   sin(daylight_frequency * 2 * PI * timer)*0.4 + 0.6;   // From 0.2 -- 1.0
+
+    // This is the final color that is used to paint everything on the screen.
+    glColor3f(daylight,daylight,daylight);
 
     // GO with the HUD
     switch (controller.view)
@@ -496,35 +510,35 @@ void drawScene() {
 
 void initRendering() {
 	// Lightning
-    
-	glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
     
     // Lighting not working.
-	glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT0);
 
     
 	// Normalize the normals (this is very expensive).
-	glEnable(GL_NORMALIZE);
+    glEnable(GL_NORMALIZE);
     
     
 	// Do not show hidden faces.
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     
     
-    // Enable wireframes
-    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+        // Enable wireframes
+        //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
     
     glShadeModel(GL_SMOOTH); // Type of shading for the polygons
     
-	glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_COLOR_MATERIAL);
     
-	// Do not show the interior faces....
-	//glEnable(GL_CULL_FACE);
+        // Do not show the interior faces....
+        //glEnable(GL_CULL_FACE);
     
 	// Blue sky !!!
     //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
-    drawLightning();
+    glClearColor(0.0f, 0.0f, 0.1f, 0.1f);
+    //drawLightning();
     
     // Initialize scene textures.
     initTextures();
