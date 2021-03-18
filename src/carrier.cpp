@@ -125,7 +125,7 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, 1200, 800, 0, -1, 1);
+    glOrtho(0, 1200, 800, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -140,12 +140,11 @@ void drawHUD()
     
     char str[256];
 
-    
-    if (isnan(Camera.pos[0])) exit(1);
+    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There is a numberical error somewhere.");
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f)  TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2], timer);
+    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -442,7 +441,6 @@ void drawScene() {
         }
     }
     
-    // If you comment the drawsky it will go dark (night).
     glPushAttrib(GL_CURRENT_BIT);
     drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
     glPopAttrib();
@@ -457,7 +455,6 @@ void drawScene() {
     drawArrow(3);
     glPopAttrib();
     
-    // Floor is changing color.
     glPushAttrib(GL_CURRENT_BIT);
     drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
@@ -488,7 +485,7 @@ void drawScene() {
     }
 
     // Daylight frequency.  The "sol" in this world lasts for 10000 cicles.  At 60 fps, 2.7 minutes.
-    float daylight_frequency = 1.0/10000.0;
+    float daylight_frequency = 1.0/CYCLES_IN_SOL;
     float daylight =   sin(daylight_frequency * 2 * PI * timer)*0.4 + 0.6;   // From 0.2 -- 1.0
 
     // This is the final color that is used to paint everything on the screen.
@@ -640,11 +637,11 @@ void update(int value)
                     if (controller.controllingid == i)
                         controller.controllingid = CONTROLLING_NONE;
 
-                   if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
-                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
+                    if (entities[i]->getBodyID()) { dBodyDisable(entities[i]->getBodyID()); }
+                    if (entities[i]->getGeom())   { dGeomDisable(entities[i]->getGeom());   }
+
                     entities.erase(entities[i]->getGeom());
-                    //delete vehicles[i];
-                    //dBodyDestroy(vehicles[i]->getBodyID());
+
                 } else if (entities[i]->getHealth()<=0)
                 {
                     if (controller.controllingid == i)
@@ -702,8 +699,8 @@ void update(int value)
 
 
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
-                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
-                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
+                    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
+                    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
 
                     entities.erase(entities[i]->getGeom());
 

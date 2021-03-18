@@ -64,7 +64,7 @@ protected:
     dBodyID me=NULL;
     dGeomID geom=NULL;
 
-    struct controlregister myCopy;
+    struct controlregister registers;
 
     bool aienable = false;
     int aistatus = FREE;

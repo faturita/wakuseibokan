@@ -136,7 +136,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f fwd = getForward();
 
@@ -225,7 +225,7 @@ void Missile::doControl()
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     c.registers.thrust = 100;
 
@@ -284,7 +284,7 @@ void Missile::doControl(struct controlregister conts)
 
     setThrottle(100.0);
 
-    myCopy = conts;
+    registers = conts;
 
 }
 

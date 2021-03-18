@@ -188,6 +188,7 @@ template<class T> size_t container<T>::next(size_t index)
 
 }
 
+// The container is the ONLY component responsible of deleting all the entities.
 template<class T> void container<T>::erase(dGeomID geom)
 {
     size_t index = geomidmap[geom];

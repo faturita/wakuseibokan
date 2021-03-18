@@ -406,7 +406,7 @@ void Cephalopod::doControlDrop()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -428,7 +428,7 @@ void Cephalopod::hoover(float sp3)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -547,7 +547,7 @@ void Cephalopod::doControlLanding()
     {
         Controller c;
 
-        c.registers = myCopy;
+        c.registers = registers;
         float thrust = 0;
 
         c.registers.thrust = thrust/(10.0);
@@ -564,7 +564,7 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 

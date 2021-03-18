@@ -183,7 +183,7 @@ void AAM::doControl()
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     c.registers.thrust = 100;
 
@@ -196,7 +196,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -279,7 +279,7 @@ void AAM::doControl(struct controlregister conts)
     // Throttle is fixed when you "teleoperate" the missile.
     setThrottle(100.0);
 
-    myCopy = conts;
+    registers = conts;
 
 }
 

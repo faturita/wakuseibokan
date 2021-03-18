@@ -242,7 +242,7 @@ void Launcher::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Launcher::doControl(c);
 }

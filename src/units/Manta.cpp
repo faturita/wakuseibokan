@@ -145,7 +145,7 @@ float restrict(float value, float restriction)
 }
 void Manta::doControl()
 {
-    doControl(myCopy);
+    doControl(registers);
 }
 
 void Manta::doControl(Controller controller)

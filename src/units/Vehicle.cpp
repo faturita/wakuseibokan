@@ -1,6 +1,12 @@
 /*
  * Vehicle.cpp
  *
+ * This is the base class of all the entities in this game.
+ * C++ is great for game programming because the inherence structure provided by the loosely Object Oriented paradigm that is imprented
+ * on this language, is very handy and appropriate for the natural problem of modelling objects.
+ *
+ *
+ *
  *  Created on: Jan 16, 2011
  *      Author: faturita
  */
@@ -54,7 +60,7 @@ Vehicle::Vehicle()
 	}
 	R[0]=R[5]=R[10]=1;
 
-    memset(&myCopy,0,sizeof(struct controlregister));
+    memset(&registers,0,sizeof(struct controlregister));
     Vehicle::speed = 0;
 
     pos = Vec3f(0.0f,0.0f,0.0f);
@@ -72,9 +78,10 @@ Vehicle::Vehicle()
 
 Vehicle::~Vehicle()
 {
+    // This is the only destructor of the entire entity tree.
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
-    //CLog::Write(CLog::Debug,"Vehicle Good bye....\n");
+    //CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
 }
 
 void Vehicle::getR(float retR[12])
@@ -363,7 +370,7 @@ void Vehicle::doControl(struct controlregister)
 
 void Vehicle::setControlRegisters(struct controlregister reg)
 {
-    Vehicle::myCopy = reg;
+    Vehicle::registers = reg;
 }
 
 void  Vehicle::doDynamics(dBodyID) {
@@ -418,6 +425,8 @@ void  Vehicle::embody(dBodyID myBodySelf)
     dBodySetMass(myBodySelf,&m);
     
     me = myBodySelf;
+
+    assert(0 || !"This should not be executed.");
 }
 
 dBodyID Vehicle::getBodyID()
@@ -497,7 +506,7 @@ void Vehicle::tick()
 
 struct controlregister Vehicle::getControlRegisters()
 {
-    return myCopy;
+    return registers;
 }
 
 /**

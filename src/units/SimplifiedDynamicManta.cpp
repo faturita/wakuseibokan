@@ -217,7 +217,7 @@ void SimplifiedDynamicManta::doControlForced(Vec3f target)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
     Vec3f maptaget(target[0],0,target[2]);
@@ -257,7 +257,7 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -335,7 +335,7 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     float height = getPos()[1];
 
@@ -379,7 +379,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -497,7 +497,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -565,7 +565,7 @@ void SimplifiedDynamicManta::doControlLanding()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -668,7 +668,7 @@ void SimplifiedDynamicManta::doControlDestination()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -815,7 +815,7 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
 
     Manta::rudder = regs.precesion;
 
-    myCopy = regs;
+    registers = regs;
 
 }
 

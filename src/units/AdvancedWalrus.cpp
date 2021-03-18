@@ -232,12 +232,12 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
 
 
-
+// Executed by the AI
 void AdvancedWalrus::doControl()
 {
     switch (aistatus) {
-        case ATTACK: doControlAttack();break;
-        case DESTINATION: doControlDestination();break;
+        case ATTACK:        doControlAttack();break;
+        case DESTINATION:   doControlDestination();break;
         default: break;
     }
 }
@@ -256,6 +256,8 @@ void AdvancedWalrus::doControl(struct controlregister conts)
     elevation = conts.pitch;
 
     setAim(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+    registers.thrust = getThrottle();
 }
 
 
@@ -263,7 +265,7 @@ void AdvancedWalrus::doControlAttack()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 

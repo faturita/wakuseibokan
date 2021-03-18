@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 
-#define CONTROLLING_NONE -1
+#define CONTROLLING_NONE (size_t)-1
 
 struct controlregister
 {

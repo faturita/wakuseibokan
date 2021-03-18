@@ -165,7 +165,7 @@ void Artillery::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Artillery::doControl(c);
 }

@@ -96,7 +96,7 @@ void LaserTurret::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Turret::doControl(c);
 }

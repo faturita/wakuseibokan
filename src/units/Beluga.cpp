@@ -32,7 +32,7 @@ void Beluga::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
 
     Vec3f Po = getPos();

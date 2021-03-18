@@ -118,7 +118,7 @@ void Balaenidae::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
 
     Vec3f Po = getPos();
@@ -227,6 +227,8 @@ void Balaenidae::doControl()
     }
 
     doControl(c);
+
+    registers.thrust = getThrottle();
 }
 
 void Balaenidae::doControl(Controller controller)

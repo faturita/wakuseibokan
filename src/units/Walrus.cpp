@@ -7,20 +7,15 @@
 
 #include "Walrus.h"
 #include "../md2model.h"
-
 #include "../actions/Gunshot.h"
-
 #include "../engine.h"
+#include "../container.h"
+#include "../sounds/sounds.h"
+#include "../profiling.h"
 
 extern dWorldID world;
 extern dSpaceID space;
-#include "../container.h"
-#include "../sounds/sounds.h"
-
-#include "../profiling.h"
-
 extern container<Vehicle*> entities;
-
 extern std::unordered_map<std::string, GLuint> textures;
 
 Walrus::Walrus(int newfaction)
@@ -154,7 +149,7 @@ void Walrus::doControlAttack()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -263,7 +258,7 @@ void Walrus::doControlDestination()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
 
     Vec3f Po = getPos();
