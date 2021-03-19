@@ -16,7 +16,9 @@ extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
 {
+    // @FIXME Check this.
     delete _model;
+    assert( !"This destructor is not being executed.");
 }
 
 Balaenidae::Balaenidae(int newfaction)
@@ -131,9 +133,6 @@ void Balaenidae::doControl()
 
     Vec3f T = Pf - Po;
 
-    float eh, midpointpitch;
-
-
     if (!reached && T.magnitude()>500)
     {
         float distance = T.magnitude();
@@ -195,6 +194,8 @@ void Balaenidae::doControl()
 
         CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
+
+        /**
         if (abs(e)>=0.5f)
         {
             c.registers.roll = 30.0 * (signn>0?+1:-1) ;
@@ -208,6 +209,9 @@ void Balaenidae::doControl()
         else {
             c.registers.roll = 0.0f;
         }
+        **/
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
 
 
     } else {
@@ -221,6 +225,7 @@ void Balaenidae::doControl()
             messages.insert(messages.begin(), mg);
             reached = true;
             c.registers.thrust = 0.0f;
+            setThrottle(0.0);
             c.registers.roll = 0.0f;
             disableAuto();
         }
@@ -228,7 +233,7 @@ void Balaenidae::doControl()
 
     doControl(c);
 
-    registers.thrust = getThrottle();
+    registers.thrust = getThrottle()/10.0;
 }
 
 void Balaenidae::doControl(Controller controller)

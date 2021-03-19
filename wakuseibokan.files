@@ -48,6 +48,7 @@ src/maincarrierbackup.cpp
 src/mainworkingstd.cpp
 src/map.cpp
 src/map.h
+src/math/kdtree.cpp
 src/math/splines.hpp
 src/math/splines.inl
 src/math/vec3f.cpp

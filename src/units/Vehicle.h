@@ -33,6 +33,8 @@ enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
+enum class DST_STATUSES { STILL=0, TRAVELLING, REACHED};
+
 class Vehicle : Observable
 {
 private:
@@ -60,6 +62,7 @@ protected:
 
     // @FIXME: This is super ugly.
     bool reached=false;
+    DST_STATUSES dst_status;
     
     dBodyID me=NULL;
     dGeomID geom=NULL;

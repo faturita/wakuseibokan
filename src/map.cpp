@@ -350,16 +350,16 @@ void drawMap()
                         placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,iconsize,"units/carriertarget.bmp");
                     } else if (entities[i]->getType() == WALRUS)
                     {
-                        drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"W",0.1f,0.0f,1.0f,1.0f);
+                        placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,iconsize,"units/walrusicon.bmp");
                     } else if (entities[i]->getType() == MANTA)
                     {
                         if (entities[i]->getSubType() == MEDUSA)
                         {
-                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"S",0.1f,1.0f,0.9f,0.5f);
+                            placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,iconsize,"units/mantaicon.bmp");
 
                         } else
                         {
-                            drawString(600-entities[i]->getPos()[0]/1000-10,entities[i]->getPos()[2]/1000,0,"M",0.1f,1.0f,0.9f,0.5f);
+                            placeMark(600-entities[i]->getPos()[0]/1000.0,0+entities[i]->getPos()[2]/1000.0,iconsize,"units/mantaicon.bmp");
                         }
                     }
                 }

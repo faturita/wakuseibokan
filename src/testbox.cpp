@@ -6000,7 +6000,7 @@ void initWorldModelling(int testcase)
     case 4:initIslands();test1();test2();test3();test4();break;// Manta landing on runway
     case 5:initIslands();test1();test2();break;     // Manta landing on aircraft
     case 6:initIslands();test1();test6();break;     // Carrier stranded on island
-    case 7:test1();test2();test7();break;           //Manta crashing on water.
+    case 7:test1();test2();test7();break;           // Manta crashing on water.
     case 8:initIslands();test1();test8();break;     // Walrus reaching island.
     case 9:test1();test9();break;                   // Walrus stability.
     case 10:initIslands();test1();test10();break;   // Walrus arrive to island and build the command center.

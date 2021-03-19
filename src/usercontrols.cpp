@@ -57,6 +57,8 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
+extern int aiplayer;
+
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
 int _yoffset = 0;
@@ -457,7 +459,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->setDestination(b->getPos()+(b->getForward().normalize()*300));
+                    w->setDestination(b->getPos()+(b->getForward().normalize()*200));
                     w->enableAuto();
                 }
             } else
@@ -472,6 +474,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("bluemode") != std::string::npos)
             {
                 controller.faction = BLUE_FACTION;
+            } else
+            if (controller.str.find("aiplayergreen") != std::string::npos)
+            {
+                aiplayer = GREEN_AI;
             } else
             if (controller.str.find("save") != std::string::npos)
             {
