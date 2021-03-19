@@ -146,3 +146,4 @@ References
 * https://github.com/jacobaustin123/Titan
 * https://libigl.github.io/
 * https://twitter.com/page_eco/status/1372175858174062594?s=20
+* Core Techniques and Algorithms in Game Programming, Daniel Sanchez Crespo Dalmau, 2003
