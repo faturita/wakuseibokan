@@ -30,6 +30,8 @@ enum AISTATUS { FREE, DESTINATION, LANDING, ATTACK, DOGFIGHT, DROP };
 
 enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
+enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
+
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
@@ -60,8 +62,7 @@ protected:
 
     int signal=3;
 
-    // @FIXME: This is super ugly.
-    bool reached=false;
+    // State Machine for handling destinations.
     DST_STATUSES dst_status;
     
     dBodyID me=NULL;
@@ -74,8 +75,6 @@ protected:
 
     int status=0;
     int order=0;
-
-    GLuint texture;
 
     void setTtl(int ttlvalue);
 

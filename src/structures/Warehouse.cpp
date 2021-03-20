@@ -1,4 +1,7 @@
+#include <unordered_map>
 #include "Warehouse.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Warehouse::Warehouse(int faction)
 {
@@ -9,7 +12,7 @@ Warehouse::Warehouse(int faction)
 void Warehouse::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
 

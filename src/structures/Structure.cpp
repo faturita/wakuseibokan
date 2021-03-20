@@ -1,4 +1,7 @@
+#include <unordered_map>
 #include "Structure.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Structure::Structure()
 {
@@ -57,7 +60,7 @@ void  Structure::doDynamics()
 void Structure::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/structure.3ds",160.99f,-19.48f,76.36f,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/structure.3ds",160.99f,-19.48f,76.36f,1,textures["sky"]);
     if (_model != NULL)
     {
 
@@ -95,7 +98,7 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f,R);
 
-        _model->draw(Structure::texture);
+        _model->draw(textures["sky"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();

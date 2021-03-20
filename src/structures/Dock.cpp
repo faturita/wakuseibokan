@@ -12,7 +12,7 @@ Dock::Dock(int faction)
 void Dock::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
 

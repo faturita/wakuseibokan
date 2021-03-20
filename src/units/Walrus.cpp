@@ -17,6 +17,7 @@ extern dWorldID world;
 extern dSpaceID space;
 extern container<Vehicle*> entities;
 extern std::unordered_map<std::string, GLuint> textures;
+extern std::vector<Message> messages;
 
 Walrus::Walrus(int newfaction)
 {
@@ -45,7 +46,7 @@ void Walrus::setIsland(BoxIsland *value)
 
 void Walrus::init()
 {
-    if (getFaction()==GREEN_FACTION)
+    if (getFaction()==BLUE_FACTION)
         _model = (Model*)MD2Model::loadModel("units/walrusgood.md2");
     else {
         _model = (Model*)MD2Model::loadModel("units/walrus.md2");
@@ -269,7 +270,7 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    if (!reached && T.magnitude()>500)
+    if (dst_status != DST_STATUSES::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -343,15 +344,19 @@ void Walrus::doControlDestination()
 
 
     } else {
-        if (!reached)
+        if (dst_status != DST_STATUSES::REACHED)
         {
             char str[256];
+            Message mg;
+            mg.faction = getFaction();
             sprintf(str, "Walrus has arrived to destination.");
-            //messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
-            reached = true;
+            dst_status = DST_STATUSES::REACHED;
             aistatus = FREE;
             c.registers.thrust = 0.0f;
+            setThrottle(0.0);
             c.registers.roll = 0.0f;
             disableAuto();
         }

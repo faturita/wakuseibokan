@@ -133,7 +133,7 @@ void Balaenidae::doControl()
 
     Vec3f T = Pf - Po;
 
-    if (!reached && T.magnitude()>500)
+    if (dst_status != DST_STATUSES::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -144,7 +144,6 @@ void Balaenidae::doControl()
 
 
         // Potential fields from the islands (to avoid them)
-
         int nearesti = 0;
         float closest = 0;
         for(int i=0;i<islands.size();i++)
@@ -215,15 +214,15 @@ void Balaenidae::doControl()
 
 
     } else {
-        if (!reached)
+        if (dst_status != DST_STATUSES::REACHED )
         {
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "Balaenidae has arrived to destination.");
+            sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
-            reached = true;
+            dst_status = DST_STATUSES::REACHED;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;

@@ -46,6 +46,8 @@ public:
     void doControlDrop();
 
     void drop();
+
+    void doMaterial();
 };
 
 #endif // CEPHALOPOD_H

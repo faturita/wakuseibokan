@@ -454,11 +454,6 @@ void Vehicle::damage(int amount)
     Vehicle::health-=amount;
 }
 
-void Vehicle::setTexture(const GLuint &value)
-{
-    texture = value;
-}
-
 int Vehicle::getPower() const
 {
     return power;
@@ -599,7 +594,7 @@ int Vehicle::getFaction()
 void Vehicle::setDestination(Vec3f dest)
 {
     Vehicle::destination = dest;
-    reached = false;
+    dst_status = DST_STATUSES::TRAVELLING;
     aistatus = DESTINATION;
 }
 
@@ -700,6 +695,6 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
 
 bool Vehicle::arrived()
 {
-    return reached;
+    return dst_status == DST_STATUSES::REACHED;
 }
 

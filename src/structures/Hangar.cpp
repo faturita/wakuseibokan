@@ -1,4 +1,7 @@
+#include <unordered_map>
 #include "Hangar.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Hangar::Hangar(int faction)
 {
@@ -8,7 +11,7 @@ Hangar::Hangar(int faction)
 void Hangar::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/hangar.3ds",-19.0f,-6.36f,4.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
 
@@ -39,7 +42,7 @@ void Hangar::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f,R);
 
-        _model->draw(Structure::texture);
+        _model->draw(textures["metal"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();

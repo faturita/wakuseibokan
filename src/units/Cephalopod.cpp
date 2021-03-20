@@ -13,7 +13,7 @@ extern dSpaceID space;
 #include "../sounds/sounds.h"
 
 extern container<Vehicle*> entities;
-
+extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 
 Cephalopod::Cephalopod(int newfaction) : SimplifiedDynamicManta(newfaction)
@@ -96,7 +96,8 @@ void Cephalopod::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-180.0f, 0.0f, 1.0f, 0.0f);
 
         glColor3f(1.0,1.0f,1.0f);
-        _model->setTexture(texture);
+        doMaterial();
+        _model->setTexture(textures["metal"]);
         _model->draw();
 
         glPopMatrix();
@@ -127,6 +128,17 @@ void  Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
     viewforward = orig-position;
 }
 
+void Cephalopod::doMaterial()
+{
+    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
+
+    glEnable(GL_COLOR_MATERIAL);
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+    glMateriali(GL_FRONT, GL_SHININESS,128);
+}
 
 void Cephalopod::doControl(struct controlregister regs)
 {
@@ -434,7 +446,7 @@ void Cephalopod::hoover(float sp3)
 
     float height = Po[1];
 
-    if (!reached)
+    if (dst_status != DST_STATUSES::REACHED)
     {
         char msg[256];
         Message mg;
@@ -442,7 +454,7 @@ void Cephalopod::hoover(float sp3)
         mg.faction = getFaction();
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
-        reached = true;
+        dst_status = DST_STATUSES::REACHED;
         setStatus(Manta::HOLDING);
     }
     // Hoover
@@ -543,7 +555,7 @@ void Cephalopod::doControlLanding()
 {
     doControlDestination(destination, 350);
 
-    if (reached)
+    if (dst_status == DST_STATUSES::REACHED)
     {
         Controller c;
 
@@ -601,7 +613,7 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
     c.registers.roll = 0;
     if (height > 200)
     {
-        if (!(!reached && map(T).magnitude()>threshold))
+        if (!(dst_status != DST_STATUSES::REACHED && map(T).magnitude()>threshold))
         {
             hoover(sp3);
             return;

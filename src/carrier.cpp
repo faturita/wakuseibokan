@@ -491,6 +491,9 @@ void drawScene() {
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
+    if (Camera.pos[1]<0) // Dark under the water.
+        glColor3f(0.1,0.1,0.1);
+
     // GO with the HUD
     switch (controller.view)
     {

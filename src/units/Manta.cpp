@@ -5,10 +5,12 @@
  *      Author: faturita
  */
 
+#include <unordered_map>
 #include "Manta.h"
 #include "../md2model.h"
-
 #include "../actions/Gunshot.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Manta::Manta(int faction)
 {
@@ -97,7 +99,7 @@ void Manta::drawModel(float yRot, float xRot, float x, float y, float z)
 		glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
         glColor3f(1.0,1.0f,1.0f);
-        _model->setTexture(texture);
+        _model->setTexture(textures["metal"]);
         _model->draw();
 
         glPopMatrix();
