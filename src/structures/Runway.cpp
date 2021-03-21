@@ -83,7 +83,7 @@ void Runway::taxi(Manta *m)
 void Runway::launch(Manta* m)
 {
     m->inert = false;
-    m->setStatus(Manta::FLYING);
+    m->setStatus(FlyingStatus::FLYING);
     m->elevator = +12;
     struct controlregister c;
     c.thrust = 600.0f/(10.0);
@@ -116,7 +116,7 @@ Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::LANDED);
+        _manta1->setStatus(FlyingStatus::LANDED);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;

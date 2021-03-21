@@ -66,6 +66,7 @@ Vehicle::Vehicle()
     pos = Vec3f(0.0f,0.0f,0.0f);
 
     _model = NULL;
+    _topModel = NULL;
     speed = 0.0f;
 
     forward = Vec3f(0.0f,0.0f,1.0f);
@@ -82,6 +83,12 @@ Vehicle::~Vehicle()
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
     //CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
+
+    // @FIXME: Risky
+    if (_model != NULL) delete _model;
+    if (_topModel != NULL) delete _topModel;
+
+
 }
 
 void Vehicle::getR(float retR[12])
@@ -484,9 +491,9 @@ void Vehicle::setOrder(int value)
     order = value;
 }
 
-int Vehicle::getAistatus() const
+AutoStatus Vehicle::getAutoStatus() const
 {
-    return aistatus;
+    return autostatus;
 }
 
 void Vehicle::setTtl(int ttlvalue)
@@ -594,8 +601,8 @@ int Vehicle::getFaction()
 void Vehicle::setDestination(Vec3f dest)
 {
     Vehicle::destination = dest;
-    dst_status = DST_STATUSES::TRAVELLING;
-    aistatus = DESTINATION;
+    dst_status = DestinationStatus::TRAVELLING;
+    autostatus = AutoStatus::DESTINATION;
 }
 
 Vec3f Vehicle::getDestination() const
@@ -695,6 +702,6 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
 
 bool Vehicle::arrived()
 {
-    return dst_status == DST_STATUSES::REACHED;
+    return dst_status == DestinationStatus::REACHED;
 }
 

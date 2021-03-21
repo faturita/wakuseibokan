@@ -133,7 +133,7 @@ void Balaenidae::doControl()
 
     Vec3f T = Pf - Po;
 
-    if (dst_status != DST_STATUSES::REACHED && T.magnitude()>500)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -214,7 +214,7 @@ void Balaenidae::doControl()
 
 
     } else {
-        if (dst_status != DST_STATUSES::REACHED )
+        if (dst_status != DestinationStatus::REACHED )
         {
             char str[256];
             Message mg;
@@ -222,7 +222,7 @@ void Balaenidae::doControl()
             sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
-            dst_status = DST_STATUSES::REACHED;
+            dst_status = DestinationStatus::REACHED;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;
@@ -356,7 +356,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::ON_DECK);
+        _manta1->setStatus(FlyingStatus::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;
@@ -386,7 +386,7 @@ void Balaenidae::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
     dBodySetPosition(m->getBodyID(),pos[0],pos[1]+28,pos[2]);
-    m->setStatus(Manta::ON_DECK);
+    m->setStatus(FlyingStatus::ON_DECK);
     alignToMe(m->getBodyID());
 }
 
@@ -398,7 +398,7 @@ void Balaenidae::launch(Manta* m)
     } else
     {
         m->inert = false;
-        m->setStatus(Manta::FLYING);
+        m->setStatus(FlyingStatus::FLYING);
         m->elevator = +12;
         struct controlregister c;
         c.thrust = 600.0f/(10.0);

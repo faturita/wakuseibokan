@@ -10,6 +10,8 @@
 
 #include "Vehicle.h"
 
+enum FlyingStatus {IN_CARRIER=0, ON_DECK, LANDED, TACKINGOFF, FLYING, HOLDING, DOCKING};
+
 class Manta : public Vehicle
 {
 
@@ -21,13 +23,6 @@ protected:
 
 public:
     Manta(int newfaction);
-    static const int IN_CARRIER = 0;
-    static const int ON_DECK = 1;
-    static const int LANDED = 2;
-    static const int TACKINGOFF = 3;
-    static const int FLYING = 4;
-    static const int HOLDING = 5;
-    static const int DOCKING = 6;
 
     bool antigravity=false;
 

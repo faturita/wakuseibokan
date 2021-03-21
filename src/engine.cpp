@@ -108,9 +108,9 @@ bool arrived(Vehicle *invadingunit, Island *island)
     {
         Cephalopod *c = (Cephalopod*)invadingunit;
 
-        if (c->getStatus()!=Manta::LANDED)
+        if (c->getStatus()!=FlyingStatus::LANDED)
         {
-            c->setStatus(Manta::LANDED);
+            c->setStatus(FlyingStatus::LANDED);
             c->setIsland((BoxIsland*)island);
             char str[256];
             Message mg;
@@ -130,7 +130,7 @@ bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
+        if (manta->getStatus() == FlyingStatus::FLYING || manta->getStatus() == FlyingStatus::HOLDING)
         {
             if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid)
                 && entities[controller.controllingid] == manta)
@@ -141,7 +141,7 @@ bool landed(Vehicle *manta, Island *island)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(Manta::LANDED);
+            s->setStatus(FlyingStatus::LANDED);
 
             char str[256];
             Message mg;
@@ -231,7 +231,7 @@ bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == MANTA)
     {
-        if (vehicle->getStatus() != Manta::ON_DECK && vehicle->getStatus() != Manta::TACKINGOFF)
+        if (vehicle->getStatus() != FlyingStatus::ON_DECK && vehicle->getStatus() != FlyingStatus::TACKINGOFF)
         {
             controller.reset();
 
@@ -241,7 +241,7 @@ bool releasecontrol(Vehicle* vehicle)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(Manta::ON_DECK);
+            s->setStatus(FlyingStatus::ON_DECK);
             s->inert = true;
 
             Message mg;
@@ -1027,7 +1027,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                     Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
 
-                    if (m && m->getStatus() != Manta::LANDED)
+                    if (m && m->getStatus() != FlyingStatus::LANDED)
                     {
 
                         if (!m->isAuto())
@@ -1184,7 +1184,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         {
                             Manta *m = findMantaByOrder(lb->getFaction(), DEFEND_ISLAND);
 
-                            Manta *ml = findManta(lb->getFaction(), Manta::LANDED, lb->getPos());
+                            Manta *ml = findManta(lb->getFaction(), FlyingStatus::LANDED, lb->getPos());
 
                             if (!m && !ml)
                             {
@@ -1370,7 +1370,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
 {
-    Manta* m = findManta(spawner->getFaction(),Manta::ON_DECK, spawner->getPos());
+    Manta* m = findManta(spawner->getFaction(),FlyingStatus::ON_DECK, spawner->getPos());
 
     if (m)
     {
@@ -1467,7 +1467,7 @@ void dockManta()
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
+        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==FlyingStatus::ON_DECK)
         {
             char str[256];
             Message mg;
@@ -1487,7 +1487,7 @@ void dockManta()
 void landManta(Vehicle *landplace)
 {
     // Auto control
-    Manta *m = findManta(landplace->getFaction(),Manta::HOLDING);
+    Manta *m = findManta(landplace->getFaction(),FlyingStatus::HOLDING);
 
     landManta(landplace, m);
 }
@@ -1512,7 +1512,7 @@ Manta* taxiManta(Vehicle *v)
     if (v->getType()==CARRIER)
     {
         Balaenidae *r = (Balaenidae*)v;
-        m = findManta(r->getFaction(),Manta::ON_DECK, v->getPos());
+        m = findManta(r->getFaction(),FlyingStatus::ON_DECK, v->getPos());
         if (m)
         {
             r->taxi(m);
@@ -1526,7 +1526,7 @@ Manta* taxiManta(Vehicle *v)
     } else if (v->getType()==LANDINGABLE )
     {
         Runway *r = (Runway*)v;
-        m = findManta(r->getFaction(),Manta::LANDED, v->getPos());
+        m = findManta(r->getFaction(),FlyingStatus::LANDED, v->getPos());
         if (m)
         {
             r->taxi(m);
@@ -1541,7 +1541,7 @@ Manta* launchManta(Vehicle *v)
     if (v->getType() == CARRIER)
     {
         Balaenidae *b = (Balaenidae*)v;
-        Manta *m = findManta(v->getFaction(),Manta::ON_DECK);
+        Manta *m = findManta(v->getFaction(),FlyingStatus::ON_DECK);
         if (m)
         {
             b->launch(m);
@@ -1559,7 +1559,7 @@ Manta* launchManta(Vehicle *v)
         Runway *r = (Runway*)v;
 
         // Need to find the manta that is actually in this island.
-        Manta *m = findManta(v->getFaction(), Manta::LANDED, r->getPos());
+        Manta *m = findManta(v->getFaction(), FlyingStatus::LANDED, r->getPos());
         if (m)
         {
             r->launch(m);

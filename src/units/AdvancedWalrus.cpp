@@ -235,9 +235,9 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 // Executed by the AI
 void AdvancedWalrus::doControl()
 {
-    switch (aistatus) {
-        case ATTACK:        doControlAttack();break;
-        case DESTINATION:   doControlDestination();break;
+    switch (autostatus) {
+        case AutoStatus::ATTACK:        doControlAttack();break;
+        case AutoStatus::DESTINATION:   doControlDestination();break;
         default: break;
     }
 }

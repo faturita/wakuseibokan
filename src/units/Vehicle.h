@@ -25,8 +25,7 @@ enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEAC
 
 enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, ARTILLERY = 10, COMMANDCENTER = 11, HANGAR = 12, WAREHOUSE = 13, RUNWAY = 14, LASERTURRET = 15, TURRET = 16, LAUNCHER = 17, FACTORY = 18, DOCK = 19, ANTENNA = 20, RADAR = 21, STRUCTURE = 22 };
 
-enum AISTATUS { FREE, DESTINATION, LANDING, ATTACK, DOGFIGHT, DROP };
-
+enum class AutoStatus { FREE=1, DESTINATION, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR };
 
 enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
@@ -35,7 +34,7 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 #define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
-enum class DST_STATUSES { STILL=0, TRAVELLING, REACHED};
+enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
 
 class Vehicle : Observable
 {
@@ -63,7 +62,7 @@ protected:
     int signal=3;
 
     // State Machine for handling destinations.
-    DST_STATUSES dst_status;
+    DestinationStatus dst_status;
     
     dBodyID me=NULL;
     dGeomID geom=NULL;
@@ -71,7 +70,7 @@ protected:
     struct controlregister registers;
 
     bool aienable = false;
-    int aistatus = FREE;
+    AutoStatus autostatus = AutoStatus::FREE;
 
     int status=0;
     int order=0;
@@ -188,7 +187,7 @@ public:
     void setSignal(int value);
     int getOrder() const;
     void setOrder(int value);
-    int getAistatus() const;
+    AutoStatus getAutoStatus() const;
 
     std::string subTypeText(int code);
 };

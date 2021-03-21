@@ -173,7 +173,7 @@ void Manta::doControl(struct controlregister regs)
     {
         Manta::inert = false;
         antigravity = false;
-        setStatus(Manta::TACKINGOFF);
+        setStatus(FlyingStatus::TACKINGOFF);
     }
 
     if (speed>150)

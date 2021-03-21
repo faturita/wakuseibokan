@@ -272,8 +272,8 @@ void Cephalopod::doDynamics(dBodyID body)
 
     }
 
-    if (height > 30 && getStatus() == Manta::LANDED)
-        setStatus(Manta::FLYING);
+    if (height > 30 && getStatus() == FlyingStatus::LANDED)
+        setStatus(FlyingStatus::FLYING);
 
     Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
     Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
@@ -411,7 +411,7 @@ Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
 
 void Cephalopod::drop()
 {
-    aistatus = DROP;
+    autostatus = AutoStatus::DROP;
 }
 
 void Cephalopod::doControlDrop()
@@ -446,7 +446,7 @@ void Cephalopod::hoover(float sp3)
 
     float height = Po[1];
 
-    if (dst_status != DST_STATUSES::REACHED)
+    if (dst_status != DestinationStatus::REACHED)
     {
         char msg[256];
         Message mg;
@@ -454,8 +454,8 @@ void Cephalopod::hoover(float sp3)
         mg.faction = getFaction();
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
-        dst_status = DST_STATUSES::REACHED;
-        setStatus(Manta::HOLDING);
+        dst_status = DestinationStatus::REACHED;
+        setStatus(FlyingStatus::HOLDING);
     }
     // Hoover
     float thrust = 200;
@@ -475,23 +475,23 @@ void Cephalopod::hoover(float sp3)
 
 void Cephalopod::doControl()
 {
-    switch (aistatus) {
-    case DOGFIGHT:
+    switch (autostatus) {
+    case AutoStatus::DOGFIGHT:
         doControlDogFight();
         break;
-    case ATTACK:
+    case AutoStatus::ATTACK:
         doControlAttack();
         break;
-    case LANDING:
+    case AutoStatus::LANDING:
         doControlLanding();
         break;
-    case DROP:
+    case AutoStatus::DROP:
         doControlDrop();
         break;
-    default:case DESTINATION:
+    default:case AutoStatus::DESTINATION:
         doControlDestination(destination,1000);
         break;
-    case FREE:
+    case AutoStatus::FREE:
         setDestination(getPos()+getForward().normalize()*100);
         break;
     }
@@ -555,7 +555,7 @@ void Cephalopod::doControlLanding()
 {
     doControlDestination(destination, 350);
 
-    if (dst_status == DST_STATUSES::REACHED)
+    if (dst_status == DestinationStatus::REACHED)
     {
         Controller c;
 
@@ -567,7 +567,7 @@ void Cephalopod::doControlLanding()
         c.registers.roll = 0;
         setThrottle(thrust);
 
-        setStatus(Manta::DOCKING);
+        setStatus(FlyingStatus::DOCKING);
 
         Manta::doControl(c);
     }
@@ -613,7 +613,7 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
     c.registers.roll = 0;
     if (height > 200)
     {
-        if (!(dst_status != DST_STATUSES::REACHED && map(T).magnitude()>threshold))
+        if (!(dst_status != DestinationStatus::REACHED && map(T).magnitude()>threshold))
         {
             hoover(sp3);
             return;

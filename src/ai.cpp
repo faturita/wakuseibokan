@@ -363,7 +363,7 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
         {
             BoxIsland *i = findNearestIsland(b->getPos());
 
-            //Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
+            //Manta *m = findNearestManta(FlyingStatus::FLYING, faction,b->getPos());
 
             Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
 
@@ -667,9 +667,9 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     }
 
     // Find all the mantas around, land them, and dock them.
-    Manta *m1 = findManta(faction,Manta::ON_DECK);
-    Manta *m2 = findNearestManta(Manta::FLYING,b->getFaction(),b->getPos(),30000);
-    Manta *m3 = findNearestManta(Manta::HOLDING,b->getFaction(), b->getPos(),30000);
+    Manta *m1 = findManta(faction,FlyingStatus::ON_DECK);
+    Manta *m2 = findNearestManta(FlyingStatus::FLYING,b->getFaction(),b->getPos(),30000);
+    Manta *m3 = findNearestManta(FlyingStatus::HOLDING,b->getFaction(), b->getPos(),30000);
 
     Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 

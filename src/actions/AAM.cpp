@@ -34,9 +34,9 @@ void AAM::init()
 
     }
 
-    AAM::height=1.0f;
-    AAM::length=5.0f;
-    AAM::width=1.0f;
+    AAM::height=10.0f;
+    AAM::length=50.0f;
+    AAM::width=10.0f;
 
     AAM::mass = 1.0f;
 

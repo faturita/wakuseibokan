@@ -1,7 +1,7 @@
 ODEF:=$(shell ode-config --cflags)
 ODEFL:=$(shell ode-config --libs)
 CC = g++
-CFLAGS = -w -g -Wall $(ODEF) -I/usr/include -I/usr/include/GL -I/System/Library/Frameworks/OpenGL.framework/Headers
+CFLAGS = -std=c++17 -w -g -Wall $(ODEF) -I/usr/include -I/usr/include/GL -I/System/Library/Frameworks/OpenGL.framework/Headers
 PROG = waku
 
 SCS = src/usercontrols.cpp src/savegame.cpp src/camera.cpp src/odeutils.cpp src/map.cpp src/terrain/imageloader.cpp src/ThreeMaxLoader.cpp src/md2model.cpp src/math/vec3f.cpp src/math/yamathutil.cpp src/openglutils.cpp src/FractalNoise.cpp src/terrain/Terrain.cpp src/font/DrawFonts.cpp $(shell ls src/units/*.cpp) $(shell ls src/structures/*.cpp) $(shell ls src/actions/*.cpp) src/sounds/sounds.cpp src/engine.cpp src/commandline.cpp src/control.cpp src/ai.cpp src/profiling.cpp

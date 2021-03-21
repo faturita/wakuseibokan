@@ -722,7 +722,6 @@ T3DSModel::T3DSModel()
 T3DSModel::~T3DSModel()
 {
 
-
 }
 
 //Switches to the given animation

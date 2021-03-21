@@ -138,9 +138,9 @@ void Walrus::drawModel()
 
 void Walrus::doControl()
 {
-    switch (aistatus) {
-        case ATTACK: doControlAttack();break;
-        case DESTINATION: doControlDestination();break;
+    switch (autostatus) {
+        case AutoStatus::ATTACK:        doControlAttack();      break;
+        case AutoStatus::DESTINATION:   doControlDestination(); break;
         default: break;
     }
 
@@ -270,7 +270,7 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    if (dst_status != DST_STATUSES::REACHED && T.magnitude()>500)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -344,7 +344,7 @@ void Walrus::doControlDestination()
 
 
     } else {
-        if (dst_status != DST_STATUSES::REACHED)
+        if (dst_status != DestinationStatus::REACHED)
         {
             char str[256];
             Message mg;
@@ -353,8 +353,8 @@ void Walrus::doControlDestination()
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
-            dst_status = DST_STATUSES::REACHED;
-            aistatus = FREE;
+            dst_status = DestinationStatus::REACHED;
+            autostatus = AutoStatus::FREE;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;
@@ -587,6 +587,6 @@ void Walrus::setStatus(int status)
 
 void Walrus::attack(Vec3f target)
 {
-    aistatus = ATTACK;
+    autostatus = AutoStatus::ATTACK;
     destination = target;
 }

@@ -111,7 +111,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         c->setNumber(number);
         c->embody(world, space);
         c->setPos(pos[0],pos[1]+38, pos[2]);
-        c->setStatus(Manta::ON_DECK);
+        c->setStatus(FlyingStatus::ON_DECK);
         c->inert = false;
         alignToMe(c->getBodyID());
         v = (Vehicle*)c;
@@ -123,7 +123,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::ON_DECK);
+        _manta1->setStatus(FlyingStatus::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;

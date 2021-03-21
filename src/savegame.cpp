@@ -258,7 +258,7 @@ void loadgame()
                 _manta1->init();
                 _manta1->setNumber(findNextNumber(MANTA));
                 _manta1->embody(world, space);
-                _manta1->setStatus(Manta::FLYING);              // @FIXME, status should be stored.
+                _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
                 _manta1->inert = true;
                 v = _manta1;
                 break;

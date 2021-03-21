@@ -11,6 +11,7 @@ public:
     void virtual draw(GLuint texture) = 0;
     void virtual setAnimation(const char *name) = 0;
     void virtual setTexture(GLuint texture) = 0;
+    virtual ~Model() {  };
 };
 
 #endif // MODEL_H

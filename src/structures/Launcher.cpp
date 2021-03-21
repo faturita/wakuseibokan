@@ -28,7 +28,7 @@ void Launcher::init()
 
     Launcher::firingpos = Vec3f(0.0f,16.0f,0.0f);
 
-    aistatus = GROUND;
+    autostatus = AutoStatus::GROUND;
 
     setForward(Vec3f(0,0,1));
 }
@@ -175,10 +175,10 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 {
 
-    switch (aistatus) {
-    case GROUND:return fireGround(world,space);
+    switch (autostatus) {
+    case AutoStatus::GROUND:return fireGround(world,space);
         break;
-    case AIR:return fireAir(world, space);
+    case AutoStatus::AIR:return fireAir(world, space);
         break;
     }
 
@@ -268,12 +268,12 @@ void Launcher::doControl(Controller controller)
 
 void Launcher::ground()
 {
-    aistatus = GROUND;
+    autostatus = AutoStatus::GROUND;
 }
 
 void Launcher::air()
 {
-    aistatus = AIR;
+    autostatus = AutoStatus::AIR;
 }
 
 int Launcher::getSubType()
