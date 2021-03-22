@@ -163,10 +163,10 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
-    if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
-        setStatus(Walrus::SAILING);
-    else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
-        setStatus(Walrus::ROLLING);
+    if (getTtl()<=0 && getStatus() == SailingStatus::OFFSHORING)
+        setStatus(SailingStatus::SAILING);
+    else if (getTtl()<=0 && getStatus() == SailingStatus::INSHORING)
+        setStatus(SailingStatus::ROLLING);
 
     // This algorithm is generating too many seg faults with ODE library.
     //Vec3f dump;

@@ -70,11 +70,11 @@ bool stranded(Vehicle *carrier, Island *island)
 
 bool departed(Vehicle *walrus)
 {
-    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::ROLLING)
+    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == SailingStatus::ROLLING)
     {
         Walrus *w = (Walrus*)walrus;
 
-        w->setStatus(Walrus::OFFSHORING);
+        w->setStatus(SailingStatus::OFFSHORING);
         BoxIsland *island = w->getIsland();
         w->setIsland(NULL);
         char str[256];
@@ -90,11 +90,11 @@ bool departed(Vehicle *walrus)
 // SYNC
 bool arrived(Vehicle *invadingunit, Island *island)
 {
-    if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == Walrus::SAILING)
+    if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == SailingStatus::SAILING)
     {
         Walrus *w = (Walrus*)invadingunit;
 
-        w->setStatus(Walrus::INSHORING);
+        w->setStatus(SailingStatus::INSHORING);
         w->setIsland((BoxIsland*)island);
         char str[256];
         Message mg;
@@ -954,10 +954,24 @@ void commLink(int faction, dSpaceID space, dWorldID world)
     }
 }
 
-
+using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeomID)>>;
+std::vector<TrackRecord>   track;
 
 void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 {
+
+    int op=0;
+    for (const auto m: track)
+    {
+        dGeomID sender = std::get<0>(m);
+        dGeomID recv = std::get<1>(m);
+        auto lambda = std::get<2>(m);
+        if (!lambda(sender, recv))
+            track.erase(track.begin() + op);
+        op++;
+    }
+
+
     for (size_t j = 0; j < islands.size(); j++)
     {
         BoxIsland *island = islands[j];
@@ -1170,6 +1184,39 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             action->setDestination(target->getPos());
                             action->enableAuto();
+
+                            if (action->getType()==CONTROLABLEACTION)
+                            {
+                                switchControl(entities.indexOf(l));
+
+                            }
+
+                            auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                                Vehicle *snd = entities.find(sender);
+                                Vehicle *rec = entities.find(recv);
+
+                                if (snd != NULL && rec != NULL)
+                                {
+                                    printf ("Updating....\n");
+                                    rec->setDestination(snd->getPos());
+                                    return true;
+                                }
+                                else
+                                {
+                                    printf ("End");
+                                    return false;
+                                }
+
+
+                            };
+
+
+                            TrackRecord val;
+                            std::get<0>(val) = target->getGeom();
+                            std::get<1>(val) = action->getGeom();
+                            std::get<2>(val) = lambda;
+                            track.push_back(val);
 
                         }
                     } else
@@ -1444,7 +1491,7 @@ void dockWalrus(Vehicle *dock)
     {
         // @FIXME: Only put back the walrus that is close to the carrier.
         //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
+        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==SailingStatus::SAILING &&
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
             char msg[256];

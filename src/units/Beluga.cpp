@@ -136,7 +136,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
-        _walrus->setStatus(Walrus::SAILING);
+        _walrus->setStatus(SailingStatus::SAILING);
         _walrus->stop();
         _walrus->inert = true;
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);

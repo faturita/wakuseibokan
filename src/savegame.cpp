@@ -272,7 +272,7 @@ void loadgame()
                 _walrus->init();
                 _walrus->setNumber(findNextNumber(WALRUS));
                 _walrus->embody(world, space);
-                _walrus->setStatus(Walrus::SAILING);
+                _walrus->setStatus(SailingStatus::SAILING);
                 //_walrus->inert = true;
                 v = _walrus;
 

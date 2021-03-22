@@ -84,7 +84,17 @@ template<class T> T container<T>::operator[](size_t index)
 
 template<class T> T container<T>::find(dGeomID geom)
 {
-    size_t i = geomidmap[geom];
+    std::unordered_map<dGeomID, size_t>::const_iterator got = geomidmap.find (geom);
+
+    if ( got == geomidmap.end() )
+    {
+        return NULL;
+    }
+
+    //std::cout << got->first << " is " << got->second;
+
+    // @NOTE: If the key doesn't exists it gets created !!!  If you have to check before if it is present or not.
+    size_t i = got->second; // geomidmap[geom];
 
     if (isValid(i))
     {

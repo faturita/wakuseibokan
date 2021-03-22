@@ -690,6 +690,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
         if (m3)
         {
             landManta(b,m3);
+            b->stop();
             done2 = false;
         }
     }

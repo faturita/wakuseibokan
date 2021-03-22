@@ -512,7 +512,7 @@ void test8()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->enableAuto();
     struct controlregister c;
     c.thrust = 200.0f;
@@ -537,7 +537,7 @@ void checktest8(unsigned long  timer)      // Check Walrus entering and leaving 
             isWalrusInIsland = true;
         }
 
-        if (_walrus->getStatus() == Walrus::OFFSHORING)
+        if (_walrus->getStatus() == SailingStatus::OFFSHORING)
         {
             didWalrusLeftIsland = true;
         }
@@ -956,7 +956,7 @@ void test9()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -1056,7 +1056,7 @@ void checktest10(unsigned long timer)     // Check Walrus arriving to an island 
         _walrus->setThrottle(200.0f);
     }
 
-    if (stateMachine == 0 && _walrus->getStatus()==Walrus::ROLLING)
+    if (stateMachine == 0 && _walrus->getStatus()==SailingStatus::ROLLING)
     {
         timerstep = timer;
         stateMachine = 1;
@@ -1236,7 +1236,7 @@ void test12()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -1930,7 +1930,7 @@ void test21()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
 
     entities.push_back(_walrus, _walrus->getGeom());
 
@@ -1987,7 +1987,7 @@ void test22()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
 
     entities.push_back(_walrus, _walrus->getGeom());
 
@@ -2061,7 +2061,7 @@ void test23()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(_b->getPos()+Vec3f(-500.0f,0.0f,0.0f));
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
 
     entities.push_back(_walrus, _walrus->getGeom());
 
@@ -3143,7 +3143,7 @@ void test34()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -3208,7 +3208,7 @@ void test35()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -4074,7 +4074,7 @@ void test44()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-16000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -4131,7 +4131,7 @@ void checktest44(unsigned long timer)
 
     if (timer == 800)
     {
-        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+        Walrus *_w1 = findWalrus(SailingStatus::SAILING,BLUE_FACTION,1);
 
         BoxIsland *is = findIslandByName("Nemesis");
 
@@ -4143,7 +4143,7 @@ void checktest44(unsigned long timer)
 
     if (timer == 1200)
     {
-        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+        Walrus *_w1 = findWalrus(SailingStatus::SAILING,BLUE_FACTION,1);
         Manta *_m1 = findManta(GREEN_FACTION,FlyingStatus::FLYING);
 
         _m1->dogfight(_w1->getPos());
@@ -4153,7 +4153,7 @@ void checktest44(unsigned long timer)
 
     if (timer > 1200)
     {
-        Walrus *_w1 = findWalrus(Walrus::SAILING,BLUE_FACTION,1);
+        Walrus *_w1 = findWalrus(SailingStatus::SAILING,BLUE_FACTION,1);
         Manta *_m1 = findManta(GREEN_FACTION,FlyingStatus::FLYING);
 
         if (_m1)
@@ -4654,6 +4654,7 @@ void test48()
     Structure *t6 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
     Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Antenna(BLUE_FACTION),world);
 
 
     Vec3f pos(0.0,1.32, - 60);
@@ -5486,7 +5487,7 @@ void checktest57(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC57: Check landing after command the command center is destroyed.");
+        sprintf(msg, "TC57: Check landing after the command center is destroyed.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -5694,7 +5695,7 @@ void test60()
     _walrus->init();
     _walrus->embody(world, space);
     _walrus->setPos(0.0f,20.5f,-5000.0f);
-    _walrus->setStatus(Walrus::SAILING);
+    _walrus->setStatus(SailingStatus::SAILING);
 
     size_t idx = entities.push_back(_walrus, _walrus->getGeom());
 
@@ -5952,6 +5953,159 @@ void checktest62(unsigned int timer)
 
 }
 
+void test64()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t10 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t11 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t12 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t13 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t14 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t15 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t16 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+
+void checktest64(unsigned long timer)
+{
+    /**
+    static Vehicle *action = NULL;
+
+    if (timer == 100)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        size_t idx=0;
+        spawnManta(space,world,_b,idx);
+    }
+
+    if (timer == 320)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        // launch
+        launchManta(_b);
+    }
+
+
+    if (timer == 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,FlyingStatus::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(FlyingStatus::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (timer == 650)
+    {
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(FlyingStatus::FLYING);
+
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+
+        _manta1->setDestination(Vec3f(1000,1000,1000));
+        _manta1->enableAuto();
+    }
+
+    if (timer == 1220)
+    {
+        BoxIsland *island = findIslandByName(std::string("Nemesis"));
+        Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
+
+        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
+
+
+        if (!target)
+            return;
+
+        printf("Found target %p\n",  target);
+
+        Vehicle *b = target;
+
+        Vec3f firingloc = lb->getPos();
+
+        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
+
+        lb->elevation = -5; // A little bit up.
+        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
+
+        struct controlregister c;
+        c.pitch = 0.0;
+        c.roll = 0.0;
+        //lb->setControlRegisters(c);
+        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
+
+        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+        action = (lb)->fireAir(world,space);
+
+        if (action != NULL)
+        {
+            size_t i = entities.push_back(action, action->getGeom());
+            //gunshot();
+
+            //action->setDestination(b->getPos());
+
+            //action->enableAuto();
+
+            if (action->getType()==CONTROLABLEACTION)
+            {
+                switchControl(entities.indexOf(i));
+
+            }
+        }
+    }
+
+    if (timer > 1021)
+    {
+        if (action)
+        {
+            BoxIsland *island = findIslandByName(std::string("Nemesis"));
+            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
+
+            if (!target)
+                return;
+
+            std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
+
+            action->setDestination(target->getPos());
+            action->enableAuto();
+
+        }
+    }**/
+
+}
 
 static int testing=-1;
 
@@ -6056,6 +6210,7 @@ void initWorldModelling(int testcase)
     case 60:test60();break;                         // Walrus evades Carrier using potential fields.
     case 61:test61();break;                         // Using Cephalopod to build the command center.
     case 62:test62();break;                         // Performance measurement (several carriers, Mantas and walruses)
+    case 64:test64();break;                         // Manta attacks island and it is defended by missile launchers.
     default:initIslands();test1();break;
     }
 
@@ -6136,6 +6291,7 @@ void worldStep(int value)
     case 60:checktest60(timer);break;
     case 61:checktest61(timer);break;
     case 62:checktest62(timer);break;
+    case 64:checktest64(timer);break;
 
     default: break;
     }

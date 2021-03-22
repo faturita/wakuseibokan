@@ -11,6 +11,8 @@
 #include "Vehicle.h"
 #include "../terrain/Terrain.h"
 
+enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING};
+
 class Walrus : public Vehicle
 {
 protected:
@@ -23,10 +25,6 @@ protected:
 
 public:
     Walrus(int faction);
-    static const int INSHORING = 3;
-    static const int OFFSHORING = 2;
-    static const int ROLLING = 1;
-    static const int SAILING = 0;
 
 	void virtual init();
     int  virtual getType();
