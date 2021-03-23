@@ -1265,6 +1265,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
 void buildAndRepair(dSpaceID space, dWorldID world)
 {
+    buildAndRepair(false, space, world);
+}
+
+void buildAndRepair(bool force, dSpaceID space, dWorldID world)
+{
     for (size_t i = 0; i < islands.size(); i++)
     {
         BoxIsland *island = islands[i];
@@ -1274,7 +1279,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
             CommandCenter *c = findCommandCenter(island);
             if (c)
             {
-                if (c->getTtl()<=0)
+                if (c->getTtl()<=0 || force)
                 {
                     // Structures can be rotated.  This is important for runways.
                     float prob = ((int)(rand() % 100 + 1))/100.0f;
@@ -1296,9 +1301,10 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.85;tp.onlyonce=true;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.4;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.6;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
@@ -1311,6 +1317,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
@@ -1321,12 +1328,13 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
 
                     }
 
                     int which = (rand() % islandstructs.size());
 
-                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f<%10.5f.\n", which, prob, islandstructs[which].chance );
+                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", which, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 

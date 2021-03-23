@@ -22,6 +22,8 @@ src/actions/actions.h
 src/ai.cpp
 src/ai.h
 src/anothermain.cpp
+src/board.cpp
+src/board.h
 src/boilerplate.cpp
 src/camera.cpp
 src/camera.h

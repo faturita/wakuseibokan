@@ -68,6 +68,7 @@
 #include "structures/Turret.h"
 
 #include "map.h"
+#include "board.h"
 
 #include "ai.h"
 
@@ -499,6 +500,7 @@ void drawScene() {
     {
     case 1: drawHUD();break;
     case 2: drawMap();break;
+    case 3: drawBoard();break;
     }
 
 	glDisable(GL_TEXTURE_2D);
@@ -766,6 +768,7 @@ int main(int argc, char** argv) {
         glutInitWindowSize(1200, 800);
     else
         glutFullScreen();
+
 
     // OpenGL Configuration information
     /* get version info */

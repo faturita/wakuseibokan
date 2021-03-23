@@ -162,6 +162,7 @@ void list();
 int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
+void buildAndRepair(bool force, dSpaceID space, dWorldID world);
 
 void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
 

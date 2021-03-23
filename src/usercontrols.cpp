@@ -95,7 +95,8 @@ void processMouse(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
-                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || entities[controller.controllingid]->getType() == CONTROLABLEACTION) )
+                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || (entities[controller.controllingid]->getType() == CONTROLABLEACTION) ||
+                 (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ) )
         {
             CLog::Write(CLog::Debug,"Active control\n");
             // Activate airplane controller.

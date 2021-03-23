@@ -536,6 +536,13 @@ void initWorldPopulation()
             else if (islands[j]->getZ()< (200 kmf))
                 captureIsland(islands[j],GREEN_FACTION,which, space,world);
         }
+
+        // Accelerate time
+        for (int j=0;j<1000;j++)
+        {
+            buildAndRepair(true,space,world);
+        }
+
     }
 
 }
