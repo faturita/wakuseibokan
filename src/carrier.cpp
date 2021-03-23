@@ -82,15 +82,10 @@ float horizon = 100000.0f;   // 100 kmf
 
 extern dWorldID world;
 extern dSpaceID space;
-extern dBodyID body[NUM];
-extern dJointID joint[NUM-1];
 extern dJointGroupID contactgroup;
-extern dGeomID sphere[NUM];
 
 extern container<Vehicle*> entities;
-
 extern std::vector<BoxIsland*> islands;
-
 std::ofstream msgboardfile;
 extern std::vector<Message> messages;
 

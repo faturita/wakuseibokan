@@ -68,6 +68,22 @@ int height = 800;
 int mapzoom=1;
 int cx=width/2,cy=height/2;
 
+/**
+ * 0 --------------------------------- 1200 --------------------------------------------|
+ *
+ * 800
+ * |
+ * |
+ * |                        600, 0 is the center
+ * |
+ * |
+ * |
+ * 0
+ */
+
+
+
+
 
 void placeMark(int x, int y, int size, const char* modelName)
 {

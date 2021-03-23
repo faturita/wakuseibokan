@@ -5994,116 +5994,49 @@ void test64()
 
 void checktest64(unsigned long timer)
 {
-    /**
-    static Vehicle *action = NULL;
+    static bool isMantaPresent = false;
 
-    if (timer == 100)
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
     {
-        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        size_t idx=0;
-        spawnManta(space,world,_b,idx);
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC64: Verifying launcher destroys Mantas by missiles.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
     }
 
-    if (timer == 320)
+    if (timer > 1000 && !isMantaPresent)
     {
-        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
-        // launch
-        launchManta(_b);
-    }
+        Vehicle *v = findManta(GREEN_FACTION);
 
-
-    if (timer == 420)
-    {
-        Vehicle *_b = findManta(GREEN_FACTION,FlyingStatus::FLYING);
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
-        _manta1->inert = false;
-        _manta1->enableAuto();
-        _manta1->setStatus(FlyingStatus::FLYING);
-        _manta1->elevator = +5;
-        struct controlregister c;
-        c.thrust = 400.0f/(10.0);
-        c.pitch = 5;
-        _manta1->setControlRegisters(c);
-        _manta1->setThrottle(400.0f);
-        _manta1->disableAuto();
-    }
-
-    if (timer == 650)
-    {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)findManta(FlyingStatus::FLYING);
-
-        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
-
-        _manta1->setDestination(Vec3f(1000,1000,1000));
-        _manta1->enableAuto();
-    }
-
-    if (timer == 1220)
-    {
-        BoxIsland *island = findIslandByName(std::string("Nemesis"));
-        Launcher *lb = (Launcher*) entities[islands[0]->getStructures()[0]];
-
-        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
-
-
-        if (!target)
-            return;
-
-        printf("Found target %p\n",  target);
-
-        Vehicle *b = target;
-
-        Vec3f firingloc = lb->getPos();
-
-        std::cout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
-
-        lb->elevation = -5; // A little bit up.
-        lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-
-        struct controlregister c;
-        c.pitch = 0.0;
-        c.roll = 0.0;
-        //lb->setControlRegisters(c);
-        lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
-
-        std::cout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
-
-        action = (lb)->fireAir(world,space);
-
-        if (action != NULL)
+        if (v)
         {
-            size_t i = entities.push_back(action, action->getGeom());
-            //gunshot();
-
-            //action->setDestination(b->getPos());
-
-            //action->enableAuto();
-
-            if (action->getType()==CONTROLABLEACTION)
-            {
-                switchControl(entities.indexOf(i));
-
-            }
+            isMantaPresent = true;
         }
     }
 
-    if (timer > 1021)
+    if (timer > 2000 && isMantaPresent)
     {
-        if (action)
+        Vehicle *v = findManta(GREEN_FACTION);
+
+        if (!v)
         {
-            BoxIsland *island = findIslandByName(std::string("Nemesis"));
-            Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION, VehicleTypes::MANTA, island->getPos(), 9 * 3.6 kmf);
-
-            if (!target)
-                return;
-
-            std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
-
-            action->setDestination(target->getPos());
-            action->enableAuto();
-
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
         }
-    }**/
+    }
+
+    if (timer > 6000)
+    {
+        printf("Test Failed:  Manta should have been hit by a Missile and got destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+
 
 }
 

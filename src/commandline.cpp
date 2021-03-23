@@ -12,7 +12,7 @@
  *					de comando.
  * pcOpcion			Modificador a buscar en la línea de comandos.
  */
-char * getCommandLineParameter(int argc, char* argv[], char *pcOpcion)
+char * getCommandLineParameter(int argc, char* argv[], const char *pcOpcion)
 {
     char *pcValor;
 
@@ -30,7 +30,7 @@ char * getCommandLineParameter(int argc, char* argv[], char *pcOpcion)
     return NULL;
 }
 
-int isPresentCommandLineParameter(int argc, char *argv[], char *pcOpcion)
+int isPresentCommandLineParameter(int argc, char *argv[], const char *pcOpcion)
 {
     char *pcValor;
 
@@ -56,7 +56,7 @@ int isPresentCommandLineParameter(int argc, char *argv[], char *pcOpcion)
  * pcOpcion			Modificador a buscar.
  * iDefault			Valor entero a devolver si no se encuentra pcOpcion.
  */
-int getDefaultedIntCommandLineParameter(int argc, char* argv[], char *pcOpcion, int iDefault)
+int getDefaultedIntCommandLineParameter(int argc, char* argv[], const char *pcOpcion, int iDefault)
 {
     char *pcValor = getCommandLineParameter(argc,argv,pcOpcion);
 
