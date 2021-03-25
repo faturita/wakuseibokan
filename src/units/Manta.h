@@ -1,7 +1,9 @@
 /*
  * Manta.h
  *
- *  Created on: Jan 16, 2011
+ * Remember Mobula Ray
+ *
+ * Created on: Jan 16, 2011
  *      Author: faturita
  */
 

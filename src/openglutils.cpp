@@ -622,7 +622,7 @@ void initTextures()
     textures["road"] = _texture;
     delete image;
 
-    image = loadBMP("structures/military.bmp");
+    image = loadBMP("structures/command.bmp");
     assert( image != NULL || !"Something went wrong." );
     _texture = loadTexture(image);
     textures["military"] = _texture;

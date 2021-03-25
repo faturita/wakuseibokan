@@ -960,17 +960,17 @@ std::vector<TrackRecord>   track;
 void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 {
 
-    int op=0;
-    for (const auto m: track)
+    // @NOTE: Going in reverse order because if the element is deleted from track, the indexes of all the other elements change too.
+    for (int i = track.size() - 1; i >= 0; i--)
     {
+        const auto m = track[i];
         dGeomID sender = std::get<0>(m);
         dGeomID recv = std::get<1>(m);
         auto lambda = std::get<2>(m);
         if (!lambda(sender, recv))
-            track.erase(track.begin() + op);
-        op++;
-    }
+            track.erase(track.begin() + i);
 
+    }
 
     for (size_t j = 0; j < islands.size(); j++)
     {
@@ -1187,7 +1187,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action->getType()==CONTROLABLEACTION)
                             {
-                                switchControl(entities.indexOf(l));
+                                //switchControl(entities.indexOf(l));
 
                             }
 
