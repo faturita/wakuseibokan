@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <queue>
 #include "../math/vec3f.h"
 #include "../math/yamathutil.h"
 #include "../model.h"
@@ -25,7 +26,7 @@ enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEAC
 
 enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, ARTILLERY = 10, COMMANDCENTER = 11, HANGAR = 12, WAREHOUSE = 13, RUNWAY = 14, LASERTURRET = 15, TURRET = 16, LAUNCHER = 17, FACTORY = 18, DOCK = 19, ANTENNA = 20, RADAR = 21, STRUCTURE = 22 };
 
-enum class AutoStatus { FREE=1, DESTINATION, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR };
+enum class AutoStatus { FREE=1, DESTINATION, WAYPOINT, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR };
 
 enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
@@ -59,6 +60,8 @@ protected:
     Vec3f destination;
     Vec3f attitude;         // This is the set point for forward.
 
+    std::queue<Vec3f> waypoints;
+
     int signal=3;
 
     // State Machine for handling destinations.
@@ -78,6 +81,8 @@ protected:
     void setTtl(int ttlvalue);
 
     void setFaction(int newfaction);
+
+
     
 public:
     bool inert=false;
@@ -88,6 +93,8 @@ public:
     
     int virtual getType();
     int virtual getSubType();
+
+    void setAutoStatus(AutoStatus au);
     
 	void virtual init();
 	void setSpeed(float speed);
@@ -146,10 +153,14 @@ public:
     void setControlRegisters(struct controlregister);
 
     float getBearing();
-    void setDestination(Vec3f target);
+    void goTo(Vec3f target);
     Vec3f getDestination() const;
 
+    void addWaypoint(Vec3f target);
+    void clearWaypoints();
+
     void virtual attack(Vec3f target);
+    void setDestination(Vec3f dest);
 
     void setAttitude(Vec3f attit);
     Vec3f getAttitude();
@@ -162,6 +173,8 @@ public:
     bool isAuto();
     void enableAuto();
     void disableAuto();
+
+    void goWaypoints();
 
     bool arrived();
 

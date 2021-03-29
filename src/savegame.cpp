@@ -130,6 +130,10 @@ void savegame()
             p = entities[i]->getDestination();
             ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
 
+            int autostatus = static_cast<int>(entities[i]->getAutoStatus());
+
+            ss << autostatus << std::endl;
+
 
         }
     }
@@ -300,7 +304,14 @@ void loadgame()
             ( isauto ? v->enableAuto() : v->disableAuto());
 
             ss >> f[0] >> f[1] >> f[2] ;
-            v->setDestination(f);
+            v->goTo(f);
+
+            int autostatus;
+            ss >> autostatus;
+
+            AutoStatus autos=static_cast<AutoStatus>(autostatus);
+            v->setAutoStatus(autos);
+
 
             entities.push_back(v, v->getGeom());
         }

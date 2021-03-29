@@ -700,7 +700,8 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
 
             vector = vector.normalize();
 
-            b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
+            b->goTo(is->getPos()+Vec3f(3500.0f * vector));
+            b->setAutoStatus(AutoStatus::DESTINATION);
             b->enableAuto();
             status = 1;
         }
@@ -717,7 +718,8 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
             printf("Carries has arrived to destination.\n");
 
             Walrus* w = spawnWalrus(space,world,b);
-            w->setDestination(is->getPos());
+            w->goTo(is->getPos());
+            w->setAutoStatus(AutoStatus::DESTINATION);
             w->enableAuto();
             status = 2;
 
@@ -750,7 +752,8 @@ void playFaction(int faction, dSpaceID space, dWorldID world)
 
         if (w)
         {
-            w->setDestination(b->getPos()+Vec3f(0.0f,0.0f,-50.0f));
+            w->goTo(b->getPos()+Vec3f(0.0f,0.0f,-50.0f));
+            w->setAutoStatus(AutoStatus::DESTINATION);
             w->enableAuto();
             status = 4;
         }

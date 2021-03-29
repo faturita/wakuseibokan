@@ -1003,7 +1003,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                 {
                     if (timer==(sc->getTimer() + 10))
                     {
-                        m->setDestination(island->getPos());
+                        m->goTo(island->getPos());
                     }
 
                     if (timer==(sc->getTimer() + 1000))
@@ -1182,7 +1182,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             size_t l = entities.push_back(action,action->getGeom());
                             gunshot();
 
-                            action->setDestination(target->getPos());
+                            action->goTo(target->getPos());
                             action->enableAuto();
 
                             if (action->getType()==CONTROLABLEACTION)
@@ -1552,10 +1552,8 @@ void landManta(Vehicle *landplace, Manta *m)
     if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
     {
         if (m)
-        {
-            m->setDestination(landplace->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
-            m->setAttitude(landplace->getForward());
-            m->land();
+        {           
+            m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }
     }

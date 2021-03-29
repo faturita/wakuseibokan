@@ -496,6 +496,11 @@ AutoStatus Vehicle::getAutoStatus() const
     return autostatus;
 }
 
+void Vehicle::setAutoStatus(AutoStatus au)
+{
+    autostatus = au;
+}
+
 void Vehicle::setTtl(int ttlvalue)
 {
     Vehicle::ttl = ttlvalue;
@@ -598,11 +603,34 @@ int Vehicle::getFaction()
     return faction;
 }
 
-void Vehicle::setDestination(Vec3f dest)
+void Vehicle::goTo(Vec3f dest)
 {
     Vehicle::destination = dest;
     dst_status = DestinationStatus::TRAVELLING;
     autostatus = AutoStatus::DESTINATION;
+}
+
+
+void Vehicle::setDestination(Vec3f dest)
+{
+    Vehicle::destination = dest;
+}
+
+void Vehicle::goWaypoints()
+{
+    dst_status = DestinationStatus::STILL;
+    autostatus = AutoStatus::WAYPOINT;
+}
+
+void Vehicle::addWaypoint(Vec3f waypoint)
+{
+    waypoints.push(waypoint);
+}
+
+void Vehicle::clearWaypoints()
+{
+    while (!waypoints.empty())
+        waypoints.pop();
 }
 
 Vec3f Vehicle::getDestination() const

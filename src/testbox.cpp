@@ -626,7 +626,7 @@ void checktest15(unsigned long timer)
 
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
-        _manta1->setDestination(_b->getPos()-_b->getForward().normalize()*(10 kmf));
+        _manta1->goTo(_b->getPos()-_b->getForward().normalize()*(10 kmf));
         _manta1->setAttitude(_b->getForward());
         _manta1->enableAuto();
     }
@@ -653,7 +653,7 @@ void checktest15(unsigned long timer)
         if (_manta1)
         {
             runonce {
-                _manta1->setDestination(_b->getPos());
+                _manta1->goTo(_b->getPos());
                 _manta1->setAttitude( _b->getForward());
                 _manta1->land();
                 _manta1->enableAuto();
@@ -1934,7 +1934,7 @@ void test21()
 
     entities.push_back(_walrus, _walrus->getGeom());
 
-    _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
+    _walrus->goTo(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
 
 }
@@ -1991,7 +1991,7 @@ void test22()
 
     entities.push_back(_walrus, _walrus->getGeom());
 
-    _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
+    _walrus->goTo(t->getPos()-Vec3f(0.0f,0.0f,-100.0f));
     _walrus->enableAuto();
 }
 
@@ -2065,7 +2065,7 @@ void test23()
 
     entities.push_back(_walrus, _walrus->getGeom());
 
-    _walrus->setDestination(t->getPos()-Vec3f(0.0f,0.0f,100.0f));
+    _walrus->goTo(t->getPos()-Vec3f(0.0f,0.0f,100.0f));
     _walrus->enableAuto();
 }
 
@@ -3087,7 +3087,7 @@ void checktest33(unsigned long timer)
 
         Manta *m = findManta(GREEN_FACTION,FlyingStatus::FLYING);
 
-        m->setDestination(Vec3f(i->getX(),1000.0, i->getZ()));
+        m->goTo(Vec3f(i->getX(),1000.0, i->getZ()));
         m->enableAuto();
 
         //m->attack(Vec3f(200.0, 0.0, -100.0f));
@@ -3238,8 +3238,7 @@ void checktest35(unsigned long timer)
         Vec3f ff = Vec3f(-10000.0f,-1.0,-4000.0f) + Vec3f(+200,0,-100);
 
 
-        a->setDestination(ff);
-
+        a->goTo(ff);
         a->enableAuto();
 
         if (a->getType()==CONTROLABLEACTION)
@@ -3263,8 +3262,7 @@ void checktest35(unsigned long timer)
             i = entities.push_back(a, a->getGeom());
 
 
-        a->setDestination(bg->getPos());
-
+        a->goTo(bg->getPos());
         a->enableAuto();
 
         if (a->getType()==CONTROLABLEACTION)
@@ -3400,7 +3398,7 @@ void checktest36(unsigned long timer)
 
                 std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
 
-                action->setDestination(target->getPos());
+                action->goTo(target->getPos());
                 action->enableAuto();
             }
         }
@@ -3560,7 +3558,7 @@ void checktest37(unsigned long timer)
 
             std::cout << target <<  ":Loc: " << action->getPos() << " Target: " << target->getPos() << std::endl;
 
-            action->setDestination(target->getPos());
+            action->goTo(target->getPos());
             action->enableAuto();
 
         }
@@ -4135,7 +4133,7 @@ void checktest44(unsigned long timer)
 
         BoxIsland *is = findIslandByName("Nemesis");
 
-        _w1->setDestination(is->getPos());
+        _w1->goTo(is->getPos());
         _w1->enableAuto();
 
     }
@@ -4673,7 +4671,7 @@ void checktest48(unsigned long timer)
         Vehicle *b = findCarrier(GREEN_FACTION);
         Walrus* w = spawnWalrus(space,world,b);
 
-        w->setDestination(Vec3f(0,0,0));
+        w->goTo(Vec3f(0,0,0));
         w->enableAuto();
     }
 
@@ -4963,7 +4961,7 @@ void checktest52(unsigned long timer)
 
         controller.controllingid = idx;
 
-        m->setDestination(Vec3f(+20000,10.0,-4500));
+        m->goTo(Vec3f(+20000,10.0,-4500));
     }
 
     if (timer == starttime + 150)
@@ -5056,7 +5054,7 @@ void checktest53(unsigned long timer)
 
         controller.controllingid = idx;
 
-        m->setDestination(Vec3f(+2000,10.0,-4500));
+        m->goTo(Vec3f(+2000,10.0,-4500));
     }
 
     if (timer == starttime + 150)
@@ -5097,7 +5095,7 @@ void checktest53(unsigned long timer)
                 printf ("Distance to carrier %10.8f", (b->getPos()-m->getPos()).magnitude());
                 if ( (b->getPos()-m->getPos()).magnitude() > 1000)
                 {
-                    m->setDestination(b->getPos());
+                    m->goTo(b->getPos());
                     m->enableAuto();
                 } else {
                     runonce {landManta(b,m);}
@@ -5283,7 +5281,7 @@ void checktest55(unsigned long timer)
     {
         Manta *m = (Manta*)findManta(BLUE_FACTION);
 
-        m->setDestination(Vec3f(100 kmf, 0, 100 kmf));
+        m->goTo(Vec3f(100 kmf, 0, 100 kmf));
         m->enableAuto();
 
         char msg[256];
@@ -5379,7 +5377,7 @@ void checktest56(unsigned long timer)
 
         Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
 
-        _manta1->setDestination(_b->getPos()-_b->getForward().normalize()*(10 kmf));
+        _manta1->goTo(_b->getPos()-_b->getForward().normalize()*(10 kmf));
         _manta1->setAttitude(_b->getForward());
         _manta1->enableAuto();
     }
@@ -5405,7 +5403,7 @@ void checktest56(unsigned long timer)
 
         {
             runonce {
-                _b->setDestination(_b->getPos()+Vec3f(-1000,0,0));
+                _b->goTo(_b->getPos()+Vec3f(-1000,0,0));
                 _b->enableAuto();
             }
         }
@@ -5414,7 +5412,7 @@ void checktest56(unsigned long timer)
         {
             {
                 runonce {
-                    _manta1->setDestination(_b->getPos());
+                    _manta1->goTo(_b->getPos());
                     _manta1->setAttitude( _b->getForward());
                     _manta1->land();
                     _manta1->enableAuto();
@@ -5499,7 +5497,7 @@ void checktest57(unsigned long timer)
 
         {
             runonce {
-                _b->setDestination(_b->getPos()+Vec3f(-1000,0,0));
+                _b->goTo(_b->getPos()+Vec3f(-1000,0,0));
                 _b->enableAuto();
             }
         }
@@ -5953,6 +5951,119 @@ void checktest62(unsigned int timer)
 
 }
 
+void test63()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Vec3f Pf = _b->getPos();
+    Vec3f attitude = _b->getForward();
+    Vec3f trans = attitude.rotateOnY(PI/2.0);
+
+    Vec3f w[5];
+    w[4] = (Pf);
+    w[3] = (Pf - attitude.normalize()*(05 kmf)) ;
+    w[2] = (Pf - attitude.normalize()*(10 kmf)) ;
+    w[1] = (Pf - (attitude.normalize()*(20 kmf) + trans.normalize()*(5 kmf))) ;
+    w[0] = (Pf - (attitude.normalize()*(10 kmf) + trans.normalize()*(10 kmf))) ;
+
+    for(int i=0;i<5;i++)
+    {
+        BoxVehicle * _bo= new BoxVehicle();
+        _bo->init();
+        _bo->embody(world, space);
+        w[i][1] = 250;
+        _bo->setPos(w[i]);
+        _bo->antigravity(_bo->getBodyID());
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+    }
+
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Launcher(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,           -330.0f,    230.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t10 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t11 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t12 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t13 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t14 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t15 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t16 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+    Structure *t17 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest63(unsigned int timer)
+{
+    Vehicle *b = findCarrier(GREEN_FACTION);
+
+    long unsigned starttime = 200;
+    static Vehicle *manta = NULL;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC63: Order Manta to follow a path using waypoints.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 500)
+    {
+        size_t idx = 0;
+        Vehicle *m = spawnManta(space,world,b,idx);
+
+        manta = m;
+    }
+
+    if (timer == 800)
+    {
+        // launch
+        launchManta(b);
+    }
+
+    if (timer == 1000)
+    {
+        Vec3f w1 = Vec3f(0,1000.0f, 15000.0f);
+        Vec3f w2 = Vec3f(30000,10000.0,0.0f);
+        Vec3f w3 = Vec3f(-30000.0f, 300.0f, 0.0f);
+
+        manta->addWaypoint(w1);
+        manta->addWaypoint(w2);
+        manta->addWaypoint(w3);
+        manta->goWaypoints();
+        manta->enableAuto();
+
+    }
+
+    if (timer == 2000)
+    {
+        landManta(b,(Manta*)manta);
+    }
+}
+
 void test64()
 {
     // Entities will be added later in time.
@@ -6143,6 +6254,7 @@ void initWorldModelling(int testcase)
     case 60:test60();break;                         // Walrus evades Carrier using potential fields.
     case 61:test61();break;                         // Using Cephalopod to build the command center.
     case 62:test62();break;                         // Performance measurement (several carriers, Mantas and walruses)
+    case 63:test63();break;                         // Manta travels through different waypoints.
     case 64:test64();break;                         // Manta attacks island and it is defended by missile launchers.
     default:initIslands();test1();break;
     }
@@ -6162,8 +6274,8 @@ void worldStep(int value)
 
     switch(testing)
     {
-    case 1:checktest1(timer);break; // Check system stability with islands and carrier.
-    case 2:checktest2(timer);break; // Check Manta droping on island when trust is interrupted.
+    case 1:checktest1(timer);break;
+    case 2:checktest2(timer);break;
     case 3:checktest3(timer);break;
     case 4:checktest4(timer);break;
     case 5:checktest5(timer);break;
@@ -6224,6 +6336,7 @@ void worldStep(int value)
     case 60:checktest60(timer);break;
     case 61:checktest61(timer);break;
     case 62:checktest62(timer);break;
+    case 63:checktest63(timer);break;
     case 64:checktest64(timer);break;
 
     default: break;

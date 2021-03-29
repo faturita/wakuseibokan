@@ -51,7 +51,7 @@ public:
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);
-    void virtual land();
+    void virtual land(Vec3f landplace, Vec3f placeattitude);
     void virtual doHold(Vec3f target, float thrust);
     void virtual attack(Vec3f target);
     void virtual dogfight(Vec3f target);

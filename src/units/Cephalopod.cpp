@@ -492,7 +492,8 @@ void Cephalopod::doControl()
         doControlDestination(destination,1000);
         break;
     case AutoStatus::FREE:
-        setDestination(getPos()+getForward().normalize()*100);
+        goTo(getPos()+getForward().normalize()*100);
+        setAutoStatus(AutoStatus::DESTINATION);
         break;
     }
 

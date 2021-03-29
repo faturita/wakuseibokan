@@ -30,7 +30,7 @@ void Manta::release(Vec3f orientation)
     assert(!"Not implemented");
 }
 
-void Manta::land()
+void Manta::land(Vec3f landplace, Vec3f placeattitude)
 {
     assert(!"Not implemented");
 }
