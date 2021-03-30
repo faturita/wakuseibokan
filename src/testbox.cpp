@@ -653,9 +653,7 @@ void checktest15(unsigned long timer)
         if (_manta1)
         {
             runonce {
-                _manta1->goTo(_b->getPos());
-                _manta1->setAttitude( _b->getForward());
-                _manta1->land();
+                _manta1->land(_b->getPos(),_b->getForward() );
                 _manta1->enableAuto();
             }
         }
@@ -2921,6 +2919,7 @@ void checktest31(unsigned long timer)
     {
         _walrus->enableAuto();
         struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
         c.thrust = 0.0f;
         c.roll = 8.0f;
         _walrus->setControlRegisters(c);
@@ -2931,21 +2930,23 @@ void checktest31(unsigned long timer)
     {
         _walrus->enableAuto();
         struct controlregister c;
+        memset(&c,0,sizeof(struct controlregister));
         c.thrust = 0.0f;
         c.roll = 0.0f;
         _walrus->setControlRegisters(c);
         _walrus->stop();
     }
 
-    if (timer == 300)
+    if (timer > 300 && timer < 900)
     {
 
         _walrus->enableAuto();
         struct controlregister c;
-        c.thrust = 10000.0f;
+        memset(&c,0,sizeof(struct controlregister));
+        c.thrust = ((timer-300)/12.0)*10.0f;
         c.roll = 0;
         _walrus->setControlRegisters(c);
-        _walrus->setThrottle(10000.0f);
+        _walrus->setThrottle(((timer-300)/12.0)*10.0f);
     }
 
     if (timer == 3000)
@@ -4677,7 +4678,7 @@ void checktest48(unsigned long timer)
 
     // Walrus will approach the island, and hopefully will be destroyed
 
-    if (timer > starttime + 10000)
+    if (timer > starttime + 20000)
     {
         Manta *m = findMantaByOrder(BLUE_FACTION,DEFEND_ISLAND);
 
@@ -5412,9 +5413,7 @@ void checktest56(unsigned long timer)
         {
             {
                 runonce {
-                    _manta1->goTo(_b->getPos());
-                    _manta1->setAttitude( _b->getForward());
-                    _manta1->land();
+                    _manta1->land(_b->getPos(),_b->getForward());
                     _manta1->enableAuto();
                 }
             }
