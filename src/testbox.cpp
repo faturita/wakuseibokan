@@ -3191,7 +3191,7 @@ void test35()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setPos(0.0f,20.5f,-6000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
