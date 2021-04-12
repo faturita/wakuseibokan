@@ -1,9 +1,12 @@
+#include <unordered_map>
 #include "Artillery.h"
 #include "../actions/Shell.h"
 
 #include "../sounds/sounds.h"
 
 #include "../profiling.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Artillery::Artillery(int faction)
 {
@@ -14,7 +17,7 @@ Artillery::Artillery(int faction)
 void Artillery::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
 
@@ -47,7 +50,7 @@ void Artillery::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
-        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,Structure::texture);
+        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,textures["sky"]);
         glPopMatrix();
 
     }
@@ -165,7 +168,7 @@ void Artillery::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Artillery::doControl(c);
 }

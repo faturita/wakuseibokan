@@ -15,7 +15,6 @@ public:
 
     int virtual getSubType();
 
-    void doControl();
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };
 

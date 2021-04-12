@@ -70,11 +70,11 @@ bool stranded(Vehicle *carrier, Island *island)
 
 bool departed(Vehicle *walrus)
 {
-    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == Walrus::ROLLING)
+    if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == SailingStatus::ROLLING)
     {
         Walrus *w = (Walrus*)walrus;
 
-        w->setStatus(Walrus::OFFSHORING);
+        w->setStatus(SailingStatus::OFFSHORING);
         BoxIsland *island = w->getIsland();
         w->setIsland(NULL);
         char str[256];
@@ -90,11 +90,11 @@ bool departed(Vehicle *walrus)
 // SYNC
 bool arrived(Vehicle *invadingunit, Island *island)
 {
-    if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == Walrus::SAILING)
+    if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == SailingStatus::SAILING)
     {
         Walrus *w = (Walrus*)invadingunit;
 
-        w->setStatus(Walrus::INSHORING);
+        w->setStatus(SailingStatus::INSHORING);
         w->setIsland((BoxIsland*)island);
         char str[256];
         Message mg;
@@ -108,9 +108,9 @@ bool arrived(Vehicle *invadingunit, Island *island)
     {
         Cephalopod *c = (Cephalopod*)invadingunit;
 
-        if (c->getStatus()!=Manta::LANDED)
+        if (c->getStatus()!=FlyingStatus::LANDED)
         {
-            c->setStatus(Manta::LANDED);
+            c->setStatus(FlyingStatus::LANDED);
             c->setIsland((BoxIsland*)island);
             char str[256];
             Message mg;
@@ -130,7 +130,7 @@ bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
     {
-        if (manta->getStatus() == Manta::FLYING || manta->getStatus() == Manta::HOLDING)
+        if (manta->getStatus() == FlyingStatus::FLYING || manta->getStatus() == FlyingStatus::HOLDING)
         {
             if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid)
                 && entities[controller.controllingid] == manta)
@@ -141,7 +141,7 @@ bool landed(Vehicle *manta, Island *island)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(Manta::LANDED);
+            s->setStatus(FlyingStatus::LANDED);
 
             char str[256];
             Message mg;
@@ -231,7 +231,7 @@ bool releasecontrol(Vehicle* vehicle)
 {
     if (vehicle && vehicle->getType() == MANTA)
     {
-        if (vehicle->getStatus() != Manta::ON_DECK && vehicle->getStatus() != Manta::TACKINGOFF)
+        if (vehicle->getStatus() != FlyingStatus::ON_DECK && vehicle->getStatus() != FlyingStatus::TACKINGOFF)
         {
             controller.reset();
 
@@ -241,7 +241,7 @@ bool releasecontrol(Vehicle* vehicle)
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->setStatus(Manta::ON_DECK);
+            s->setStatus(FlyingStatus::ON_DECK);
             s->inert = true;
 
             Message mg;
@@ -954,10 +954,24 @@ void commLink(int faction, dSpaceID space, dWorldID world)
     }
 }
 
-
+using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeomID)>>;
+std::vector<TrackRecord>   track;
 
 void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 {
+
+    // @NOTE: Going in reverse order because if the element is deleted from track, the indexes of all the other elements change too.
+    for (int i = track.size() - 1; i >= 0; i--)
+    {
+        const auto m = track[i];
+        dGeomID sender = std::get<0>(m);
+        dGeomID recv = std::get<1>(m);
+        auto lambda = std::get<2>(m);
+        if (!lambda(sender, recv))
+            track.erase(track.begin() + i);
+
+    }
+
     for (size_t j = 0; j < islands.size(); j++)
     {
         BoxIsland *island = islands[j];
@@ -989,7 +1003,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                 {
                     if (timer==(sc->getTimer() + 10))
                     {
-                        m->setDestination(island->getPos());
+                        m->goTo(island->getPos());
                     }
 
                     if (timer==(sc->getTimer() + 1000))
@@ -1027,7 +1041,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                     Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
 
-                    if (m && m->getStatus() != Manta::LANDED)
+                    if (m && m->getStatus() != FlyingStatus::LANDED)
                     {
 
                         if (!m->isAuto())
@@ -1168,8 +1182,41 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             size_t l = entities.push_back(action,action->getGeom());
                             gunshot();
 
-                            action->setDestination(target->getPos());
+                            action->goTo(target->getPos());
                             action->enableAuto();
+
+                            if (action->getType()==CONTROLABLEACTION)
+                            {
+                                //switchControl(entities.indexOf(l));
+
+                            }
+
+                            auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                                Vehicle *snd = entities.find(sender);
+                                Vehicle *rec = entities.find(recv);
+
+                                if (snd != NULL && rec != NULL)
+                                {
+                                    printf ("Updating....\n");
+                                    rec->setDestination(snd->getPos());
+                                    return true;
+                                }
+                                else
+                                {
+                                    printf ("End");
+                                    return false;
+                                }
+
+
+                            };
+
+
+                            TrackRecord val;
+                            std::get<0>(val) = target->getGeom();
+                            std::get<1>(val) = action->getGeom();
+                            std::get<2>(val) = lambda;
+                            track.push_back(val);
 
                         }
                     } else
@@ -1184,7 +1231,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         {
                             Manta *m = findMantaByOrder(lb->getFaction(), DEFEND_ISLAND);
 
-                            Manta *ml = findManta(lb->getFaction(), Manta::LANDED, lb->getPos());
+                            Manta *ml = findManta(lb->getFaction(), FlyingStatus::LANDED, lb->getPos());
 
                             if (!m && !ml)
                             {
@@ -1218,6 +1265,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
 void buildAndRepair(dSpaceID space, dWorldID world)
 {
+    buildAndRepair(false, space, world);
+}
+
+void buildAndRepair(bool force, dSpaceID space, dWorldID world)
+{
     for (size_t i = 0; i < islands.size(); i++)
     {
         BoxIsland *island = islands[i];
@@ -1227,7 +1279,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
             CommandCenter *c = findCommandCenter(island);
             if (c)
             {
-                if (c->getTtl()<=0)
+                if (c->getTtl()<=0 || force)
                 {
                     // Structures can be rotated.  This is important for runways.
                     float prob = ((int)(rand() % 100 + 1))/100.0f;
@@ -1249,9 +1301,10 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.85;tp.onlyonce=true;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.4;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.6;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
@@ -1264,6 +1317,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
@@ -1274,12 +1328,13 @@ void buildAndRepair(dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
 
                     }
 
                     int which = (rand() % islandstructs.size());
 
-                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f<%10.5f.\n", which, prob, islandstructs[which].chance );
+                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", which, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
@@ -1370,7 +1425,7 @@ void buildAndRepair(dSpaceID space, dWorldID world)
 
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
 {
-    Manta* m = findManta(spawner->getFaction(),Manta::ON_DECK, spawner->getPos());
+    Manta* m = findManta(spawner->getFaction(),FlyingStatus::ON_DECK, spawner->getPos());
 
     if (m)
     {
@@ -1444,7 +1499,7 @@ void dockWalrus(Vehicle *dock)
     {
         // @FIXME: Only put back the walrus that is close to the carrier.
         //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==Walrus::SAILING &&
+        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==SailingStatus::SAILING &&
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
             char msg[256];
@@ -1467,7 +1522,7 @@ void dockManta()
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
-        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==Manta::ON_DECK)
+        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==FlyingStatus::ON_DECK)
         {
             char str[256];
             Message mg;
@@ -1487,7 +1542,7 @@ void dockManta()
 void landManta(Vehicle *landplace)
 {
     // Auto control
-    Manta *m = findManta(landplace->getFaction(),Manta::HOLDING);
+    Manta *m = findManta(landplace->getFaction(),FlyingStatus::HOLDING);
 
     landManta(landplace, m);
 }
@@ -1497,10 +1552,8 @@ void landManta(Vehicle *landplace, Manta *m)
     if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
     {
         if (m)
-        {
-            m->setDestination(landplace->getPos());             // @FIXME: This needs to be performed all the time while manta is landing.
-            m->setAttitude(landplace->getForward());
-            m->land();
+        {           
+            m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }
     }
@@ -1512,7 +1565,7 @@ Manta* taxiManta(Vehicle *v)
     if (v->getType()==CARRIER)
     {
         Balaenidae *r = (Balaenidae*)v;
-        m = findManta(r->getFaction(),Manta::ON_DECK, v->getPos());
+        m = findManta(r->getFaction(),FlyingStatus::ON_DECK, v->getPos());
         if (m)
         {
             r->taxi(m);
@@ -1526,7 +1579,7 @@ Manta* taxiManta(Vehicle *v)
     } else if (v->getType()==LANDINGABLE )
     {
         Runway *r = (Runway*)v;
-        m = findManta(r->getFaction(),Manta::LANDED, v->getPos());
+        m = findManta(r->getFaction(),FlyingStatus::LANDED, v->getPos());
         if (m)
         {
             r->taxi(m);
@@ -1541,7 +1594,7 @@ Manta* launchManta(Vehicle *v)
     if (v->getType() == CARRIER)
     {
         Balaenidae *b = (Balaenidae*)v;
-        Manta *m = findManta(v->getFaction(),Manta::ON_DECK);
+        Manta *m = findManta(v->getFaction(),FlyingStatus::ON_DECK);
         if (m)
         {
             b->launch(m);
@@ -1559,7 +1612,7 @@ Manta* launchManta(Vehicle *v)
         Runway *r = (Runway*)v;
 
         // Need to find the manta that is actually in this island.
-        Manta *m = findManta(v->getFaction(), Manta::LANDED, r->getPos());
+        Manta *m = findManta(v->getFaction(), FlyingStatus::LANDED, r->getPos());
         if (m)
         {
             r->launch(m);

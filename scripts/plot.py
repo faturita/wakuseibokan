@@ -46,11 +46,19 @@ data2 = np.asarray(data2)
 data3 = np.asarray(data3)
 
 fig = plt.figure()
-ax1 = fig.add_subplot(111)
+ax1 = fig.add_subplot(311)
 
 ax1.plot(data1,'r', label='entities')
+ax1.set_ylim([0, 250])
+
+ax1 = fig.add_subplot(312)
 ax1.plot(data2,'g', label='fps')
+ax1.set_ylim([0, 65])
+
+ax1 = fig.add_subplot(313)
 ax1.plot(data3,'b', label='elapsedtime')
+ax1.set_ylim([0, 15000])
+
 plt.legend(loc='upper left')
 
 plt.savefig('output.png')

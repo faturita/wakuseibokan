@@ -29,7 +29,8 @@ public:
     void doControlControl(Vec3f target, float thrust);
     void doControlForced(Vec3f target);
     void doControlFlipping(Vec3f target, float thust);
-    void doControlControl2(Vec3f target, float thrust);
+    void doControlControl2(Vec3f target, float thrust, float sp_height, float threshold=1000);
+    void doControlWaypoint(float threshold=1000);
     void doHold(Vec3f target, float thrust);
 
     void doControlDestination();
@@ -50,7 +51,7 @@ public:
     void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);
     void rotateBody(dBodyID);
 
-    void land();
+    void land(Vec3f landplace, Vec3f landattitude);
     void attack(Vec3f target);
     void dogfight(Vec3f target);
 

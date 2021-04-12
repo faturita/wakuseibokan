@@ -57,6 +57,8 @@ extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
 
+extern int aiplayer;
+
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
 int _yoffset = 0;
@@ -93,7 +95,8 @@ void processMouse(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
-                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || entities[controller.controllingid]->getType() == CONTROLABLEACTION) )
+                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || (entities[controller.controllingid]->getType() == CONTROLABLEACTION) ||
+                 (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ) )
         {
             CLog::Write(CLog::Debug,"Active control\n");
             // Activate airplane controller.
@@ -149,7 +152,7 @@ void processMouse(int button, int state, int x, int y) {
                 {
                     Vec3f target = setLocationOnMap(x,y);
                     //@FIXME
-                    entities[controller.controllingid]->setDestination(target);
+                    entities[controller.controllingid]->goTo(target);
 
                     CLog::Write(CLog::Debug,"Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
 
@@ -457,7 +460,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->setDestination(b->getPos()+(b->getForward().normalize()*300));
+                    w->goTo(b->getPos()+(b->getForward().normalize()*200));
                     w->enableAuto();
                 }
             } else
@@ -472,6 +475,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("bluemode") != std::string::npos)
             {
                 controller.faction = BLUE_FACTION;
+            } else
+            if (controller.str.find("aiplayergreen") != std::string::npos)
+            {
+                aiplayer = GREEN_AI;
             } else
             if (controller.str.find("save") != std::string::npos)
             {

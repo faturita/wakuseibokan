@@ -1,8 +1,9 @@
+#include <unordered_map>
 #include "Runway.h"
 #include "../units/Medusa.h"
 
 
-extern GLuint _textureRoad;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Runway::Runway(int faction)
 {
@@ -12,7 +13,7 @@ Runway::Runway(int faction)
 void Runway::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/runway.3ds",-466.06f,0.0f,0.0f,20,1,10,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/runway.3ds",-466.06f,0.0f,0.0f,20,1,10,textures["road"]);
     if (_model != NULL)
     {
 
@@ -42,7 +43,7 @@ void Runway::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //_model->draw(Structure::texture);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length, _textureRoad);
-        drawTheRectangularBox(_textureRoad,Structure::width, Structure::height, Structure::length);
+        drawTheRectangularBox(textures["road"],Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }
@@ -82,7 +83,7 @@ void Runway::taxi(Manta *m)
 void Runway::launch(Manta* m)
 {
     m->inert = false;
-    m->setStatus(Manta::FLYING);
+    m->setStatus(FlyingStatus::FLYING);
     m->elevator = +12;
     struct controlregister c;
     c.thrust = 600.0f/(10.0);
@@ -115,7 +116,7 @@ Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::LANDED);
+        _manta1->setStatus(FlyingStatus::LANDED);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;

@@ -45,7 +45,6 @@
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
 
-enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
@@ -163,6 +162,7 @@ void list();
 int findNextNumber(int type);
 
 void buildAndRepair(dSpaceID space, dWorldID world);
+void buildAndRepair(bool force, dSpaceID space, dWorldID world);
 
 void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
 

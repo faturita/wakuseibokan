@@ -9,7 +9,7 @@
 
 #include "../profiling.h"
 
-extern GLuint _textureRoad;
+extern std::unordered_map<std::string, GLuint> textures;
 
 AAM::AAM(int faction)
 {
@@ -34,9 +34,9 @@ void AAM::init()
 
     }
 
-    AAM::height=1.0f;
-    AAM::length=5.0f;
-    AAM::width=1.0f;
+    AAM::height=10.0f;
+    AAM::length=50.0f;
+    AAM::width=10.0f;
 
     AAM::mass = 1.0f;
 
@@ -68,7 +68,7 @@ void AAM::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
 
         //drawRectangularBox(width, height, length);
-        _model->setTexture(_textureRoad);
+        _model->setTexture(textures["road"]);
         _model->draw();
 
         glPopMatrix();
@@ -183,7 +183,7 @@ void AAM::doControl()
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     c.registers.thrust = 100;
 
@@ -196,7 +196,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -279,7 +279,7 @@ void AAM::doControl(struct controlregister conts)
     // Throttle is fixed when you "teleoperate" the missile.
     setThrottle(100.0);
 
-    myCopy = conts;
+    registers = conts;
 
 }
 

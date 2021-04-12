@@ -1,8 +1,11 @@
+#include <unordered_map>
 #include "Launcher.h"
 #include "../actions/Missile.h"
 #include "../actions/AAM.h"
 
 #include "../sounds/sounds.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Launcher::Launcher(int faction)
 {
@@ -13,7 +16,7 @@ Launcher::Launcher(int faction)
 void Launcher::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,6,6,6,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,6,6,6,textures["metal"]);
     if (_model != NULL)
     {
         _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,4,4,4,0);
@@ -25,7 +28,7 @@ void Launcher::init()
 
     Launcher::firingpos = Vec3f(0.0f,16.0f,0.0f);
 
-    aistatus = GROUND;
+    autostatus = AutoStatus::GROUND;
 
     setForward(Vec3f(0,0,1));
 }
@@ -43,7 +46,7 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glScalef(4.0f,4.0f,4.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        _model->draw(Structure::texture);
+        _model->draw(textures["metal"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glTranslatef(0.0f,16.0f,0.0f);
@@ -52,7 +55,7 @@ void Launcher::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
 
-        _topModel->setTexture(Structure::texture);
+        _topModel->setTexture(textures["metal"]);
         _topModel->draw();
 
         glPopMatrix();
@@ -172,10 +175,10 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
 Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
 {
 
-    switch (aistatus) {
-    case GROUND:return fireGround(world,space);
+    switch (autostatus) {
+    case AutoStatus::GROUND:return fireGround(world,space);
         break;
-    case AIR:return fireAir(world, space);
+    case AutoStatus::AIR:return fireAir(world, space);
         break;
     }
 
@@ -242,7 +245,7 @@ void Launcher::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Launcher::doControl(c);
 }
@@ -265,12 +268,12 @@ void Launcher::doControl(Controller controller)
 
 void Launcher::ground()
 {
-    aistatus = GROUND;
+    autostatus = AutoStatus::GROUND;
 }
 
 void Launcher::air()
 {
-    aistatus = AIR;
+    autostatus = AutoStatus::AIR;
 }
 
 int Launcher::getSubType()

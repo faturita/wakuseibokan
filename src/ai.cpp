@@ -181,7 +181,7 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 
         vector = vector.normalize();
 
-        b->setDestination(is->getPos()+Vec3f(12500.0f * vector));
+        b->goTo(is->getPos()+Vec3f(12500.0f * vector));
         b->enableAuto();
         timeevent=timer;return 10;
     }
@@ -207,7 +207,7 @@ int ApproachAnyEnemyIsland::apply(int state, int faction, unsigned long &timeeve
 
         vector = vector.normalize();
 
-        b->setDestination(is->getPos()+Vec3f(12500.0f * vector));
+        b->goTo(is->getPos()+Vec3f(12500.0f * vector));
         b->enableAuto();
         timeevent=timer;return 10;
     }
@@ -265,8 +265,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
                 CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
-                a->setDestination(c->getPos());
-
+                a->goTo(c->getPos());
                 a->enableAuto();
 
                 if (a->getType()==CONTROLABLEACTION)
@@ -346,7 +345,7 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
             {
                 if (!c)
                 {
-                    m->setDestination(b->getPos());
+                    m->goTo(b->getPos());
                     m->enableAuto() ;                    // @FIXME: This needs to be performed all the time while manta is landing.
                     return 0;
                 } else
@@ -363,7 +362,7 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
         {
             BoxIsland *i = findNearestIsland(b->getPos());
 
-            //Manta *m = findNearestManta(Manta::FLYING, faction,b->getPos());
+            //Manta *m = findNearestManta(FlyingStatus::FLYING, faction,b->getPos());
 
             Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
 
@@ -412,7 +411,7 @@ int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, 
 
             vector = vector.normalize();
 
-            b->setDestination(is->getPos()+Vec3f(3500.0f * vector));
+            b->goTo(is->getPos()+Vec3f(3500.0f * vector));
             b->enableAuto();
             timeevent = timer; return 1;
         } else {
@@ -467,7 +466,7 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
 
             if (m)
             {
-                m->setDestination(is->getPos());
+                m->goTo(is->getPos());
                 m->enableAuto();
             }
         }
@@ -500,7 +499,7 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
                 captureIsland(c,is,m->getFaction(),which,space, world);
                 //landManta(b,c);
 
-                m->setDestination(b->getPos());
+                m->goTo(b->getPos());
                 m->enableAuto();
 
                 timeevent = timer;
@@ -538,7 +537,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
             {
                 w = spawnWalrus(space,world,b);
             }
-            w->setDestination(is->getPos());
+            w->goTo(is->getPos());
             w->enableAuto();
 
             timeevent = timer;return 2;
@@ -610,7 +609,7 @@ int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, uns
                 t = t.cross(up);
                 t = t.normalize();
 
-                w->setDestination(b->getPos()+t*300);
+                w->goTo(b->getPos()+t*300);
                 w->enableAuto();
                 found = true;
             }
@@ -667,9 +666,9 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     }
 
     // Find all the mantas around, land them, and dock them.
-    Manta *m1 = findManta(faction,Manta::ON_DECK);
-    Manta *m2 = findNearestManta(Manta::FLYING,b->getFaction(),b->getPos(),30000);
-    Manta *m3 = findNearestManta(Manta::HOLDING,b->getFaction(), b->getPos(),30000);
+    Manta *m1 = findManta(faction,FlyingStatus::ON_DECK);
+    Manta *m2 = findNearestManta(FlyingStatus::FLYING,b->getFaction(),b->getPos(),30000);
+    Manta *m3 = findNearestManta(FlyingStatus::HOLDING,b->getFaction(), b->getPos(),30000);
 
     Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 
@@ -689,7 +688,9 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     {
         if (m3)
         {
-            landManta(b,m3);
+            if (m3->getAutoStatus() != AutoStatus::LANDING)
+                landManta(b,m3);
+            b->stop();
             done2 = false;
         }
     }

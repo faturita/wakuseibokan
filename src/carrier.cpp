@@ -68,6 +68,7 @@
 #include "structures/Turret.h"
 
 #include "map.h"
+#include "board.h"
 
 #include "ai.h"
 
@@ -81,15 +82,10 @@ float horizon = 100000.0f;   // 100 kmf
 
 extern dWorldID world;
 extern dSpaceID space;
-extern dBodyID body[NUM];
-extern dJointID joint[NUM-1];
 extern dJointGroupID contactgroup;
-extern dGeomID sphere[NUM];
 
 extern container<Vehicle*> entities;
-
 extern std::vector<BoxIsland*> islands;
-
 std::ofstream msgboardfile;
 extern std::vector<Message> messages;
 
@@ -97,15 +93,15 @@ extern int aiplayer;
 
 extern int gamemode;
 
-// @FIXME Change
-extern GLuint _textureBox;
-extern GLuint _textureMetal;
+extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
 extern unsigned long timer;
 clock_t elapsedtime;
 
 bool wincondition=false;
+
+bool mute=false;
 
 void disclaimer()
 {
@@ -125,10 +121,12 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, 1200, 800, 0, -1, 1);
+    glOrtho(0, 1200, 800, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+
+    glPushAttrib(GL_CURRENT_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1);
 	glDisable(GL_DEPTH_TEST);
 	glRotatef(180.0f,0,0,1);
@@ -138,12 +136,11 @@ void drawHUD()
     
     char str[256];
 
-    
-    if (isnan(Camera.pos[0])) exit(1);
+    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There is a numberical error somewhere.");
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f)  TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2], timer);
+    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -378,7 +375,7 @@ void drawHUD()
         
     } glPopMatrix();
     
-    
+    glPopAttrib();
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -390,15 +387,15 @@ void drawHUD()
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+        //glMatrixMode(GL_PROJECTION);
+        //glLoadIdentity();
+        //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
 
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
     
-    //drawLightning();
+    drawLightning();
 
     Vec3f up,pos,forward;
     
@@ -440,8 +437,9 @@ void drawScene() {
         }
     }
     
-    // If you comment the drawsky it will go dark (night).
-    //drawSky(pos[0],pos[1],pos[2]);
+    glPushAttrib(GL_CURRENT_BIT);
+    drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
+    glPopAttrib();
     
     Camera.lookAtFrom(up, pos, forward);
     
@@ -453,10 +451,10 @@ void drawScene() {
     drawArrow(3);
     glPopAttrib();
     
-    // Floor is changing color.
     glPushAttrib(GL_CURRENT_BIT);
     drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
+
 
     // Draw islands.
     for (int i=0; i<islands.size(); i++) {
@@ -474,17 +472,30 @@ void drawScene() {
         {
             if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
             {
-                (entities[i]->setTexture(_textureMetal));
+                //(entities[i]->setTexture(textures["metal"]));
+                glPushAttrib(GL_CURRENT_BIT);
                 (entities[i]->drawModel());
+                glPopAttrib();
             }
         }
     }
+
+    // Daylight frequency.  The "sol" in this world lasts for 10000 cicles.  At 60 fps, 2.7 minutes.
+    float daylight_frequency = 1.0/CYCLES_IN_SOL;
+    float daylight =   sin(daylight_frequency * 2 * PI * timer)*0.4 + 0.6;   // From 0.2 -- 1.0
+
+    // This is the final color that is used to paint everything on the screen.
+    glColor3f(daylight,daylight,daylight);
+
+    if (Camera.pos[1]<0) // Dark under the water.
+        glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD
     switch (controller.view)
     {
     case 1: drawHUD();break;
     case 2: drawMap();break;
+    case 3: drawBoard();break;
     }
 
 	glDisable(GL_TEXTURE_2D);
@@ -496,35 +507,35 @@ void drawScene() {
 
 void initRendering() {
 	// Lightning
-    
-	glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
     
     // Lighting not working.
-	glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT0);
 
     
 	// Normalize the normals (this is very expensive).
-	glEnable(GL_NORMALIZE);
+    glEnable(GL_NORMALIZE);
     
     
 	// Do not show hidden faces.
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     
     
-    // Enable wireframes
-    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+        // Enable wireframes
+        //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
     
     glShadeModel(GL_SMOOTH); // Type of shading for the polygons
     
-	glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_COLOR_MATERIAL);
     
-	// Do not show the interior faces....
-	//glEnable(GL_CULL_FACE);
+        // Do not show the interior faces....
+        //glEnable(GL_CULL_FACE);
     
 	// Blue sky !!!
     //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
-    drawLightning();
+    glClearColor(0.0f, 0.0f, 0.1f, 0.1f);
+    //drawLightning();
     
     // Initialize scene textures.
     initTextures();
@@ -626,11 +637,11 @@ void update(int value)
                     if (controller.controllingid == i)
                         controller.controllingid = CONTROLLING_NONE;
 
-                   if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
-                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
+                    if (entities[i]->getBodyID()) { dBodyDisable(entities[i]->getBodyID()); }
+                    if (entities[i]->getGeom())   { dGeomDisable(entities[i]->getGeom());   }
+
                     entities.erase(entities[i]->getGeom());
-                    //delete vehicles[i];
-                    //dBodyDestroy(vehicles[i]->getBodyID());
+
                 } else if (entities[i]->getHealth()<=0)
                 {
                     if (controller.controllingid == i)
@@ -688,8 +699,8 @@ void update(int value)
 
 
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
-                    if (entities[i]->getBodyID()) dBodyDisable(entities[i]->getBodyID());
-                    if (entities[i]->getGeom()) dGeomDisable(entities[i]->getGeom());
+                    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
+                    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
 
                     entities.erase(entities[i]->getGeom());
 
@@ -734,6 +745,11 @@ int main(int argc, char** argv) {
     else
         srand (0);
 
+    if (isPresentCommandLineParameter(argc,argv,"-mute"))
+        mute = true;
+    else
+        mute = false;
+
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -747,6 +763,7 @@ int main(int argc, char** argv) {
         glutInitWindowSize(1200, 800);
     else
         glutFullScreen();
+
 
     // OpenGL Configuration information
     /* get version info */

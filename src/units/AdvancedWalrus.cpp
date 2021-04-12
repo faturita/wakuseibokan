@@ -1,4 +1,4 @@
-
+#include <unordered_map>
 #include "AdvancedWalrus.h"
 
 #include "../profiling.h"
@@ -13,7 +13,7 @@ extern dSpaceID space;
 
 extern container<Vehicle*> entities;
 
-extern GLuint _textureSky;
+extern std::unordered_map<std::string, GLuint> textures;
 
 AdvancedWalrus::AdvancedWalrus(int newfaction) : Walrus(newfaction)
 {
@@ -80,7 +80,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
 
-        _model->setTexture(_textureSky);
+        _model->setTexture(textures["sky"]);
         _model->draw();
 
 
@@ -96,7 +96,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
         // Rotate the turret cannon so that it is aligned properly.
         glRotatef(90.0f,0.0f,1.0f,0.0f);
 
-        _topModel->setTexture(_textureSky);
+        _topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
         glPopMatrix();
@@ -163,10 +163,10 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
-    if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
-        setStatus(Walrus::SAILING);
-    else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
-        setStatus(Walrus::ROLLING);
+    if (getTtl()<=0 && getStatus() == SailingStatus::OFFSHORING)
+        setStatus(SailingStatus::SAILING);
+    else if (getTtl()<=0 && getStatus() == SailingStatus::INSHORING)
+        setStatus(SailingStatus::ROLLING);
 
     // This algorithm is generating too many seg faults with ODE library.
     //Vec3f dump;
@@ -232,12 +232,12 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
 
 
-
+// Executed by the AI
 void AdvancedWalrus::doControl()
 {
-    switch (aistatus) {
-        case ATTACK: doControlAttack();break;
-        case DESTINATION: doControlDestination();break;
+    switch (autostatus) {
+        case AutoStatus::ATTACK:        doControlAttack();break;
+        case AutoStatus::DESTINATION:   doControlDestination();break;
         default: break;
     }
 }
@@ -256,6 +256,8 @@ void AdvancedWalrus::doControl(struct controlregister conts)
     elevation = conts.pitch;
 
     setAim(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+    registers.thrust = getThrottle();
 }
 
 
@@ -263,7 +265,7 @@ void AdvancedWalrus::doControlAttack()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 

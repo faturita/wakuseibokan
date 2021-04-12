@@ -3,8 +3,6 @@
 
 #include "Structure.h"
 
-enum TARGETS {GROUND, AIR};
-
 class Launcher : public Structure
 {
 protected:

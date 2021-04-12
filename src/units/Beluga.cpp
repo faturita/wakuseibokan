@@ -8,8 +8,7 @@
 #include "../sounds/sounds.h"
 #include "../keplerivworld.h"
 
-extern GLuint _textureRoad;
-
+extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
@@ -22,126 +21,10 @@ Beluga::Beluga(int faction) : Balaenidae(faction)
 void Beluga::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,_textureRoad);
+    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,textures["road"]);
 
     setForward(0,0,1);
 
-}
-
-
-void Beluga::doControl()
-{
-    Controller c;
-
-    c.registers = myCopy;
-
-
-    Vec3f Po = getPos();
-
-    Po[1] = 0.0f;
-
-    Vec3f Pf(145 kmf, -1.0f, 89 kmf - 3.5 kmf);
-
-    Pf = destination;
-
-    Vec3f T = Pf - Po;
-
-    float eh, midpointpitch;
-
-
-    if (!reached && T.magnitude()>500)
-    {
-        float distance = T.magnitude();
-
-        Vec3f F = getForward();
-
-        F = F.normalize();
-        T = T.normalize();
-
-
-        // Potential fields from the islands (to avoid them)
-
-        int nearesti = 0;
-        float closest = 0;
-        for(int i=0;i<islands.size();i++)
-        {
-            BoxIsland *b = islands[i];
-            Vec3f l(b->getX(),0.0f,b->getZ());
-
-            if ((l-Po).magnitude()<closest || closest ==0) {
-                closest = (l-Po).magnitude();
-                nearesti = i;
-            }
-        }
-
-        c.registers.thrust = 1500.0f;
-
-        if (distance<10000.0f)
-        {
-            c.registers.thrust = 800.0f;
-        }
-
-        if (distance<2000.0f)
-        {
-            c.registers.thrust = 150.0f;
-        }
-
-        if (closest > 1800 && closest < 4000)
-        {
-            BoxIsland *b = islands[nearesti];
-            Vec3f l = b->getPos();
-            Vec3f d = Po-l;
-
-            d = d.normalize();
-
-            T = T+d;
-            T = T.normalize();
-
-            c.registers.thrust = 45.0f;
-        }
-
-
-
-        float e = acos(  T.dot(F) );
-
-        float signn = T.cross(F) [1];
-
-
-        CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
-
-        if (abs(e)>=0.5f)
-        {
-            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
-        } else
-        if (abs(e)>=0.4f)
-        {
-            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
-        } else
-        if (abs(e)>=0.2f)
-            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
-        else {
-            c.registers.roll = 0.0f;
-        }
-
-
-    } else {
-        if (!reached)
-        {
-            char str[256];
-            Message mg;
-            mg.faction = getFaction();
-            sprintf(str, "Beluga has arrived to destination.");
-            mg.msg = std::string(str);
-            messages.insert(messages.begin(), mg);
-
-            reached = true;
-            c.registers.thrust = 0.0f;
-            c.registers.roll = 0.0f;
-            disableAuto();
-        }
-    }
-
-    Balaenidae::doControl(c);
 }
 
 
@@ -228,7 +111,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         c->setNumber(number);
         c->embody(world, space);
         c->setPos(pos[0],pos[1]+38, pos[2]);
-        c->setStatus(Manta::ON_DECK);
+        c->setStatus(FlyingStatus::ON_DECK);
         c->inert = false;
         alignToMe(c->getBodyID());
         v = (Vehicle*)c;
@@ -240,7 +123,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::ON_DECK);
+        _manta1->setStatus(FlyingStatus::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;
@@ -253,7 +136,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
         Vec3f p;
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
-        _walrus->setStatus(Walrus::SAILING);
+        _walrus->setStatus(SailingStatus::SAILING);
         _walrus->stop();
         _walrus->inert = true;
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);

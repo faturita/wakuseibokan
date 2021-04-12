@@ -1,6 +1,9 @@
+#include <unordered_map>
 #include "Turret.h"
 #include "../actions/Gunshot.h"
 #include "../profiling.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Turret::Turret(int faction)
 {
@@ -12,7 +15,7 @@ Turret::Turret(int faction)
 void Turret::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,Structure::texture);
+    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
         _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
@@ -38,7 +41,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        _model->draw(Structure::texture);
+        _model->draw(textures["metal"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glTranslatef(0.0f,27.97f-8.140f,0.0f);
@@ -48,7 +51,7 @@ void Turret::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
 
-        _topModel->setTexture(Structure::texture);
+        _topModel->setTexture(textures["metal"]);
         _topModel->draw();
 
         // Gun shots
@@ -175,7 +178,7 @@ void Turret::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Turret::doControl(c);
 }

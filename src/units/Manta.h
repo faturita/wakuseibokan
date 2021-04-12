@@ -1,7 +1,9 @@
 /*
  * Manta.h
  *
- *  Created on: Jan 16, 2011
+ * Remember Mobula Ray
+ *
+ * Created on: Jan 16, 2011
  *      Author: faturita
  */
 
@@ -9,6 +11,8 @@
 #define MANTA_H_
 
 #include "Vehicle.h"
+
+enum FlyingStatus {IN_CARRIER=0, ON_DECK, LANDED, TACKINGOFF, FLYING, HOLDING, DOCKING};
 
 class Manta : public Vehicle
 {
@@ -21,13 +25,6 @@ protected:
 
 public:
     Manta(int newfaction);
-    static const int IN_CARRIER = 0;
-    static const int ON_DECK = 1;
-    static const int LANDED = 2;
-    static const int TACKINGOFF = 3;
-    static const int FLYING = 4;
-    static const int HOLDING = 5;
-    static const int DOCKING = 6;
 
     bool antigravity=false;
 
@@ -54,7 +51,7 @@ public:
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);
-    void virtual land();
+    void virtual land(Vec3f landplace, Vec3f placeattitude);
     void virtual doHold(Vec3f target, float thrust);
     void virtual attack(Vec3f target);
     void virtual dogfight(Vec3f target);

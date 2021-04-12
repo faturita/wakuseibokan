@@ -1,14 +1,11 @@
 #include <iomanip>
 
 #include "SimplifiedDynamicManta.h"
-
 #include "../profiling.h"
-
 #include "../control.h"
-
 #include "../actions/Gunshot.h"
-
 #include "../math/yamathutil.h"
+#include "../messages.h"
 
 extern dWorldID world;
 extern dSpaceID space;
@@ -16,6 +13,7 @@ extern dSpaceID space;
 #include "../sounds/sounds.h"
 
 extern container<Vehicle*> entities;
+extern std::vector<Message> messages;
 
 SimplifiedDynamicManta::SimplifiedDynamicManta(int newfaction) : Manta(newfaction)
 {
@@ -51,22 +49,26 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
 
 void SimplifiedDynamicManta::doControl()
 {
-    switch (aistatus) {
-    case DOGFIGHT:
+    switch (autostatus) {
+    case AutoStatus::DOGFIGHT:
         doControlDogFight();
         break;
-    case ATTACK:
+    case AutoStatus::ATTACK:
         doControlAttack();
         break;
-    case LANDING:
+    case AutoStatus::LANDING:
         doControlLanding();
         break;
-    default:case DESTINATION:
-        //doControlDestination();// @FIXME
-        doControlControl2(destination, 1000);
+    case AutoStatus::WAYPOINT:
+        doControlWaypoint();
         break;
-    case FREE:
-        setDestination(getPos()+getForward().normalize()*100);
+    case AutoStatus::FREE:
+        goTo(getPos()+getForward().normalize()*100);
+        setAutoStatus(AutoStatus::DESTINATION);
+        break;
+    default:case AutoStatus::DESTINATION:
+        //doControlDestination();// @FIXME
+        doControlControl2(destination, 1000, 1000);
         break;
     }
 }
@@ -93,7 +95,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     switch (flyingstate) {
         default:case 0:// Approach
         {
-            doControlControl2(target,10000);
+            doControlControl2(target,10000, 720);
             dout << (destination-getPos()).magnitude() << std::endl;
             if ((destination-getPos()).magnitude()<9000)
                 flyingstate = 1;
@@ -135,7 +137,7 @@ void SimplifiedDynamicManta::doControlDogFight()
         flyingstate = 3;
         break;
     case 3:
-        doControlControl2(waypoint,10000);
+        doControlControl2(waypoint,10000, 720);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 0;
         break;
@@ -190,7 +192,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 3;
         break;
     case 3:
-        doControlControl2(waypoint,10000);
+        doControlControl2(waypoint,10000, 720);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 4;
         break;
@@ -200,7 +202,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 5;
         break;
     case 5:
-        doControlControl2(waypoint,10000);
+        doControlControl2(waypoint,10000, 720);
         if (((waypoint-getPos()).magnitude()<12000))
                 flyingstate = 0;
         break;
@@ -217,7 +219,7 @@ void SimplifiedDynamicManta::doControlForced(Vec3f target)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
     Vec3f maptaget(target[0],0,target[2]);
@@ -257,7 +259,7 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -335,7 +337,7 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     float height = getPos()[1];
 
@@ -357,15 +359,18 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
 
     setThrottle(30.0f);
 
-    setStatus(Manta::HOLDING);
+    setStatus(FlyingStatus::HOLDING);
 
-    if (!reached)
-    {
-        char str[256];
-        sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
-        //messages.insert(messages.begin(), str);
-        reached = true;
-        setStatus(Manta::HOLDING);
+    if (dst_status != DestinationStatus::REACHED)
+    {   
+        char msg[256];
+        Message mg;
+        sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
+        mg.faction = getFaction();
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+        dst_status = DestinationStatus::REACHED;
+        setStatus(FlyingStatus::HOLDING);
     }
 
     c.registers.yaw = 0;
@@ -374,27 +379,26 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
 
 }
 
-void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
+void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float sp_height, float threshold)
 {
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
     float height = Po[1];
     float declination = getDeclination(getForward());
 
-    float sp2=-0,        sp3 = 720;
+    float sp2=-0,        sp3 = sp_height;
 
     Vec3f T = (target - Po);
 
+    CLog::Write(CLog::Debug,"T: %10.3f\t\t", T.magnitude());dout << target << std::endl;
 
-    dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
 
-
-    if (!(!reached && map(T).magnitude()>1000))
+    if (!(dst_status != DestinationStatus::REACHED && (T.magnitude()>threshold && map(T).magnitude()>threshold)))
     {
         doHold(target, thrust);
         return;
@@ -435,14 +439,14 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust)
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    dout << "T:Az:"
-              << std::setw(10) << getAzimuth(getForward())
-              << std::setw(10) << getAzimuth(T)
-              << "(" << std::setw(12) << e1 << ")"
-              << std::setw(10) << declination
-              << std::setw(10) << sp2
-              << " Destination:"
-              << std::setw(10) << T.magnitude() << std::endl;
+    //    dout << "T:Az:"
+    //              << std::setw(10) << getAzimuth(getForward())
+    //              << std::setw(10) << getAzimuth(T)
+    //              << "(" << std::setw(12) << e1 << ")"
+    //              << std::setw(10) << declination
+    //              << std::setw(10) << sp2
+    //              << " Destination:"
+    //              << std::setw(10) << T.magnitude() << std::endl;
 
     r1 = max(r1, 5);
     r1 = min(r1, -5);
@@ -497,7 +501,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -560,12 +564,98 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
 }
 
+void SimplifiedDynamicManta::doControlWaypoint(float threshold)
+{
+    if (dst_status == DestinationStatus::STILL)
+    {
+        if (!waypoints.empty()) destination = waypoints.front();waypoints.pop();
+        dst_status = DestinationStatus::TRAVELLING;
+    }
+    if (dst_status == DestinationStatus::REACHED && !waypoints.empty())
+    {
+        destination = waypoints.front();waypoints.pop();
+        dst_status = DestinationStatus::TRAVELLING;
+    }
 
+    doControlControl2(destination, 500, destination[1], threshold);
+
+}
+
+void SimplifiedDynamicManta::land(Vec3f landplace, Vec3f placelattitude)
+{
+    autostatus = AutoStatus::LANDING;
+    setStatus(FlyingStatus::FLYING);
+    setDestination(landplace);
+    setAttitude(placelattitude);
+    flyingstate=0;
+
+
+    Vec3f Po = getPos();
+
+    float height = Po[1];
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf;
+
+    Pf = landplace;  // This is the carrier or a runway.  If it is the carrier this must be modified during each tick.
+    Pf[1] = 0;
+
+    placelattitude[1]=0;
+
+    Vec3f trans = placelattitude.rotateOnY(PI/2.0);
+
+    Vec3f w5 = (Pf);
+    Vec3f w4 = (Pf - placelattitude.normalize()*(05 kmf)) ;
+    Vec3f w3 = (Pf - placelattitude.normalize()*(10 kmf)) ;
+    Vec3f w2 = (Pf - (placelattitude.normalize()*(20 kmf) + trans.normalize()*(5 kmf))) ;
+    Vec3f w1 = (Pf - (placelattitude.normalize()*(10 kmf) + trans.normalize()*(10 kmf))) ;
+
+
+    w1[1] = 500;
+    w2[1] = 250;
+    w3[1] = 200;
+    w4[1] = 190;
+    w5[1] = 180;
+
+    dout << w1 << w2 << w3 << w4 << std::endl;
+
+    clearWaypoints();
+
+    addWaypoint(w1);
+    addWaypoint(w2);
+    addWaypoint(w3);
+    addWaypoint(w4);
+    addWaypoint(w5);
+    dst_status = DestinationStatus::STILL;
+    enableAuto();
+}
+
+void SimplifiedDynamicManta::doControlLanding()
+{
+    if (waypoints.empty() && dst_status == DestinationStatus::REACHED)
+    {
+        Controller c;
+
+        c.registers = registers;
+
+        c.registers.thrust = 25.0f/(10.0);
+        c.registers.pitch = 0;
+        c.registers.roll = 0;
+        setThrottle(0.0f);
+
+        doControl(c);
+    } else {
+        doControlWaypoint(300.0);
+    }
+}
+
+/**
 void SimplifiedDynamicManta::doControlLanding()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -598,7 +688,7 @@ void SimplifiedDynamicManta::doControlLanding()
 
     float eh, midpointpitch, distance;
 
-    if (!reached && T.magnitude()>TH)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>TH)
     {
         float Kp = -0.8;
         float val = ((getAzimuth(getForward())-180.0f)*PI/180.0f - (getAzimuth(T)-180.0f)*PI/180.0f);
@@ -649,13 +739,17 @@ void SimplifiedDynamicManta::doControlLanding()
             c.registers.roll = 0;
             setThrottle(0.0f);
 
-            if (!reached)
+            if (dst_status != DestinationStatus::REACHED)
             {
                 flyingstate = 0;
-                char str[256];
-                sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
-                //messages.insert(messages.begin(), str);
-                reached = true;
+                char msg[256];
+                //Message mg;
+                //sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
+                //mg.faction = getFaction();
+                //mg.msg = std::string(msg);
+                //messages.insert(messages.begin(), mg);
+                dst_status = DestinationStatus::REACHED;
+                setStatus(FlyingStatus::HOLDING);
             }
         }
     }
@@ -663,12 +757,13 @@ void SimplifiedDynamicManta::doControlLanding()
     doControl(c);
 
 }
+**/
 
 void SimplifiedDynamicManta::doControlDestination()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -685,7 +780,7 @@ void SimplifiedDynamicManta::doControlDestination()
     float eh, midpointpitch;
 
 
-    if (!reached && T.magnitude()>precission)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>precission)
     {
         float distance = T.magnitude();
 
@@ -756,15 +851,19 @@ void SimplifiedDynamicManta::doControlDestination()
 
         setThrottle(30.0f);
 
-                    setStatus(Manta::HOLDING);
+        setStatus(FlyingStatus::HOLDING);
 
-        if (!reached)
+        if (dst_status != DestinationStatus::REACHED)
         {
-            char str[256];
-            sprintf(str, "Manta %d has arrived to destination.", getNumber()+1);
-            //messages.insert(messages.begin(), str);
-            reached = true;
-            setStatus(Manta::HOLDING);
+            flyingstate = 0;
+            char msg[256];
+            Message mg;
+            sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
+            mg.faction = getFaction();
+            mg.msg = std::string(msg);
+            messages.insert(messages.begin(), mg);
+            dst_status = DestinationStatus::REACHED;
+            setStatus(FlyingStatus::HOLDING);
         }
 
 
@@ -796,7 +895,7 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
     {
         Manta::inert = false;
         antigravity = false;
-        setStatus(Manta::TACKINGOFF);
+        setStatus(FlyingStatus::TACKINGOFF);
     }
 
     if (speed>150 && getStatus()!=HOLDING)
@@ -815,7 +914,7 @@ void SimplifiedDynamicManta::doControl(struct controlregister regs)
 
     Manta::rudder = regs.precesion;
 
-    myCopy = regs;
+    registers = regs;
 
 }
 
@@ -850,34 +949,34 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
     printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\t", Cd, CL, Cy, Cm, Cl,Cn);
 }
 
-void SimplifiedDynamicManta::land()
+/**void SimplifiedDynamicManta::land()
 {
-    aistatus = LANDING;
-    setStatus(Manta::FLYING);
+    autostatus = AutoStatus::LANDING;
+    setStatus(FlyingStatus::FLYING);
     flyingstate=0;
-}
+}**/
 
 void SimplifiedDynamicManta::attack(Vec3f target)
 {
-    aistatus = ATTACK;
+    autostatus = AutoStatus::ATTACK;
     destination = target;
 }
 
 void SimplifiedDynamicManta::hold()
 {
-    aistatus = FREE;
+    autostatus = AutoStatus::FREE;
 }
 
 void SimplifiedDynamicManta::enableAuto()
 {
     Vehicle::enableAuto();
     flyingstate=0;
-    reached=false;
+    dst_status == DestinationStatus::STILL;
 }
 
 void SimplifiedDynamicManta::dogfight(Vec3f target)
 {
-    aistatus = DOGFIGHT;
+    autostatus = AutoStatus::DOGFIGHT;
     destination = target;
 }
 

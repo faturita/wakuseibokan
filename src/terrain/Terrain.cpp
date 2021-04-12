@@ -43,7 +43,7 @@
 
 
 // The texture is preloaded somewhere else.
-extern GLuint _textureLand;
+extern std::unordered_map<std::string, GLuint> textures;
 
 
 using namespace std;
@@ -381,7 +381,7 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
     
     
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureLand);
+    glBindTexture(GL_TEXTURE_2D, textures["land"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);

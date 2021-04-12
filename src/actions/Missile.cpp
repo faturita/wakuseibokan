@@ -1,8 +1,9 @@
+#include <unordered_map>
 #include "Missile.h"
 #include "../ThreeMaxLoader.h"
 #include "../profiling.h"
 
-extern GLuint _textureRoad;
+extern std::unordered_map<std::string, GLuint> textures;
 
 Missile::Missile(int faction)
 {
@@ -61,7 +62,7 @@ void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
 
         //drawRectangularBox(width, height, length);
-        _model->setTexture(_textureRoad);
+        _model->setTexture(textures["road"]);
         _model->draw();
 
         glPopMatrix();
@@ -135,7 +136,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f fwd = getForward();
 
@@ -224,7 +225,7 @@ void Missile::doControl()
 
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     c.registers.thrust = 100;
 
@@ -283,7 +284,7 @@ void Missile::doControl(struct controlregister conts)
 
     setThrottle(100.0);
 
-    myCopy = conts;
+    registers = conts;
 
 }
 

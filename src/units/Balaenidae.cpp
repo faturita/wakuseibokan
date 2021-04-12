@@ -10,16 +10,15 @@
 #include "../actions/AAM.h"
 #include "../keplerivworld.h"
 
-extern GLuint _textureMetal;
-
-extern GLuint _textureRoad;
-
+extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
 
 Balaenidae::~Balaenidae()
 {
+    // @FIXME Check this.
     delete _model;
+    assert( !"This destructor is not being executed.");
 }
 
 Balaenidae::Balaenidae(int newfaction)
@@ -31,7 +30,7 @@ Balaenidae::Balaenidae(int newfaction)
 void Balaenidae::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,_textureMetal);
+    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,textures["metal"]);
 
     setForward(0,0,1);
 
@@ -121,7 +120,7 @@ void Balaenidae::doControl()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
 
     Vec3f Po = getPos();
@@ -134,10 +133,7 @@ void Balaenidae::doControl()
 
     Vec3f T = Pf - Po;
 
-    float eh, midpointpitch;
-
-
-    if (!reached && T.magnitude()>500)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -148,7 +144,6 @@ void Balaenidae::doControl()
 
 
         // Potential fields from the islands (to avoid them)
-
         int nearesti = 0;
         float closest = 0;
         for(int i=0;i<islands.size();i++)
@@ -198,6 +193,8 @@ void Balaenidae::doControl()
 
         CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
+
+        /**
         if (abs(e)>=0.5f)
         {
             c.registers.roll = 30.0 * (signn>0?+1:-1) ;
@@ -211,19 +208,23 @@ void Balaenidae::doControl()
         else {
             c.registers.roll = 0.0f;
         }
+        **/
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
 
 
     } else {
-        if (!reached)
+        if (dst_status != DestinationStatus::REACHED )
         {
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "Balaenidae has arrived to destination.");
+            sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
-            reached = true;
+            dst_status = DestinationStatus::REACHED;
             c.registers.thrust = 0.0f;
+            setThrottle(0.0);
             c.registers.roll = 0.0f;
             disableAuto();
         }
@@ -353,7 +354,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _manta1->setNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
-        _manta1->setStatus(Manta::ON_DECK);
+        _manta1->setStatus(FlyingStatus::ON_DECK);
         _manta1->inert = true;
         alignToMe(_manta1->getBodyID());
         v = (Vehicle*)_manta1;
@@ -367,7 +368,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         p = p.normalize();
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
-        _walrus->setStatus(Walrus::SAILING);
+        _walrus->setStatus(SailingStatus::SAILING);
         _walrus->stop();
         _walrus->inert = true;
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
@@ -383,7 +384,7 @@ void Balaenidae::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
     dBodySetPosition(m->getBodyID(),pos[0],pos[1]+28,pos[2]);
-    m->setStatus(Manta::ON_DECK);
+    m->setStatus(FlyingStatus::ON_DECK);
     alignToMe(m->getBodyID());
 }
 
@@ -395,7 +396,7 @@ void Balaenidae::launch(Manta* m)
     } else
     {
         m->inert = false;
-        m->setStatus(Manta::FLYING);
+        m->setStatus(FlyingStatus::FLYING);
         m->elevator = +12;
         struct controlregister c;
         c.thrust = 600.0f/(10.0);

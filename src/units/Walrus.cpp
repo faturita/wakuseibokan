@@ -7,21 +7,17 @@
 
 #include "Walrus.h"
 #include "../md2model.h"
-
 #include "../actions/Gunshot.h"
-
 #include "../engine.h"
+#include "../container.h"
+#include "../sounds/sounds.h"
+#include "../profiling.h"
 
 extern dWorldID world;
 extern dSpaceID space;
-#include "../container.h"
-#include "../sounds/sounds.h"
-
-#include "../profiling.h"
-
 extern container<Vehicle*> entities;
-
-extern GLuint _textureSky;
+extern std::unordered_map<std::string, GLuint> textures;
+extern std::vector<Message> messages;
 
 Walrus::Walrus(int newfaction)
 {
@@ -50,7 +46,7 @@ void Walrus::setIsland(BoxIsland *value)
 
 void Walrus::init()
 {
-    if (getFaction()==GREEN_FACTION)
+    if (getFaction()==BLUE_FACTION)
         _model = (Model*)MD2Model::loadModel("units/walrusgood.md2");
     else {
         _model = (Model*)MD2Model::loadModel("units/walrus.md2");
@@ -118,13 +114,13 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
         //drawRectangularBox(width, height, length);
 
-        _model->setTexture(_textureSky);
+        _model->setTexture(textures["sky"]);
         glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 
         glRotatef(90.0f,0.0f,1.0f,0.0f);
         //glScalef(0.4f,0.4f,0.4f);
-        _topModel->setTexture(_textureSky);
+        _topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
         glPopMatrix();
@@ -142,9 +138,9 @@ void Walrus::drawModel()
 
 void Walrus::doControl()
 {
-    switch (aistatus) {
-        case ATTACK: doControlAttack();break;
-        case DESTINATION: doControlDestination();break;
+    switch (autostatus) {
+        case AutoStatus::ATTACK:        doControlAttack();      break;
+        case AutoStatus::DESTINATION:   doControlDestination(); break;
         default: break;
     }
 
@@ -154,7 +150,7 @@ void Walrus::doControlAttack()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
     Vec3f Po = getPos();
 
@@ -263,7 +259,7 @@ void Walrus::doControlDestination()
 {
     Controller c;
 
-    c.registers = myCopy;
+    c.registers = registers;
 
 
     Vec3f Po = getPos();
@@ -274,7 +270,7 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    if (!reached && T.magnitude()>500)
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500)
     {
         float distance = T.magnitude();
 
@@ -348,15 +344,19 @@ void Walrus::doControlDestination()
 
 
     } else {
-        if (!reached)
+        if (dst_status != DestinationStatus::REACHED)
         {
             char str[256];
+            Message mg;
+            mg.faction = getFaction();
             sprintf(str, "Walrus has arrived to destination.");
-            //messages.insert(messages.begin(), str);
+            mg.msg = std::string(str);
+            messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
-            reached = true;
-            aistatus = FREE;
+            dst_status = DestinationStatus::REACHED;
+            autostatus = AutoStatus::FREE;
             c.registers.thrust = 0.0f;
+            setThrottle(0.0);
             c.registers.roll = 0.0f;
             disableAuto();
         }
@@ -465,10 +465,10 @@ void Walrus::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
-    if (getTtl()<=0 && getStatus() == Walrus::OFFSHORING)
-        setStatus(Walrus::SAILING);
-    else if (getTtl()<=0 && getStatus() == Walrus::INSHORING)
-        setStatus(Walrus::ROLLING);
+    if (getTtl()<=0 && getStatus() == SailingStatus::OFFSHORING)
+        setStatus(SailingStatus::SAILING);
+    else if (getTtl()<=0 && getStatus() == SailingStatus::INSHORING)
+        setStatus(SailingStatus::ROLLING);
 
     // This algorithm is generating too many seg faults with ODE library.
     //Vec3f dump;
@@ -578,7 +578,7 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
 
 void Walrus::setStatus(int status)
 {
-    if (status == Walrus::OFFSHORING || status == Walrus::INSHORING)
+    if (status == SailingStatus::OFFSHORING || status == SailingStatus::INSHORING)
         setTtl(500);
 
     Vehicle::status = status;
@@ -587,6 +587,6 @@ void Walrus::setStatus(int status)
 
 void Walrus::attack(Vec3f target)
 {
-    aistatus = ATTACK;
+    autostatus = AutoStatus::ATTACK;
     destination = target;
 }

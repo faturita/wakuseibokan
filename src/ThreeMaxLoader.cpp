@@ -355,6 +355,18 @@ obj_type load3DSModel(const char *p_filename)
     return object;
 }
 
+/**
+ * @brief This set the color of each vertice so be carefull if you do not reset the color attributes.
+ * @param object
+ * @param x
+ * @param y
+ * @param z
+ * @param scalex
+ * @param scaley
+ * @param scalez
+ * @param _texture
+ * @return
+ */
 int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float scaley, float scalez, GLuint _texture)
 {
 
@@ -709,7 +721,6 @@ T3DSModel::T3DSModel()
 }
 T3DSModel::~T3DSModel()
 {
-
 
 }
 

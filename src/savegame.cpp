@@ -130,6 +130,10 @@ void savegame()
             p = entities[i]->getDestination();
             ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
 
+            int autostatus = static_cast<int>(entities[i]->getAutoStatus());
+
+            ss << autostatus << std::endl;
+
 
         }
     }
@@ -258,7 +262,7 @@ void loadgame()
                 _manta1->init();
                 _manta1->setNumber(findNextNumber(MANTA));
                 _manta1->embody(world, space);
-                _manta1->setStatus(Manta::FLYING);              // @FIXME, status should be stored.
+                _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
                 _manta1->inert = true;
                 v = _manta1;
                 break;
@@ -272,7 +276,7 @@ void loadgame()
                 _walrus->init();
                 _walrus->setNumber(findNextNumber(WALRUS));
                 _walrus->embody(world, space);
-                _walrus->setStatus(Walrus::SAILING);
+                _walrus->setStatus(SailingStatus::SAILING);
                 //_walrus->inert = true;
                 v = _walrus;
 
@@ -300,7 +304,14 @@ void loadgame()
             ( isauto ? v->enableAuto() : v->disableAuto());
 
             ss >> f[0] >> f[1] >> f[2] ;
-            v->setDestination(f);
+            v->goTo(f);
+
+            int autostatus;
+            ss >> autostatus;
+
+            AutoStatus autos=static_cast<AutoStatus>(autostatus);
+            v->setAutoStatus(autos);
+
 
             entities.push_back(v, v->getGeom());
         }
