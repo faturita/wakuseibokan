@@ -416,6 +416,21 @@ void inline initIslands()
     enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
     enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
+    BoxIsland *arachnid = new BoxIsland(&entities);
+    arachnid->setName("Arachnid");
+    arachnid->setLocation(-450 kmf, -1.0, -300 kmf);
+    arachnid->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *outcrop = new BoxIsland(&entities);
+    outcrop->setName("Outcrop");
+    outcrop->setLocation(-450 kmf, -1.0, -210 kmf);
+    outcrop->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *taksaven = new BoxIsland(&entities);
+    taksaven->setName("Taksaven");
+    taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
+    taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
+
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     islands.push_back(vulcano);
@@ -438,6 +453,9 @@ void inline initIslands()
     islands.push_back(midway);
     islands.push_back(enewetak);
     islands.push_back(statera);
+    islands.push_back(arachnid);
+    islands.push_back(outcrop);
+    islands.push_back(taksaven);
 
 }
 
