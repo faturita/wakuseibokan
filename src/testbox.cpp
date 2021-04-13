@@ -6220,8 +6220,6 @@ void test66()
 
     entities.push_back(_b, _b->getGeom());
 
-    static dJointID joint;
-
     CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
     _bo->init();
     _bo->embody(world, space);

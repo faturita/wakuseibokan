@@ -27,6 +27,9 @@ void CarrierTurret::init()
     Weapon::width=11.68;
 
     setForward(0,0,1);
+
+    Weapon::azimuth = 0;
+    Weapon::elevation = 0;
     
 }
 
@@ -96,6 +99,8 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
     {
         glPushMatrix();
         glTranslatef(x, y, z);
+
+        doTransform(f, R);
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
