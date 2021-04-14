@@ -69,24 +69,6 @@ void CarrierTurret::embody(dBodyID myBodySelf)
     
 }
 
-void CarrierTurret::attachTo(dWorldID world, Vehicle *attacher, float x, float y, float z)
-{
-    // @NOTE, it takes the position of the attacher and creates a fixed joint between them.  The joint is created in the world, in the zero group.
-    setPos(attacher->getPos()[0]+x, attacher->getPos()[1]+y, attacher->getPos()[2]+z);
-
-    joint = dJointCreateFixed(world,0);
-    dJointAttach (joint,attacher->getBodyID(), getBodyID());
-
-    dJointSetFixed(joint);     // @NOTE: SetFixed is mandatory, otherwise the objects share the same center.
-    dJointSetFixedParam(joint,dParamSuspensionERP,0.0f );
-    dJointSetFixedParam(joint,dParamSuspensionCFM, 0.0f);
-
-}
-
-dBodyID CarrierTurret::getBodyID()
-{
-    return me;
-}
 
 
 void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z)
@@ -143,30 +125,10 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
 }
 
 
-void CarrierTurret::doDynamics(dBodyID body)
-{
-    me = body;
-    doDynamics();
-}
-
-void CarrierTurret::stop()
-{
-
-}
-
-void CarrierTurret::doDynamics()
-{
-
-
-    wrapDynamics(me);
-    
-}
-
-
 Vec3f CarrierTurret::getForward()
 {
-    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Weapon::azimuth,-Weapon::elevation);
-    return forward;
+    Vec3f fw = toVectorInFixedSystem(0, 0, 1,Weapon::azimuth,-Weapon::elevation);
+    return fw;
 }
 
 void CarrierTurret::setForward(float x, float y, float z)
@@ -179,13 +141,20 @@ void CarrierTurret::setForward(Vec3f forw)
     Weapon::azimuth = getAzimuth(forw);
 
     Weapon::setForward(forw);
-
 }
 
+Vec3f CarrierTurret::getAim()
+{
+    return aim;
+}
+
+void CarrierTurret::setAim(Vec3f aim)
+{
+    CarrierTurret::aim = aim;
+}
 
 Vec3f CarrierTurret::getFiringPort()
 {
-    //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
@@ -193,7 +162,7 @@ void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
     position[1] += 19.0f; // Move upwards to the center of the real rotation.
-    fw = getForward();
+    fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
@@ -219,7 +188,7 @@ Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space)
 
     Vec3f position = getPos();
     position[1] += 19.0f; // Move upwards to the center of the real rotation.
-    forward = getForward();
+    forward = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;

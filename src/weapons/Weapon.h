@@ -1,8 +1,3 @@
-//
-//  Weapon.h
-//
-//
-
 #ifndef WEAPON_H
 #define WEAPON_H
 
@@ -13,7 +8,6 @@
 class Weapon : public Vehicle
 {
     GLuint _textureBox;
-    dGeomID geom;
 
     dJointID joint;
 
@@ -27,20 +21,30 @@ protected:
     
 public:
     Weapon(int faction);
-	void  init();
-    int   getType();
-	void  drawModel(float yRot, float xRot, float x, float y, float z);
-    
+    ~Weapon();
+    void init();
+    void drawModel(float yRot, float xRot, float x, float y, float z);
 	void drawModel();
+
+    void virtual setPos(const Vec3f &newpos);
+    void virtual setPos(float x, float y, float z);
     
-	void  drawDirectModel();
-	void doMaterial();
 	void  doDynamics(dBodyID);
     void  doDynamics();
-    void attachTo(dWorldID world, Vehicle *attacher, float x, float y, float z);
+
+    int getType();
+    int virtual getSubType();
+
+    void  attachTo(dWorldID world, Vehicle *attacher, float x, float y, float z);
     void  embody(dBodyID);
     void  embody(dWorldID world, dSpaceID space);
+
     void  doControl(Controller);
+
+    void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
+
+    Vec3f getForward();
+
     dBodyID  getBodyID();
     void  stop();
 };

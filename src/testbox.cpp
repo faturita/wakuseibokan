@@ -6206,6 +6206,7 @@ void test65()
 void checktest65(unsigned long timer)
 {
 
+
 }
 
 
@@ -6258,7 +6259,51 @@ void test66()
 
 void checktest66(unsigned long timer)
 {
+    long unsigned starttime = 200;
 
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier turret shoots the command center.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 1000)
+    {
+        Vehicle *c = findCarrier(GREEN_FACTION);
+        BoxIsland *b = findNearestIsland(c->getPos());
+
+        c->goTo(b->getPos()+Vec3f(1500,0.0,0.0));
+        c->enableAuto();
+    }
+
+    if (timer > 1400)
+    {
+        Vehicle *c = findCarrier(GREEN_FACTION);
+        BoxIsland *b = findNearestIsland(c->getPos());
+
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            Vehicle *v=entities[i];
+            if (v->getType() == WALRUS && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
+            {
+                Weapon *w = (Weapon*)v;
+                if (dAreConnected(c->getBodyID(),v->getBodyID()))
+                {
+                    CommandCenter *cm = (CommandCenter*)b->getCommandCenter();
+
+                    if (cm)
+                    {
+                        // w->setAim(cm->getPos());
+                    }
+                }
+            }
+        }
+
+    }
 }
 
 static int testing=-1;
@@ -6366,8 +6411,8 @@ void initWorldModelling(int testcase)
     case 62:test62();break;                         // Performance measurement (several carriers, Mantas and walruses)
     case 63:test63();break;                         // Manta travels through different waypoints.
     case 64:test64();break;                         // Manta attacks island and it is defended by missile launchers.
-    case 65:test65();break;                         // Carrier weapons.  Check first Artillery.
-    case 66:test66();break;                         // Carrier Turret Weapon firing to targets.
+    case 65:test65();break;                         // Carrier weapons.  Add a template weapon, attached to the carrier.
+    case 66:test66();break;                         // Carrier Turret Weapon firing to Command Center as the carrier approaches the island.
     default:initIslands();test1();break;
     }
 

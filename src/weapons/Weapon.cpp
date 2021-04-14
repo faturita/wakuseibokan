@@ -1,7 +1,3 @@
-//
-//  Weapon.cpp
-//
-
 #include "Weapon.h"
 
 
@@ -10,12 +6,25 @@ Weapon::Weapon(int faction)
     setFaction(faction);
 }
 
+Weapon::~Weapon()
+{
+    if (joint)
+    {
+        dJointDisable(joint);
+        dJointDestroy(joint);
+    }
+}
+
 void Weapon::init()
 {
 
     Image* image = loadBMP("vtr.bmp");
     _textureBox = loadTexture(image);
     delete image;
+
+    Weapon::width = 7.0;
+    Weapon::height = 7.0;
+    Weapon::length = 7.0;
     
     setForward(0,0,1);
     
@@ -26,12 +35,51 @@ int Weapon::getType()
     return WALRUS;
 }
 
+int Weapon::getSubType()
+{
+    return STRUCTURE;
+}
+
+void Weapon::setPos(const Vec3f &newpos)
+{
+    pos[0] = newpos[0];
+    pos[1] = newpos[1];
+    pos[2] = newpos[2];
+
+    dGeomSetPosition(geom, pos[0], pos[1], pos[2]);
+}
+void Weapon::setPos(float x, float y, float z)
+{
+    pos[0] = x;
+    pos[1] = y;
+    pos[2] = z;
+
+    dGeomSetPosition(geom, pos[0], pos[1], pos[2]);
+}
+
+void Weapon::doDynamics(dBodyID body)
+{
+    me = body;
+    doDynamics();
+}
+
+void Weapon::doDynamics()
+{
+    wrapDynamics(me);
+}
+
+void Weapon::stop()
+{
+    // @NOTE: As this body is attached to another one, do nothing.
+}
+
+
 
 void Weapon::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
     embody(me);
-    geom = dCreateBox(space, 7.0f,7.0f,7.0f);
+    geom = dCreateBox(space, width, height, length);
     dGeomSetBody(geom, me);
 }
 
@@ -41,10 +89,9 @@ void Weapon::embody(dBodyID myBodySelf)
 	dMass m;
 
     float myMass = 1.0f;
-    float length = 7.0f;
 
 	dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,length,length,length);
+    dMassSetBox(&m,1,width, height, length);
 	dMassAdjust(&m, myMass*1.0f);
 	dBodySetMass(myBodySelf,&m);
     
@@ -74,7 +121,23 @@ dBodyID Weapon::getBodyID()
 
 void Weapon::doControl(Controller controller)
 {
+    Weapon::elevation = controller.registers.pitch;
+    Weapon::azimuth = controller.registers.roll;
+}
 
+void Weapon::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
+{
+    position = getPos();
+    fwd = toVectorInFixedSystem(0, 0, 1,Weapon::azimuth,Weapon::elevation);
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fwd = fwd.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=4;// 4 is a good value to be just above the shoulders, like watching somebodys cellphone on the train
+    position = position - 40*fwd + Up;
+    fwd = orig-position;
 }
 
 void Weapon::drawModel()
@@ -92,7 +155,7 @@ void  Weapon::drawModel(float yRot, float xRot, float x, float y, float z)
     float yy = pos[1];
     float zz = pos[2];
     
-    const float BOX_SIZE = 7.0f; //The length of each side of the cube
+    const float BOX_SIZE = length; //The length of each side of the cube
     
     //glLoadIdentity();
     glPushMatrix();
@@ -185,26 +248,5 @@ void  Weapon::drawModel(float yRot, float xRot, float x, float y, float z)
       //  boxangle = 0.0f;
 }
 
-void Weapon::drawDirectModel()
-{
-
-}
-
-void Weapon::doDynamics(dBodyID body)
-{
-    me = body;
-    doDynamics();
-}
-
-void Weapon::stop()
-{
-
-}
-
-void Weapon::doDynamics()
-{
 
 
-    wrapDynamics(me);
-    
-}
