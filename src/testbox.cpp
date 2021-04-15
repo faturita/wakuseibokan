@@ -6265,7 +6265,7 @@ void checktest66(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier turret shoots the command center.");
+        sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier shoots the CC.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6276,7 +6276,7 @@ void checktest66(unsigned long timer)
         Vehicle *c = findCarrier(GREEN_FACTION);
         BoxIsland *b = findNearestIsland(c->getPos());
 
-        c->goTo(b->getPos()+Vec3f(1500,0.0,0.0));
+        c->goTo(b->getPos()+Vec3f(1900,0.0,0.0));
         c->enableAuto();
     }
 
@@ -6285,24 +6285,45 @@ void checktest66(unsigned long timer)
         Vehicle *c = findCarrier(GREEN_FACTION);
         BoxIsland *b = findNearestIsland(c->getPos());
 
-        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
-        {
-            Vehicle *v=entities[i];
-            if (v->getType() == WALRUS && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
-            {
-                Weapon *w = (Weapon*)v;
-                if (dAreConnected(c->getBodyID(),v->getBodyID()))
-                {
-                    CommandCenter *cm = (CommandCenter*)b->getCommandCenter();
+        if (c)
 
-                    if (cm)
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+            {
+                Vehicle *v=entities[i];
+                if (v->getType() == WALRUS && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
+                {
+                    CarrierTurret *w = (CarrierTurret*)v;
+                    if (dAreConnected(c->getBodyID(),v->getBodyID()))
                     {
-                        // w->setAim(cm->getPos());
+                        CommandCenter *cm = (CommandCenter*)b->getCommandCenter();
+                        if (cm)
+                        {
+
+                            Vehicle *action = w->aimAndFire(world,space, cm->getPos());
+
+                            if (action != NULL)
+                            {
+                                entities.push_back(action, action->getGeom());
+                                gunshot();
+                                //cm->setTtl(100);
+                            }
+
+                        } else {
+                            printf("Test Passed\n");
+                            endWorldModelling();
+                            exit(1);
+                        }
                     }
                 }
             }
-        }
 
+    }
+
+    if (timer > 6000)
+    {
+        printf("Test Failed:  The carrier should have destroyed so far the Enemy Command Center.\n");
+        endWorldModelling();
+        exit(0);
     }
 }
 

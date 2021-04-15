@@ -14,7 +14,6 @@
 class CarrierTurret : public Weapon
 {
     Vec3f firingpos;
-    Vec3f aim;
 
     int zoom;
     
@@ -28,13 +27,15 @@ public:
     void  embody(dBodyID);
     void  embody(dWorldID world, dSpaceID space);
     void  doControl(Controller);
-
+    void  doControl(struct controlregister conts);
     void doControl();
 
     int   getType();
     int getSubType();
 
     Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(dWorldID world, dSpaceID space, int shellloadingtime);
+    Vehicle* aimAndFire(dWorldID world, dSpaceID space, Vec3f target);
 
     void setForward(Vec3f forw);
     void setForward(float x, float y, float z);
@@ -42,9 +43,6 @@ public:
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw);
     Vec3f getFiringPort();
-
-    void setAim(Vec3f aim);
-    Vec3f getAim();
 };
 
 

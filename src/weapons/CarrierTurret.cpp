@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include "../ThreeMaxLoader.h"
 #include "../actions/Gunshot.h"
+#include "../profiling.h"
 #include "Weapon.h"
 #include "CarrierTurret.h"
 
@@ -143,15 +144,6 @@ void CarrierTurret::setForward(Vec3f forw)
     Weapon::setForward(forw);
 }
 
-Vec3f CarrierTurret::getAim()
-{
-    return aim;
-}
-
-void CarrierTurret::setAim(Vec3f aim)
-{
-    CarrierTurret::aim = aim;
-}
 
 Vec3f CarrierTurret::getFiringPort()
 {
@@ -175,9 +167,27 @@ void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
     //forward = -orig+position;
 }
 
+Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
+{
+    Vec3f aimTarget = target - getPos();
+    Vec3f aim = toBody(me,aimTarget);
 
+    setForward((aim));
+    Weapon::azimuth = getAzimuth(aim);
+    Weapon::elevation = getDeclination(aim);
+
+
+    Vehicle *action = fire(world,space,100);
+
+    return action;
+}
 
 Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space)
+{
+    return fire(world, space, 1);
+}
+
+Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtime)
 {
     if (getTtl()>0)
         return NULL;
@@ -220,7 +230,7 @@ Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space)
     dBodySetRotation(action->getBodyID(),Re);
 
     // Shell loading time.
-    setTtl(1);
+    setTtl(shellloadingtime);
 
     // I can set power or something here.
     return (Vehicle*)action;
@@ -233,7 +243,14 @@ void CarrierTurret::doControl()
 
     c.registers = registers;
 
+    dout << "controlling !!!!!!" << std::endl;
+
     CarrierTurret::doControl(c);
+}
+
+void CarrierTurret::doControl(Controller controller)
+{
+    doControl(controller.registers);
 }
 
 
@@ -242,14 +259,14 @@ void CarrierTurret::doControl()
  * @brief Turret::doControl
  * @param controller
  */
-void CarrierTurret::doControl(Controller controller)
+void CarrierTurret::doControl(struct controlregister conts)
 {
-    zoom = 20.0f + controller.registers.precesion*100;
+    zoom = 20.0f + conts.precesion*100;
 
-    elevation -= controller.registers.pitch * (20.0f/abs(zoom)) ;
-    azimuth += controller.registers.roll * (20.0f/abs(zoom)) ;
+    elevation -= conts.pitch * (20.0f/abs(zoom)) ;
+    azimuth += conts.roll * (20.0f/abs(zoom)) ;
 
-    //dout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+    dout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 }
