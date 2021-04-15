@@ -85,6 +85,7 @@
 
 #include "weapons/Weapon.h"
 #include "weapons/CarrierTurret.h"
+#include "weapons/CarrierArtillery.h"
 
 #include "map.h"
 
@@ -6290,7 +6291,7 @@ void checktest66(unsigned long timer)
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 Vehicle *v=entities[i];
-                if (v->getType() == WALRUS && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
+                if (v->getType() == WEAPON && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
                 {
                     CarrierTurret *w = (CarrierTurret*)v;
                     if (dAreConnected(c->getBodyID(),v->getBodyID()))

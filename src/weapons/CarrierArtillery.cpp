@@ -1,46 +1,47 @@
 #include <unordered_map>
+#include "../actions/Shell.h"
 #include "../ThreeMaxLoader.h"
 #include "../actions/Gunshot.h"
 #include "../profiling.h"
-#include "Weapon.h"
-#include "CarrierTurret.h"
+#include "../sounds/sounds.h"
+
+#include "CarrierArtillery.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
 
-
-CarrierTurret::CarrierTurret(int faction) : Weapon(faction)
+CarrierArtillery::CarrierArtillery(int faction) : Weapon(faction)
 {
-    CarrierTurret::zoom = 20.0f;
-    CarrierTurret::firingpos = Vec3f(0.0f,19.0f,0.0f);
+    CarrierArtillery::zoom = 20.0f;
+    CarrierArtillery::firingpos = Vec3f(0.0f,19.0f,0.0f);
 }
 
-void CarrierTurret::init()
+void CarrierArtillery::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
         _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
+
     }
 
     Weapon::height=27.97;
     Weapon::length=11.68;
     Weapon::width=11.68;
 
-    setForward(0,0,1);
+    setForward(Vec3f(0,0,1));
 
     Weapon::azimuth = 0;
     Weapon::elevation = 0;
-    
 }
 
-int CarrierTurret::getSubType()
+int CarrierArtillery::getSubType()
 {
-    return TURRET;
+    return ARTILLERY;
 }
 
 
-void CarrierTurret::embody(dWorldID world, dSpaceID space)
+void CarrierArtillery::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
     embody(me);
@@ -50,24 +51,22 @@ void CarrierTurret::embody(dWorldID world, dSpaceID space)
 }
 
 
-void CarrierTurret::embody(dBodyID myBodySelf)
+void CarrierArtillery::embody(dBodyID myBodySelf)
 {
-	dMass m;
+    dMass m;
 
     float myMass = 0.001f;                  // @NOTE: I want it to do not disrupt too much the structure of the carrier.
 
-	dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
+    dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,Weapon::width, Weapon::height, Weapon::length);
-	dMassAdjust(&m, myMass*1.0f);
-	dBodySetMass(myBodySelf,&m);
-    
+    dMassAdjust(&m, myMass*1.0f);
+    dBodySetMass(myBodySelf,&m);
+
     me = myBodySelf;
-    
+
 }
 
-
-
-void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z)
+void CarrierArtillery::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
@@ -82,37 +81,17 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        _model->draw(textures["metal"]);
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
-
-        glTranslatef(0.0f,27.97f-8.140f,0.0f);
-
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
-
         glRotatef(-Weapon::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Weapon::elevation,0.0f,0.0f,1.0f);
 
-        _topModel->setTexture(textures["metal"]);
+        _topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
-        // Gun shots
-        //glTranslatef((firing+=100),0.0f,0.0f);
-        //drawArrow(100.0f,0.0f,0.0f,0.0,1.0,0.0);
 
-
-        // Laser Beam
-        //drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
-
-        //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();
 
-        /**glPushMatrix();
-        glLoadIdentity();
-        glLoadMatrixf(modelview);
-        glTranslatef((firing+=50),0.0f,0.0f);
-        drawArrow(100.0f,0.0f,0.0f,1.0,0.0,0.0);
-
-        glPopMatrix();**/
     }
     else
     {
@@ -120,39 +99,42 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
     }
 }
 
-
-Vec3f CarrierTurret::getForward()
+Vec3f CarrierArtillery::getForward()
 {
-    Vec3f fw = toVectorInFixedSystem(0, 0, 1,Weapon::azimuth,-Weapon::elevation);
-    return fw;
+    Vec3f forward = toVectorInFixedSystem(0, 0, 1,Weapon::azimuth,-Weapon::elevation);
+    return forward;
 }
 
-void CarrierTurret::setForward(float x, float y, float z)
+void CarrierArtillery::setForward(float x, float y, float z)
 {
-    CarrierTurret::setForward(Vec3f(x,y,z));
+    CarrierArtillery::setForward(Vec3f(x,y,z));
 }
-void CarrierTurret::setForward(Vec3f forw)
+
+void CarrierArtillery::setForward(Vec3f forw)
 {
     Weapon::elevation = getDeclination(forw);
     Weapon::azimuth = getAzimuth(forw);
 
     Weapon::setForward(forw);
+
 }
 
-
-Vec3f CarrierTurret::getFiringPort()
+Vec3f CarrierArtillery::getFiringPort()
 {
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
-void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
+void CarrierArtillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
-    position[1] += 19.0f; // Move upwards to the center of the real rotation.
+    position[1] += 2.0f;
     fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
+    //dout << "Forward:" << forward << std::endl;
+
     Vec3f orig;
+
 
     fw = fw.normalize();
     orig = position;
@@ -160,9 +142,10 @@ void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
     position = position + (abs(zoom))*fw;
 
     //forward = -orig+position;
+
 }
 
-Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
+Vehicle* CarrierArtillery::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
 {
     Vec3f aimTarget = target - getPos();
     Vec3f aim = toBody(me,aimTarget);
@@ -177,33 +160,34 @@ Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
     return action;
 }
 
-Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space)
+Vehicle* CarrierArtillery::fire(dWorldID world, dSpaceID space)
 {
     return fire(world, space, 1);
 }
 
-Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtime)
+Vehicle* CarrierArtillery::fire(dWorldID world, dSpaceID space, int shellloadingtime)
 {
     if (getTtl()>0)
         return NULL;
 
-    Gunshot *action = new Gunshot();
+    Shell *action = new Shell();
     // Need axis conversion.
     action->init();
 
+
     Vec3f position = getPos();
-    position[1] += 19.0f; // Move upwards to the center of the real rotation.
     forward = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
+
 
     forward = forward.normalize();
     orig = position;
     position = position + 40*forward;
     forward = -orig+position;
 
-    Vec3f Ft = forward*100;
+    Vec3f Ft = forward*15;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
@@ -221,40 +205,35 @@ Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtim
 
     //dout << d << std::endl;
 
+    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+
+
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
-    // Shell loading time.
+    artilleryshot();
     setTtl(shellloadingtime);
 
     // I can set power or something here.
     return (Vehicle*)action;
 }
 
-// Pick the target that was identified, aim to it and fire.
-void CarrierTurret::doControl()
+void CarrierArtillery::doControl()
 {
     Controller c;
 
     c.registers = registers;
 
-    dout << "controlling !!!!!!" << std::endl;
-
-    CarrierTurret::doControl(c);
+    CarrierArtillery::doControl(c);
 }
 
-void CarrierTurret::doControl(Controller controller)
+void CarrierArtillery::doControl(Controller controller)
 {
     doControl(controller.registers);
 }
 
 
-/**
- * The values are modified from the rc
- * @brief Turret::doControl
- * @param controller
- */
-void CarrierTurret::doControl(struct controlregister conts)
+void CarrierArtillery::doControl(struct controlregister conts)
 {
     zoom = 20.0f + conts.precesion*100;
 
@@ -265,5 +244,8 @@ void CarrierTurret::doControl(struct controlregister conts)
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 }
+
+
+
 
 

@@ -55,6 +55,9 @@
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
 
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierTurret.h"
+
 extern  Camera Camera;
 
 extern  Controller controller;
@@ -510,6 +513,23 @@ void initWorldPopulation()
 
         entities.push_back(_b, _b->getGeom());
 
+        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        _bo->init();
+        _bo->embody(world, space);
+        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+
+
+        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        _w1->init();
+        _w1->embody(world, space);
+        _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
+        _w1->stop();
+
+        entities.push_back(_w1, _w1->getGeom());
+
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
         _bg->init();
@@ -532,6 +552,23 @@ void initWorldPopulation()
         _b->stop();
 
         entities.push_back(_b,_b->getGeom());
+
+        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        _bo->init();
+        _bo->embody(world, space);
+        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+
+
+        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        _w1->init();
+        _w1->embody(world, space);
+        _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
+        _w1->stop();
+
+        entities.push_back(_w1, _w1->getGeom());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);

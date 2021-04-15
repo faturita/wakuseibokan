@@ -32,7 +32,7 @@ void Weapon::init()
 
 int Weapon::getType()
 {
-    return WALRUS;
+    return WEAPON;
 }
 
 int Weapon::getSubType()

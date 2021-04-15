@@ -1,24 +1,24 @@
-#ifndef CARRIERTURRET_H
-#define CARRIERTURRET_H
+#ifndef CARRIERARTILLERY_H
+#define CARRIERARTILLERY_H
 
 #include <iostream>
 
 #include "../units/Vehicle.h"
 #include "Weapon.h"
 
-class CarrierTurret : public Weapon
+class CarrierArtillery : public Weapon
 {
     Vec3f firingpos;
 
     int zoom;
-    
+
 public:
-    CarrierTurret(int faction);
-	void  init();
+    CarrierArtillery(int faction);
+    void  init();
 
-	void  drawModel(float yRot, float xRot, float x, float y, float z);
+    void  drawModel(float yRot, float xRot, float x, float y, float z);
 
-    
+
     void  embody(dBodyID);
     void  embody(dWorldID world, dSpaceID space);
     void  doControl(Controller);
@@ -39,5 +39,4 @@ public:
     Vec3f getFiringPort();
 };
 
-
-#endif // CARRIERTURRET_H
+#endif // CARRIERARTILLERY_H
