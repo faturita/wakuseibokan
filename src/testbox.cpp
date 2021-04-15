@@ -83,6 +83,10 @@
 #include "structures/Radar.h"
 #include "structures/Factory.h"
 
+#include "weapons/Weapon.h"
+#include "weapons/CarrierTurret.h"
+#include "weapons/CarrierArtillery.h"
+
 #include "map.h"
 
 extern  Camera Camera;
@@ -6150,6 +6154,180 @@ void checktest64(unsigned long timer)
 
 }
 
+
+void test65()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    static dJointID joint;
+
+    Weapon * _bo= new Weapon(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, 00.0f, 22.0f, 0.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t10 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t11 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t12 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t13 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t14 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t15 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t16 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest65(unsigned long timer)
+{
+
+
+}
+
+
+void test66()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t10 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t11 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t12 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t13 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t14 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t15 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t16 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+    Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest66(unsigned long timer)
+{
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier shoots the CC.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 1000)
+    {
+        Vehicle *c = findCarrier(GREEN_FACTION);
+        BoxIsland *b = findNearestIsland(c->getPos());
+
+        c->goTo(b->getPos()+Vec3f(1900,0.0,0.0));
+        c->enableAuto();
+    }
+
+    if (timer > 1400)
+    {
+        Vehicle *c = findCarrier(GREEN_FACTION);
+        BoxIsland *b = findNearestIsland(c->getPos());
+
+        if (c)
+
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+            {
+                Vehicle *v=entities[i];
+                if (v->getType() == WEAPON && v->getSubType() == TURRET && v->getFaction() == GREEN_FACTION)
+                {
+                    CarrierTurret *w = (CarrierTurret*)v;
+                    if (dAreConnected(c->getBodyID(),v->getBodyID()))
+                    {
+                        CommandCenter *cm = (CommandCenter*)b->getCommandCenter();
+                        if (cm)
+                        {
+
+                            Vehicle *action = w->aimAndFire(world,space, cm->getPos());
+
+                            if (action != NULL)
+                            {
+                                entities.push_back(action, action->getGeom());
+                                gunshot();
+                                //cm->setTtl(100);
+                            }
+
+                        } else {
+                            printf("Test Passed\n");
+                            endWorldModelling();
+                            exit(1);
+                        }
+                    }
+                }
+            }
+
+    }
+
+    if (timer > 6000)
+    {
+        printf("Test Failed:  The carrier should have destroyed so far the Enemy Command Center.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -6255,6 +6433,8 @@ void initWorldModelling(int testcase)
     case 62:test62();break;                         // Performance measurement (several carriers, Mantas and walruses)
     case 63:test63();break;                         // Manta travels through different waypoints.
     case 64:test64();break;                         // Manta attacks island and it is defended by missile launchers.
+    case 65:test65();break;                         // Carrier weapons.  Add a template weapon, attached to the carrier.
+    case 66:test66();break;                         // Carrier Turret Weapon firing to Command Center as the carrier approaches the island.
     default:initIslands();test1();break;
     }
 
@@ -6337,6 +6517,8 @@ void worldStep(int value)
     case 62:checktest62(timer);break;
     case 63:checktest63(timer);break;
     case 64:checktest64(timer);break;
+    case 65:checktest65(timer);break;
+    case 66:checktest66(timer);break;
 
     default: break;
     }

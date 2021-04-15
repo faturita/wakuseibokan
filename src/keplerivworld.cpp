@@ -55,6 +55,9 @@
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
 
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierTurret.h"
+
 extern  Camera Camera;
 
 extern  Controller controller;
@@ -416,6 +419,21 @@ void inline initIslands()
     enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
     enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
+    BoxIsland *arachnid = new BoxIsland(&entities);
+    arachnid->setName("Arachnid");
+    arachnid->setLocation(-450 kmf, -1.0, -300 kmf);
+    arachnid->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    BoxIsland *outcrop = new BoxIsland(&entities);
+    outcrop->setName("Outcrop");
+    outcrop->setLocation(-450 kmf, -1.0, -210 kmf);
+    outcrop->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *taksaven = new BoxIsland(&entities);
+    taksaven->setName("Taksaven");
+    taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
+    taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
+
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     islands.push_back(vulcano);
@@ -438,6 +456,9 @@ void inline initIslands()
     islands.push_back(midway);
     islands.push_back(enewetak);
     islands.push_back(statera);
+    islands.push_back(arachnid);
+    islands.push_back(outcrop);
+    islands.push_back(taksaven);
 
 }
 
@@ -492,6 +513,23 @@ void initWorldPopulation()
 
         entities.push_back(_b, _b->getGeom());
 
+        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        _bo->init();
+        _bo->embody(world, space);
+        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+
+
+        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        _w1->init();
+        _w1->embody(world, space);
+        _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
+        _w1->stop();
+
+        entities.push_back(_w1, _w1->getGeom());
+
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
         _bg->init();
@@ -514,6 +552,23 @@ void initWorldPopulation()
         _b->stop();
 
         entities.push_back(_b,_b->getGeom());
+
+        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        _bo->init();
+        _bo->embody(world, space);
+        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+
+
+        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        _w1->init();
+        _w1->embody(world, space);
+        _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
+        _w1->stop();
+
+        entities.push_back(_w1, _w1->getGeom());
 
 
         Beluga *_bg = new Beluga(BLUE_FACTION);

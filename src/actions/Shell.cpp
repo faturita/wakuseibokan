@@ -1,4 +1,9 @@
+#include <unordered_map>
+#include "../ThreeMaxLoader.h"
 #include "Shell.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
+
 
 Shell::Shell()
 {
@@ -20,6 +25,12 @@ void Shell::init()
     Shell::width=10.0f;
 
     Shell::mass = 1000.0f;
+
+    //Load the model
+    _model = (Model*)T3DSModel::loadModel("units/bomb.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
+    if (_model != NULL)
+    {
+    }
 
     setDamage(20);
 
@@ -52,7 +63,11 @@ void Shell::drawModel(float yRot, float xRot, float x, float y, float z)
         v = v*100;
 
         //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
-        drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
+        //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
+        _model->setTexture(textures["metal"]);
+        _model->draw();
+
+
 
         glPopMatrix();
     }

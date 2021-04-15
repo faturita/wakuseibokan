@@ -169,4 +169,10 @@ src/water/main.c
 src/water/noise.c
 src/water/noise.h
 src/water/water
+src/weapons/CarrierArtillery.cpp
+src/weapons/CarrierArtillery.h
+src/weapons/CarrierTurret.cpp
+src/weapons/CarrierTurret.h
+src/weapons/Weapon.cpp
+src/weapons/Weapon.h
 src/writevideosample.cpp

@@ -373,7 +373,6 @@ void AdvancedWalrus::setAim(Vec3f aim)
 
 Vec3f AdvancedWalrus::getFiringPort()
 {
-    //return Vec3f(getPos()[0],20.1765f, getPos()[2]);
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
