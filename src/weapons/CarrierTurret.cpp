@@ -11,7 +11,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 CarrierTurret::CarrierTurret(int faction) : Weapon(faction)
 {
     CarrierTurret::zoom = 20.0f;
-    CarrierTurret::firingpos = Vec3f(0.0f,19.0f,0.0f);
+    CarrierTurret::firingpos = Vec3f(0.0f,14.0f,0.0f);
 }
 
 void CarrierTurret::init()
@@ -23,7 +23,7 @@ void CarrierTurret::init()
         _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
     }
 
-    Weapon::height=27.97;
+    Weapon::height=4.68;
     Weapon::length=11.68;
     Weapon::width=11.68;
 
@@ -82,10 +82,11 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        _model->draw(textures["metal"]);
-        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        //_model->draw(textures["metal"]);
+        drawRectangularBox(Weapon::width, Weapon::height, Weapon::length);
 
-        glTranslatef(0.0f,27.97f-8.140f,0.0f);
+        //glTranslatef(0.0f,27.97f-8.140f,0.0f);
+        glTranslatef(0.0f,firingpos[1]+0.83f,0.0f);
 
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
 
@@ -148,7 +149,7 @@ Vec3f CarrierTurret::getFiringPort()
 void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
-    position[1] += 19.0f; // Move upwards to the center of the real rotation.
+    position[1] += firingpos[1]; // Move upwards to the center of the real rotation.
     fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
@@ -192,23 +193,23 @@ Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtim
     action->init();
 
     Vec3f position = getPos();
-    position[1] += 19.0f; // Move upwards to the center of the real rotation.
-    forward = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+    position[1] += firingpos[1]; // Move upwards to the center of the real rotation.
+    Vec3f fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
 
-    forward = forward.normalize();
+    fw = fw.normalize();
     orig = position;
-    position = position + 40*forward;
-    forward = -orig+position;
+    position = position + 40*fw;
+    fw = -orig+position;
 
-    Vec3f Ft = forward*100;
+    Vec3f Ft = fw*100;
 
     Vec3f f1(0.0,0.0,1.0);
-    Vec3f f2 = forward.cross(f1);
+    Vec3f f2 = fw.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = acos( fw.dot(f1)/(f1.magnitude()*fw.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

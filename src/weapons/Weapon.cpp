@@ -70,7 +70,10 @@ void Weapon::doDynamics()
 
 void Weapon::stop()
 {
-    // @NOTE: As this body is attached to another one, do nothing.
+    // @NOTE: ODE is extraordinary, but if you do not use it exactly as they suggest (using motors to drive forces) there could appear
+    //    many issues.  I've found that I need to provide a stop function for the weapons (attached to other units) because if there happen
+    //    to be some problem with the unit, ODE halts and the simulation is stopped.
+    Vehicle::stop();
 }
 
 

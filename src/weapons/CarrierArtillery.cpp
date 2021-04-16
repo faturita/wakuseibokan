@@ -25,7 +25,7 @@ void CarrierArtillery::init()
 
     }
 
-    Weapon::height=27.97;
+    Weapon::height=11.68;
     Weapon::length=11.68;
     Weapon::width=11.68;
 
@@ -81,7 +81,7 @@ void CarrierArtillery::drawModel(float yRot, float xRot, float x, float y, float
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        //drawRectangularBox(Weapon::width, Weapon::height, Weapon::length);
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Weapon::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Weapon::elevation,0.0f,0.0f,1.0f);

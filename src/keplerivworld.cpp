@@ -513,23 +513,6 @@ void initWorldPopulation()
 
         entities.push_back(_b, _b->getGeom());
 
-        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
-        _bo->init();
-        _bo->embody(world, space);
-        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
-        _bo->stop();
-
-        entities.push_back(_bo, _bo->getGeom());
-
-
-        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
-        _w1->init();
-        _w1->embody(world, space);
-        _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
-        _w1->stop();
-
-        entities.push_back(_w1, _w1->getGeom());
-
 
         Beluga *_bg = new Beluga(BLUE_FACTION);
         _bg->init();
@@ -539,6 +522,24 @@ void initWorldPopulation()
         _bg->stop();
 
         entities.push_back(_bg, _bg->getGeom());
+
+
+        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        _bo->init();
+        _bo->embody(world, space);
+        _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+        _bo->stop();
+
+        entities.push_back(_bo, _bo->getGeom());
+
+
+        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        _w1->init();
+        _w1->embody(world, space);
+        _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+        _w1->stop();
+
+        entities.push_back(_w1, _w1->getGeom());
     }
     else if (gamemode == ACTIONGAME)
     {
@@ -553,10 +554,22 @@ void initWorldPopulation()
 
         entities.push_back(_b,_b->getGeom());
 
+
+        Beluga *_bg = new Beluga(BLUE_FACTION);
+        _bg->init();
+        _bg->embody(world,space);
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
+        _bg->stop();
+
+        entities.push_back(_bg, _bg->getGeom());
+
+
         CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
         _bo->init();
         _bo->embody(world, space);
-        _bo->attachTo(world,_b, -40.0f, 20.0f, -210.0f);
+        _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
         _bo->stop();
 
         entities.push_back(_bo, _bo->getGeom());
@@ -569,17 +582,6 @@ void initWorldPopulation()
         _w1->stop();
 
         entities.push_back(_w1, _w1->getGeom());
-
-
-        Beluga *_bg = new Beluga(BLUE_FACTION);
-        _bg->init();
-        _bg->embody(world,space);
-        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
-        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
-        _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
-        _bg->stop();
-
-        entities.push_back(_bg, _bg->getGeom());
 
 
         for (int j=0;j<islands.size();j++)
