@@ -4305,6 +4305,23 @@ void test46()
 
     entities.push_back(_b, _b->getGeom());
 
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+
     BoxIsland *statera = new BoxIsland(&entities);
     statera->setName("Statera");
     statera->setLocation(0.0f,-1.0,0.0f);
@@ -4416,7 +4433,20 @@ void test46()
     enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
     enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
+    BoxIsland *arachnid = new BoxIsland(&entities);
+    arachnid->setName("Arachnid");
+    arachnid->setLocation(-450 kmf, -1.0, -300 kmf);
+    arachnid->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
+    BoxIsland *outcrop = new BoxIsland(&entities);
+    outcrop->setName("Outcrop");
+    outcrop->setLocation(-450 kmf, -1.0, -210 kmf);
+    outcrop->buildTerrainModel(space,"terrain/atom.bmp");
+
+    BoxIsland *taksaven = new BoxIsland(&entities);
+    taksaven->setName("Taksaven");
+    taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
+    taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
 
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
@@ -4440,6 +4470,9 @@ void test46()
     islands.push_back(midway);
     islands.push_back(enewetak);
     islands.push_back(statera);
+    islands.push_back(arachnid);
+    islands.push_back(outcrop);
+    islands.push_back(taksaven);
 }
 
 void checktest46(unsigned long timer)
@@ -4477,6 +4510,28 @@ void checktest46(unsigned long timer)
         BoxIsland *is = findIslandByName("Statera");
         Structure *t8 = is->addStructure(new Runway(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
 
+        // Accelerate time
+        for (int j=0;j<1000;j++)
+        {
+            buildAndRepair(true,space,world);
+        }
+
+
+
+    }
+
+    if (timer == 1000)
+    {
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            if (!((entities[i]->getPos() - Camera.getPos()).magnitude()<10000))
+            {
+                if (entities[i]->getBodyID() == NULL)
+                {
+                    dGeomDisable(entities[i]->getGeom());
+                }
+            }
+        }
     }
 
     if (timer == starttime)
@@ -6353,7 +6408,12 @@ void setupWorldModelling()
     world = dWorldCreate();
     space = dHashSpaceCreate (0);
 
-    //dWorldSetAutoDisableFlag(World, 1);
+    // Default disable parameters for newly created objects.
+    dWorldSetAutoDisableFlag(world, 1);
+
+    dWorldSetAutoDisableLinearThreshold(world, 0.01);
+    dWorldSetAutoDisableAngularThreshold(world, 0.01);
+    dWorldSetAutoDisableTime(world, 20);
 
     // The parameter needs to be zero.
     contactgroup = dJointGroupCreate (0);

@@ -142,8 +142,6 @@ bool  groundcollisions(Vehicle *vehicle);
 
 void  groundcollisions(dGeomID body);
 
-void commLink(int faction, dSpaceID space, dWorldID world);
-
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByNumber(size_t &pos, int number);
@@ -161,10 +159,13 @@ void list();
 
 int findNextNumber(int type);
 
-void buildAndRepair(dSpaceID space, dWorldID world);
-void buildAndRepair(bool force, dSpaceID space, dWorldID world);
+void  buildAndRepair(dSpaceID space, dWorldID world);
+void  buildAndRepair(bool force, dSpaceID space, dWorldID world);
 
-void defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
+void  defendIsland(unsigned long timer,dSpaceID space, dWorldID world);
+
+void commLink(int faction, dSpaceID space, dWorldID world);
+
 
 Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx);
 

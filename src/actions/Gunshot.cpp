@@ -26,7 +26,7 @@ Gunshot::~Gunshot()
 void Gunshot::init()
 {
     Gunshot::height=0.1f;
-    Gunshot::length=4000.0f;
+    Gunshot::length=200.0f; // 4000 is more clear from the point of view of the bullets, but dissapears quickly when hit the target.
     Gunshot::width=0.1f;
 
     Gunshot::mass = 1.0f;

@@ -463,6 +463,18 @@ void drawScene() {
 
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
 
+
+    // Movable units, and the camera, carry the living energy.
+    // Get a list of points in 3D space where there are movable units and the camera.
+    // Put all of them in a list.
+    // And activate all the structures that are inside a 10k radius of that.
+    // Deactivate all the others.
+    // If a tree is in the middle of the forest and nobody is around it to see it, then, does the tree actually fall ?
+
+    Vec3f carrierloc1(0,0,0);
+    Vec3f carrierloc2(0,0,0);
+    Vec3f cameraloc = Camera.getPos();
+
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
     // This is a very easy enhancement with tremendous consequences in fps stability.
@@ -470,12 +482,31 @@ void drawScene() {
     {
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
-            if ((entities[i]->getPos() - Camera.getPos()).magnitude()<10000)
+            if (entities[i]->getType() == CARRIER && entities[i]->getFaction() == BLUE_FACTION)
+                carrierloc1 = entities[i]->getPos();
+            if (entities[i]->getType() == CARRIER && entities[i]->getFaction() == GREEN_FACTION)
+                carrierloc2 = entities[i]->getPos();
+            if ((entities[i]->getPos() - cameraloc).magnitude()<10000)
             {
                 //(entities[i]->setTexture(textures["metal"]));
                 glPushAttrib(GL_CURRENT_BIT);
                 (entities[i]->drawModel());
                 glPopAttrib();
+
+                if ((entities[i]->getBodyID()))
+                    dBodyEnable(entities[i]->getBodyID());
+                else
+                    dGeomEnable(entities[i]->getGeom());
+            }
+            else if ( ((entities[i]->getPos() - carrierloc1).magnitude()<10000) ||
+                      ((entities[i]->getPos() - carrierloc2).magnitude()<10000) )
+            {
+                if (!(entities[i]->getBodyID()))
+                    dGeomEnable(entities[i]->getGeom());
+            }
+            else if (entities[i]->getBodyID() == NULL)
+            {
+                dGeomDisable(entities[i]->getGeom());
             }
         }
     }
@@ -621,7 +652,10 @@ void update(int value)
                 entities[i]->doControl();
             }
             if ((entities[i]->getSpeed()>10000.0f || isnan(entities[i]->getSpeed())) && entities[i]->getType()!= ACTION)
+            {
+                // @NOTE: Extra safeguard (ODE stability issues).
                 entities[i]->stop();
+            }
             entities[i]->doDynamics();
             entities[i]->tick();
         }
@@ -632,7 +666,8 @@ void update(int value)
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 //CLog::Write(CLog::Debug,"Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
-                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) && entities[i]->getTtl()<=0)
+                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) &&
+                        entities[i]->getTtl()<=0)
                 {
                     if (controller.controllingid == i)
                         controller.controllingid = CONTROLLING_NONE;
@@ -725,7 +760,7 @@ void update(int value)
     
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
-    glutTimerFunc(25, worldStep, 0);
+    glutTimerFunc(20, worldStep, 0);
 }
 
 
@@ -793,6 +828,8 @@ int main(int argc, char** argv) {
         controller.faction = BOTH_FACTION;
     else
         controller.faction = GREEN_FACTION;
+
+    controller.controllingid = 1;
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
