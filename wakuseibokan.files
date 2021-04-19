@@ -152,6 +152,8 @@ src/units/Vehicle.cpp
 src/units/Vehicle.h
 src/units/Walrus.cpp
 src/units/Walrus.h
+src/units/Wheel.cpp
+src/units/Wheel.h
 src/units/carrier.blend
 src/units/carrier.blend1
 src/units/carrier2.blend

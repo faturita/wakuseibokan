@@ -6,28 +6,42 @@
 //  Copyright (c) 2015 Baufest. All rights reserved.
 //
 
-#ifndef __wakuseibokan__Buggy__
-#define __wakuseibokan__Buggy__
+#ifndef BUGGY_H
+#define BUGGY_H
+
 
 #include "Vehicle.h"
+#include "Wheel.h"
 
 class Buggy : public Vehicle
 {
     dGeomID geom;
+
+protected:
+    float height;
+    float width;
+    float length;
+
+    Wheel *left;
+    Wheel *right;
+
+    Wheel *backleft;
+    Wheel *backright;
     
 public:
+    Buggy(int faction);
     void virtual init();
     int  virtual getType();
     void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void virtual drawModel();
-    void virtual drawDirectModel();
-    void doMaterial();
     void virtual doDynamics(dBodyID);
     void doDynamics();
     void doControl(Controller controller);
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
+
+    void addFrontWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright);
 };
 
-#endif /* defined(__wakuseibokan__Buggy__) */
+#endif //BUGGY_H

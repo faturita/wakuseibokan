@@ -87,6 +87,8 @@
 #include "weapons/CarrierTurret.h"
 #include "weapons/CarrierArtillery.h"
 
+#include "units/Wheel.h"
+
 #include "map.h"
 
 extern  Camera Camera;
@@ -272,13 +274,22 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
                  //printf("5\n");
-                 contact[i].surface.mu = 0;
-                 contact[i].surface.bounce = 0.2f;
-                 contact[i].surface.slip1 = 0.1f;
-                 contact[i].surface.slip2 = 0.1f;
+                 //contact[i].surface.mu = 0;
+                 //contact[i].surface.bounce = 0.2f;
+                 //contact[i].surface.slip1 = 0.1f;
+                 //contact[i].surface.slip2 = 0.1f;
 
-                 contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
-                 contact[i].surface.soft_cfm = 0;
+                 //contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                 //contact[i].surface.soft_cfm = 0;
+
+
+                 //contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+                 //   dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                 contact[i].surface.mu = dInfinity;
+                 contact[i].surface.slip1 = 0.1;
+                 contact[i].surface.slip2 = 0.1;
+                 contact[i].surface.soft_erp = 0.5;
+                 contact[i].surface.soft_cfm = 0.3;
 
 
                  //if (v1 && isManta(v1) && groundcollisions(v1)) {printf("Hit manta against structure.\n");}
@@ -6392,6 +6403,97 @@ void checktest66(unsigned long timer)
     }
 }
 
+void test67()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // 6,3,12
+    Buggy *_buggy = new Buggy(GREEN_FACTION);
+    _buggy->init();
+    _buggy->embody(world,space);
+    _buggy->setPos(0.0f,15.0f,0.0f);
+    _buggy->stop();
+
+    entities.push_back(_buggy, _buggy->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION);
+    _fr->init();
+    _fr->embody(world, space);
+    _fr->attachTo(world,_buggy, 2.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION);
+    _fl->init();
+    _fl->embody(world, space);
+    _fl->attachTo(world,_buggy, -2.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION);
+    _br->init();
+    _br->embody(world, space);
+    _br->attachTo(world,_buggy, +2.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION);
+    _bl->init();
+    _bl->embody(world, space);
+    _bl->attachTo(world,_buggy, -2.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    //_fr->setThrottle(100);
+    //_fl->setThrottle(100);
+    //_bl->setThrottle(100);
+    //_br->setThrottle(100);
+
+    //_fr->azimuth = 5;
+    //_fl->azimuth = 5;
+
+    _buggy->addFrontWheels(_fl, _fr, _bl, _br);
+
+    _fl->steeringwheel = _fr->steeringwheel = true;
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+
+
+}
+
+void checktest67(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -6504,6 +6606,7 @@ void initWorldModelling(int testcase)
     case 64:test64();break;                         // Manta attacks island and it is defended by missile launchers.
     case 65:test65();break;                         // Carrier weapons.  Add a template weapon, attached to the carrier.
     case 66:test66();break;                         // Carrier Turret Weapon firing to Command Center as the carrier approaches the island.
+    case 67:test67();break;                         // Test buggy behaviour on the islands.
     default:initIslands();test1();break;
     }
 
@@ -6588,6 +6691,7 @@ void worldStep(int value)
     case 64:checktest64(timer);break;
     case 65:checktest65(timer);break;
     case 66:checktest66(timer);break;
+    case 67:checktest67(timer);break;
 
     default: break;
     }
