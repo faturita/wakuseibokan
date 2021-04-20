@@ -269,27 +269,18 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.soft_cfm = 0;
             }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
-            {
+            {               
                  // Island reaction
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
                  //printf("5\n");
-                 //contact[i].surface.mu = 0;
-                 //contact[i].surface.bounce = 0.2f;
-                 //contact[i].surface.slip1 = 0.1f;
-                 //contact[i].surface.slip2 = 0.1f;
-
-                 //contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
-                 //contact[i].surface.soft_cfm = 0;
-
-
-                 //contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
-                 //   dContactSoftERP | dContactSoftCFM | dContactApprox1;
                  contact[i].surface.mu = dInfinity;
-                 contact[i].surface.slip1 = 0.1;
-                 contact[i].surface.slip2 = 0.1;
-                 contact[i].surface.soft_erp = 0.5;
-                 contact[i].surface.soft_cfm = 0.3;
+                 contact[i].surface.bounce = 0.2f;
+                 contact[i].surface.slip1 = 0.1f;
+                 contact[i].surface.slip2 = 0.1f;
+
+                 contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                 contact[i].surface.soft_cfm = 0;
 
 
                  //if (v1 && isManta(v1) && groundcollisions(v1)) {printf("Hit manta against structure.\n");}
@@ -6409,7 +6400,7 @@ void test67()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-17000.0f);
+    _b->setPos(0.0f,20.5f,-4000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
@@ -6417,7 +6408,7 @@ void test67()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,-0.0f);
-    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
 
     islands.push_back(nemesis);
 
@@ -6425,8 +6416,9 @@ void test67()
     Buggy *_buggy = new Buggy(GREEN_FACTION);
     _buggy->init();
     _buggy->embody(world,space);
-    _buggy->setPos(0.0f,15.0f,0.0f);
+    _buggy->setPos(0.0f,25.0f,0.0f);
     _buggy->stop();
+    _buggy->setSignal(4);
 
     entities.push_back(_buggy, _buggy->getGeom());
 
@@ -6467,17 +6459,19 @@ void test67()
 
     entities.push_back(_bl, _bl->getGeom());
 
-    //_fr->setThrottle(100);
-    //_fl->setThrottle(100);
-    //_bl->setThrottle(100);
-    //_br->setThrottle(100);
-
-    //_fr->azimuth = 5;
-    //_fl->azimuth = 5;
-
     _buggy->addFrontWheels(_fl, _fr, _bl, _br);
 
     _fl->steeringwheel = _fr->steeringwheel = true;
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(0.0f,20.5f,2000);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setSignal(4);
+
+    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
 
 
     Vec3f pos(0.0,1.32, - 3500);

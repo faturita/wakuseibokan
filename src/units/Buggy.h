@@ -37,6 +37,8 @@ public:
     void virtual doDynamics(dBodyID);
     void doDynamics();
     void doControl(Controller controller);
+    void  doControl();
+    void  doControl(struct controlregister conts);
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);

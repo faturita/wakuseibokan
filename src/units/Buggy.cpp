@@ -8,6 +8,7 @@
 
 #include "Buggy.h"
 #include "Wheel.h"
+#include "../profiling.h"
 #include "../md2model.h"
 
 Buggy::Buggy(int faction)
@@ -22,6 +23,7 @@ void Buggy::init()
     length=12.0f;
     
     setForward(0,0,1);
+
     
 }
 
@@ -73,6 +75,17 @@ void Buggy::doControl(Controller controller)
     backright->azimuth = 0;
 }
 
+
+void Buggy::doControl()
+{
+
+}
+
+
+void Buggy::doControl(struct controlregister conts)
+{
+
+}
 
 
 void Buggy::doDynamics()

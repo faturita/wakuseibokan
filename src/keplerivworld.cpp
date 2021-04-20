@@ -619,11 +619,11 @@ void setupWorldModelling()
     space = dHashSpaceCreate (0);
 
     // Default disable parameters for newly created objects.
-    dWorldSetAutoDisableFlag(world, 1);
+    //dWorldSetAutoDisableFlag(world, 1);
 
-    dWorldSetAutoDisableLinearThreshold(world, 0.01);
-    dWorldSetAutoDisableAngularThreshold(world, 0.01);
-    dWorldSetAutoDisableTime(world, 20);
+    //dWorldSetAutoDisableLinearThreshold(world, 0.01);
+    //dWorldSetAutoDisableAngularThreshold(world, 0.01);
+    //dWorldSetAutoDisableTime(world, 20);
 
     // The parameter needs to be zero.
     contactgroup = dJointGroupCreate (0);
