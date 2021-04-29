@@ -1,6 +1,13 @@
 #include "engine.h"
 #include "profiling.h"
 
+#ifdef __linux
+#include <functional>
+#elif __APPLE__
+#endif
+
+
+
 extern  Controller controller;
 
 /* dynamics and collision objects */

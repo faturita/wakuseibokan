@@ -13,6 +13,18 @@ Compiling and Installation
 * ODE: Open Dynamics Engine, version 0.14: https://bitbucket.org/odedevs/ode
 * Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
 
+# ODE
+
+ ./bootstrap
+ ./configure
+ make
+ make install
+
+# Ubuntu Packages
+
+ libbsd-dev  freeglut3-dev
+
+# Compiling
 
  make
  ./waku

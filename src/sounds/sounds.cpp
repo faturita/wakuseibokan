@@ -7,9 +7,17 @@
 
 extern bool mute;
 
+void playsound(char *filename)
+{
+    // @FIXME: This is extremly risky !!!
+    char temp[200];
+    sprintf(temp, "%s %s &",PLAYSOUNDCOMMAND, filename);
+    system(temp);
+}
+
 void bullethit()
 {
-    if (!mute) system("afplay sounds/bullethit.wav &");
+    if (!mute) playsound("sounds/bullethit.wav");
 }
 
 void firesound(int times)
@@ -21,55 +29,55 @@ void firesound(int times)
 
 void smallenginestart()
 {
-    if (!mute) system("afplay sounds/boozing.m4a &");
+    if (!mute) playsound("sounds/boozing.m4a");
 }
 
 void enginestart()
 {
-    if (!mute) system("afplay sounds/cruise.m4a &");
+    if (!mute) playsound("sounds/cruise.m4a");
 }
 
 void takeoff()
 {
-    if (!mute) system("afplay sounds/takeoff.mp3 &");
+    if (!mute) playsound("sounds/takeoff.mp3");
 }
 
 void explosion()
 {
-    if (!mute) system("afplay sounds/explosion.mp3 &");
+    if (!mute) playsound("sounds/explosion.mp3");
 }
 
 void coast()
 {
-    if (!mute) system("afplay sounds/Coast.m4a &");
+    if (!mute) playsound("sounds/Coast.m4a");
 }
 
 void honk()
 {
-    if (!mute) system("afplay sounds/BoatHonk.m4a &");
+    if (!mute) playsound("sounds/BoatHonk.m4a");
 }
 
 void soaring()
 {
-    if (!mute) system("afplay sounds/soaring.m4a &");
+    if (!mute) playsound("sounds/soaring.m4a");
 }
 
 void gunshot()
 {
-    if (!mute) system("afplay sounds/Gunshot.m4a &");
+    if (!mute) playsound("sounds/Gunshot.m4a");
 }
 
 void artilleryshot()
 {
-    if (!mute) system("afplay sounds/Artillery.wav &");
+    if (!mute) playsound("sounds/Artillery.wav");
 }
 
 void droneflying()
 {
-    if (!mute) system("afplay sounds/Cephalopod.m4a &");
+    if (!mute) playsound("sounds/Cephalopod.m4a");
 }
 
 void intro()
 {
-    if (!mute) system("afplay sounds/intro.mp3 &");
+    if (!mute) playsound("sounds/intro.mp3");
 }

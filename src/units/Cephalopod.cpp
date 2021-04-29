@@ -4,6 +4,12 @@
 #include "../ThreeMaxLoader.h"
 #include "../actions/Gunshot.h"
 #include <vector>
+
+#ifdef __linux
+#include <iomanip>
+#elif __APPLE__
+#endif
+
 #include "../messages.h"
 #include "Cephalopod.h"
 

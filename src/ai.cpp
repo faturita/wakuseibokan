@@ -1,4 +1,10 @@
 #include <assert.h>
+
+#ifdef __linux
+#include <bsd/stdlib.h>
+#elif __APPLE__
+#endif
+
 #include "profiling.h"
 #include "engine.h"
 #include "ai.h"
