@@ -31,8 +31,8 @@ void AdvancedWalrus::init()
 
     setForward(0,0,1);
 
-    Walrus::height=4.0f;
     Walrus::width=5.0f;
+    Walrus::height=4.0f;
     Walrus::length=10.0f;
 
     firingpos[1] = 2.3;
@@ -76,7 +76,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
         doMaterial();
-        //drawRectangularBox(width, height, length);
+        drawRectangularBox(width, height, length);
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
 

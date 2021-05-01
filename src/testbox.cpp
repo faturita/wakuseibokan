@@ -88,6 +88,8 @@
 #include "weapons/CarrierArtillery.h"
 
 #include "units/Wheel.h"
+#include "units/WheeledManta.h"
+#include "units/Otter.h"
 
 #include "map.h"
 
@@ -246,6 +248,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
+                contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;
                 contact[i].surface.bounce = 0.2f;
@@ -274,7 +277,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
                  //printf("5\n");
-                 contact[i].surface.mu = dInfinity;
+                 contact[i].surface.mu = dInfinity;     // This enable rolling on islands, and no more slipping.
                  contact[i].surface.bounce = 0.2f;
                  contact[i].surface.slip1 = 0.1f;
                  contact[i].surface.slip2 = 0.1f;
@@ -291,6 +294,12 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+
+                 if (isIsland(contact[i].geom.g1) && isType(v2, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g2),getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isType(v1, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g1),getIsland(contact[i].geom.g2))) {}
+
+
 
                  if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
@@ -319,6 +328,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  // Walrus reaching shore.
                  if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
                  if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+
+                 if (ground == contact[i].geom.g1 && isType(v2, WEAPON) && departed(dGeomGetSpace(contact[i].geom.g2))) {}
+                 if (ground == contact[i].geom.g2 && isType(v1, WEAPON) && departed(dGeomGetSpace(contact[i].geom.g1))) {}
 
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
@@ -6412,11 +6424,19 @@ void test67()
 
     islands.push_back(nemesis);
 
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(3100.0f,-1.0,-0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(thermopilae);
+
     // 6,3,12
     Buggy *_buggy = new Buggy(GREEN_FACTION);
     _buggy->init();
     _buggy->embody(world,space);
-    _buggy->setPos(0.0f,25.0f,0.0f);
+    _buggy->setPos(0.0f,50.0f,0.0f);
     _buggy->stop();
     _buggy->setSignal(4);
 
@@ -6459,9 +6479,11 @@ void test67()
 
     entities.push_back(_bl, _bl->getGeom());
 
-    _buggy->addFrontWheels(_fl, _fr, _bl, _br);
+    _buggy->addWheels(_fl, _fr, _bl, _br);
 
-    _fl->steeringwheel = _fr->steeringwheel = true;
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
 
@@ -6484,6 +6506,225 @@ void test67()
 }
 
 void checktest67(unsigned long timer)
+{
+
+}
+
+void test68()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(3100.0f,-1.0,-0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(thermopilae);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
+
+    // 6,3,12
+    WheeledManta *_manta = new WheeledManta(GREEN_FACTION);
+    _manta->init();
+    _manta->embody(world,space);
+    _manta->setPos(0.0f,30.0f,-1400.0f);
+    _manta->stop();
+    _manta->setSignal(4);
+    Vec3f dimensions(10.0f,3.0f,10.0f);
+
+    entities.push_back(_manta, _manta->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION);
+    _fr->init();
+    _fr->embody(world, space);
+    _fr->attachTo(world,_manta, dimensions, WheelLocations::FRONT_RIGHT);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION);
+    _fl->init();
+    _fl->embody(world, space);
+    _fl->attachTo(world,_manta, dimensions, WheelLocations::FRONT_LEFT);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION);
+    _br->init();
+    _br->embody(world, space);
+    _br->attachTo(world,_manta, dimensions, WheelLocations::BACK_RIGHT);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION);
+    _bl->init();
+    _bl->embody(world, space);
+    _bl->attachTo(world,_manta, dimensions, WheelLocations::BACK_LEFT);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _manta->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(0.0f,20.5f,2000);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setSignal(4);
+
+    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest68(unsigned long timer)
+{
+
+}
+
+void test69()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(3100.0f,-1.0,-0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(thermopilae);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
+
+
+    // 5,4,10
+    Otter *_otter = new Otter(GREEN_FACTION);
+    _otter->init();
+    dSpaceID car_space = _otter->embody_in_space(world, space);
+    _otter->setPos(400.0f,70.0f,-4400.0f);
+    _otter->stop();
+    _otter->setSignal(4);
+    _otter->setNumber(1);
+    _otter->setStatus(SailingStatus::SAILING);
+
+    Vec3f dimensions(5.0f,4.0f,10.0f);
+
+    entities.push_back(_otter, _otter->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_otter,2.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_otter, -2.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_otter, 2.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_otter, -2.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _otter->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+
+
+
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(0.0f,20.5f,2000);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setSignal(4);
+
+    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest69(unsigned long timer)
 {
 
 }
@@ -6601,6 +6842,8 @@ void initWorldModelling(int testcase)
     case 65:test65();break;                         // Carrier weapons.  Add a template weapon, attached to the carrier.
     case 66:test66();break;                         // Carrier Turret Weapon firing to Command Center as the carrier approaches the island.
     case 67:test67();break;                         // Test buggy behaviour on the islands.
+    case 68:test68();break;                         // Test a wheeled version of Manta which will be interesting to test.
+    case 69:test69();break;                         // Test a wheeled version of Walrus which is mandatory from now on.
     default:initIslands();test1();break;
     }
 
@@ -6686,6 +6929,8 @@ void worldStep(int value)
     case 65:checktest65(timer);break;
     case 66:checktest66(timer);break;
     case 67:checktest67(timer);break;
+    case 68:checktest68(timer);break;
+    case 69:checktest69(timer);break;
 
     default: break;
     }

@@ -18,9 +18,9 @@ void AdvancedManta::init()
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
     }
 
-    AdvancedManta::height=8.0f;
-    AdvancedManta::width=1.6f;
-    AdvancedManta::length=4.0f;
+    AdvancedManta::width=10.0f;
+    AdvancedManta::height=3.0f;
+    AdvancedManta::length=10.0f;
 
     setForward(0,0,1);
 
@@ -49,7 +49,7 @@ void AdvancedManta::drawModel(float yRot, float xRot, float x, float y, float z)
         // Draw linear velocity
         //drawArrow(V[0],V[1],V[2],0.0,1.0,0.0);
 
-        //drawRectangularBox(16.0f/2.0f, 5.2f/2.0f, 8.0f/2.0f);
+        //drawRectangularBox(width/2.0f, height/2.0f, length/2.0f);
 
         glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
@@ -77,7 +77,7 @@ void AdvancedManta::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     embody(me);
     //geom = dCreateSphere( space, 2.64f);
-    geom = dCreateBox( space, 8.0f,1.6f,4.0f);
+    geom = dCreateBox( space, width, height, length);
     dGeomSetBody(geom, me);
 }
 
@@ -88,7 +88,7 @@ void AdvancedManta::embody(dBodyID myBodySelf)
     float myMass = 10.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetBox(&m,1,8.0f,1.6f,4.0f);
+    dMassSetBox(&m,1, width, height, length);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
 

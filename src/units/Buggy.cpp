@@ -58,7 +58,7 @@ void Buggy::drawModel()
 
 void Buggy::doControl(Controller controller)
 {
-
+    // @TODO: Add a safeguard for nullpointer.
     left->setThrottle(controller.registers.thrust);
     right->setThrottle(controller.registers.thrust);
     backright->setThrottle(controller.registers.thrust);
@@ -67,12 +67,12 @@ void Buggy::doControl(Controller controller)
     if (controller.registers.thrust>0)
     {
 
-        left->azimuth = controller.registers.roll/controller.registers.thrust;
-        right->azimuth = controller.registers.roll/controller.registers.thrust;
+        left->setAzimuth(controller.registers.roll/controller.registers.thrust);
+        right->setAzimuth(controller.registers.roll/controller.registers.thrust);
     }
 
-    backleft->azimuth = 0;
-    backright->azimuth = 0;
+    backleft->setAzimuth(0);
+    backright->setAzimuth(0);
 }
 
 
@@ -124,7 +124,7 @@ void Buggy::embody(dBodyID myBodySelf)
     me = myBodySelf;
 }
 
-void Buggy::addFrontWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright)
+void Buggy::addWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright)
 {
     Buggy::left = left;
     Buggy::right = right;

@@ -43,7 +43,7 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
-    void addFrontWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright);
+    void addWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright);
 };
 
 #endif //BUGGY_H

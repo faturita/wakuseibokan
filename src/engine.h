@@ -62,12 +62,13 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2,Structure* &s1, Structure* &s2, dGeomID
 // SYNC
 bool stranded(Vehicle *carrier, Island *island);
 
-
+bool departed(dSpaceID space);
 bool departed(Vehicle *walrus);
 
 
 // SYNC
 bool arrived(Vehicle *walrus, Island *island);
+bool arrived(dSpaceID s, Island *island);
 
 
 // SYNC

@@ -68,6 +68,19 @@ bool stranded(Vehicle *carrier, Island *island)
     }
 }
 
+bool departed(dSpaceID space)
+{
+    for(int gids=0;gids<dSpaceGetNumGeoms(space);gids++)
+    {
+
+        dGeomID g = dSpaceGetGeom(space,gids);
+        Vehicle *v = gVehicle(g);
+
+        if (v->getType() == WALRUS)
+            departed(v);
+    }
+}
+
 bool departed(Vehicle *walrus)
 {
     if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == SailingStatus::ROLLING)
@@ -88,6 +101,19 @@ bool departed(Vehicle *walrus)
 }
 
 // SYNC
+bool arrived(dSpaceID s, Island *island)
+{
+    for(int gids=0;gids<dSpaceGetNumGeoms(s);gids++)
+    {
+
+        dGeomID g = dSpaceGetGeom(s,gids);
+        Vehicle *v = gVehicle(g);
+
+        if (v->getType() == WALRUS)
+            arrived(v,island);
+    }
+}
+
 bool arrived(Vehicle *invadingunit, Island *island)
 {
     if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == SailingStatus::SAILING)
