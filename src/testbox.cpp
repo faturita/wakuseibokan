@@ -6646,11 +6646,12 @@ void test69()
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
 
 
-    // 5,4,10
+    // 6,3,12
     Otter *_otter = new Otter(GREEN_FACTION);
     _otter->init();
     dSpaceID car_space = _otter->embody_in_space(world, space);
     _otter->setPos(400.0f,70.0f,-4400.0f);
+    _otter->setPos(0.0f,70.0f,-0.0f);
     _otter->stop();
     _otter->setSignal(4);
     _otter->setNumber(1);
@@ -6662,7 +6663,7 @@ void test69()
 
 
 
-    Wheel * _fr= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _fr->init();
     _fr->embody(world, car_space);
     _fr->attachTo(world,_otter,2.9f, -3.0, 5.8);
@@ -6671,7 +6672,7 @@ void test69()
     entities.push_back(_fr, _fr->getGeom());
 
 
-    Wheel * _fl= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _fl->init();
     _fl->embody(world, car_space);
     _fl->attachTo(world,_otter, -2.9f, -3.0, 5.8);
@@ -6680,7 +6681,7 @@ void test69()
     entities.push_back(_fl, _fl->getGeom());
 
 
-    Wheel * _br= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _br->init();
     _br->embody(world, car_space);
     _br->attachTo(world,_otter, 2.9f, -3.0, -5.8);
@@ -6689,7 +6690,7 @@ void test69()
     entities.push_back(_br, _br->getGeom());
 
 
-    Wheel * _bl= new Wheel(GREEN_FACTION, 0.8, 5.0);
+    Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _bl->init();
     _bl->embody(world, car_space);
     _bl->attachTo(world,_otter, -2.9f, -3.0, -5.8);

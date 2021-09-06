@@ -22,6 +22,57 @@ void Otter::init()
 
 }
 
+void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
+{
+    float f[3];
+    f[0] = 0; f[1] = 0; f[2] = 0;
+
+    //Draw the saved model
+    if (_model != NULL)
+    {
+        glPushMatrix();
+        glTranslatef(x, y, z);
+
+        //glScalef(2.0f,2.0f,2.0f);
+
+        doTransform(f, R);
+
+        //drawArrow();
+
+        glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
+
+        doMaterial();
+        drawRectangularBox(width/1, height/1, length/1);
+
+        glRotatef(90.0, 0.0f, 1.0, 0.0f);
+
+        _model->setTexture(textures["sky"]);
+        _model->draw();
+
+
+        // Move to the roof of the Walrus
+        glTranslatef(0.0f,-2.3f,0.0f);
+
+        glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+
+        // Adjust azimuth and elevation which are used to aim the turret.
+        glRotatef(azimuth,0.0f,1.0f,0.0f);
+        glRotatef(-elevation,1.0f,0.0f,0.0f);
+
+        // Rotate the turret cannon so that it is aligned properly.
+        glRotatef(90.0f,0.0f,1.0f,0.0f);
+
+        _topModel->setTexture(textures["sky"]);
+        _topModel->draw();
+
+        glPopMatrix();
+    }
+    else
+    {
+        printf ("model is null\n");
+    }
+}
+
 void Otter::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
@@ -34,7 +85,7 @@ void Otter::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 1.0f;
+    float myMass = 20.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,width, height, length);
@@ -73,20 +124,20 @@ void Otter::doControl(Controller controller)
 
         setAim(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
-    left->setThrottle(controller.registers.thrust);
-    right->setThrottle(controller.registers.thrust);
-    backright->setThrottle(controller.registers.thrust);
-    backleft->setThrottle(controller.registers.thrust);
+        left->setThrottle(controller.registers.thrust);
+        right->setThrottle(controller.registers.thrust);
+        backright->setThrottle(controller.registers.thrust);
+        backleft->setThrottle(controller.registers.thrust);
 
-    if (controller.registers.thrust>0)
-    {
+        if (controller.registers.thrust>0)
+        {
 
-        left->setAzimuth(controller.registers.roll/controller.registers.thrust);
-        right->setAzimuth(controller.registers.roll/controller.registers.thrust);
-    }
+            left->setAzimuth(controller.registers.roll/((controller.registers.thrust)));
+            right->setAzimuth(controller.registers.roll/((controller.registers.thrust)));
+        }
 
-    backleft->setAzimuth(0);
-    backright->setAzimuth(0);
+        backleft->setAzimuth(0);
+        backright->setAzimuth(0);
     } else {
         AdvancedWalrus::doControl(controller);
     }

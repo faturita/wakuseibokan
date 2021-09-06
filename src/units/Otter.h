@@ -31,6 +31,8 @@ public:
     void embody(dWorldID world, dSpaceID space);
 
     dSpaceID embody_in_space(dWorldID world, dSpaceID space);
+
+    void drawModel(float yRot, float xRot, float x, float y, float z);
 };
 
 #endif // OTTER_H
