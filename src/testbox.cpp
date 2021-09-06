@@ -277,7 +277,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
                  //printf("5\n");
-                 contact[i].surface.mu = dInfinity;     // This enable rolling on islands, and no more slipping.
+                 contact[i].surface.mu = 0.9;  //dInfinity;     // This enable rolling on islands, and no more slipping.
                  contact[i].surface.bounce = 0.2f;
                  contact[i].surface.slip1 = 0.1f;
                  contact[i].surface.slip2 = 0.1f;
@@ -6666,7 +6666,7 @@ void test69()
     Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _fr->init();
     _fr->embody(world, car_space);
-    _fr->attachTo(world,_otter,2.9f, -3.0, 5.8);
+    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
     _fr->stop();
 
     entities.push_back(_fr, _fr->getGeom());
@@ -6675,7 +6675,7 @@ void test69()
     Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _fl->init();
     _fl->embody(world, car_space);
-    _fl->attachTo(world,_otter, -2.9f, -3.0, 5.8);
+    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
     _fl->stop();
 
     entities.push_back(_fl, _fl->getGeom());
@@ -6684,7 +6684,7 @@ void test69()
     Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _br->init();
     _br->embody(world, car_space);
-    _br->attachTo(world,_otter, 2.9f, -3.0, -5.8);
+    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
     _br->stop();
 
     entities.push_back(_br, _br->getGeom());
@@ -6693,7 +6693,7 @@ void test69()
     Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
     _bl->init();
     _bl->embody(world, car_space);
-    _bl->attachTo(world,_otter, -2.9f, -3.0, -5.8);
+    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
     _bl->stop();
 
     entities.push_back(_bl, _bl->getGeom());

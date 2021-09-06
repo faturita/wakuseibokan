@@ -129,11 +129,11 @@ void Otter::doControl(Controller controller)
         backright->setThrottle(controller.registers.thrust);
         backleft->setThrottle(controller.registers.thrust);
 
-        if (controller.registers.thrust>0)
+        //if (controller.registers.thrust>0)
         {
 
-            left->setAzimuth(controller.registers.roll/((controller.registers.thrust)));
-            right->setAzimuth(controller.registers.roll/((controller.registers.thrust)));
+            left->setAzimuth(controller.registers.roll/10.0);
+            right->setAzimuth(controller.registers.roll/10.0);
         }
 
         backleft->setAzimuth(0);

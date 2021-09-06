@@ -75,13 +75,16 @@ void Wheel::doDynamics()
     if (steeringwheel)
     {
 
-        dReal v = azimuth - dJointGetHinge2Angle1 (joint);
+        dReal v = dJointGetHinge2Angle1 (joint) - azimuth;
         if (v > 0.1) v = 0.1;
         if (v < -0.1) v = -0.1;
-        v *= 10.0;
+        v *= -5.0;
+
+        printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
+
 
         dJointSetHinge2Param (joint,dParamVel,v);
-        dJointSetHinge2Param (joint,dParamFMax,0.2);
+        dJointSetHinge2Param (joint,dParamFMax,100);
         dJointSetHinge2Param (joint,dParamLoStop,-0.75);
         dJointSetHinge2Param (joint,dParamHiStop,0.75);
         dJointSetHinge2Param (joint,dParamFudgeFactor,0.1);
@@ -107,7 +110,7 @@ void Wheel::embody(dWorldID world, dSpaceID space)
     dQFromAxisAndAngle (q,0,0,1,M_PI*0.5);
     dBodySetQuaternion (me,q);
     embody(me);
-    geom = dCreateSphere(space, 1);
+    geom = dCreateSphere(space, length);
     dGeomSetBody(geom, me);
 }
 
@@ -119,7 +122,7 @@ void Wheel::embody(dBodyID myBodySelf)
     float myMass = 0.2f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    dMassSetSphere(&m,1,1);
+    dMassSetSphere(&m,1,length);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
 
