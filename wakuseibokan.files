@@ -142,6 +142,8 @@ src/units/Medusa.cpp
 src/units/Medusa.h
 src/units/MultiBodyVehicle.cpp
 src/units/MultiBodyVehicle.h
+src/units/Otter.cpp
+src/units/Otter.h
 src/units/SimplifiedDynamicManta.cpp
 src/units/SimplifiedDynamicManta.h
 src/units/SimplifiedManta.cpp
@@ -152,6 +154,10 @@ src/units/Vehicle.cpp
 src/units/Vehicle.h
 src/units/Walrus.cpp
 src/units/Walrus.h
+src/units/Wheel.cpp
+src/units/Wheel.h
+src/units/WheeledManta.cpp
+src/units/WheeledManta.h
 src/units/carrier.blend
 src/units/carrier.blend1
 src/units/carrier2.blend

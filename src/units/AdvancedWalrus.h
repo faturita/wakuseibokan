@@ -11,6 +11,7 @@ class AdvancedWalrus : public Walrus
 protected:
     Vec3f firingpos;
     Vec3f aim;
+    float viewport_height = 20.0;
 public:
 
     float azimuth = 0;

@@ -829,7 +829,7 @@ int main(int argc, char** argv) {
     else
         controller.faction = GREEN_FACTION;
 
-    controller.controllingid = 1;
+    controller.controllingid = 0;
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
