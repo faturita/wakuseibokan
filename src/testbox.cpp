@@ -6432,58 +6432,6 @@ void test67()
 
     islands.push_back(thermopilae);
 
-    // 6,3,12
-    Buggy *_buggy = new Buggy(GREEN_FACTION);
-    _buggy->init();
-    _buggy->embody(world,space);
-    _buggy->setPos(0.0f,50.0f,0.0f);
-    _buggy->stop();
-    _buggy->setSignal(4);
-
-    entities.push_back(_buggy, _buggy->getGeom());
-
-
-
-    Wheel * _fr= new Wheel(GREEN_FACTION);
-    _fr->init();
-    _fr->embody(world, space);
-    _fr->attachTo(world,_buggy, 2.9f, -3.0, 5.8);
-    _fr->stop();
-
-    entities.push_back(_fr, _fr->getGeom());
-
-
-    Wheel * _fl= new Wheel(GREEN_FACTION);
-    _fl->init();
-    _fl->embody(world, space);
-    _fl->attachTo(world,_buggy, -2.9f, -3.0, 5.8);
-    _fl->stop();
-
-    entities.push_back(_fl, _fl->getGeom());
-
-
-    Wheel * _br= new Wheel(GREEN_FACTION);
-    _br->init();
-    _br->embody(world, space);
-    _br->attachTo(world,_buggy, +2.9f, -3.0, -5.8);
-    _br->stop();
-
-    entities.push_back(_br, _br->getGeom());
-
-
-    Wheel * _bl= new Wheel(GREEN_FACTION);
-    _bl->init();
-    _bl->embody(world, space);
-    _bl->attachTo(world,_buggy, -2.9f, -3.0, -5.8);
-    _bl->stop();
-
-    entities.push_back(_bl, _bl->getGeom());
-
-    _buggy->addWheels(_fl, _fr, _bl, _br);
-
-    _fl->setSteering(true);
-    _fr->setSteering(true);
-
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
 
@@ -6704,9 +6652,6 @@ void test69()
     _fr->setSteering(true);
 
 
-
-
-
     Walrus *_walrus = new Walrus(GREEN_FACTION);
 
     _walrus->init();
@@ -6727,7 +6672,17 @@ void test69()
 
 void checktest69(unsigned long timer)
 {
+    long unsigned starttime = 200;
 
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC69: Testing the controllers of a wheeled Walrus.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
 }
 
 static int testing=-1;

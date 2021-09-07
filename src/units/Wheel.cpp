@@ -227,7 +227,7 @@ void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
 
     //glRotatef(0, 0.0f, 0.0f, 1.0f);
 
-    drawRectangularBox(width, height, length);
+    //drawRectangularBox(width, height, length);
 
     glPopMatrix();
 

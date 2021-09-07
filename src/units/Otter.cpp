@@ -33,7 +33,7 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        //glScalef(2.0f,2.0f,2.0f);
+        glScalef(1.5f,1.5f,1.5f);
 
         doTransform(f, R);
 
@@ -42,7 +42,7 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
         doMaterial();
-        drawRectangularBox(width/1, height/1, length/1);
+        //drawRectangularBox(width/1, height/1, length/1);
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
 
