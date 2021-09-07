@@ -392,7 +392,7 @@ void  AdvancedWalrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward
     viewforward = viewforward.normalize();
     orig = position;
     Up[0]=Up[2]=0;Up[1]=4;
-    position = position - 20*viewforward + Up;
+    position = position - viewport_height*viewforward + Up;
     viewforward = orig-position;
 }
 

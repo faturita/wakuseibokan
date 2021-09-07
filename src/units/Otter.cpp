@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include "../ThreeMaxLoader.h"
 #include "Otter.h"
+#include "../profiling.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
 extern container<Vehicle*> entities;
@@ -16,6 +17,8 @@ void Otter::init()
     width=6.0f;
     height=3.0f;
     length=12.0f;
+
+    viewport_height = 40.0;
 
     setForward(0,0,1);
 
@@ -98,7 +101,7 @@ void Otter::embody(dBodyID myBodySelf)
 dSpaceID Otter::embody_in_space(dWorldID world, dSpaceID space)
 {
     body_space = dSimpleSpaceCreate (space);
-    dSpaceSetCleanup (body_space,0);
+    dSpaceSetCleanup (body_space,1);
 
     embody(world, body_space);
 
@@ -156,6 +159,14 @@ void Otter::doDynamics(dBodyID body)
     if (status == SailingStatus::ROLLING)
         wrapDynamics(me);
     else
+    {
+        left->setAzimuth(0);
+        right->setAzimuth(0);
+        left->setThrottle(0.0);
+        right->setThrottle(0.0);
+        backleft->setThrottle(0.0);
+        backright->setThrottle(0.0);
         AdvancedWalrus::doDynamics(body);
+    }
 
 }

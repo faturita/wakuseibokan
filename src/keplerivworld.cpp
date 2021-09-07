@@ -211,7 +211,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
-                contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
+                contact[i].surface.mu2 = 0.9;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;
                 contact[i].surface.bounce = 0.2f;
