@@ -13,6 +13,10 @@ TOBJS = $(TSRCS:.cpp=.o)
 SSRC = $(SCS) src/keplerivworld.cpp src/carrier.cpp 
 OBJS = $(SSRC:.cpp=.o)
 
+TCSRCS = $(SCS) src/carrier.cpp src/tests/tester.cpp src/tests/testcase.cpp src/tests/testcase_101.cpp
+TCOBJS = $(TCSRCS:.cpp=.o)
+
+
 TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
@@ -35,6 +39,12 @@ test:		$(TOBJS)
 	@echo "Building test version (testbox)"
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
+
+testcase:	$(TCOBJS)
+	@echo "Building test cases"
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+
 $(PROG):	$(OBJS)
 	@echo "Object files are $(OBJS)"
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
@@ -51,4 +61,5 @@ clean:
 	rm -f $(OBJS)
 	rm -f testall
 	rm -f test
+	rm -f testcase
 

@@ -122,6 +122,11 @@ src/terrain/sun.jpg
 src/terrain/terrain
 src/testall.cpp
 src/testbox.cpp
+src/tests/testcase.cpp
+src/tests/testcase.h
+src/tests/testcase_101.cpp
+src/tests/testcase_101.h
+src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h
 src/units/AdvancedWalrus.cpp
