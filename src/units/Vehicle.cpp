@@ -82,7 +82,7 @@ Vehicle::~Vehicle()
     // This is the only destructor of the entire entity tree.
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
-    //CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
+    CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
 
     // @FIXME: Risky
     if (_model != NULL) delete _model;
@@ -240,7 +240,22 @@ void Vehicle::init()
     _model = MD2Model::loadModel("units/walrusgood.md2");
     if (_model != NULL)
         _model->setAnimation("run");
+}
 
+void Vehicle::clean()
+{
+    // For Vehicle the cleanup is performed in the destructor (is the only class).
+
+    // This works for all multiobject objects
+
+
+
+
+}
+
+dSpaceID Vehicle::myspace()
+{
+    return body_space;
 }
 
 int Vehicle::getType()
@@ -459,6 +474,11 @@ int Vehicle::getHealth() const
 void Vehicle::damage(int amount)
 {
     Vehicle::health-=amount;
+}
+
+void Vehicle::destroy()
+{
+    damage(getHealth()+1);
 }
 
 int Vehicle::getPower() const

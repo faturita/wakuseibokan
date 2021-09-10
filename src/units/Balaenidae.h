@@ -20,10 +20,12 @@ public:
     Balaenidae(int newfaction);
     void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void init();
+    void clean();
     int getType();
     int virtual getSubType();
     void virtual embody(dWorldID world, dSpaceID space);
     void virtual embody(dBodyID myBodySelf);
+    dSpaceID embody_in_space(dWorldID world, dSpaceID space);
 
     void doControl(Controller controller);
     void doControl(struct controlregister regs);

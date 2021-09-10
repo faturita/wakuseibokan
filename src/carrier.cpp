@@ -733,6 +733,26 @@ void update(int value)
                     }
 
 
+                    // Clean up of entities, just before they are going to be deleted.
+                    entities[i]->clean();
+
+                    // Pick the space of a multibody entity, bring in all the assosiated entities, and mark them for deletion.
+                    dSpaceID body_space = entities[i]->myspace();
+
+                    if (body_space != NULL)
+                    for(int gids=0;gids<dSpaceGetNumGeoms(body_space);gids++)
+                    {
+
+                        dGeomID g = dSpaceGetGeom(body_space,gids);
+                        Vehicle *v = entities.find(g);
+
+                        CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
+
+                        v->destroy();
+                    }
+
+
+
                     // Disable bodies and geoms.  The update will take care of the object later to delete it.
                     if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
                     if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
@@ -840,7 +860,9 @@ int main(int argc, char** argv) {
     setupWorldModelling();
 
     // Initialize ODE, create islands, structures and populate the world.
-    if (isPresentCommandLineParameter(argc,argv,"-test"))
+    if (isPresentCommandLineParameter(argc,argv,"-testcase"))
+        initWorldModelling(0);
+    else if (isPresentCommandLineParameter(argc,argv,"-test"))
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
     else if (isPresentCommandLineParameter(argc,argv,"-load"))
         loadgame();

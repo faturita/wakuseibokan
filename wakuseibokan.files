@@ -126,6 +126,12 @@ src/tests/testcase.cpp
 src/tests/testcase.h
 src/tests/testcase_101.cpp
 src/tests/testcase_101.h
+src/tests/testcase_102.cpp
+src/tests/testcase_102.h
+src/tests/testcase_103.cpp
+src/tests/testcase_103.h
+src/tests/testcase_104.cpp
+src/tests/testcase_104.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h

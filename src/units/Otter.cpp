@@ -11,6 +11,7 @@ Otter::Otter(int newfaction) : AdvancedWalrus(newfaction)
 
 }
 
+
 void Otter::init()
 {
     AdvancedWalrus::init();
@@ -21,8 +22,6 @@ void Otter::init()
     viewport_height = 40.0;
 
     setForward(0,0,1);
-
-
 }
 
 void Otter::drawModel(float yRot, float xRot, float x, float y, float z)

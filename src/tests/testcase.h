@@ -11,7 +11,7 @@ class TestCase
 {
 protected:
     bool isdone=false;
-    bool ispassed=false;
+    bool haspassed=false;
     std::string message;
 public:
     TestCase();

@@ -15,11 +15,8 @@ protected:
     Wheel *backleft;
     Wheel *backright;
 
-    dSpaceID body_space;
-
 public:
     Otter(int newfaction);
-    ~Otter();
     void init();
     void addWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright);
     void getWheels(Wheel* &left, Wheel* &right, Wheel* &backleft, Wheel* &backright );

@@ -31,7 +31,7 @@ int TestCase_101::check(unsigned long timertick)
     if (timertick > 1000)
     {
         isdone = true;
-        ispassed = false;
+        haspassed = false;
         message = std::string("The timeout has occurred and nothing happened.");
     }
 
@@ -57,7 +57,7 @@ bool TestCase_101::done()
 }
 bool TestCase_101::passed()
 {
-    return ispassed;
+    return haspassed;
 }
 std::string TestCase_101::failedMessage()
 {

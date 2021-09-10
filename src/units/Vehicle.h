@@ -82,7 +82,7 @@ protected:
 
     void setFaction(int newfaction);
 
-
+    dSpaceID body_space = NULL;
     
 public:
     bool inert=false;
@@ -96,7 +96,8 @@ public:
 
     void setAutoStatus(AutoStatus au);
     
-	void virtual init();
+    void virtual init();                                        // Init, when the entity is created.
+    void virtual clean();                                       // Clean, do some cleanup when the entitiy is above to be removed. DON't USE destructor !
 	void setSpeed(float speed);
 	float getSpeed();
 	void setXRotAngle(float xRotAngle);
@@ -107,6 +108,8 @@ public:
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
 	Vec3f getForward();
+
+    dSpaceID myspace();
 
     void getR(float retR[12]);
     void setR(float newR[12]);
@@ -184,6 +187,8 @@ public:
     void setStatus(int value);
     int getHealth() const;
     void damage(int d);
+    void destroy();
+
     void setTexture(const GLuint &value);
 
     const Vec3f map(Vec3f);

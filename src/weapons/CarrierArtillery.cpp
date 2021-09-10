@@ -240,7 +240,7 @@ void CarrierArtillery::doControl(struct controlregister conts)
     elevation -= conts.pitch * (20.0f/abs(zoom)) ;
     azimuth += conts.roll * (20.0f/abs(zoom)) ;
 
-    dout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+    //dout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 }

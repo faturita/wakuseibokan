@@ -17,8 +17,10 @@ extern std::vector<BoxIsland*> islands;
 Balaenidae::~Balaenidae()
 {
     // @FIXME Check this.
-    delete _model;
+    //delete _model;
     assert( !"This destructor is not being executed.");
+
+
 }
 
 Balaenidae::Balaenidae(int newfaction)
@@ -34,6 +36,11 @@ void Balaenidae::init()
 
     setForward(0,0,1);
 
+}
+
+void Balaenidae::clean()
+{
+    CLog::Write(CLog::Debug,"Carrier: Destructor.\n");
 }
 
 int Balaenidae::getType()
@@ -91,6 +98,16 @@ void Balaenidae::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+dSpaceID Balaenidae::embody_in_space(dWorldID world, dSpaceID space)
+{
+    body_space = dSimpleSpaceCreate (space);
+    dSpaceSetCleanup (body_space,1);
+
+    embody(world, body_space);
+
+    return body_space;
+}
+
 void Balaenidae::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);
@@ -113,7 +130,6 @@ void Balaenidae::embody(dBodyID myBodySelf)
     dBodySetMass(myBodySelf,&m);
 
     me = myBodySelf;
-
 }
 
 void Balaenidae::doControl()

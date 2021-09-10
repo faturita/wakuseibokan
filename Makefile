@@ -13,7 +13,7 @@ TOBJS = $(TSRCS:.cpp=.o)
 SSRC = $(SCS) src/keplerivworld.cpp src/carrier.cpp 
 OBJS = $(SSRC:.cpp=.o)
 
-TCSRCS = $(SCS) src/carrier.cpp src/tests/tester.cpp src/tests/testcase.cpp src/tests/testcase_101.cpp
+TCSRCS = $(SCS) src/carrier.cpp src/tests/tester.cpp src/tests/testcase.cpp src/tests/testcase_$(TC).cpp
 TCOBJS = $(TCSRCS:.cpp=.o)
 
 

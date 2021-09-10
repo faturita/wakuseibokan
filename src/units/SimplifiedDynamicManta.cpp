@@ -277,6 +277,8 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
+    if (isnan(e1)) e1=0.0;
+
     // Needs fixing, check azimuth to make a continuos function.
 
     float Kp1 = 0.42,    Kp2 = 2.98,     Kp3 = 0.2;
@@ -312,14 +314,14 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
     setForward(T);
     release(T);
 
-    dout << "T:Az:"
-              << std::setw(10) << getAzimuth(getForward())
-              << std::setw(10) << getAzimuth(T)
-              << "(" << std::setw(12) << e1 << ")"
-              << std::setw(10) << declination
-              << std::setw(10) << sp2
-              << " Destination:"
-              << std::setw(10) << T.magnitude() << std::endl;
+//    dout << "T:Az:"
+//              << std::setw(10) << getAzimuth(getForward())
+//              << std::setw(10) << getAzimuth(T)
+//              << "(" << std::setw(12) << e1 << ")"
+//              << std::setw(10) << declination
+//              << std::setw(10) << sp2
+//              << " Destination:"
+//              << std::setw(10) << T.magnitude() << std::endl;
 
     et1 = e1;
     et2 = e2;
@@ -414,6 +416,10 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
+
+    printf( "E1: %10.5f\n" , e1 );
+
+
     // Set the sign of e1 in relation to rolling encoding.
     // Negative: Clockwise
     // Positive: Counterclockwise
@@ -439,14 +445,16 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    //    dout << "T:Az:"
-    //              << std::setw(10) << getAzimuth(getForward())
-    //              << std::setw(10) << getAzimuth(T)
-    //              << "(" << std::setw(12) << e1 << ")"
-    //              << std::setw(10) << declination
-    //              << std::setw(10) << sp2
-    //              << " Destination:"
-    //              << std::setw(10) << T.magnitude() << std::endl;
+    if (isnan(e1)) e1=0.0;
+
+//        dout << "--T:Az:"
+//                  << std::setw(10) << getAzimuth(getForward())
+//                  << std::setw(10) << getAzimuth(T)
+//                  << "(" << std::setw(12) << e1 << ")"
+//                  << std::setw(10) << declination
+//                  << std::setw(10) << sp2
+//                  << " Destination:"
+//                  << std::setw(10) << T.magnitude() << std::endl;
 
     r1 = max(r1, 5);
     r1 = min(r1, -5);
