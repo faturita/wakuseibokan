@@ -2,6 +2,8 @@
 #include "SimplifiedDynamicManta.h"
 #include "Walrus.h"
 #include "AdvancedWalrus.h"
+#include "Otter.h"
+#include "Otter.h"
 #include "AdvancedManta.h"
 #include "../profiling.h"
 #include "../ThreeMaxLoader.h"
@@ -13,6 +15,7 @@
 extern std::unordered_map<std::string, GLuint> textures;
 extern std::vector<Message> messages;
 extern std::vector<BoxIsland*> islands;
+extern container<Vehicle*> entities;
 
 Balaenidae::~Balaenidae()
 {
@@ -162,7 +165,7 @@ void Balaenidae::doControl()
         // Potential fields from the islands (to avoid them)
         int nearesti = 0;
         float closest = 0;
-        for(int i=0;i<islands.size();i++)
+        for(size_t i=0;i<islands.size();i++)
         {
             BoxIsland *b = islands[i];
             Vec3f l(b->getX(),0.0f,b->getZ());
@@ -361,7 +364,7 @@ void Balaenidae::offshore()
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 {
-    Vehicle *v;
+    Vehicle *v = NULL;
 
     if (type == MANTA)
     {
@@ -376,21 +379,64 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         v = (Vehicle*)_manta1;
     } else if (type == WALRUS)
     {
-        AdvancedWalrus *_walrus = new AdvancedWalrus(getFaction());
+        Otter *_walrus = new Otter(getFaction());
         _walrus->init();
-        _walrus->setNumber(number);
-        _walrus->embody(world,space);
+        dSpaceID car_space = _walrus->embody_in_space(world, space);
         Vec3f p;
         p = p.normalize();
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
-        _walrus->setStatus(SailingStatus::SAILING);
         _walrus->stop();
-        _walrus->inert = true;
+        _walrus->setSignal(4);
+        _walrus->setNumber(number);
+        _walrus->setStatus(SailingStatus::SAILING);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
-
         alignToMe(_walrus->getBodyID());
         v = (Vehicle*)_walrus;
+
+        Vec3f dimensions(5.0f,4.0f,10.0f);
+
+
+        Wheel * _fr= new Wheel(getFaction(), 0.001, 30.0);
+        _fr->init();
+        _fr->embody(world, car_space);
+        _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
+        _fr->stop();
+
+        entities.push_back(_fr, _fr->getGeom());
+
+
+        Wheel * _fl= new Wheel(getFaction(), 0.001, 30.0);
+        _fl->init();
+        _fl->embody(world, car_space);
+        _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
+        _fl->stop();
+
+        entities.push_back(_fl, _fl->getGeom());
+
+
+        Wheel * _br= new Wheel(getFaction(), 0.001, 30.0);
+        _br->init();
+        _br->embody(world, car_space);
+        _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
+        _br->stop();
+
+        entities.push_back(_br, _br->getGeom());
+
+
+        Wheel * _bl= new Wheel(getFaction(), 0.001, 30.0);
+        _bl->init();
+        _bl->embody(world, car_space);
+        _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
+        _bl->stop();
+
+        entities.push_back(_bl, _bl->getGeom());
+
+        _walrus->addWheels(_fl, _fr, _bl, _br);
+
+        _fl->setSteering(true);
+        _fr->setSteering(true);
+
     }
 
     return v;

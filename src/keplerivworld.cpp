@@ -42,6 +42,7 @@
 #include "units/AdvancedWalrus.h"
 #include "units/Medusa.h"
 #include "units/AdvancedManta.h"
+#include "units/Otter.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -211,7 +212,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 //printf("Landing on Runways...\n");
 
                 contact[i].surface.mu = 0.99f;
-                contact[i].surface.mu2 = 0.9;             // This prevents the side slipping while landing.
+                contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;
                 contact[i].surface.bounce = 0.2f;
@@ -240,8 +241,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
                  //printf("5\n");
-                 contact[i].surface.mu = dInfinity;
-                 contact[i].surface.bounce = 0.2f;
+                 contact[i].surface.mu = 0.9;  //dInfinity;     // This enable rolling on islands, and no more slipping.  Change to 0.9, because
+                 contact[i].surface.bounce = 0.2f;              //   otherwise rolling is very unstable on ODE.
                  contact[i].surface.slip1 = 0.1f;
                  contact[i].surface.slip2 = 0.1f;
 
@@ -257,6 +258,12 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isCarrier(v1) && stranded(v1,getIsland(contact[i].geom.g2))) {}
                  if (isIsland(contact[i].geom.g1) && isWalrus(v2)  && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isWalrus(v1)  && arrived(v1,getIsland(contact[i].geom.g2))) {}
+
+
+                 if (isIsland(contact[i].geom.g1) && isType(v2, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g2),getIsland(contact[i].geom.g1))) {}
+                 if (isIsland(contact[i].geom.g2) && isType(v1, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g1),getIsland(contact[i].geom.g2))) {}
+
+
 
                  if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
@@ -285,6 +292,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  // Walrus reaching shore.
                  if (ground == contact[i].geom.g1 && isWalrus(v2) && departed(v2)) {}
                  if (ground == contact[i].geom.g2 && isWalrus(v1) && departed(v1)) {}
+
+                 if (ground == contact[i].geom.g1 && isType(v2, WEAPON) && departed(dGeomGetSpace(contact[i].geom.g2))) {}
+                 if (ground == contact[i].geom.g2 && isType(v1, WEAPON) && departed(dGeomGetSpace(contact[i].geom.g1))) {}
 
                  if (ground == contact[i].geom.g1 && v2 && isManta(v2) && groundcollisions(v2)) {}
                  if (ground == contact[i].geom.g2 && v1 && isManta(v1) && groundcollisions(v1)) {}
@@ -541,6 +551,7 @@ void initWorldPopulation()
         _w1->stop();
 
         entities.push_back(_w1, _w1->getGeom());
+
     }
     else if (gamemode == ACTIONGAME)
     {

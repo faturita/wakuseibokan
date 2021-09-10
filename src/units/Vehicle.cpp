@@ -82,7 +82,7 @@ Vehicle::~Vehicle()
     // This is the only destructor of the entire entity tree.
     if (me) dBodyDestroy(me);
     if (geom) dGeomDestroy(geom);
-    CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
+    //CLog::Write(CLog::Debug,"Vehicle: Destructor.\n");
 
     // @FIXME: Risky
     if (_model != NULL) delete _model;
