@@ -41,8 +41,8 @@ void Cephalopod::init()
 
 
     Cephalopod::height=15.0f;
-    Cephalopod::width=40.0f;
-    Cephalopod::length=28.0f;
+    Cephalopod::width=20.0f;
+    Cephalopod::length=32.0f;
 
 
     setForward(0,0,1);
@@ -85,7 +85,7 @@ void Cephalopod::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(2.0f,2.0f,2.0f);
+        glScalef(1.0f,1.0f,1.0f);
 
         doTransform(f, R);
 
@@ -274,12 +274,15 @@ void Cephalopod::doDynamics(dBodyID body)
     if (speed > 10 && speed <32 )
     {
         //droneflying();
-        island = NULL;
+        //island = NULL;  // This is not necessary but my bring some issues when the drone bounces.
 
     }
 
     if (height > 30 && getStatus() == FlyingStatus::LANDED)
+    {
         setStatus(FlyingStatus::FLYING);
+        island = NULL;
+    }
 
     Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
     Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
@@ -430,7 +433,7 @@ void Cephalopod::doControlDrop()
 
     float height = Po[1];
 
-    float thrust = 0;
+    float thrust = 18;
 
     c.registers.thrust = thrust/(10.0);
     c.registers.yaw = 0;

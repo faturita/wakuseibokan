@@ -387,7 +387,6 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->stop();
-        _walrus->setSignal(4);
         _walrus->setNumber(number);
         _walrus->setStatus(SailingStatus::SAILING);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
@@ -436,6 +435,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
         _fl->setSteering(true);
         _fr->setSteering(true);
+
 
     }
 

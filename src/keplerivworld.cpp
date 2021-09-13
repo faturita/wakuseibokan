@@ -517,7 +517,7 @@ void initWorldPopulation()
         // Strategy Game
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
         _b->init();
-        _b->embody(world,space);
+        dSpaceID carrier_space = _b->embody_in_space(world, space);
         //_b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
         _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
@@ -537,7 +537,7 @@ void initWorldPopulation()
 
         CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
         _bo->init();
-        _bo->embody(world, space);
+        _bo->embody(world, carrier_space);
         _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
         _bo->stop();
 
@@ -546,7 +546,7 @@ void initWorldPopulation()
 
         CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
         _w1->init();
-        _w1->embody(world, space);
+        _w1->embody(world, carrier_space);
         _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
         _w1->stop();
 
@@ -558,7 +558,7 @@ void initWorldPopulation()
         // Action Game
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
         _b->init();
-        _b->embody(world,space);
+        dSpaceID carrier_space = _b->embody_in_space(world, space);
         _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
         _b->setPos(0.0f + 0.0 kmf,20.5f,-16000.0f + 0.0 kmf);
         //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
@@ -580,7 +580,7 @@ void initWorldPopulation()
 
         CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
         _bo->init();
-        _bo->embody(world, space);
+        _bo->embody(world, carrier_space);
         _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
         _bo->stop();
 
@@ -589,14 +589,14 @@ void initWorldPopulation()
 
         CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
         _w1->init();
-        _w1->embody(world, space);
+        _w1->embody(world, carrier_space);
         _w1->attachTo(world,_b, -40.0, 25.0f, +210.0f);
         _w1->stop();
 
         entities.push_back(_w1, _w1->getGeom());
 
 
-        for (int j=0;j<islands.size();j++)
+        for (size_t j=0;j<islands.size();j++)
         {
             // @FIXME Decide which island to create.
             int which = (rand() % 3);

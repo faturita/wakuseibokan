@@ -301,7 +301,7 @@ void AdvancedWalrus::doControlAttack()
         float closest = (b->getPos() - Po).magnitude();
         if (closest > 1800 && closest < 1900)
         {
-            c.registers.thrust = 15.0f;
+            //c.registers.thrust = 35.0f;                 // This is the thrust at which the walrus enter the island (more or less).
         }
 
 

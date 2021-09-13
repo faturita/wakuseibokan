@@ -553,6 +553,12 @@ void checktest8(unsigned long  timer)      // Check Walrus entering and leaving 
         if (_walrus->getIsland() != NULL)
         {
             isWalrusInIsland = true;
+            _walrus->stop();
+            struct controlregister c;
+            c.thrust = -200.0f;
+            c.roll = 0;
+            _walrus->setControlRegisters(c);
+            _walrus->setThrottle(-200.0f);
         }
 
         if (_walrus->getStatus() == SailingStatus::OFFSHORING)
@@ -1023,15 +1029,14 @@ void checktest9(unsigned long timer)     // Check walrus stability.
 
 void test10()
 {
-    Vehicle *walrus = (entities[0])->spawn(world,space,WALRUS,1);
-    if (walrus != NULL)
-    {
-        size_t id = entities.push_back(walrus, walrus->getGeom());
-        Message mg;
-        mg.faction = walrus->getFaction();
-        mg.msg = std::string("Walrus has been deployed.");
-        messages.insert(messages.begin(), mg);
-    }
+    AdvancedWalrus *_walrus = new AdvancedWalrus(GREEN_FACTION);
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(200.0f,1.32f,-6000.0f);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->stop();
+
+    entities.push_back(_walrus, _walrus->getGeom());
 }
 
 void checktest10(unsigned long timer)     // Check Walrus arriving to an island and creating the command center.
@@ -5825,7 +5830,7 @@ void test61()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("North Sentinel");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
+    nemesis->buildTerrainModel(space,"terrain/island.bmp");  //sentinel
 
     islands.push_back(nemesis);
 

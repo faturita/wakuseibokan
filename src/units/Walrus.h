@@ -21,7 +21,7 @@ protected:
     float length;
     int number;
 
-    BoxIsland *island;
+    BoxIsland *island=NULL;
 
 public:
     Walrus(int faction);

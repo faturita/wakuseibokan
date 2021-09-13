@@ -29,6 +29,7 @@
 #include "units/Medusa.h"
 #include "units/AdvancedManta.h"
 #include "units/Stingray.h"
+#include "units/Otter.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -38,6 +39,9 @@
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
 #include "structures/Launcher.h"
+
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierTurret.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -111,6 +115,10 @@ void savegame()
                 subtype = 4;
             else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
                 subtype = 5;
+            else if(Otter* ot = dynamic_cast<Otter*>(entities[i]))
+                subtype = 8;
+            else if(Cephalopod* cp = dynamic_cast<Cephalopod*>(entities[i]))
+                subtype = 9;
 
             ss << subtype << std::endl;
 
@@ -194,7 +202,6 @@ void savegame()
 }
 
 
-
 void loadgame()
 {
     /**std::ifstream ss("savegame.w", std::ios_base::binary);
@@ -231,7 +238,7 @@ void loadgame()
         ss >> type;
         ss >> subtype;
         dout << "Type:" << type << " subtype:" << subtype << std::endl;
-
+        Vec3f f(0,0,0);
         if (type == CARRIER || type == MANTA || type == WALRUS)
         {
             switch (type) {
@@ -239,12 +246,46 @@ void loadgame()
             {
                 Balaenidae *b = NULL;
                 if (subtype==5)
+                {
                     b = new Balaenidae(faction);
-                else if (subtype==4)
-                    b = new Beluga(faction);
+                    v = b;
+                    b->init();
+                    dSpaceID carrier_space = b->embody_in_space(world, space);
+                    //_b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+                    b->stop();
 
-                b->init();
-                b->embody(world,space);
+                    entities.push_back(b, b->getGeom());
+
+
+                    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+                    _bo->init();
+                    _bo->embody(world, carrier_space);
+                    _bo->attachTo(world,b, -40.0f, 20.0f + 5, -210.0f);
+                    _bo->stop();
+
+                    entities.push_back(_bo, _bo->getGeom());
+
+
+                    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+                    _w1->init();
+                    _w1->embody(world, carrier_space);
+                    _w1->attachTo(world,b, -40.0, 27.0f, +210.0f);
+                    _w1->stop();
+
+                    entities.push_back(_w1, _w1->getGeom());
+                }
+                else if (subtype==4)
+                {
+                    b = new Beluga(faction);
+                    v = b;
+                    b->init();
+                    b->embody(world,space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+
+                }
                 v = b;
                 break;
             }
@@ -256,12 +297,17 @@ void loadgame()
                     _manta1 = new Medusa(faction);
                 else if (subtype == 7)
                     _manta1 = new Stingray(faction);
-                else
+                else if (subtype == 3)
                     _manta1 = new AdvancedManta(faction);
+                else if (subtype == 9)
+                    _manta1 = new Cephalopod(faction);
 
+                v = _manta1;
                 _manta1->init();
                 _manta1->setNumber(findNextNumber(MANTA));
                 _manta1->embody(world, space);
+                ss >> f[0] >> f[1] >> f[2] ;
+                v->setPos(f);
                 _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
                 _manta1->inert = true;
                 v = _manta1;
@@ -270,20 +316,82 @@ void loadgame()
             case WALRUS:
                 Walrus *_walrus = NULL;
                 if (subtype == 1)
+                {
                     _walrus = new AdvancedWalrus(faction);
+                    v = _walrus;
+                    _walrus->init();
+                    _walrus->embody(world, space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+
+                }
                 else if (subtype == 2)
+                {
                     _walrus = new Walrus(faction);
-                _walrus->init();
+                    v = _walrus;
+                    _walrus->init();
+                    _walrus->embody(world, space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+
+                }
+                else if (subtype == 8)
+                {
+                    Otter* _ot = new Otter(faction);
+                    v = _ot;
+                    _ot->init();
+                    dSpaceID car_space = _ot->embody_in_space(world, space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+
+                    _walrus = _ot;
+
+                    Wheel * _fr= new Wheel(faction, 0.001, 30.0);
+                    _fr->init();
+                    _fr->embody(world, car_space);
+                    _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
+                    _fr->stop();
+
+                    entities.push_back(_fr, _fr->getGeom());
+
+
+                    Wheel * _fl= new Wheel(faction, 0.001, 30.0);
+                    _fl->init();
+                    _fl->embody(world, car_space);
+                    _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
+                    _fl->stop();
+
+                    entities.push_back(_fl, _fl->getGeom());
+
+
+                    Wheel * _br= new Wheel(faction, 0.001, 30.0);
+                    _br->init();
+                    _br->embody(world, car_space);
+                    _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
+                    _br->stop();
+
+                    entities.push_back(_br, _br->getGeom());
+
+
+                    Wheel * _bl= new Wheel(faction, 0.001, 30.0);
+                    _bl->init();
+                    _bl->embody(world, car_space);
+                    _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
+                    _bl->stop();
+
+                    entities.push_back(_bl, _bl->getGeom());
+
+                    _ot->addWheels(_fl, _fr, _bl, _br);
+                    _fl->setSteering(true);
+                    _fr->setSteering(true);
+                }
+
                 _walrus->setNumber(findNextNumber(WALRUS));
-                _walrus->embody(world, space);
                 _walrus->setStatus(SailingStatus::SAILING);
                 //_walrus->inert = true;
                 v = _walrus;
 
             }
-            Vec3f f(0,0,0);
-            ss >> f[0] >> f[1] >> f[2] ;
-            v->setPos(f);
             float health;ss >> health ;v->damage(1000-health);
             float power; ss >> power ;v->setPower(power);
 

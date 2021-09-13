@@ -477,7 +477,7 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
             }
         }
 
-        if (timer>(timeevent + 1600))
+        if (timer>(timeevent + 1600) && timer<(timeevent + 3500))
         {
             Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 
@@ -491,13 +491,24 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
             CLog::Write(CLog::Debug,"Magnitude: %10.5f\n", d.magnitude());
 
             Cephalopod *c = (Cephalopod*)m;
-            if (d.magnitude()<800)
+            if (c->getIsland() == NULL && d.magnitude()<800)
             {
                 // The drone is instructed to drop to the floor.
                 c->drop();
             }
+        }
 
+        if (timer>(timeevent + 3800))
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 
+            if (!m)
+            {
+                timeevent = timer;
+                return state;
+            }
+
+            Cephalopod *c = (Cephalopod*)m;
             if (c->getIsland() != NULL)
             {
                 // @FIXME: Decide which island to create
@@ -568,12 +579,16 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
         // @FIXME: It may happen that the walrus is wandering do nothing never de-autopilot and this is endless.
         if (!w->isAuto() || ( w->getIsland() == is && timer>(timeevent + 1000))  )
         {
-            // @FIXME: Decide which island to create.
+            Vec3f d = w->getPos() - is->getPos();
 
-            assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-            int which = (rand() % 3);
-            captureIsland(is,w->getFaction(),which,space, world);
-            timeevent = timer; return 3;
+            if (d.magnitude() < 500.0)
+            {
+                // @FIXME: Decide which island to create.
+                assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
+                int which = (rand() % 3);
+                captureIsland(is,w->getFaction(),which,space, world);
+                timeevent = timer; return 3;
+            }
         }
     } else
     {
