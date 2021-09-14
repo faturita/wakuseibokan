@@ -433,7 +433,7 @@ void Cephalopod::doControlDrop()
 
     float height = Po[1];
 
-    float thrust = 18;
+    float thrust = 40.0;
 
     c.registers.thrust = thrust/(10.0);
     c.registers.yaw = 0;

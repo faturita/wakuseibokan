@@ -581,7 +581,7 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
         {
             Vec3f d = w->getPos() - is->getPos();
 
-            if (d.magnitude() < 500.0)
+            if (d.magnitude() < 1200.0)     // This is connected to the Terrain, and to how the Walrus actually moves.
             {
                 // @FIXME: Decide which island to create.
                 assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
@@ -630,7 +630,7 @@ int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, uns
                 t = t.cross(up);
                 t = t.normalize();
 
-                w->goTo(b->getPos()+t*300);
+                w->goTo(b->getPos()+t*250);             // @FIXME: This should be just on the back of the carrier.
                 w->enableAuto();
                 found = true;
             }

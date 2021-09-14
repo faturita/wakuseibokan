@@ -64,7 +64,7 @@ Terrain* loadTerrain(const char* filename, float height)
 
             // @NOTE:  Heightmap color 0 is FIXME
             //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
-            //if (color == 0) h =  -70.0f;
+            if (color == 0) h =  -70.0f;
             t->setHeight(x, y, h+height/2.0);
             //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
         }

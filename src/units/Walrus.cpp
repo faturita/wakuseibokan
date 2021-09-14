@@ -293,7 +293,13 @@ void Walrus::doControlDestination()
         float closest = (b->getPos() - Po).magnitude();
         if (closest > 1600 && closest < 2100)
         {
-            c.registers.thrust = 95.0f;
+            c.registers.thrust = 15.0f;
+
+        }
+
+        if (island != NULL)
+        {
+            c.registers.thrust = 400.0;
         }
 
         // Potential fields from Carrier
