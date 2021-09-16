@@ -64,7 +64,7 @@ Terrain* loadTerrain(const char* filename, float height)
 
             // @NOTE:  Heightmap color 0 is FIXME
             //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
-            if (color == 0) h =  -70.0f;
+            //if (color == 0) h =  -70.0f;
             t->setHeight(x, y, h+height/2.0);
             //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
         }
@@ -185,6 +185,56 @@ void BoxIsland::draw()
     
     //drawBoxIsland(300,5,300,600,5*2);
 }
+
+Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
+{
+    float heightOffset = 0;
+    float x = 0;
+    float z = 0;
+
+    for (int j=0;j<4;j++)
+    {
+        float t = (rand() % 360 + 1);
+
+        t = t * PI/180.0f;
+        float adjusted = t * 4.0/(2.0*PI);
+        int rounded = round(adjusted);
+        adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
+
+
+        for(int radius = 0;radius<2500;radius++)
+        {
+            x = cos(t);
+            z = sin(t);
+
+            x = x * radius;
+            z = z * radius;
+
+            if (x>1799) x = 1799;
+            if (x<-1799) x = -1799;
+            if (z>1799) z = 1799;
+            if (z<-1799) z = -1799;
+
+            assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
+
+            // @FIXME Put this line in a different function and use it from there.  Repeated code here.
+            heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+            CLog::Write(CLog::Debug,"(%10.5f - %10.5f  %d: %10.5f,%10.5f) Desired %10.5f vs Height %10.5f\n", t*180.0/PI, adjusted, radius,x,z,desiredHeight, heightOffset);
+
+            if (  heightOffset>desiredHeight )
+            {
+                return Vec3f(x, heightOffset, z);
+            }
+        }
+    }
+    assert (false || !"You are asking for a height which is invalid for this island.");
+
+    return getPos();
+}
+
+
+
 
 /**
  * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinate.  After that start

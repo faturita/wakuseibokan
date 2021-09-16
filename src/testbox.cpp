@@ -5830,7 +5830,7 @@ void test61()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("North Sentinel");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/island.bmp");  //sentinel
+    nemesis->buildTerrainModel(space,"terrain/baltimore.bmp");  //sentinel
 
     islands.push_back(nemesis);
 

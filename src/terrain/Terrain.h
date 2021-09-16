@@ -221,6 +221,7 @@ public:
     float getX();
     float getZ();
     Vec3f getPos();
+    Vec3f getPosAtDesiredHeight(float desiredHeight);
 
     std::string getName();
     void setName(std::string name);
