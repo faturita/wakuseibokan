@@ -156,7 +156,10 @@ void Otter::doDynamics()
 void Otter::doDynamics(dBodyID body)
 {
     if (status == SailingStatus::ROLLING)
+    {
+        doAmphibious(me);
         wrapDynamics(me);
+    }
     else
     {
         left->setAzimuth(0);

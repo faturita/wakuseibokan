@@ -705,7 +705,7 @@ int findNextNumber(int type)
         if (type == MANTA && v->getType() == type)
         {
             Manta *m = (Manta*)v;
-            numbers[m->getNumber()] = 1;
+            numbers[m->getNumber()] = 1;                // @FIXME: Pay attention to these memory access can produce invalid address access.
         }
         if (type == WALRUS && v->getType() == type)
         {

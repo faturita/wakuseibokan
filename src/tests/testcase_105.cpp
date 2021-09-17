@@ -47,7 +47,7 @@ void TestCase_105::init()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
 
     islands.push_back(nemesis);
 

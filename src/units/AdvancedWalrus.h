@@ -44,6 +44,7 @@ public:
     Vehicle* fire(dWorldID world, dSpaceID space);
 
 
+    void doAmphibious(dBodyID body);
 };
 
 

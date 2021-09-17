@@ -19,7 +19,7 @@ protected:
     float height;
     float width;
     float length;
-    int number;
+    int number=0;
 
     BoxIsland *island=NULL;
 

@@ -581,7 +581,7 @@ int CaptureIsland::apply(int state, int faction, unsigned long &timeevent, unsig
         {
             Vec3f d = w->getPos() - is->getPos();
 
-            if (d.magnitude() < 1200.0)     // This is connected to the Terrain, and to how the Walrus actually moves.
+            if (d.magnitude() < 1800.0)     // This is connected to the Terrain, and to how the Walrus actually moves.
             {
                 // @FIXME: Decide which island to create.
                 assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");

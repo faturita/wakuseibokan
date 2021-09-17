@@ -102,23 +102,23 @@ void savegame()
 
 
             if (AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
-                subtype = 1;
+                subtype = VehicleSubTypes::ADVANCEDWALRUS;
             else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
-                subtype = 2;
+                subtype = VehicleSubTypes::SIMPLEWALRUS;
             else if (Medusa *lb = dynamic_cast<Medusa*>(entities[i]))
-                subtype = 6;
+                subtype = VehicleSubTypes::MEDUSA;
             else if (AdvancedManta *lb = dynamic_cast<AdvancedManta*>(entities[i]))
-                subtype = 3;
+                subtype = VehicleSubTypes::SIMPLEMANTA;
             else if (Stingray *lb = dynamic_cast<Stingray*>(entities[i]))
-                subtype = 7;
+                subtype = VehicleSubTypes::STINGRAY;
             else if (Beluga *lb = dynamic_cast<Beluga*>(entities[i]))
-                subtype = 4;
+                subtype = VehicleSubTypes::BELUGA;
             else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
-                subtype = 5;
+                subtype = VehicleSubTypes::BALAENIDAE;
             else if(Otter* ot = dynamic_cast<Otter*>(entities[i]))
-                subtype = 8;
+                subtype = VehicleSubTypes::OTTER;
             else if(Cephalopod* cp = dynamic_cast<Cephalopod*>(entities[i]))
-                subtype = 9;
+                subtype = VehicleSubTypes::CEPHALOPOD;
 
             ss << subtype << std::endl;
 
@@ -141,6 +141,12 @@ void savegame()
             int autostatus = static_cast<int>(entities[i]->getAutoStatus());
 
             ss << autostatus << std::endl;
+
+            ss << entities[i]->getStatus() << std::endl;
+
+            ss << entities[i]->getSignal() << std::endl;
+
+            ss << entities[i]->getOrder() << std::endl;
 
 
         }
@@ -245,7 +251,7 @@ void loadgame()
             case CARRIER:
             {
                 Balaenidae *b = NULL;
-                if (subtype==5)
+                if (subtype==VehicleSubTypes::BALAENIDAE)
                 {
                     b = new Balaenidae(faction);
                     v = b;
@@ -276,7 +282,7 @@ void loadgame()
 
                     entities.push_back(_w1, _w1->getGeom());
                 }
-                else if (subtype==4)
+                else if (subtype==VehicleSubTypes::BELUGA)
                 {
                     b = new Beluga(faction);
                     v = b;
@@ -284,6 +290,7 @@ void loadgame()
                     b->embody(world,space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    entities.push_back(b, b->getGeom());
 
                 }
                 v = b;
@@ -293,13 +300,13 @@ void loadgame()
             {
                 Manta *_manta1 = NULL;
 
-                if (subtype == 6)
+                if (subtype == VehicleSubTypes::MEDUSA)
                     _manta1 = new Medusa(faction);
-                else if (subtype == 7)
+                else if (subtype == VehicleSubTypes::STINGRAY)
                     _manta1 = new Stingray(faction);
-                else if (subtype == 3)
+                else if (subtype == VehicleSubTypes::SIMPLEMANTA)
                     _manta1 = new AdvancedManta(faction);
-                else if (subtype == 9)
+                else if (subtype == VehicleSubTypes::CEPHALOPOD)
                     _manta1 = new Cephalopod(faction);
 
                 v = _manta1;
@@ -311,11 +318,12 @@ void loadgame()
                 _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
                 _manta1->inert = true;
                 v = _manta1;
+                entities.push_back(_manta1, _manta1->getGeom());
                 break;
             }
             case WALRUS:
                 Walrus *_walrus = NULL;
-                if (subtype == 1)
+                if (subtype == VehicleSubTypes::ADVANCEDWALRUS)
                 {
                     _walrus = new AdvancedWalrus(faction);
                     v = _walrus;
@@ -323,9 +331,10 @@ void loadgame()
                     _walrus->embody(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    entities.push_back(_walrus, _walrus->getGeom());
 
                 }
-                else if (subtype == 2)
+                else if (subtype == VehicleSubTypes::SIMPLEWALRUS)
                 {
                     _walrus = new Walrus(faction);
                     v = _walrus;
@@ -333,9 +342,10 @@ void loadgame()
                     _walrus->embody(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    entities.push_back(_walrus, _walrus->getGeom());
 
                 }
-                else if (subtype == 8)
+                else if (subtype == VehicleSubTypes::OTTER)
                 {
                     Otter* _ot = new Otter(faction);
                     v = _ot;
@@ -345,6 +355,7 @@ void loadgame()
                     v->setPos(f);
 
                     _walrus = _ot;
+                    entities.push_back(_walrus, _walrus->getGeom());
 
                     Wheel * _fr= new Wheel(faction, 0.001, 30.0);
                     _fr->init();
@@ -386,8 +397,7 @@ void loadgame()
                     _fr->setSteering(true);
                 }
 
-                _walrus->setNumber(findNextNumber(WALRUS));
-                _walrus->setStatus(SailingStatus::SAILING);
+                //_walrus->setNumber(findNextNumber(WALRUS));
                 //_walrus->inert = true;
                 v = _walrus;
 
@@ -420,8 +430,21 @@ void loadgame()
             AutoStatus autos=static_cast<AutoStatus>(autostatus);
             v->setAutoStatus(autos);
 
+            int status;
+            ss >> status;
 
-            entities.push_back(v, v->getGeom());
+            v->setStatus(status);
+
+            int signal;
+            ss >> signal;
+
+            v->setSignal(signal);
+
+            int order;
+            ss >> order;
+
+            v->setOrder(order);
+
         }
     }
 

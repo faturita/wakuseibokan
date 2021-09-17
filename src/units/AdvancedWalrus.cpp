@@ -141,28 +141,8 @@ void AdvancedWalrus::doDynamics()
     doDynamics(getBodyID());
 }
 
-void AdvancedWalrus::doDynamics(dBodyID body)
+void AdvancedWalrus::doAmphibious(dBodyID body)
 {
-    dReal *v = (dReal *)dBodyGetLinearVel(body);
-
-    dVector3 O;
-    dBodyGetRelPointPos( body, 0,0,0, O);
-
-    dVector3 F;
-    dBodyGetRelPointPos( body, 0,0,1, F);
-
-    F[0] = (F[0]-O[0]);
-    F[1] = (F[1]-O[1]);
-    F[2] = (F[2]-O[2]);
-
-    Vec3f vec3fF;
-    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
-
-    Vec3f vec3fV;
-    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
-
-    speed = vec3fV.magnitude();
-
     if (getTtl()<=0 && getStatus() == SailingStatus::OFFSHORING)
         setStatus(SailingStatus::SAILING);
     else if (getTtl()<=0 && getStatus() == SailingStatus::INSHORING)
@@ -210,6 +190,43 @@ void AdvancedWalrus::doDynamics(dBodyID body)
         // Walrus has tumbled.
         damage(1);
     }
+}
+
+void AdvancedWalrus::doDynamics(dBodyID body)
+{
+    dReal *v = (dReal *)dBodyGetLinearVel(body);
+
+    dVector3 O;
+    dBodyGetRelPointPos( body, 0,0,0, O);
+
+    dVector3 F;
+    dBodyGetRelPointPos( body, 0,0,1, F);
+
+    F[0] = (F[0]-O[0]);
+    F[1] = (F[1]-O[1]);
+    F[2] = (F[2]-O[2]);
+
+    Vec3f vec3fF;
+    vec3fF[0] = F[0];vec3fF[1] = F[1]; vec3fF[2] = F[2];
+
+    Vec3f vec3fV;
+    vec3fV[0]= v[0];vec3fV[1] = v[1]; vec3fV[2] = v[2];
+
+    speed = vec3fV.magnitude();
+
+    doAmphibious(body);
+
+    dVector3 result;
+    dBodyVectorFromWorld(body, 0,1,0,result);
+
+    Vec3f upInBody = Vec3f(result[0],result[1],result[2]);
+    Vec3f Up = Vec3f(0.0f,1.0f,0.0f);
+
+    upInBody = upInBody.normalize();
+
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+
+    float attitude = acos(upInBody.dot(Up))*180.0/PI;
 
 
     if (VERIFY(pos,me) && !Vehicle::inert)
