@@ -145,7 +145,7 @@ void  groundcollisions(dGeomID body);
 
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
-Manta* findMantaByNumber(size_t &pos, int number);
+Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number);
 Manta* findManta(int faction);
 Manta* findManta(int faction, int status);
 Manta* findManta(int faction, int status, Vec3f around);
@@ -154,11 +154,11 @@ Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
 Walrus* findWalrus(int status, int faction, int order);
 Walrus* findWalrusByOrder(int faction, int order);
-Walrus* findWalrusByNumber(size_t &pos, int number);
+Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number);
 Walrus* findNearestWalrus(int faction, Vec3f l, float threshold);
 void list();
 
-int findNextNumber(int type);
+int findNextNumber(int faction, int type, int subtype);
 
 void  buildAndRepair(dSpaceID space, dWorldID world);
 void  buildAndRepair(bool force, dSpaceID space, dWorldID world);

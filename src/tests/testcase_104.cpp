@@ -68,7 +68,7 @@ void TestCase_104::init()
     _otter->setPos(0.0f,70.0f,-0.0f);
     _otter->stop();
     _otter->setSignal(4);
-    _otter->setNumber(1);
+    _otter->setNameByNumber(1);
     _otter->setStatus(SailingStatus::SAILING);
 
     Vec3f dimensions(5.0f,4.0f,10.0f);

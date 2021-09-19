@@ -69,7 +69,7 @@ void AdvancedManta::drawModel(float yRot, float xRot, float x, float y, float z)
 
 int AdvancedManta::getSubType()
 {
-    return MANTA;
+    return SIMPLEMANTA;
 }
 
 void AdvancedManta::embody(dWorldID world, dSpaceID space)

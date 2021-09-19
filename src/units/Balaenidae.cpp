@@ -39,6 +39,8 @@ void Balaenidae::init()
 
     setForward(0,0,1);
 
+    setName("Balaenidae");
+
 }
 
 void Balaenidae::clean()
@@ -370,7 +372,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         AdvancedManta *_manta1 = new AdvancedManta(getFaction());
         _manta1->init();
-        _manta1->setNumber(number);
+        _manta1->setNameByNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
         _manta1->setStatus(FlyingStatus::ON_DECK);
@@ -387,7 +389,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         p = getForward().normalize()*450;
         _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->stop();
-        _walrus->setNumber(number);
+        _walrus->setNameByNumber(number);
         _walrus->setStatus(SailingStatus::SAILING);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
         alignToMe(_walrus->getBodyID());

@@ -69,3 +69,9 @@ int Medusa::getSubType()
 {
     return MEDUSA;
 }
+
+void Medusa::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Medusa",number);
+}

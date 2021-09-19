@@ -110,3 +110,9 @@ void Stingray::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
     position = position - 20*forward + Up;
     forward = orig-position;
 }
+
+void Stingray::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Stingray",number);
+}

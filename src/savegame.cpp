@@ -148,6 +148,8 @@ void savegame()
 
             ss << entities[i]->getOrder() << std::endl;
 
+            ss << entities[i]->getName() << std::endl;
+
 
         }
     }
@@ -311,7 +313,6 @@ void loadgame()
 
                 v = _manta1;
                 _manta1->init();
-                _manta1->setNumber(findNextNumber(MANTA));
                 _manta1->embody(world, space);
                 ss >> f[0] >> f[1] >> f[2] ;
                 v->setPos(f);
@@ -444,6 +445,11 @@ void loadgame()
             ss >> order;
 
             v->setOrder(order);
+
+            std::string name;
+            ss >> name;
+
+            v->setName(name);
 
         }
     }

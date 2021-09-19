@@ -25,6 +25,7 @@ void Beluga::init()
 
     setForward(0,0,1);
 
+    setName("Beluga");
 }
 
 
@@ -108,7 +109,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         Cephalopod *c = new Cephalopod(getFaction());
         c->init();
-        c->setNumber(number);
+        c->setNameByNumber(number);
         c->embody(world, space);
         c->setPos(pos[0],pos[1]+38, pos[2]);
         c->setStatus(FlyingStatus::ON_DECK);
@@ -120,7 +121,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         Stingray *_manta1 = new Stingray(getFaction());
         _manta1->init();
-        _manta1->setNumber(number);
+        _manta1->setNameByNumber(number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
         _manta1->setStatus(FlyingStatus::ON_DECK);
@@ -131,7 +132,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         Walrus *_walrus = new Walrus(getFaction());
         _walrus->init();
-        _walrus->setNumber(number);
+        _walrus->setNameByNumber(number);
         _walrus->embody(world,space);
         Vec3f p;
         p = getForward().normalize()*450;

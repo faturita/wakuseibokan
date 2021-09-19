@@ -19,7 +19,6 @@ protected:
     float height;
     float width;
     float length;
-    int number=0;
 
     BoxIsland *island=NULL;
 
@@ -47,8 +46,6 @@ public:
     void embody(dBodyID myBodySelf);
 
     Vehicle* fire(dWorldID world, dSpaceID space);
-    int getNumber() const;
-    void setNumber(int value);
 
     BoxIsland *getIsland() const;
     void setIsland(BoxIsland *value);
@@ -56,6 +53,8 @@ public:
     void virtual setStatus(int status);
 
     void attack(Vec3f target);
+
+    void setNameByNumber(int number);
 };
 
 #endif /* WALRUS_H_ */

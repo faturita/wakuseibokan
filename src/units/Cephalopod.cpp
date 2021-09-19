@@ -459,7 +459,7 @@ void Cephalopod::hoover(float sp3)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Cephalopod %d has arrived to destination.", getNumber()+1);
+        sprintf(msg, "%s has arrived to destination.", getName().c_str());
         mg.faction = getFaction();
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -510,7 +510,7 @@ void Cephalopod::doControl()
 
 void Cephalopod::doControlAttack()
 {
-    dout << "A:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     Vec3f target = destination;
     switch (flyingstate) {
@@ -666,4 +666,10 @@ BoxIsland *Cephalopod::getIsland() const
 void Cephalopod::setIsland(BoxIsland *value)
 {
     island = value;
+}
+
+void Cephalopod::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Cephalopod",number);
 }

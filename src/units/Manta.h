@@ -21,7 +21,6 @@ protected:
     float height = 10;
     float width = 10;
     float length = 10;
-    int number=0;
 
 public:
     Manta(int newfaction);
@@ -71,8 +70,9 @@ public:
     void embody(dBodyID myBodySelf);
 
     Vehicle* fire(dWorldID world, dSpaceID space);
-    int getNumber() const;
-    void setNumber(int value);
+
+    void setNameByNumber(int number);
+
 };
 
 #endif /* MANTA_H_ */

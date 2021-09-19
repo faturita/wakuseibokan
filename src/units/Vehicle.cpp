@@ -753,3 +753,35 @@ bool Vehicle::arrived()
     return dst_status == DestinationStatus::REACHED;
 }
 
+std::string Vehicle::getName()
+{
+    return name;
+}
+
+void Vehicle::setName(std::string newname)
+{
+    name = newname;
+}
+
+void Vehicle::setName(char name[256], int number)
+{
+    char msg[256];
+    sprintf(msg, "%s %d", name, number);
+    setName(std::string(msg));
+}
+
+void Vehicle::setNameByNumber(int number)
+{
+    assert(!"Vehicle numbering should not be called.");
+}
+
+int Vehicle::getNumber()
+{
+    return number;
+}
+
+void Vehicle::setNumber(int number)
+{
+    this->number = number;
+}
+
