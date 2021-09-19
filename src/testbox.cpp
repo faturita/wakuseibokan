@@ -2706,7 +2706,7 @@ void checktest29(unsigned long timer)
         m->enableAuto();
 
         size_t pos;
-        findMantaByNumber(pos,1);
+        findMantaByFactionAndNumber(pos,GREEN_FACTION,1);
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
         size_t id = entities.indexAt(pos);
@@ -2734,7 +2734,7 @@ void checktest29(unsigned long timer)
         BoxIsland *i = findNearestIsland(b->getPos());
 
         size_t pos;
-        Manta *m = findMantaByNumber(pos,2);
+        Manta *m = findMantaByFactionAndNumber(pos,GREEN_FACTION,2);
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
         //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
@@ -2764,7 +2764,7 @@ void checktest29(unsigned long timer)
         BoxIsland *i = findNearestIsland(b->getPos());
 
         size_t pos;
-        Manta *m = findMantaByNumber(pos,3);
+        Manta *m = findMantaByFactionAndNumber(pos,GREEN_FACTION,3);
 
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
@@ -3118,7 +3118,7 @@ void checktest33(unsigned long timer)
         m->enableAuto();
 
         size_t pos;
-        findMantaByNumber(pos,1);
+        findMantaByFactionAndNumber(pos,GREEN_FACTION,1);
 
         controller.controllingid = pos;
     }
@@ -3130,16 +3130,19 @@ void checktest33(unsigned long timer)
 
         Manta *m = findManta(GREEN_FACTION,FlyingStatus::FLYING);
 
-        Vec3f pos = m->getPos();
-        Vec3f center = i->getPos();
-
-        pos[1] = 0.0;
-
-        if ( (pos-center).magnitude() < 500 )
+        if (m)
         {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            Vec3f pos = m->getPos();
+            Vec3f center = i->getPos();
+
+            pos[1] = 0.0;
+
+            if ( (pos-center).magnitude() < 500 )
+            {
+                printf("Test passed OK!\n");
+                endWorldModelling();
+                exit(1);
+            }
         }
     }
 
@@ -4935,7 +4938,7 @@ void checktest51(unsigned long timer)
 
         Runway *r = (Runway*)entities[islands[0]->getStructures()[1]];
 
-        int mantNumber = findNextNumber(MANTA);
+        int mantNumber = findNextNumber(GREEN_FACTION,MANTA, VehicleSubTypes::MEDUSA);
         Vehicle *manta = (r)->spawn(world,space,MANTA,mantNumber);
         size_t l = entities.push_back(manta, manta->getGeom());
         manta->setOrder(DEFEND_ISLAND);
@@ -5034,7 +5037,7 @@ void checktest52(unsigned long timer)
     {
         Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
         size_t idx=0;
-        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(BLUE_FACTION,MANTA,CEPHALOPOD)));
 
         idx = entities.push_back(m, m->getGeom());
 
@@ -5127,7 +5130,7 @@ void checktest53(unsigned long timer)
     {
         Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
         size_t idx=0;
-        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(BLUE_FACTION,MANTA,CEPHALOPOD)));
 
         idx = entities.push_back(m, m->getGeom());
 
