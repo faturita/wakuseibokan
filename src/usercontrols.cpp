@@ -72,6 +72,9 @@ enum COMMAND_MODES {ATTACK_MODE, DESTINATION_MODE};
 int commandmode=DESTINATION_MODE;
 
 
+static int controlmap[] = {1,2,3,4,5,6,7,8,9};
+
+
 void processMouseEntry(int state) {
     /**if (state == GLUT_LEFT)
         _angle = 0.0;
@@ -256,6 +259,7 @@ void switchControl(int controlposition)
         return;
     }
 
+
     // Check if it is controllable ?
     int type=entities[id]->getType();
     if (type == ACTION)
@@ -306,14 +310,28 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(atoi(content));
 
             } else
-            if (controller.str.find("walrus") != std::string::npos)
+            if (controller.str.find("set") != std::string::npos)
             {
+                std::string command = controller.str.substr(3+1,1);
+                std::string entityid = controller.str.substr(controller.str.find("#")+1);
+
+                dout << "Command-" << command << " map to " << entityid << std::endl;
+
+                int keycontrol = atoi(command.c_str());
+
+                if (keycontrol>=1 && keycontrol<=9)
+                    controlmap[keycontrol-1] = atoi(entityid.c_str())+1;
+
+            }
+            else if (controller.str.find("walrus") != std::string::npos)
+            {
+                // @FIXME What happen the controller.faction is both !!! Need to decide that.
                 const char *content = controller.str.substr(6).c_str();
 
                 printf ("Walrus %s\n", content);
 
                 size_t pos = CONTROLLING_NONE;
-                findWalrusByNumber(pos,atoi(content));
+                findWalrusByFactionAndNumber(pos, controller.faction, atoi(content));
                 switchControl(pos);
 
             } else
@@ -322,7 +340,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 const char *content = controller.str.substr(5).c_str();
 
                 size_t pos = CONTROLLING_NONE;
-                findMantaByNumber(pos,atoi(content));
+                findMantaByFactionAndNumber(pos, controller.faction, atoi(content));
 
                 printf ("Manta %d\n", pos);
 
@@ -460,7 +478,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->goTo(b->getPos()+(b->getForward().normalize()*200));
+                    w->goTo(b->getPos()+(b->getForward().normalize()*150));
                     w->enableAuto();
                 }
             } else
@@ -547,23 +565,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             controller.reset();
             Camera.reset();
         break;
-        case '1':case '2':
-        {
-            switchControl((int)(key-48));
-        }
-        break;
-        case '3': case '4': case '5':
+        case '1':case '2':case '3': case '4': case '5':case '6':case '7':case '8':case '9':
         {
             size_t pos = CONTROLLING_NONE;
-            findMantaByNumber(pos,(int)(key-48)-2);
-
-            switchControl(pos);
-        }
-        break;
-        case '6':case '7':case '8':case '9':
-        {
-            size_t pos = CONTROLLING_NONE;
-            findWalrusByNumber(pos,(int)(key-48)-5);
+            pos = controlmap[(int)(key-48)-1];
 
             switchControl(pos);
         }
@@ -591,7 +596,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
                 {
-                    Cephalopod* m = (Cephalopod*)(entities[controller.controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+                    Cephalopod* m = (Cephalopod*)(entities[controller.controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(entities[controller.controllingid]->getFaction(),MANTA,CEPHALOPOD)));
 
                     size_t idx = entities.push_back(m, m->getGeom());
                 }

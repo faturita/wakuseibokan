@@ -151,12 +151,15 @@ void drawHUD()
     bool lostsignal = false;
     
     float speed=0, health=0, power = 0;
+
+    std::string name;
     
     if (controller.controllingid != CONTROLLING_NONE)
     {
         speed = entities[controller.controllingid]->getSpeed();
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
+        name = entities[controller.controllingid]->getName();
 
         if (entities[controller.controllingid]->getType() == CEPHALOPOD)
         {
@@ -179,7 +182,7 @@ void drawHUD()
     sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d  - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,controller.registers.thrust, health, power);
+    sprintf (str, "Vehicle:%d %s - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,name.c_str(), controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
     if (controller.isTeletype())
@@ -710,56 +713,23 @@ void update(int value)
                         messages.insert(messages.begin(), m);
                     }
 
-                    if (entities[i]->getType() == VehicleTypes::MANTA)
+                    if ((entities[i]->getType() == VehicleTypes::MANTA) || (entities[i]->getType() == VehicleTypes::WALRUS) )
                     {
-                        Manta *m = (Manta*)entities[i];
+                        Vehicle *v = entities[i];
                         char str[256];
                         Message mg;
                         mg.faction = BOTH_FACTION;
-                        sprintf(str, "Manta %2d has been destroyed.", NUMBERING(m->getNumber()));
+                        sprintf(str, "%s has been destroyed.", v->getName().c_str());
                         mg.msg = std::string(str);
                         messages.insert(messages.begin(), mg);
                     }
 
-                    if (entities[i]->getType() == VehicleTypes::WALRUS)
+                    if (entities[i]->getType() != VehicleTypes::WEAPON)
                     {
-                        Walrus *m = (Walrus*)entities[i];
-                        char str[256];
-                        Message mg;
-                        mg.faction = BOTH_FACTION;
-                        sprintf(str, "Walrus %2d has been destroyed.", NUMBERING(m->getNumber()));
-                        mg.msg = std::string(str);
-                        messages.insert(messages.begin(), mg);
+                        explosion();
                     }
 
-
-                    // Clean up of entities, just before they are going to be deleted.
-                    entities[i]->clean();
-
-                    // Pick the space of a multibody entity, bring in all the assosiated entities, and mark them for deletion.
-                    dSpaceID body_space = entities[i]->myspace();
-
-                    if (body_space != NULL)
-                    for(int gids=0;gids<dSpaceGetNumGeoms(body_space);gids++)
-                    {
-
-                        dGeomID g = dSpaceGetGeom(body_space,gids);
-                        Vehicle *v = entities.find(g);
-
-                        CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
-
-                        v->destroy();
-                    }
-
-
-
-                    // Disable bodies and geoms.  The update will take care of the object later to delete it.
-                    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
-                    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
-
-                    entities.erase(entities[i]->getGeom());
-
-                    explosion();
+                    deleteEntity(i);
                 }
             }
         }

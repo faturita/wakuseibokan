@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "profiling.h"
+#include <map>
 
 #ifdef __linux
 #include <functional>
@@ -52,6 +53,35 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, Structure* &s1, Structure* &s2, dGeomI
 
 }
 
+
+// SYNC:  This method handle the elimination of an entity.
+void deleteEntity(size_t i)
+{
+    // Clean up of entities, just before they are going to be deleted.
+    entities[i]->clean();
+
+    // Pick the space of a multibody entity, bring in all the assosiated entities, and mark them for deletion.
+    dSpaceID body_space = entities[i]->myspace();
+
+    if (body_space != NULL)
+    for(int gids=0;gids<dSpaceGetNumGeoms(body_space);gids++)
+    {
+
+        dGeomID g = dSpaceGetGeom(body_space,gids);
+        Vehicle *v = entities.find(g);
+
+        CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
+
+        v->destroy();
+    }
+
+    // Disable bodies and geoms.  The update will take care of the object later to delete it.
+    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
+    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
+
+    entities.erase(entities[i]->getGeom());
+}
+
 // SYNC
 bool stranded(Vehicle *carrier, Island *island)
 {
@@ -99,7 +129,7 @@ bool departed(Vehicle *walrus)
         w->setIsland(NULL);
         char str[256];
         Message mg;
-        sprintf(str, "Walrus %d has departed from %s.", NUMBERING(w->getNumber()), island->getName().c_str());
+        sprintf(str, "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -131,7 +161,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         w->setIsland((BoxIsland*)island);
         char str[256];
         Message mg;
-        sprintf(str, "Walrus %d has arrived to %s.", NUMBERING(w->getNumber()), island->getName().c_str());
+        sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -147,7 +177,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
             c->setIsland((BoxIsland*)island);
             char str[256];
             Message mg;
-            sprintf(str, "Cephalopod Unit %d has landed to %s.", NUMBERING(c->getNumber()), island->getName().c_str());
+            sprintf(str, "%s has landed in %s.", c->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);
             mg.faction = c->getFaction();
             messages.insert(messages.begin(), mg);
@@ -179,7 +209,7 @@ bool landed(Vehicle *manta, Island *island)
             char str[256];
             Message mg;
             mg.faction = manta->getFaction();
-            sprintf(str, "Manta %d has landed on Island %s.", NUMBERING(s->getNumber()), island->getName().c_str());
+            sprintf(str, "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
         }
@@ -280,7 +310,7 @@ bool releasecontrol(Vehicle* vehicle)
             Message mg;
             mg.faction = s->getFaction();
             char str[256];
-            sprintf(str, "Manta %d has landed on Aircraft.", NUMBERING(s->getNumber()));
+            sprintf(str, "%s has landed on Aircraft.", s->getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
         }
@@ -501,12 +531,50 @@ void groundcollisions(dGeomID geom)
     }
 }
 
-Manta* findMantaByNumber(size_t &pos, int number)
+Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getType() == MANTA && ((Manta*)v)->getNumber() == number-1)
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            if (number == v->getNumber())
+            {
+                pos = i+1;  // @FIXME Risky
+                pos = entities.indexOf(i);
+                return (Walrus*)v;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getFaction() == faction)
+        {
+            if (number == v->getNumber())
+            {
+                pos = i+1;  // @FIXME Risky
+                pos = entities.indexOf(i);
+                return (Manta*)v;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+Manta* findMantaByName(size_t &pos, std::string name)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getName() == name)
         {
             pos = i+1;  // @FIXME Risky
             pos = entities.indexOf(i);
@@ -617,12 +685,12 @@ Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
 
 }
 
-Walrus* findWalrusByNumber(size_t &pos, int number)
+Walrus* findWalrusByName(size_t &pos, std::string name)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getType() == WALRUS  && ((Walrus*)v)->getNumber() == number - 1)
+        if (v->getType() == WALRUS  && v->getName() == name)
         {
             pos = i+1;   // @FIXME Fix this risky numbering system.
             pos = entities.indexOf(i);
@@ -694,30 +762,55 @@ Vehicle* findCarrier(int faction)
     return NULL;
 }
 
-int findNextNumber(int type)
+int findAvailableNumber(int bitmap)
 {
-    int numbers[256];
-    memset(numbers,0,sizeof(int)*256);
+
+    for(unsigned short a=0;a<20;a++)
+    {
+        int val = bitmap & 0x01;
+        printf("The number %d is %d\n", a, val);
+        bitmap = bitmap  >> 1;
+
+        if (val == 0)
+            return a+1;
+    }
+
+    assert(false || !"No more available numbers!");
+}
+
+
+int findNextNumber(int faction, int type, int subtype)
+{
+    std::map<std::tuple<int,int,int>, int> idGenerator;
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (type == MANTA && v->getType() == type)
+
+        if (idGenerator.find(std::make_tuple(v->getFaction(), v->getType(), v->getSubType())) == idGenerator.end() )
         {
-            Manta *m = (Manta*)v;
-            numbers[m->getNumber()] = 1;                // @FIXME: Pay attention to these memory access can produce invalid address access.
+            int number = v->getNumber();
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = (0x01 << (number-1));
+        } else {
+            int number = v->getNumber();
+            int bmap = idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())];
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = bmap | (0x01 << (number-1));
         }
-        if (type == WALRUS && v->getType() == type)
-        {
-            Walrus *m = (Walrus*)v;
-            numbers[m->getNumber()] = 1;
-        }
+
     }
-    for(int i=0;i<256;i++)
+
+    if (idGenerator.find(std::make_tuple(faction, type, subtype)) == idGenerator.end() )
     {
-        if (numbers[i]==0)
-            return i;
+        return 1;
     }
+    else
+    {
+        int bmap = idGenerator[std::make_tuple(faction,type,subtype)];
+        int number = findAvailableNumber(bmap);
+        return number;
+    }
+
+
     assert(!"No more available numbers !!!!!");
 }
 
@@ -957,17 +1050,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         {
                             char msg[256];
                             Message mg;
-                            switch (entities[i]->getType()) {
-                                    case WALRUS:
-                                    sprintf(msg, "Walrus %d is loosing connection.", NUMBERING(((Walrus*)entities[i])->getNumber()));
-                                break;
-                                    case MANTA:
-                                    sprintf(msg, "Manta %d is loosing connection.", NUMBERING(((Walrus*)entities[i])->getNumber()));
-                                    break;
-                                    default:
-                                    sprintf(msg, "Vehicle is loosing connection.");
-                            }
-
+                            sprintf(msg, "%s is loosing connection.", entities[i]->getName().c_str());
                             mg.faction = entities[i]->getFaction();
                             mg.msg = std::string(msg);
                             messages.insert(messages.begin(), mg);
@@ -1269,7 +1352,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             if (!m && !ml)
                             {
 
-                                int mantNumber = findNextNumber(MANTA);
+                                int mantNumber = findNextNumber(lb->getFaction(), MANTA,MEDUSA);
                                 Vehicle *manta = (lb)->spawn(world,space,MANTA,mantNumber);
 
                                 size_t l = entities.push_back(manta, manta->getGeom());
@@ -1472,15 +1555,16 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
     }
 
 
-    int mantaNumber = findNextNumber(MANTA);
-    Vehicle *manta = (spawner)->spawn(world,space,MANTA,mantaNumber);
+    Vehicle *manta = (spawner)->spawn(world,space,MANTA,0);
+    int mantaNumber = findNextNumber(spawner->getFaction(), manta->getType(), manta->getSubType());
+    manta->setNameByNumber(mantaNumber);              // This will name the vehicle accordingly.
     if (manta != NULL)
     {
         idx = entities.push_back(manta, manta->getGeom());
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
-        sprintf(msg, "Manta %2d is ready to takeoff.",NUMBERING(mantaNumber));
+        sprintf(msg, "%s is ready to takeoff.",manta->getName().c_str());
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
     }
@@ -1489,7 +1573,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
 
 Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
 {
-    Cephalopod* m = (Cephalopod*)(spawner->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+    Cephalopod* m = (Cephalopod*)(spawner->spawn(world,space,CEPHALOPOD,findNextNumber(spawner->getFaction(),MANTA,CEPHALOPOD)));
 
     if (m != NULL)
     {
@@ -1497,7 +1581,7 @@ Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "Cephalopod %2d has been deployed.",NUMBERING(m->getNumber()));
+        sprintf(msg, "%s has been deployed.",m->getName().c_str());
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
     }
@@ -1509,20 +1593,22 @@ Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
 {
-    int walrusNumber = findNextNumber(WALRUS);
-    Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,walrusNumber);
+    Vehicle *walrus = (spawner)->spawn(world,space,WALRUS,findNextNumber(spawner->getFaction(),WALRUS,VehicleSubTypes::SIMPLEWALRUS));
+    int walrusNumber = findNextNumber(spawner->getFaction(),WALRUS,walrus->getSubType());
+    walrus->setNameByNumber(walrusNumber);
     if (walrus != NULL)
     {
         entities.push_back(walrus,walrus->getGeom());
         char msg[256];
         Message mg;
         mg.faction = walrus->getFaction();
-        sprintf(msg, "Walrus %2d has been deployed.",NUMBERING(walrusNumber));
+        sprintf(msg, "%s has been deployed.",walrus->getName().c_str());
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
     }
     return (Walrus*)walrus;
 }
+
 
 // SYNCJ
 void dockWalrus(Vehicle *dock)
@@ -1538,13 +1624,11 @@ void dockWalrus(Vehicle *dock)
             char msg[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            int numb = ((Walrus*)entities[i])->getNumber();
-            sprintf(msg, "Walrus %d is now back on deck.",NUMBERING(numb));
+            sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
 
-            dBodyDisable(entities[i]->getBodyID());
-            entities.erase(entities[i]->getGeom());
+            deleteEntity(i);
         }
     }
 }
@@ -1560,13 +1644,12 @@ void dockManta()
             char str[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(str, "Manta %2d is now on bay.",NUMBERING(((Manta*)entities[i])->getNumber()));
+            sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
             mg.msg = std::string(str);
-
             messages.insert(messages.begin(), mg);
             //CLog::Write(CLog::Debug,"Eliminating....\n");
-            dBodyDisable(entities[i]->getBodyID());
-            entities.erase(entities[i]->getGeom());
+
+            deleteEntity(i);
         }
     }
 }
@@ -1605,7 +1688,7 @@ Manta* taxiManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = m->getFaction();
-            sprintf(msg,"Manta %2d is ready for launch.",NUMBERING(m->getNumber()));
+            sprintf(msg,"%s is ready for launch.",m->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
         }
@@ -1634,7 +1717,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = b->getFaction();
-            sprintf(msg, "Manta %2d has been launched.", NUMBERING(m->getNumber()));
+            sprintf(msg, "%s has been launched.", m->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
             takeoff();
@@ -1656,7 +1739,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = r->getFaction();
-            sprintf(msg, "Medusa %2d is departing from %s.", NUMBERING(m->getNumber()), is->getName().c_str());
+            sprintf(msg, "%s is departing from %s.", m->getName().c_str(), is->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
             takeoff();

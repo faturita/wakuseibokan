@@ -18,6 +18,8 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
+
+    void setNameByNumber(int number);
 };
 
 #endif // STINGRAY_H

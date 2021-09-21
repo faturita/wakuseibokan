@@ -32,7 +32,6 @@ enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
 enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 
-#define NUMBERING(m) (m + 1)
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
 enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
@@ -83,6 +82,10 @@ protected:
     void setFaction(int newfaction);
 
     dSpaceID body_space = NULL;
+
+    std::string name;
+
+    int number;
     
 public:
     bool inert=false;
@@ -208,6 +211,15 @@ public:
     AutoStatus getAutoStatus() const;
 
     std::string subTypeText(int code);
+
+    std::string getName();
+    void setName(char msg[256], int number);
+    void virtual setNameByNumber(int number);
+    void setName(std::string);
+
+    void setNumber(int number);
+    int getNumber();
+
 };
 
 #endif /* VEHICLE_H_ */

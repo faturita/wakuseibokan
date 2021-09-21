@@ -24,15 +24,6 @@ Walrus::Walrus(int newfaction)
     setFaction(newfaction);
 }
 
-int Walrus::getNumber() const
-{
-    return number;
-}
-
-void Walrus::setNumber(int value)
-{
-    number = value;
-}
 
 BoxIsland *Walrus::getIsland() const
 {
@@ -595,4 +586,10 @@ void Walrus::attack(Vec3f target)
 {
     autostatus = AutoStatus::ATTACK;
     destination = target;
+}
+
+void Walrus::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Walrus", number);
 }

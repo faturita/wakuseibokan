@@ -88,7 +88,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     // When in range, Aim with flipping increasing speed, shooting with all you have.
     // If starts to trail behind go 2
     // Fly away and restarts going to 1.
-    dout << "DF:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    dout << "DF:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     // @NOTE: Someone will give me, all the time, current target position.
     Vec3f target = destination;
@@ -153,7 +153,7 @@ void SimplifiedDynamicManta::doControlDogFight()
 void SimplifiedDynamicManta::doControlAttack()
 {
 
-    dout << "A:" << std::setw(3) << getNumber() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     Vec3f target = destination;
     switch (flyingstate) {
@@ -239,7 +239,7 @@ void SimplifiedDynamicManta::doControlForced(Vec3f target)
     setForward(T);
     release(T);
 
-    dout << "Number:" << getNumber() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
+    dout << "Number:" << getName() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
 
     c.registers.thrust = 400/(10.0);
     c.registers.pitch = pitch;
@@ -367,7 +367,7 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
     {   
         char msg[256];
         Message mg;
-        sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
+        sprintf(msg, "%s has arrived to destination.", getName().c_str());
         mg.faction = getFaction();
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -866,7 +866,7 @@ void SimplifiedDynamicManta::doControlDestination()
             flyingstate = 0;
             char msg[256];
             Message mg;
-            sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
+            sprintf(msg, "%s has arrived to destination.", getName().c_str());
             mg.faction = getFaction();
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);

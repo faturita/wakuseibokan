@@ -113,7 +113,7 @@ Vehicle* Runway::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         Medusa *_manta1 = new Medusa(getFaction());
         _manta1->init();
-        _manta1->setNumber(number);
+        _manta1->setName("Medusa",number);
         _manta1->embody(world, space);
         _manta1->setPos(pos[0],pos[1]+28, pos[2]);
         _manta1->setStatus(FlyingStatus::LANDED);

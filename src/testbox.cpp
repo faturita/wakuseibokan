@@ -2706,7 +2706,7 @@ void checktest29(unsigned long timer)
         m->enableAuto();
 
         size_t pos;
-        findMantaByNumber(pos,1);
+        findMantaByFactionAndNumber(pos,GREEN_FACTION,1);
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
         size_t id = entities.indexAt(pos);
@@ -2734,7 +2734,7 @@ void checktest29(unsigned long timer)
         BoxIsland *i = findNearestIsland(b->getPos());
 
         size_t pos;
-        Manta *m = findMantaByNumber(pos,2);
+        Manta *m = findMantaByFactionAndNumber(pos,GREEN_FACTION,2);
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
         //m->setDestination(Vec3f(i->getX(),0.0, i->getZ()));
@@ -2764,7 +2764,7 @@ void checktest29(unsigned long timer)
         BoxIsland *i = findNearestIsland(b->getPos());
 
         size_t pos;
-        Manta *m = findMantaByNumber(pos,3);
+        Manta *m = findMantaByFactionAndNumber(pos,GREEN_FACTION,3);
 
         std::cout << "-----------:" << m << " / " << m->getNumber() << std::endl;
 
@@ -3118,7 +3118,7 @@ void checktest33(unsigned long timer)
         m->enableAuto();
 
         size_t pos;
-        findMantaByNumber(pos,1);
+        findMantaByFactionAndNumber(pos,GREEN_FACTION,1);
 
         controller.controllingid = pos;
     }
@@ -3130,16 +3130,19 @@ void checktest33(unsigned long timer)
 
         Manta *m = findManta(GREEN_FACTION,FlyingStatus::FLYING);
 
-        Vec3f pos = m->getPos();
-        Vec3f center = i->getPos();
-
-        pos[1] = 0.0;
-
-        if ( (pos-center).magnitude() < 500 )
+        if (m)
         {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            Vec3f pos = m->getPos();
+            Vec3f center = i->getPos();
+
+            pos[1] = 0.0;
+
+            if ( (pos-center).magnitude() < 500 )
+            {
+                printf("Test passed OK!\n");
+                endWorldModelling();
+                exit(1);
+            }
         }
     }
 
@@ -4935,7 +4938,7 @@ void checktest51(unsigned long timer)
 
         Runway *r = (Runway*)entities[islands[0]->getStructures()[1]];
 
-        int mantNumber = findNextNumber(MANTA);
+        int mantNumber = findNextNumber(GREEN_FACTION,MANTA, VehicleSubTypes::MEDUSA);
         Vehicle *manta = (r)->spawn(world,space,MANTA,mantNumber);
         size_t l = entities.push_back(manta, manta->getGeom());
         manta->setOrder(DEFEND_ISLAND);
@@ -5034,7 +5037,7 @@ void checktest52(unsigned long timer)
     {
         Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
         size_t idx=0;
-        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(BLUE_FACTION,MANTA,CEPHALOPOD)));
 
         idx = entities.push_back(m, m->getGeom());
 
@@ -5127,7 +5130,7 @@ void checktest53(unsigned long timer)
     {
         Beluga *b = (Beluga*)findCarrier(BLUE_FACTION);
         size_t idx=0;
-        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(CEPHALOPOD)));
+        Cephalopod* m = (Cephalopod*)(b->spawn(world,space,CEPHALOPOD,findNextNumber(BLUE_FACTION,MANTA,CEPHALOPOD)));
 
         idx = entities.push_back(m, m->getGeom());
 
@@ -6460,7 +6463,12 @@ void test67()
 
 void checktest67(unsigned long timer)
 {
-
+    if (timer == 1000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+    }
 }
 
 void test68()
@@ -6492,71 +6500,6 @@ void test68()
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
 
-    // 6,3,12
-    WheeledManta *_manta = new WheeledManta(GREEN_FACTION);
-    _manta->init();
-    _manta->embody(world,space);
-    _manta->setPos(0.0f,30.0f,-1400.0f);
-    _manta->stop();
-    _manta->setSignal(4);
-    Vec3f dimensions(10.0f,3.0f,10.0f);
-
-    entities.push_back(_manta, _manta->getGeom());
-
-
-
-    Wheel * _fr= new Wheel(GREEN_FACTION);
-    _fr->init();
-    _fr->embody(world, space);
-    _fr->attachTo(world,_manta, dimensions, WheelLocations::FRONT_RIGHT);
-    _fr->stop();
-
-    entities.push_back(_fr, _fr->getGeom());
-
-
-    Wheel * _fl= new Wheel(GREEN_FACTION);
-    _fl->init();
-    _fl->embody(world, space);
-    _fl->attachTo(world,_manta, dimensions, WheelLocations::FRONT_LEFT);
-    _fl->stop();
-
-    entities.push_back(_fl, _fl->getGeom());
-
-
-    Wheel * _br= new Wheel(GREEN_FACTION);
-    _br->init();
-    _br->embody(world, space);
-    _br->attachTo(world,_manta, dimensions, WheelLocations::BACK_RIGHT);
-    _br->stop();
-
-    entities.push_back(_br, _br->getGeom());
-
-
-    Wheel * _bl= new Wheel(GREEN_FACTION);
-    _bl->init();
-    _bl->embody(world, space);
-    _bl->attachTo(world,_manta, dimensions, WheelLocations::BACK_LEFT);
-    _bl->stop();
-
-    entities.push_back(_bl, _bl->getGeom());
-
-    _manta->addWheels(_fl, _fr, _bl, _br);
-
-    _fl->setSteering(true);
-    _fr->setSteering(true);
-
-
-    Walrus *_walrus = new Walrus(GREEN_FACTION);
-
-    _walrus->init();
-    _walrus->embody(world, space);
-    _walrus->setPos(0.0f,20.5f,2000);
-    _walrus->setStatus(SailingStatus::SAILING);
-    _walrus->setSignal(4);
-
-    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
-
-
     Vec3f pos(0.0,1.32, - 3500);
     Camera.setPos(pos);
 
@@ -6566,7 +6509,12 @@ void test68()
 
 void checktest68(unsigned long timer)
 {
-
+    if (timer == 1000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+    }
 }
 
 void test69()
@@ -6607,7 +6555,7 @@ void test69()
     _otter->setPos(0.0f,70.0f,-0.0f);
     _otter->stop();
     _otter->setSignal(4);
-    _otter->setNumber(1);
+    _otter->setNameByNumber(1);
     _otter->setStatus(SailingStatus::SAILING);
 
     Vec3f dimensions(5.0f,4.0f,10.0f);
@@ -6687,6 +6635,13 @@ void checktest69(unsigned long timer)
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 10000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
     }
 }
 

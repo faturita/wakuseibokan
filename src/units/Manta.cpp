@@ -16,15 +16,7 @@ Manta::Manta(int faction)
 {
     setFaction(faction);
 }
-int Manta::getNumber() const
-{
-    return number;
-}
 
-void Manta::setNumber(int value)
-{
-    number = value;
-}
 void Manta::release(Vec3f orientation)
 {
     assert(!"Not implemented");
@@ -431,5 +423,11 @@ Vehicle* Manta::fire(dWorldID world, dSpaceID space)
 
     // I can set power or something here.
     return (Vehicle*)action;
+}
+
+void Manta::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Manta", number);
 }
 

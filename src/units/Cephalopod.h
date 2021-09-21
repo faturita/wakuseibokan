@@ -48,6 +48,8 @@ public:
     void drop();
 
     void doMaterial();
+
+    void setNameByNumber(int number);
 };
 
 #endif // CEPHALOPOD_H
