@@ -148,7 +148,11 @@ void savegame()
 
             ss << entities[i]->getOrder() << std::endl;
 
-            ss << entities[i]->getName() << std::endl;
+            // @NOTE Take care when you write string with namespaces.
+            std::string name = entities[i]->getName();
+            name = std::regex_replace(name, std::regex(" "), "-");
+
+            ss << name << std::endl;
 
 
         }
@@ -450,6 +454,8 @@ void loadgame()
             ss >> name;
 
             v->setName(name);
+
+            printf("Unit name: %s\n", name.c_str());
 
         }
     }

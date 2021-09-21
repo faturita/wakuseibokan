@@ -724,34 +724,12 @@ void update(int value)
                         messages.insert(messages.begin(), mg);
                     }
 
-
-                    // Clean up of entities, just before they are going to be deleted.
-                    entities[i]->clean();
-
-                    // Pick the space of a multibody entity, bring in all the assosiated entities, and mark them for deletion.
-                    dSpaceID body_space = entities[i]->myspace();
-
-                    if (body_space != NULL)
-                    for(int gids=0;gids<dSpaceGetNumGeoms(body_space);gids++)
+                    if (entities[i]->getType() != VehicleTypes::WEAPON)
                     {
-
-                        dGeomID g = dSpaceGetGeom(body_space,gids);
-                        Vehicle *v = entities.find(g);
-
-                        CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
-
-                        v->destroy();
+                        explosion();
                     }
 
-
-
-                    // Disable bodies and geoms.  The update will take care of the object later to delete it.
-                    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
-                    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
-
-                    entities.erase(entities[i]->getGeom());
-
-                    explosion();
+                    deleteEntity(i);
                 }
             }
         }

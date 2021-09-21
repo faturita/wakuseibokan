@@ -58,6 +58,7 @@ Vehicle* gVehicle(dGeomID geom);
 
 void gVehicle(Vehicle* &v1, Vehicle* &v2,Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
+void deleteEntity(size_t i);
 
 // SYNC
 bool stranded(Vehicle *carrier, Island *island);

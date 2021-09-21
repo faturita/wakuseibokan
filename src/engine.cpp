@@ -53,6 +53,35 @@ void gVehicle(Vehicle* &v1, Vehicle* &v2, Structure* &s1, Structure* &s2, dGeomI
 
 }
 
+
+// SYNC:  This method handle the elimination of an entity.
+void deleteEntity(size_t i)
+{
+    // Clean up of entities, just before they are going to be deleted.
+    entities[i]->clean();
+
+    // Pick the space of a multibody entity, bring in all the assosiated entities, and mark them for deletion.
+    dSpaceID body_space = entities[i]->myspace();
+
+    if (body_space != NULL)
+    for(int gids=0;gids<dSpaceGetNumGeoms(body_space);gids++)
+    {
+
+        dGeomID g = dSpaceGetGeom(body_space,gids);
+        Vehicle *v = entities.find(g);
+
+        CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
+
+        v->destroy();
+    }
+
+    // Disable bodies and geoms.  The update will take care of the object later to delete it.
+    if (entities[i]->getBodyID())   {   dBodyDisable(entities[i]->getBodyID()); }
+    if (entities[i]->getGeom())     {   dGeomDisable(entities[i]->getGeom());   }
+
+    entities.erase(entities[i]->getGeom());
+}
+
 // SYNC
 bool stranded(Vehicle *carrier, Island *island)
 {
@@ -1580,6 +1609,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
     return (Walrus*)walrus;
 }
 
+
 // SYNCJ
 void dockWalrus(Vehicle *dock)
 {
@@ -1598,8 +1628,7 @@ void dockWalrus(Vehicle *dock)
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
 
-            dBodyDisable(entities[i]->getBodyID());
-            entities.erase(entities[i]->getGeom());
+            deleteEntity(i);
         }
     }
 }
@@ -1617,11 +1646,10 @@ void dockManta()
             mg.faction = entities[i]->getFaction();
             sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
             mg.msg = std::string(str);
-
             messages.insert(messages.begin(), mg);
             //CLog::Write(CLog::Debug,"Eliminating....\n");
-            dBodyDisable(entities[i]->getBodyID());
-            entities.erase(entities[i]->getGeom());
+
+            deleteEntity(i);
         }
     }
 }

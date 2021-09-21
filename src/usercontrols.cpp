@@ -478,7 +478,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->goTo(b->getPos()+(b->getForward().normalize()*200));
+                    w->goTo(b->getPos()+(b->getForward().normalize()*150));
                     w->enableAuto();
                 }
             } else
