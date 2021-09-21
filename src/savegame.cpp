@@ -101,7 +101,10 @@ void savegame()
             int subtype = 0;
 
 
-            if (AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
+            // @NOTE, Remember that you need to put the more specific on top, becuase otherwise the dynamic casting works.
+            if (Otter* ot = dynamic_cast<Otter*>(entities[i]))
+                subtype = VehicleSubTypes::OTTER;
+            else if(AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
                 subtype = VehicleSubTypes::ADVANCEDWALRUS;
             else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
                 subtype = VehicleSubTypes::SIMPLEWALRUS;
@@ -115,8 +118,6 @@ void savegame()
                 subtype = VehicleSubTypes::BELUGA;
             else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(entities[i]))
                 subtype = VehicleSubTypes::BALAENIDAE;
-            else if(Otter* ot = dynamic_cast<Otter*>(entities[i]))
-                subtype = VehicleSubTypes::OTTER;
             else if(Cephalopod* cp = dynamic_cast<Cephalopod*>(entities[i]))
                 subtype = VehicleSubTypes::CEPHALOPOD;
 
@@ -126,13 +127,13 @@ void savegame()
 
             Vec3f p= entities[i]->getPos();
             ss << p[0] << std::endl << p[1] << std::endl << p[2] << std::endl;
-            ss << entities[i]->getHealth() << std::endl;
-            ss << entities[i]->getPower() << std::endl;
-
 
             float R[12];
             entities[i]->getR(R);
             for(int j=0;j<12;j++) ss << R[j] << std::endl;
+
+            ss << entities[i]->getHealth() << std::endl;
+            ss << entities[i]->getPower() << std::endl;
 
             ss << entities[i]->isAuto() << std::endl;
             p = entities[i]->getDestination();
@@ -154,13 +155,15 @@ void savegame()
 
             ss << name << std::endl;
 
+            ss << entities[i]->getNumber() << std::endl;
+
 
         }
     }
 
 
     ss << islands.size() << std::endl;
-    for (int j=0;j<islands.size();j++)
+    for (size_t j=0;j<islands.size();j++)
     {
         std::string s;
         s = islands[j]->getName();
@@ -270,6 +273,10 @@ void loadgame()
 
                     entities.push_back(b, b->getGeom());
 
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
+
 
                     CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
                     _bo->init();
@@ -296,6 +303,9 @@ void loadgame()
                     b->embody(world,space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
                     entities.push_back(b, b->getGeom());
 
                 }
@@ -323,6 +333,9 @@ void loadgame()
                 _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
                 _manta1->inert = true;
                 v = _manta1;
+                float R[12];
+                for(int j=0;j<12;j++) ss >> R[j];
+                v->setRotation(R);
                 entities.push_back(_manta1, _manta1->getGeom());
                 break;
             }
@@ -336,6 +349,9 @@ void loadgame()
                     _walrus->embody(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
                     entities.push_back(_walrus, _walrus->getGeom());
 
                 }
@@ -347,17 +363,25 @@ void loadgame()
                     _walrus->embody(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
                     entities.push_back(_walrus, _walrus->getGeom());
 
                 }
                 else if (subtype == VehicleSubTypes::OTTER)
                 {
+                    printf("OTTER \n");
                     Otter* _ot = new Otter(faction);
                     v = _ot;
                     _ot->init();
                     dSpaceID car_space = _ot->embody_in_space(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
+
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    //v->setRotation(R);
 
                     _walrus = _ot;
                     entities.push_back(_walrus, _walrus->getGeom());
@@ -400,19 +424,20 @@ void loadgame()
                     _ot->addWheels(_fl, _fr, _bl, _br);
                     _fl->setSteering(true);
                     _fr->setSteering(true);
+
+                    v->setRotation(R);
+                    _fl->setRotation(R);
+                    _fr->setRotation(R);
+                    _bl->setRotation(R);
+                    _br->setRotation(R);
                 }
 
-                //_walrus->setNumber(findNextNumber(WALRUS));
                 //_walrus->inert = true;
                 v = _walrus;
 
             }
             float health;ss >> health ;v->damage(1000-health);
             float power; ss >> power ;v->setPower(power);
-
-            float R[12];
-            for(int j=0;j<12;j++) ss >> R[j];
-            v->setRotation(R);
 
 
             if (type == MANTA)
@@ -453,9 +478,16 @@ void loadgame()
             std::string name;
             ss >> name;
 
+            name = std::regex_replace(name, std::regex("-"), " ");
+
             v->setName(name);
 
             printf("Unit name: %s\n", name.c_str());
+
+            int number;
+            ss >> number;
+
+            v->setNumber(number);
 
         }
     }

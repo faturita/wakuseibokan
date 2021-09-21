@@ -80,7 +80,7 @@ void Wheel::doDynamics()
         if (v < -0.1) v = -0.1;
         v *= -5.0;
 
-        //printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
+        printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
 
 
         dJointSetHinge2Param (joint,dParamVel,v);
@@ -227,7 +227,7 @@ void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
 
     //glRotatef(0, 0.0f, 0.0f, 1.0f);
 
-    //drawRectangularBox(width, height, length);
+    drawRectangularBox(width, height, length);
 
     glPopMatrix();
 
