@@ -22,6 +22,7 @@ Compiling and Installation
 
 # Ubuntu Packages
 
+ g++ make  git
  libbsd-dev  freeglut3-dev
 
 # Compiling
@@ -89,12 +90,33 @@ sudo make install
 
 echo "Installation complete."
 ```
-
+* libtool, autotools-dev, automake
 * Now download the ode-0.14.tar tarball.
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 * ./bootstrap
 * ./configure
 * make clean && make && sudo make install
+
+Ubuntu 18-04/20
+---------------
+
+Fix the issue that the touchpad is disabled when you are pressing keys
+
+Deactivate the «disable touchpad when typing» feature.
+
+In Ubuntu 18.04, at the command line (e.g. in an xterm):
+
+Find id m of touchpad device, called e.g. «Elantech Touchpad»:
+
+xinput --list
+
+Find property id n, probably called «Disable While Typing Enabled»:
+
+xinput --list-props <m>
+
+Deactivate it:
+
+xinput --set-prop <m> <n> 0
 
 
 Characteristics
