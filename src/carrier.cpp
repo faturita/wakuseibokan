@@ -77,6 +77,9 @@ extern  Camera Camera;
 
 float horizon = 100000.0f;   // 100 kmf
 
+int screen_width;
+int screen_height;
+
 
 /* dynamics and collision objects */
 
@@ -579,6 +582,9 @@ void initRendering() {
 void handleResize(int w, int h) {
     CLog::Write(CLog::Debug,"Handling Resize: %d, %d \n", w, h);
 	glViewport(0, 0, w, h);
+
+    screen_width = w;
+    screen_height = h;
     
     // ADDED
     glOrtho( 0, w, 0, h, -1, 1);

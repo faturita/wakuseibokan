@@ -392,7 +392,6 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _walrus->setNameByNumber(number);
         _walrus->setStatus(SailingStatus::SAILING);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
-        alignToMe(_walrus->getBodyID());
         v = (Vehicle*)_walrus;
 
         Vec3f dimensions(5.0f,4.0f,10.0f);
@@ -438,6 +437,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _fl->setSteering(true);
         _fr->setSteering(true);
 
+        alignToMe(_walrus->getBodyID());
 
     }
 
