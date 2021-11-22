@@ -3,7 +3,6 @@
 //  wakuseibokan
 //
 //  Created by Rodrigo Ramele on 1/12/17.
-//  Copyright © 2017 Baufest. All rights reserved.
 //
 
 #include "MultiBodyVehicle.h"

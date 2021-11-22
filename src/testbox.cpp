@@ -1,9 +1,8 @@
 //
 //  testbox.cpp
-//  mycarrier
+//  Wakuseibokan
 //
 //  Created by Rodrigo Ramele on 22/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #include <iostream>

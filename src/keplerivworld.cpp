@@ -5,7 +5,6 @@
 //  Dynamic World Model
 //
 //  Created by Rodrigo Ramele on 24/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #define dSINGLE

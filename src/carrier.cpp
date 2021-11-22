@@ -1,9 +1,8 @@
 //
 //  carrier.cpp
-//  mycarrier
+//  Wakuseibokan
 //
 //  Created by Rodrigo Ramele on 22/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #include <iostream>
@@ -409,7 +408,10 @@ void drawScene() {
     
     // @FIXME Safe code.  Destroy something and see what happens here.
     if (!entities.isValid(controller.controllingid))
+    {
         controller.controllingid = CONTROLLING_NONE;
+        controller.reset();
+    }
 
     if (controller.controllingid != CONTROLLING_NONE )
     {
@@ -558,8 +560,8 @@ void initRendering() {
     glEnable(GL_DEPTH_TEST);
     
     
-        // Enable wireframes
-        //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    // Enable wireframes
+    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
     
     glShadeModel(GL_SMOOTH); // Type of shading for the polygons
@@ -679,7 +681,10 @@ void update(int value)
                         entities[i]->getTtl()<=0)
                 {
                     if (controller.controllingid == i)
+                    {
                         controller.controllingid = CONTROLLING_NONE;
+                        controller.reset();
+                    }
 
                     if (entities[i]->getBodyID()) { dBodyDisable(entities[i]->getBodyID()); }
                     if (entities[i]->getGeom())   { dGeomDisable(entities[i]->getGeom());   }
@@ -689,7 +694,10 @@ void update(int value)
                 } else if (entities[i]->getHealth()<=0)
                 {
                     if (controller.controllingid == i)
+                    {
                         controller.controllingid = CONTROLLING_NONE;
+                        controller.reset();
+                    }
 
 
                     if (entities[i]->getType() == CARRIER)
@@ -815,9 +823,11 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
         aiplayer = BOTH_AI;
 
+    controller.controllingid = 0;
+
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        controller.faction = BLUE_FACTION;
+        {controller.faction = BLUE_FACTION;controller.controllingid = 1;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
         controller.faction = GREEN_FACTION;
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
@@ -825,7 +835,7 @@ int main(int argc, char** argv) {
     else
         controller.faction = GREEN_FACTION;
 
-    controller.controllingid = 0;
+
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
