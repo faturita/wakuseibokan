@@ -489,6 +489,7 @@ void loadgame()
 
             v->setNumber(number);
 
+
         }
     }
 
