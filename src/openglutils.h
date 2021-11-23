@@ -21,6 +21,8 @@
 
 void CheckGLError();
 GLuint loadTexture(Image* image) ;
+void drawLine(float x, float y, float z, float red, float green, float blue);
+void drawLine(float x, float y, float z,float red, float green, float blue, float linewidth);
 void drawArrow();
 void drawArrow(float scale);
 void drawArrow(float x, float y, float z);
@@ -34,6 +36,7 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz);
 void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz);
 void drawBox(GLuint texturedId, float xx, float yy, float zz);
 void drawBox(float xx, float yy, float zz);
+void drawRedBox(float width, float height, float length);
 
 void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side,float height);
 void drawBoxIsland(float xx, float yy, float zz, float side, float height);

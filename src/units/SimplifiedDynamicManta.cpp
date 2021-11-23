@@ -273,7 +273,7 @@ void SimplifiedDynamicManta::doControlFlipping(Vec3f target, float thrust)
 
     sp2 = getDeclination(T);
 
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
@@ -412,7 +412,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
     sp2 = getDeclination(T);
 
     // This function returns principal arc cosine of x, in the interval [0, pi] radians.
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
@@ -524,7 +524,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
     // Needs fixing, check azimuth to make a continuos function.
 
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
@@ -708,7 +708,7 @@ void SimplifiedDynamicManta::doControlLanding()
         release(T);
 
 
-        CLog::Write(CLog::Debug,"Landing:T: %10.3f %10.3f %10.3f %10.3f vs %10.3f: %10.3f\n", distance, val, c.registers.roll, getAzimuth(attitude), getAzimuth(getForward()),acos(  attitude.normalize().dot(getForward().normalize()) ));
+        CLog::Write(CLog::Debug,"Landing:T: %10.3f %10.3f %10.3f %10.3f vs %10.3f: %10.3f\n", distance, val, c.registers.roll, getAzimuth(attitude), getAzimuth(getForward()),_acos(  attitude.normalize().dot(getForward().normalize()) ));
 
 
         eh = height-H;
@@ -731,7 +731,7 @@ void SimplifiedDynamicManta::doControlLanding()
             flyingstate += 1;
         else
         {
-            float e1 = acos(  attitude.normalize().dot(getForward().normalize()) );
+            float e1 = _acos(  attitude.normalize().dot(getForward().normalize()) );
             if (e1>0.2)
             {
                 // Pull back, wrong attitude.
@@ -798,7 +798,7 @@ void SimplifiedDynamicManta::doControlDestination()
         T = T.normalize();
 
 
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
@@ -1381,7 +1381,7 @@ Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

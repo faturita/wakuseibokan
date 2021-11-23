@@ -99,6 +99,23 @@ void drawArrow(float x, float y, float z)
     drawArrow(x,y,z,1.0f,0.5f,0.5f);
 }
 
+void drawLine(float x, float y, float z,float red, float green, float blue, float linewidth)
+{
+    glPushMatrix();
+    glLineWidth(linewidth);
+
+    // RED
+    glTranslatef(0.0f,0.0f,0.0f);
+    glColor3f(red,green,blue);
+    glBegin(GL_LINES);
+    glVertex3f(0.0f,0.0f,0.0f);
+    glVertex3f(x,y,z);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+}
+
 void drawArrow(float x, float y, float z,float red, float green, float blue, float linewidth)
 {
     glPushMatrix();
@@ -123,6 +140,11 @@ void drawArrow(float x, float y, float z,float red, float green, float blue, flo
 void drawArrow(float x, float y, float z, float red, float green, float blue)
 {
     drawArrow(x,y,z,red,green,blue,3.0f);
+}
+
+void drawLine(float x, float y, float z, float red, float green, float blue)
+{
+    drawLine(x,y,z,red,green,blue,3.0f);
 }
 
 void drawArrow()
@@ -273,6 +295,60 @@ void drawBoxIsland(GLuint _textureId, float xx, float yy, float zz, float side, 
 }
 
 
+
+/**
+ * When you draw the object, you move to height/2 to one side, and then height/2 to the other.
+ *
+ **/
+void drawRedBox(float width, float height, float length)
+{
+    float x = width/2, y = height/2, z = length/2;
+    glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
+    // Top face (y = 1.0f)
+    // Define vertices in counter-clockwise (CCW) order with normal pointing out
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f( x, y, -z);
+    glVertex3f(-x, y, -z);
+    glVertex3f(-x, y,  z);
+    glVertex3f( x, y,  z);
+
+    // Bottom face (y = -1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f( x, -y,  z);
+    glVertex3f(-x, -y,  z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f( x, -y, -z);
+
+    // Front face  (z = 1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f( x,  y, z);
+    glVertex3f(-x,  y, z);
+    glVertex3f(-x, -y, z);
+    glVertex3f( x, -y, z);
+
+    // Back face (z = -1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f( x, -y, -z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(-x,  y, -z);
+    glVertex3f( x,  y, -z);
+
+    // Left face (x = -1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f(-x,  y,  z);
+    glVertex3f(-x,  y, -z);
+    glVertex3f(-x, -y, -z);
+    glVertex3f(-x, -y,  z);
+
+    // Right face (x = 1.0f)
+    glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glVertex3f(x,  y, -z);
+    glVertex3f(x,  y,  z);
+    glVertex3f(x, -y,  z);
+    glVertex3f(x, -y, -z);
+    glEnd();  // End of drawing color-cube
+
+}
 
 
 /**

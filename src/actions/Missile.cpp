@@ -152,7 +152,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     sp2 = getDeclination(T);
 
     // This function returns principal arc cosine of x, in the interval [0, pi] radians.
-    float e1 = acos(  T.normalize().dot(fwd.normalize()) );
+    float e1 = _acos(  T.normalize().dot(fwd.normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
@@ -262,7 +262,7 @@ void Missile::doControl(Controller controller)
 
     Vec3f T = (target - Po);
 
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
 
     // Set the sign of e1 in relation to rolling encoding.
     if (getAzimuth(getForward())>270 && getAzimuth(T)<(getAzimuth(getForward())-180))

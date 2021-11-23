@@ -51,7 +51,7 @@ void ArtilleryAmmo::drawModel(float yRot, float xRot, float x, float y, float z)
         v = v*100;
 
         //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
-        drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
+        drawRedBox(Gunshot::width, Gunshot::height, Gunshot::length);
 
         glPopMatrix();
     }

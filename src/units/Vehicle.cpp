@@ -603,7 +603,7 @@ void Vehicle::alignToMe(dBodyID fBodyID)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);
@@ -692,9 +692,9 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     {
         //assert(!"position System is unstable.");   // This does not work with bullets.
         setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
-        stop();
-        dBodyAddRelForce (who,0, 0,0);
-        dBodyAddRelTorque( who, 0, 0,0 );
+        //stop();
+        //dBodyAddRelForce (who,0, 0,0);
+        //dBodyAddRelTorque( who, 0, 0,0 );
         return false;
     }
 
@@ -703,11 +703,12 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
 
     if ((speed>10000.0f || isnan(speed)) && (getType()!= ACTION && getType()!=CONTROLABLEACTION))
     {
-        //assert(!"high speed System is unstable.");   // This does not work with bullets.
+        //assert(!"High speed:System is unstable.");   // This does not work with bullets.
         setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
-        stop();
-        dBodyAddRelForce (who,0, 0,0);
-        dBodyAddRelTorque( who, 0, 0,0 );
+        //stop();
+        //dBodyAddRelForce (who,0, 0,0);
+        //dBodyAddRelTorque( who, 0, 0,0 );
+
         return false;
     }
 
@@ -716,9 +717,9 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     {
         //assert(!"NAN System is unstable.");   // This does not work with bullets.
         setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
-        stop();
-        dBodyAddRelForce (who,0, 0,0);
-        dBodyAddRelTorque( who, 0, 0,0 );
+        //stop();
+        //dBodyAddRelForce (who,0, 0,0);
+        //dBodyAddRelTorque( who, 0, 0,0 );
         return false;
     }
 

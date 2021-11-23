@@ -210,4 +210,9 @@ int getRandomInteger(int min, int max)
     return val;
 }
 
-
+float _acos(float val)
+{
+    float out = acos(val);
+    if (isnan(out)) out=0.001;
+    return out;
+}

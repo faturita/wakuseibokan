@@ -206,11 +206,9 @@ void Balaenidae::doControl()
         }
 
 
-
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
-
 
         CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
@@ -508,7 +506,7 @@ Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

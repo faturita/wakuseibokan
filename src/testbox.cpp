@@ -1403,7 +1403,7 @@ void checktest14(unsigned long timer)
             T = T.normalize();
 
 
-            float e = acos(  T.dot(F) );
+            float e = _acos(  T.dot(F) );
 
             float signn = T.cross(F) [1];
 

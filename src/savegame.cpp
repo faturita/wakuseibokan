@@ -241,6 +241,10 @@ void loadgame()
 
     ss >> timer;
 
+    if (controller.faction == BLUE_FACTION)
+        controller.controllingid = 3;
+
+
     int size;
     ss >> size;
     dout << "Size:" << size << std::endl;
@@ -273,10 +277,6 @@ void loadgame()
 
                     entities.push_back(b, b->getGeom());
 
-                    float R[12];
-                    for(int j=0;j<12;j++) ss >> R[j];
-                    v->setRotation(R);
-
 
                     CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
                     _bo->init();
@@ -294,6 +294,10 @@ void loadgame()
                     _w1->stop();
 
                     entities.push_back(_w1, _w1->getGeom());
+
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
                 }
                 else if (subtype==VehicleSubTypes::BELUGA)
                 {
@@ -381,7 +385,6 @@ void loadgame()
 
                     float R[12];
                     for(int j=0;j<12;j++) ss >> R[j];
-                    //v->setRotation(R);
 
                     _walrus = _ot;
                     entities.push_back(_walrus, _walrus->getGeom());

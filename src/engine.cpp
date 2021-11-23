@@ -536,8 +536,10 @@ Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
+        printf("%3d\n", v->getNumber());
         if (v->getType() == WALRUS && v->getFaction() == faction)
         {
+
             if (number == v->getNumber())
             {
                 pos = i+1;  // @FIXME Risky

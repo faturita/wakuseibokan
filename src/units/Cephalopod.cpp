@@ -174,9 +174,9 @@ float Cephalopod::getVerticalAttitude()
 
     upInTheWorld = upInTheWorld.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float verattitude = acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
+    float verattitude = _acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
 
     return verattitude;
 }
@@ -195,7 +195,7 @@ float Cephalopod::getRollAngle()
 
     upInTheWorldProjection2 = upInTheWorldProjection2.normalize();
 
-    float rollattitude = acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
+    float rollattitude = _acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
 
     return rollattitude * sgn(upInTheWorldProjection2[0]);
 }
@@ -214,7 +214,7 @@ float Cephalopod::getPitchAngle()
 
     upInTheWorldProjection1 = upInTheWorldProjection1.normalize();
 
-    float pitchattitude = acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
+    float pitchattitude = _acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
 
     return pitchattitude * sgn(upInTheWorldProjection1[2]);
 }
@@ -250,9 +250,9 @@ void Cephalopod::doDynamics(dBodyID body)
 
     upInTheWorld = upInTheWorld.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitude = acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
+    float attitude = _acos(upInTheWorld.dot(upInTheBody))*180.0/PI;
 
     //dout << "Attitude:" << attitude << std::endl;
 
@@ -260,7 +260,7 @@ void Cephalopod::doDynamics(dBodyID body)
 
     upInTheWorldProjection1 = upInTheWorldProjection1.normalize();
 
-    float pitchattitude = acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
+    float pitchattitude = _acos( upInTheWorldProjection1.dot(upInTheBody))*180.0/PI;
 
 
 
@@ -268,7 +268,7 @@ void Cephalopod::doDynamics(dBodyID body)
 
     upInTheWorldProjection2 = upInTheWorldProjection2.normalize();
 
-    float rollattitude = acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
+    float rollattitude = _acos( upInTheWorldProjection2.dot(upInTheBody))*180.0/PI;
 
 
     if (speed > 10 && speed <32 )
@@ -289,9 +289,9 @@ void Cephalopod::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitudes = acos(upInBody.dot(Up))*180.0/PI;
+    float attitudes = _acos(upInBody.dot(Up))*180.0/PI;
 
     if (attitudes>70 || attitudes<-70)
     {
@@ -401,7 +401,7 @@ Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);
@@ -600,7 +600,7 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
 
     sp2 = getDeclination(T);
 
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
