@@ -531,7 +531,7 @@ void groundcollisions(dGeomID geom)
     }
 }
 
-Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number)
+Walrus* findWalrusByFactionAndNumber(size_t &index, int faction, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -542,8 +542,7 @@ Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number)
 
             if (number == v->getNumber())
             {
-                pos = i+1;  // @FIXME Risky
-                pos = entities.indexOf(i);
+                index = i;
                 return (Walrus*)v;
             }
         }
@@ -552,7 +551,7 @@ Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number)
 }
 
 
-Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number)
+Manta* findMantaByFactionAndNumber(size_t &index, int faction, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -561,8 +560,7 @@ Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number)
         {
             if (number == v->getNumber())
             {
-                pos = i+1;  // @FIXME Risky
-                pos = entities.indexOf(i);
+                index = i;
                 return (Manta*)v;
             }
         }
@@ -571,15 +569,14 @@ Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number)
 }
 
 
-Manta* findMantaByName(size_t &pos, std::string name)
+Manta* findMantaByName(size_t &index, std::string name)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == MANTA && v->getName() == name)
         {
-            pos = i+1;  // @FIXME Risky
-            pos = entities.indexOf(i);
+            index = i;
             return (Manta*)v;
         }
     }
@@ -687,15 +684,14 @@ Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
 
 }
 
-Walrus* findWalrusByName(size_t &pos, std::string name)
+Walrus* findWalrusByName(size_t &index, std::string name)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
         if (v->getType() == WALRUS  && v->getName() == name)
         {
-            pos = i+1;   // @FIXME Fix this risky numbering system.
-            pos = entities.indexOf(i);
+            index = i;
             return (Walrus*)v;
         }
     }
