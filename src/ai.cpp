@@ -630,7 +630,7 @@ int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, uns
                 t = t.cross(up);
                 t = t.normalize();
 
-                w->goTo(b->getPos()+t*250);             // @FIXME: This should be just on the back of the carrier.
+                w->goTo(b->getPos()+t*150);             // @FIXME: This should be just on the back of the carrier.
                 w->enableAuto();
                 found = true;
             }
