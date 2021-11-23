@@ -179,9 +179,9 @@ void AdvancedWalrus::doAmphibious(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+    float attitude = _acos(upInBody.dot(Up))*180.0/PI;
 
     //dout << "Attitude:" << attitude << std::endl;
 
@@ -224,9 +224,9 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+    float attitude = _acos(upInBody.dot(Up))*180.0/PI;
 
 
     if (VERIFY(pos,me) && !Vehicle::inert)
@@ -322,7 +322,7 @@ void AdvancedWalrus::doControlAttack()
         }
 
 
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
@@ -449,7 +449,7 @@ Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);
@@ -469,6 +469,7 @@ Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
+    dBodyAddRelTorque(action->getBodyID(),5.0, 4.0, 2.0);
 
     // Recoil (excellent for the simulation, cumbersome for playing...)
     Ft = Ft.normalize();  Ft=Ft * 0.2;

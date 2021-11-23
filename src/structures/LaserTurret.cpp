@@ -27,7 +27,7 @@ void LaserTurret::locateLaserRay(LaserRay *action)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

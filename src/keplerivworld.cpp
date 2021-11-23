@@ -5,7 +5,6 @@
 //  Dynamic World Model
 //
 //  Created by Rodrigo Ramele on 24/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #define dSINGLE
@@ -207,11 +206,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             if  (isRunway(s1) || isRunway(s2))
             {
                 // Manta landing on Runways.
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
+                contact[i].surface.mode = dContactFDir1 | dContactBounce |
+                dContactApprox1 | dContactMu2;
                 //printf("Landing on Runways...\n");
 
-                contact[i].surface.mu = 0.99f;
+                Vec3f f;
+                if      (isManta(v1)) f = v1->getForward();
+                else if (isManta(v2)) f = v2->getForward();
+
+                contact[i].fdir1[0] = f[0];
+                contact[i].fdir1[1] = f[1];
+                contact[i].fdir1[2] = f[2];
+
+                contact[i].surface.mu = 0.99;
                 contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;

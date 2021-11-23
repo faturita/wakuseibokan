@@ -72,7 +72,7 @@ enum COMMAND_MODES {ATTACK_MODE, DESTINATION_MODE};
 int commandmode=DESTINATION_MODE;
 
 
-static int controlmap[] = {1,2,3,4,5,6,7,8,9};
+static int controlmap[] = {0,1,2,3,4,5,6,7,8};
 
 
 void processMouseEntry(int state) {
@@ -244,14 +244,21 @@ void processMousePassiveMotion(int x, int y) {
 }
 
 
-void switchControl(int controlposition)
+/**
+ * Now this function uses directly not the position of the entity in the list, rather the index.
+ * The index does not change as long as the unit is still active.
+ *
+ * @brief switchControl
+ * @param controlposition
+ */
+void switchControl(size_t id)
 {
-    if (controlposition > entities.size())
-    {
-        controller.controllingid = CONTROLLING_NONE;
-        return;
-    }
-    size_t id = entities.indexAt(controlposition);
+    //if (controlposition > entities.size())
+    //{
+    //    controller.controllingid = CONTROLLING_NONE;
+    //    return;
+    //}
+    //size_t id = entities.indexAt(controlposition);
 
     if (!entities.isValid(id))
     {
@@ -320,7 +327,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 int keycontrol = atoi(command.c_str());
 
                 if (keycontrol>=1 && keycontrol<=9)
-                    controlmap[keycontrol-1] = atoi(entityid.c_str())+1;
+                    controlmap[keycontrol-1] = atoi(entityid.c_str());
 
             }
             else if (controller.str.find("walrus") != std::string::npos)
@@ -330,21 +337,21 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 printf ("Walrus %s\n", content);
 
-                size_t pos = CONTROLLING_NONE;
-                findWalrusByFactionAndNumber(pos, controller.faction, atoi(content));
-                switchControl(pos);
+                size_t index = CONTROLLING_NONE;
+                findWalrusByFactionAndNumber(index, controller.faction, atoi(content));
+                switchControl(index);
 
             } else
             if (controller.str.find("manta") != std::string::npos)
             {
                 const char *content = controller.str.substr(5).c_str();
 
-                size_t pos = CONTROLLING_NONE;
-                findMantaByFactionAndNumber(pos, controller.faction, atoi(content));
+                size_t index = CONTROLLING_NONE;
+                findMantaByFactionAndNumber(index, controller.faction, atoi(content));
 
-                printf ("Manta %d\n", pos);
+                printf ("Manta %d\n", index);
 
-                switchControl(pos);
+                switchControl(index);
 
             } else
             if (controller.str.find("def") != std::string::npos)
@@ -355,17 +362,17 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 dout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
 
-                size_t pos = CONTROLLING_NONE;
+                size_t index = CONTROLLING_NONE;
 
                 for (int j=0;j<islands.size();j++)
                 {
                     if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
                     {
                         dout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
-                        pos = entities.indexOf(islands[j]->getStructures()[atoi(structurenumber)]);
+                        index = islands[j]->getStructures()[atoi(structurenumber)];
                     }
                 }
-                switchControl(pos);
+                switchControl(index);
 
             } else
             if (controller.str.find("attack") != std::string::npos)
@@ -567,10 +574,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case '1':case '2':case '3': case '4': case '5':case '6':case '7':case '8':case '9':
         {
-            size_t pos = CONTROLLING_NONE;
-            pos = controlmap[(int)(key-48)-1];
+            size_t index = CONTROLLING_NONE;
+            index = controlmap[(int)(key-48)-1];
 
-            switchControl(pos);
+            switchControl(index);
         }
         break;
         case 'I':
@@ -652,7 +659,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                             if (action->getType()==CONTROLABLEACTION)
                             {
-                                switchControl(entities.indexOf(i));
+                                switchControl(i);
 
                             }
                         }

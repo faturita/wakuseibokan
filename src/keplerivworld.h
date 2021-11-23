@@ -1,9 +1,8 @@
 //
 //  keplerivworld.h
-//  mycarrier
+//  Wakuseibokan
 //
 //  Created by Rodrigo Ramele on 24/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #ifndef __mycarrier__keplerivworld__

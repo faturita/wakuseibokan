@@ -209,7 +209,7 @@ Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtim
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = fw.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( fw.dot(f1)/(f1.magnitude()*fw.magnitude()));
+    float alpha = _acos( fw.dot(f1)/(f1.magnitude()*fw.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

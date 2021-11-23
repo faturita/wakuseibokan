@@ -1,9 +1,8 @@
 //
 //  testbox.cpp
-//  mycarrier
+//  Wakuseibokan
 //
 //  Created by Rodrigo Ramele on 22/05/14.
-//  Copyright (c) 2014 Baufest. All rights reserved.
 //
 
 #include <iostream>
@@ -243,11 +242,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             if  (isRunway(s1) || isRunway(s2))
             {
                 // Manta landing on Runways.
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
+                contact[i].surface.mode = dContactFDir1 | dContactBounce |
+                dContactApprox1 | dContactMu2;
                 //printf("Landing on Runways...\n");
 
-                contact[i].surface.mu = 0.99f;
+                Vec3f f;
+                if      (isManta(v1)) f = v1->getForward();
+                else if (isManta(v2)) f = v2->getForward();
+
+                contact[i].fdir1[0] = f[0];
+                contact[i].fdir1[1] = f[1];
+                contact[i].fdir1[2] = f[2];
+
+                contact[i].surface.mu = 0.99;
                 contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;
@@ -1396,7 +1403,7 @@ void checktest14(unsigned long timer)
             T = T.normalize();
 
 
-            float e = acos(  T.dot(F) );
+            float e = _acos(  T.dot(F) );
 
             float signn = T.cross(F) [1];
 
@@ -3270,7 +3277,7 @@ void checktest35(unsigned long timer)
 
         if (a->getType()==CONTROLABLEACTION)
         {
-            switchControl(entities.indexOf(i));
+            switchControl(i);
 
         }
 
@@ -3294,7 +3301,7 @@ void checktest35(unsigned long timer)
 
         if (a->getType()==CONTROLABLEACTION)
         {
-            switchControl(entities.indexOf(i));
+            switchControl(i);
 
         }
     }
@@ -3406,7 +3413,7 @@ void checktest36(unsigned long timer)
 
             if (action->getType()==CONTROLABLEACTION)
             {
-                switchControl(entities.indexOf(i));
+                switchControl(i);
 
             }
         }
@@ -3567,7 +3574,7 @@ void checktest37(unsigned long timer)
 
             if (action->getType()==CONTROLABLEACTION)
             {
-                switchControl(entities.indexOf(i));
+                switchControl(i);
 
             }
         }
@@ -6485,7 +6492,7 @@ void test68()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,-0.0f);
-    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    nemesis->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
     islands.push_back(nemesis);
 
@@ -6498,7 +6505,7 @@ void test68()
     islands.push_back(thermopilae);
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,33,world);
 
     Vec3f pos(0.0,1.32, - 3500);
     Camera.setPos(pos);
@@ -6509,7 +6516,7 @@ void test68()
 
 void checktest68(unsigned long timer)
 {
-    if (timer == 1000)
+    if (timer == 10000)
     {
         printf("Test Passed\n");
         endWorldModelling();
@@ -6645,6 +6652,66 @@ void checktest69(unsigned long timer)
     }
 }
 
+
+void test70()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(3100.0f,-1.0,-0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(thermopilae);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest70(unsigned long timer)
+{
+    long unsigned starttime = 200;
+
+    if (timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC70: Testing manta landing on islands");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 10000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -6760,6 +6827,7 @@ void initWorldModelling(int testcase)
     case 67:test67();break;                         // Test buggy behaviour on the islands.
     case 68:test68();break;                         // Test a wheeled version of Manta which will be interesting to test.
     case 69:test69();break;                         // Test a wheeled version of Walrus which is mandatory from now on.
+    case 70:test70();break;                         // Manta lands on island's runway. Check slippage.
     default:initIslands();test1();break;
     }
 
@@ -6847,6 +6915,7 @@ void worldStep(int value)
     case 67:checktest67(timer);break;
     case 68:checktest68(timer);break;
     case 69:checktest69(timer);break;
+    case 70:checktest70(timer);break;
 
     default: break;
     }

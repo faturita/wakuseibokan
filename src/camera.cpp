@@ -1,5 +1,6 @@
 /*
  * camera.cpp
+ * Wakuseibokan
  *
  *  Created on: May 10, 2011
  *      Author: faturita

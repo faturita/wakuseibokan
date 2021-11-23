@@ -210,7 +210,7 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
 
     sp2 = getDeclination(T);
 
-    float e1 = acos(  T.normalize().dot(getForward().normalize()) );
+    float e1 = _acos(  T.normalize().dot(getForward().normalize()) );
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 

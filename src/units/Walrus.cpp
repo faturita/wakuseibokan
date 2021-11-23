@@ -183,7 +183,7 @@ void Walrus::doControlAttack()
         }
 
 
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
@@ -215,7 +215,7 @@ void Walrus::doControlAttack()
         F = F.normalize();
         T = T.normalize();
 
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
@@ -313,7 +313,7 @@ void Walrus::doControlDestination()
         }
 
 
-        float e = acos(  T.dot(F) );
+        float e = _acos(  T.dot(F) );
 
         float signn = T.cross(F) [1];
 
@@ -498,9 +498,9 @@ void Walrus::doDynamics(dBodyID body)
 
     upInBody = upInBody.normalize();
 
-    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", acos(upInBody.dot(Up))*180.0/PI);
+    //CLog::Write(CLog::Debug,"Angle between vectors %10.5f\n", _acos(upInBody.dot(Up))*180.0/PI);
 
-    float attitude = acos(upInBody.dot(Up))*180.0/PI;
+    float attitude = _acos(upInBody.dot(Up))*180.0/PI;
 
     //dout << "Attitude:" << attitude << std::endl;
 
@@ -557,7 +557,7 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
     f2 = f2.normalize();
-    float alpha = acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
 
     dMatrix3 Re;
     dRSetIdentity(Re);

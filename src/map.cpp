@@ -63,6 +63,11 @@ extern  Controller controller;
 
 std::unordered_map<std::string, GLuint> maptextures;
 
+extern int screen_width;
+extern int screen_height;
+
+// 1200 x 800
+// 1920 x 1080
 int width = 1200;
 int height = 800;
 int mapzoom=1;
@@ -188,9 +193,9 @@ void centermap(int ccx, int ccy)
     int xsize = 1200/mapzoom;
     int ysize = 800/mapzoom;
 
-    // @FIXME: This should be adapted according to the screen resolution.
-    cx = (int)(ccx*(xsize)/1440.0)+cx-xsize/2;
-    cy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
+    // Screen width and height come from OpenGL.
+    cx = (int)(ccx*(xsize)/(float)screen_width)+cx-xsize/2; // 1440
+    cy = (int)(ccy*(ysize)/(float)screen_height)+cy-ysize/2;  // 900
 }
 
 Vec3f setLocationOnMap(int ccx, int ccy)
@@ -199,9 +204,9 @@ Vec3f setLocationOnMap(int ccx, int ccy)
     int xsize = 1200/mapzoom;
     int ysize = 800/mapzoom;
 
-    // @FIXME: This should be adapted according to the screen resolution.
-    ccx = (int)(ccx*(xsize)/1440.0)+cx-xsize/2;
-    ccy = (int)(ccy*(ysize)/900.0)+cy-ysize/2;
+    // Screen width and height come from OpenGL.
+    ccx = (int)(ccx*(xsize)/(float)screen_width)+cx-xsize/2;
+    ccy = (int)(ccy*(ysize)/(float)screen_height)+cy-ysize/2;
 
     // Map coordinates in kmf are centered at (0,0) which is the center of the screen.  Positive is upwards, left.
     ccx = ccx - 600;

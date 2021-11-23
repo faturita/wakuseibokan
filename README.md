@@ -2,7 +2,10 @@
 
 Excited warfare on the seas of a Kepler IV.
 
-The time has come to conquer Kepler IV.   Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU). 
+The time has come to conquer Kepler IV.  Humanity is now able to travel further away from our solar system, and it has now reached exoplanets.  Two companies sent surveying parties in the form of two AI carriers that aim to control the vast archipielago of Kepler IV. These AIs can be controlled remotely in real-time by space folding uplinks.
+
+
+Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU). 
 
 ![Manta taking off](images/screenshot1.png)
 
@@ -14,11 +17,12 @@ Compiling and Installation
 * Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
 
 # ODE
-
- ./bootstrap
- ./configure
- make
- make install
+```bash
+./bootstrap
+./configure --disable-asserts
+make
+make install
+```
 
 # Ubuntu Packages
 
@@ -160,3 +164,4 @@ References
 * https://twitter.com/page_eco/status/1372175858174062594?s=20
 * Core Techniques and Algorithms in Game Programming, Daniel Sanchez Crespo Dalmau, 2003
 * https://rosettacode.org/wiki/K-d_tree
+* Project Chrono: https://projectchrono.org/

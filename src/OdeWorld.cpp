@@ -3,7 +3,6 @@
 //  wakuseibokan
 //
 //  Created by Rodrigo Ramele on 1/10/17.
-//  Copyright © 2017 Baufest. All rights reserved.
 //
 
 #include "OdeWorld.h"

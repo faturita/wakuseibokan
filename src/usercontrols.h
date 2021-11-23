@@ -87,7 +87,7 @@ public:
 
 
 GLint gltWriteTGA(const char *szFileName);
-void switchControl(int controlposition);
+void switchControl(size_t index);
 void processMouseEntry(int state) ;
 
 void processMouse(int button, int state, int x, int y) ;

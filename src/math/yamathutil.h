@@ -33,6 +33,8 @@ float min(float val, float defval);
 float max(float val, float defval);
 float clipped(float val, float min, float max);
 float sgn(float val);
+float _acos(float val);
+
 
 Vec3f getRandomCircularSpot(Vec3f origin, float radius);
 int getRandomInteger(int min, int max);
