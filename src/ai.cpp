@@ -277,7 +277,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
                 if (a->getType()==CONTROLABLEACTION)
                 {
                     // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
-                    switchControl(entities.indexOf(i));
+                    switchControl(i);
 
                 }
             }

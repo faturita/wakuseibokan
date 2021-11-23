@@ -3277,7 +3277,7 @@ void checktest35(unsigned long timer)
 
         if (a->getType()==CONTROLABLEACTION)
         {
-            switchControl(entities.indexOf(i));
+            switchControl(i);
 
         }
 
@@ -3301,7 +3301,7 @@ void checktest35(unsigned long timer)
 
         if (a->getType()==CONTROLABLEACTION)
         {
-            switchControl(entities.indexOf(i));
+            switchControl(i);
 
         }
     }
@@ -3413,7 +3413,7 @@ void checktest36(unsigned long timer)
 
             if (action->getType()==CONTROLABLEACTION)
             {
-                switchControl(entities.indexOf(i));
+                switchControl(i);
 
             }
         }
@@ -3574,7 +3574,7 @@ void checktest37(unsigned long timer)
 
             if (action->getType()==CONTROLABLEACTION)
             {
-                switchControl(entities.indexOf(i));
+                switchControl(i);
 
             }
         }
