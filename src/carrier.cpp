@@ -406,7 +406,7 @@ void drawScene() {
     
     int ctrling = 0;
     
-    // @FIXME Safe code.  Destroy something and see what happens here.
+    // @NOTE Safe code.  Destroy something and see what happens here.
     if (!entities.isValid(controller.controllingid))
     {
         controller.controllingid = CONTROLLING_NONE;

@@ -1,3 +1,18 @@
+/**
+  ai.cpp
+  wakuseibokan
+
+  Created around 2020.
+
+  This is a general state machine, on top of all the others that drive any individual unit.
+  It is raw.  I've found that it is much more difficult to do something generic, nice, that actually works.
+  When you need something workable you have to cook up a lot of details.
+  Player represent an AI that tries to behave like a human player.  This has been a mantra on this project.
+  Hence each class is a state in the sequence of steps that you need to perform to win the game, and each transition
+  represent some action.  The idea was to model like state-action diagram, able for use in a RL model.
+
+**/
+
 #include <assert.h>
 
 #ifdef __linux
@@ -20,6 +35,10 @@ extern std::vector<Message> messages;
 extern dWorldID world;
 extern dSpaceID space;
 
+// This runs all the time, on every frame.  It checks whether or not there is a threat nearby the carrier.
+// @FIXME: We should do the same for every unit on existence.
+// @FIXME: We could extend that, including the buildings from each island.
+// @FIXME: Finally, we need a system to read information from sensors to sense the world.
 int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -48,7 +67,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 }
 
 
-
+// This is a state machine to grab a Manta and send it towards any incoming airplane.
 int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -112,7 +131,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
 
 
 
-
+// Spawn walruses to defend the carrier of incoming boats.
 int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -140,7 +159,7 @@ int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsig
 
 
 
-
+// Control the walruses and instruct them to defend the carrier.
 int NavalDeffending::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -168,7 +187,7 @@ int NavalDeffending::apply(int state, int faction, unsigned long &timeevent, uns
 
 
 
-
+// Find a closer enemy island and attack it.
 int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -195,6 +214,7 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 }
 
 
+// Find any enemy island
 int ApproachAnyEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -222,7 +242,7 @@ int ApproachAnyEnemyIsland::apply(int state, int faction, unsigned long &timeeve
 
 
 
-
+// Travelling towards the designated island.
 int ApproachingEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -245,7 +265,7 @@ int ApproachingEnemyIsland::apply(int state, int faction, unsigned long &timeeve
 
 
 
-
+// Missile attack
 int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -309,7 +329,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
 
 
-
+// Spawn mantas and attack the island.
 int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -606,7 +626,7 @@ int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, uns
 {
     Vehicle *b = findCarrier(faction);
 
-    // @FIXME Do something when the carrier is destroyed.
+    // @FIXME Do something when the carrier is destroyed (perhaps walruses can become rogue squadrons destroying everything they found).
     if (!b)
     {
         return state;
@@ -630,7 +650,7 @@ int ReturnToCarrier::apply(int state, int faction, unsigned long &timeevent, uns
                 t = t.cross(up);
                 t = t.normalize();
 
-                w->goTo(b->getPos()+t*250);             // @FIXME: This should be just on the back of the carrier.
+                w->goTo(b->getPos()+t*150);             // @FIXME: This should be just on the back of the carrier.
                 w->enableAuto();
                 found = true;
             }

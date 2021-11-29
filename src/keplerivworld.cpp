@@ -607,7 +607,7 @@ void initWorldPopulation()
         {
             // @FIXME Decide which island to create.
             int which = (rand() % 3);
-            if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))   //@FIXME
+            if (islands[j]->getX()<10 || (islands[j]->getName().find("Gaijin") != std::string::npos))   //@FIXME Randomize how islands are distribuited
                 captureIsland(islands[j],BLUE_FACTION,which, space,world);
             else if (islands[j]->getZ()< (200 kmf))
                 captureIsland(islands[j],GREEN_FACTION,which, space,world);

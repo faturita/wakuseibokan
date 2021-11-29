@@ -260,6 +260,9 @@ void switchControl(size_t id)
     //}
     //size_t id = entities.indexAt(controlposition);
 
+    if (id == CONTROLLING_NONE)
+        return;
+
     if (!entities.isValid(id))
     {
         controller.controllingid = CONTROLLING_NONE;
@@ -332,7 +335,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             else if (controller.str.find("walrus") != std::string::npos)
             {
-                // @FIXME What happen the controller.faction is both !!! Need to decide that.
+                // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
                 const char *content = controller.str.substr(6).c_str();
 
                 printf ("Walrus %s\n", content);
@@ -635,7 +638,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             break;
         case 'O':
             {
-                // @FIXME: Find the walrus that is actually closer to the dock bay.
+                // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
                 synchronized(entities.m_mutex)
                 {
                     dockWalrus(entities[controller.controllingid]);

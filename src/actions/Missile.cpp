@@ -96,7 +96,7 @@ void Missile::doDynamics(dBodyID body)
     dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, 0.0, -length - 0.1);
 
 
-    // @FIXME: Bullets are really unstable.
+    // @NOTE: Bullets are really unstable.
     if (VERIFY(pos, body))
         wrapDynamics(body);
 }
