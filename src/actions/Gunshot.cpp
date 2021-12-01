@@ -86,7 +86,7 @@ void Gunshot::doDynamics(dBodyID body)
 {
     //dBodyAddForce(body,0,9.81f,0);
 
-    // @FIXME: Bullets are really unstable.
+    // @NOTE: Bullets are really unstable.
     if (VERIFY(pos, body))
         wrapDynamics(body);
 }

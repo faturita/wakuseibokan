@@ -135,7 +135,7 @@ void AAM::doDynamics(dBodyID body)
     dBodyAddRelForce(body, 0,0,getThrottle());
 
 
-    // @FIXME: Bullets are really unstable.
+    // @NOTE: Bullets are really unstable.
     if (VERIFY(pos, body))
         wrapDynamics(body);
 }
