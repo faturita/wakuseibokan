@@ -479,6 +479,7 @@ void drawScene() {
     // Deactivate all the others.
     // If a tree is in the middle of the forest and nobody is around it to see it, then, does the tree actually fall ?
 
+    // @NOTE: I am only considering two carriers here.
     Vec3f carrierloc1(0,0,0);
     Vec3f carrierloc2(0,0,0);
     Vec3f cameraloc = Camera.getPos();
