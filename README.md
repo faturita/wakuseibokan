@@ -149,14 +149,17 @@ References
 * ODE http://www.ode.org/ode-0.5-userguide.html
 * ODE http://opende.sourceforge.net/docs/index.html
 * ODE Manual http://ode.org/wiki/index.php?title=Manual
+* Rigid Body Dynamics http://www.chrishecker.com/Rigid_Body_Dynamics
+* Rigid Body Dynamics Sample https://www.myphysicslab.com/engine2D/collision-en.html
 * OpenGL Textures: https://learnopengl.com/Getting-started/Textures
 * OpenGL Demura Blog: http://demura.net/english
 * Langevin Functions: https://journals.sagepub.com/doi/full/10.1177/1081286518811876
-* https://ccrma.stanford.edu/software/stk/download.html
-* https://pleiades.ucsc.edu/hyades/OpenGL_on_OS_X
-* https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
-* https://forums.khronos.org/showthread.php/4991-The-Solution-for-gluLookAt()-Function!!!!
-* www.videotutorialsrock.com
+* STK https://ccrma.stanford.edu/software/stk/download.html
+* OpenGL on OSX https://pleiades.ucsc.edu/hyades/OpenGL_on_OS_X
+* OpenGL common pitfalls https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
+* gloLookAt Issue https://forums.khronos.org/showthread.php/4991-The-Solution-for-gluLookAt()-Function!!!!
+* Old and excellent OpenGL video tutorial www.videotutorialsrock.com
+* Learning modern 3d graphics programming https://paroj.github.io/gltut/
 * https://learnopengl.com/Advanced-OpenGL
 * https://www.salome-platform.org/
 * https://github.com/jacobaustin123/Titan
@@ -165,3 +168,5 @@ References
 * Core Techniques and Algorithms in Game Programming, Daniel Sanchez Crespo Dalmau, 2003
 * https://rosettacode.org/wiki/K-d_tree
 * Project Chrono: https://projectchrono.org/
+* Rust programming language https://doc.rust-lang.org/book/ch00-00-introduction.html
+* Vulkan Tutorial https://kylemayes.github.io/vulkanalia/introduction.html
