@@ -695,6 +695,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        dGeomDisable(geom);
         return false;
     }
 
@@ -708,6 +709,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        dGeomDisable(geom);
 
         return false;
     }
@@ -720,6 +722,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        dGeomDisable(geom);
         return false;
     }
 
