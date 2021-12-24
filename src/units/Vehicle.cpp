@@ -537,7 +537,7 @@ struct controlregister Vehicle::getControlRegisters()
 }
 
 /**
- * This is the key of the the binding between ODE and OpenGL to make this engine work.
+ * This is the key binding between ODE and OpenGL to make this engine work.
  * Get the speed.
  * Get the forward direction in global coordinates (setForward is in global coordinates).
  * Get the position and rotation from ODE, and set the position with setPos and with setLocation, it updates the R matrix of rotation
