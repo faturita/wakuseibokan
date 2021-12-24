@@ -428,6 +428,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 taxiManta(entities[controller.controllingid]);
             }
             else
+            if (controller.str.find("telemetry") != std::string::npos)
+            {
+                if (controller.str.find("on") != std::string::npos)
+                    entities[controller.controllingid]->enableTelemetry();
+                else
+                    entities[controller.controllingid]->disableTelemetry();
+            }
+            else
             if (controller.str.find("launch") != std::string::npos)
             {
                 //const char* content = controller.str.substr(7).c_str();

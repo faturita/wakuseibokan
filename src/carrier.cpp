@@ -71,6 +71,8 @@
 
 #include "ai.h"
 
+#include "networking/telemetry.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -104,6 +106,9 @@ clock_t elapsedtime;
 bool wincondition=false;
 
 bool mute=false;
+
+int sockfd;
+struct sockaddr_in servaddr;
 
 void disclaimer()
 {
@@ -803,6 +808,8 @@ int main(int argc, char** argv) {
         glutInitWindowSize(1200, 800);
     else
         glutFullScreen();
+
+    inittelemetry();
 
 
     // OpenGL Configuration information

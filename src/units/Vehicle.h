@@ -46,6 +46,8 @@ private:
 
     int faction=-1;
 
+    bool dotelemetry=false;
+
 protected:
     Vec3f pos;
     Model* _model;
@@ -219,6 +221,9 @@ public:
 
     void setNumber(int number);
     int getNumber();
+
+    void enableTelemetry();
+    void disableTelemetry();
 
 };
 
