@@ -1666,7 +1666,8 @@ void landManta(Vehicle *landplace, Manta *m)
     if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
     {
         if (m)
-        {           
+        {
+            landplace->stop();                              // @NOTE: I am assumming that the carrier is still.
             m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }

@@ -99,6 +99,8 @@ int aiplayer;
  * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
  * the highest possible in this platform.
  *
+ * THIS FUNCTION MUST BE IN THIS FILE.  Otherwise, there are a lot of problems (wellcome to C++).
+ *
  *
  * @brief nearCallback
  * @param data
