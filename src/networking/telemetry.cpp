@@ -24,22 +24,21 @@ extern struct sockaddr_in servaddr;
 
 void inittelemetry()
 {
-
-    /* Blanquea la estructura */
+    /* Clean up */
     bzero(&servaddr, sizeof(servaddr));
 
-    /* Inicializa los campos para que funcionen en el puerto 4500 */
+    /* Initialize the client to connect to the server on local port 4500 */
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(4500);
     inet_pton(AF_INET, "127.0.0.1", &servaddr.sin_addr);
 
-    /* Genera el socket */
+    /* Bring up the client socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 }
 
 void logudp(LogStructure logstructure, int sockfd, const SA *pservaddr, socklen_t servlen)
 {
-    printf("Length %d\n", sizeof(logstructure));
+    // @NOTE: The socket must be already connected at this point.
     sendto(sockfd, &logstructure, sizeof(logstructure), 0, pservaddr, servlen);
 }
 
@@ -66,5 +65,4 @@ void telemetryme(float *dBodyPosition, float *dBodyRotation)
 
     logudp(logstructure, sockfd, (SA *) &servaddr, sizeof(servaddr));
 
-    //close(sockfd);
 }
