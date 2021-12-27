@@ -90,6 +90,8 @@
 #include "units/WheeledManta.h"
 #include "units/Otter.h"
 
+#include "actions/ArtilleryAmmo.h"
+
 #include "map.h"
 
 extern  Camera Camera;
@@ -134,6 +136,8 @@ extern bool wincondition;
  *
  * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
  * the highest possible in this platform.
+ *
+ * THIS FUNCTION MUST BE IN THIS FILE.  Otherwise, there are a lot of problems (wellcome to C++).
  *
  *
  * @brief nearCallback
@@ -279,7 +283,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.soft_cfm = 0;
             }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
-            {               
+            {
                  // Island reaction
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
@@ -347,10 +351,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             } else {
                 // Object against object collision.
-                 //printf("7\n");
+                //printf("7\n");
                 if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
+
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
             }
+
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
             dJointAttach (c,
@@ -359,6 +372,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
         }
     }
 }
+
 
 void __nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
@@ -634,6 +648,7 @@ void checktest15(unsigned long timer)
     }
 
 
+
     if (timer == 420)
     {
         Vehicle *_b = findManta(GREEN_FACTION,FlyingStatus::FLYING);
@@ -649,6 +664,8 @@ void checktest15(unsigned long timer)
         _manta1->setThrottle(400.0f);
         _manta1->disableAuto();
     }
+
+
 
 
     if (timer == 650)
@@ -684,6 +701,7 @@ void checktest15(unsigned long timer)
         if (_manta1)
         {
             runonce {
+                _b->stop();
                 _manta1->land(_b->getPos(),_b->getForward() );
                 _manta1->enableAuto();
             }
@@ -703,7 +721,7 @@ void checktest15(unsigned long timer)
         }
     }
 
-    if (timer>8000)
+    if (timer>10000)
     {
         // Timeout
         printf("Test failed.\n");
@@ -5501,6 +5519,7 @@ void checktest56(unsigned long timer)
         {
             {
                 runonce {
+                    _b->stop();
                     _manta1->land(_b->getPos(),_b->getForward());
                     _manta1->enableAuto();
                 }
@@ -6712,6 +6731,173 @@ void checktest70(unsigned long timer)
     }
 }
 
+void test71()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-9000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+}
+
+void checktest71(unsigned long timer)
+{
+    long unsigned starttime = 200;
+    static int step = 0;
+
+    if (step==0 && timer == starttime)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC71: Landing Manta on a moving Carrier.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (step == 0 && timer == starttime + 100)
+    {
+        size_t idx = 0;
+        spawnManta(space,world,entities[0],idx);
+    }
+
+    if (step==0 && timer == starttime + 320)
+    {
+        // launch
+        launchManta(entities[0]);
+    }
+
+
+
+    if (step==0 && timer == starttime + 420)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION,FlyingStatus::FLYING);
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+        _manta1->inert = false;
+        _manta1->enableAuto();
+        _manta1->setStatus(FlyingStatus::FLYING);
+        _manta1->elevator = +5;
+        struct controlregister c;
+        c.thrust = 400.0f/(10.0);
+        c.pitch = 5;
+        _manta1->setControlRegisters(c);
+        _manta1->setThrottle(400.0f);
+        _manta1->disableAuto();
+    }
+
+    if (step ==0 && timer == starttime + 500)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        Vec3f pos = _b->getPos();
+        pos = Vec3f(pos[0]+(rand() % 10 -5 +1)*200,pos[1],pos[2]+(rand() % 10 -5 +1)*200);
+
+        _b->setDestination(pos);
+        _b->enableAuto();
+
+    }
+
+    if (step ==0 && timer > starttime + 500)
+    {
+        Balaenidae *_b = (Balaenidae*)findCarrier(GREEN_FACTION);
+        if (!_b->isAuto())
+        {
+            step = 1;
+            Vehicle *_b = findManta(GREEN_FACTION,FlyingStatus::FLYING);
+            SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
+            Balaenidae *_c = (Balaenidae*)findCarrier(GREEN_FACTION);
+            _c->stop();
+            _manta1->land(_c->getPos(), _c->getForward());
+        }
+    }
+
+
+    if (timer == 15000)
+    {
+        Vehicle *_b = findManta(GREEN_FACTION, FlyingStatus::ON_DECK);
+        if (_b)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Manta did not landed.\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+}
+
+void test72()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest72(unsigned long timer)
+{
+    if (timer == 100)
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        Vec3f pos(10.0f,10.0f,-30.0f);
+        Camera.setPos(pos);
+        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+    }
+
+    if (timer == 300)
+    {
+        Vec3f loc(10.0f, 10.0f, 10.0f);
+        float stride = 0.7;
+
+        for(int i=-3;i<3;i++)
+        {
+            for (int j=-3;j<3;j++)
+            {
+                for (int h=-3;h<3;h++)
+                {
+                    ArtilleryAmmo* b1 = new ArtilleryAmmo();
+                    b1->init();
+                    b1->embody(world, space);
+                    b1->setPos(loc[0]+i*stride,loc[1]+h*stride,loc[2]+j*stride);
+                    b1->stop();
+
+                    entities.push_back(b1, b1->getGeom());
+                }
+            }
+        }
+
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -6828,6 +7014,8 @@ void initWorldModelling(int testcase)
     case 68:test68();break;                         // Test a wheeled version of Manta which will be interesting to test.
     case 69:test69();break;                         // Test a wheeled version of Walrus which is mandatory from now on.
     case 70:test70();break;                         // Manta lands on island's runway. Check slippage.
+    case 71:test71();break;                         // Manta landing on a moving carrier.
+    case 72:test72();break;                         // Testing explosions with ODE.
     default:initIslands();test1();break;
     }
 
@@ -6916,6 +7104,8 @@ void worldStep(int value)
     case 68:checktest68(timer);break;
     case 69:checktest69(timer);break;
     case 70:checktest70(timer);break;
+    case 71:checktest71(timer);break;
+    case 72:checktest72(timer);break;
 
     default: break;
     }

@@ -16,6 +16,7 @@
 #include <assert.h>
 #include "../profiling.h"
 #include "../md2model.h"
+#include "../networking/telemetry.h"
 
 
 
@@ -576,7 +577,30 @@ void Vehicle::wrapDynamics(dBodyID body)
         CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
-    // @NOTE:  Uncomment the following line if you want the game to be more stable.
+    if (dotelemetry)
+    {
+
+        float *fPos = (float *)dBodyPosition;
+        float *R = (float *)dBodyRotation;
+
+        for (int i=0;i<4;i++)
+        {
+            printf("|");
+            for (int j=0; j<3;j++)
+            {
+                printf ("%10.5f", R[i*4+j]);
+            }
+            printf("|\n");
+        }
+
+        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
+        dout << s << std::endl;
+
+        telemetryme((float *)dBodyPosition, (float *)dBodyRotation);
+    }
+
+
+    // @NOTE:  Keep the following line if you want the game to be more stable.
     if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
@@ -678,7 +702,6 @@ Vec3f Vehicle::getAttitude()
  * Check model consistencies.
  *
  * ODE sometimes just blow away.  Try to catch empirically those situations here.
- * Energy is not infinite and must come from somewhere. So if you can catch the calls to addforce...
  *
  * @brief Vehicle::VERIFY
  * @param speed
@@ -695,6 +718,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        //dGeomDisable(geom);
         return false;
     }
 
@@ -708,6 +732,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        //dGeomDisable(geom);
 
         return false;
     }
@@ -720,6 +745,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         //stop();
         //dBodyAddRelForce (who,0, 0,0);
         //dBodyAddRelTorque( who, 0, 0,0 );
+        //dGeomDisable(geom);
         return false;
     }
 
@@ -786,3 +812,12 @@ void Vehicle::setNumber(int number)
     this->number = number;
 }
 
+void Vehicle::enableTelemetry()
+{
+    dotelemetry = true;
+}
+
+void Vehicle::disableTelemetry()
+{
+    dotelemetry = false;
+}

@@ -552,7 +552,7 @@ Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
     forward = -orig+position;
 
     // Shoot faster to avoid hurting myself (moving myself indeed, hurting is disabled per collision handling).
-    Vec3f Ft = forward*10000.0f;
+    Vec3f Ft = forward*100.0f;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
@@ -592,4 +592,20 @@ void Walrus::setNameByNumber(int number)
 {
     setNumber(number);
     setName("Walrus", number);
+}
+
+void  Walrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+{
+    position = getPos();
+    forward = getForward();
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=6;
+    position = position - 20*forward + Up;
+    forward = orig-position;
 }

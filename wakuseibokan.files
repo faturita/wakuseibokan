@@ -61,6 +61,8 @@ src/md2model.cpp
 src/md2model.h
 src/messages.h
 src/model.h
+src/networking/telemetry.cpp
+src/networking/telemetry.h
 src/observable.h
 src/odeutils.cpp
 src/odeutils.h
@@ -134,6 +136,8 @@ src/tests/testcase_104.cpp
 src/tests/testcase_104.h
 src/tests/testcase_105.cpp
 src/tests/testcase_105.h
+src/tests/testcase_106.cpp
+src/tests/testcase_106.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h

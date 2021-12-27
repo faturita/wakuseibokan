@@ -820,7 +820,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float th
     {
         Vehicle *v=entities[i];
         if (v &&
-                ( (type == -1 && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
                 && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
@@ -1666,7 +1666,8 @@ void landManta(Vehicle *landplace, Manta *m)
     if (landplace->getType() == CARRIER || landplace->getType() == LANDINGABLE)
     {
         if (m)
-        {           
+        {
+            landplace->stop();                              // @NOTE: I am assumming that the carrier is still.
             m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }

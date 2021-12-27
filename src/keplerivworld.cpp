@@ -99,6 +99,8 @@ int aiplayer;
  * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
  * the highest possible in this platform.
  *
+ * THIS FUNCTION MUST BE IN THIS FILE.  Otherwise, there are a lot of problems (wellcome to C++).
+ *
  *
  * @brief nearCallback
  * @param data
@@ -311,10 +313,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
             } else {
                 // Object against object collision.
-                 //printf("7\n");
+                //printf("7\n");
                 if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
+
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
             }
+
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
             dJointAttach (c,

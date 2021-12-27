@@ -71,6 +71,8 @@
 
 #include "ai.h"
 
+#include "networking/telemetry.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -104,6 +106,9 @@ clock_t elapsedtime;
 bool wincondition=false;
 
 bool mute=false;
+
+int sockfd;
+struct sockaddr_in servaddr;
 
 void disclaimer()
 {
@@ -804,6 +809,8 @@ int main(int argc, char** argv) {
     else
         glutFullScreen();
 
+    // Connects a socket to a UDP Server.  Keep in mind that the server must exist at this point for this to work.
+    inittelemetry();
 
     // OpenGL Configuration information
     /* get version info */
@@ -835,7 +842,6 @@ int main(int argc, char** argv) {
         controller.faction = BOTH_FACTION;
     else
         controller.faction = GREEN_FACTION;
-
 
 
 

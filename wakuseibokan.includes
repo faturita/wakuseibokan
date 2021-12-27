@@ -11,3 +11,4 @@ src/water
 /usr/local/include
 src/weapons
 src/tests
+src/networking

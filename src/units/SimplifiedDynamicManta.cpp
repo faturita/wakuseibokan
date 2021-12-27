@@ -606,7 +606,7 @@ void SimplifiedDynamicManta::land(Vec3f landplace, Vec3f placelattitude)
 
     Vec3f Pf;
 
-    Pf = landplace;  // This is the carrier or a runway.  If it is the carrier this must be modified during each tick.
+    Pf = landplace;  // This is the carrier or a runway.@NOTE: The carrier DOES NOT move while Mantas are landing.
     Pf[1] = 0;
 
     placelattitude[1]=0;
