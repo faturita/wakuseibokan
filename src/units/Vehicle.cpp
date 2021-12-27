@@ -711,7 +711,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
 {
     //if (speed>1000.0f && getType()!= ACTION)
     //    stop(who);
-    if ((newpos-pos).magnitude()>1000.0f && (getType() != ACTION && getType()!=CONTROLABLEACTION))
+    if ((newpos-pos).magnitude()>1000.0f && (getType() != ACTION && getType()!=CONTROLABLEACTION && getType()!=EXPLOTABLEACTION))
     {
         //assert(!"position System is unstable.");   // This does not work with bullets.
         setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);
@@ -725,7 +725,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     Vec3f angularVel = dBodyGetAngularVelInBody(who);
     float angspeed = angularVel.magnitude();
 
-    if ((speed>10000.0f || isnan(speed)) && (getType()!= ACTION && getType()!=CONTROLABLEACTION))
+    if ((speed>10000.0f || isnan(speed)) && (getType() != ACTION && getType()!=CONTROLABLEACTION && getType()!=EXPLOTABLEACTION))
     {
         //assert(!"High speed:System is unstable.");   // This does not work with bullets.
         setPos(pos[0]+(rand() % 10 -5 +1)*0.1,pos[1],pos[2]+(rand() % 10 -5 +1)*0.1);

@@ -91,6 +91,8 @@
 #include "units/Otter.h"
 
 #include "actions/ArtilleryAmmo.h"
+#include "actions/Debris.h"
+#include "actions/Explosion.h"
 
 #include "map.h"
 
@@ -228,8 +230,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1)) {}
-                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v2)) {}
+                if (isAction(v1) && s2 && !isAction(s2) && hit(s2, (Gunshot*)v1)) {}
+                if (isAction(v2) && s1 && !isAction(s1) && hit(s1, (Gunshot*)v2)) {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -311,15 +313,17 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isType(v1, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g1),getIsland(contact[i].geom.g2))) {}
 
 
-
                  if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
                  if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
                  if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
 
-                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
-                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);groundexplosion(v2,world, space);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);groundexplosion(v1,world, space);}
+
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {groundexplosion(v2,world, space);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {groundexplosion(v1,world, space);}
 
 
             } else
@@ -6876,24 +6880,15 @@ void checktest72(unsigned long timer)
     if (timer == 300)
     {
         Vec3f loc(10.0f, 10.0f, 10.0f);
-        float stride = 0.7;
 
-        for(int i=-3;i<3;i++)
-        {
-            for (int j=-3;j<3;j++)
-            {
-                for (int h=-3;h<3;h++)
-                {
-                    ArtilleryAmmo* b1 = new ArtilleryAmmo();
-                    b1->init();
-                    b1->embody(world, space);
-                    b1->setPos(loc[0]+i*stride,loc[1]+h*stride,loc[2]+j*stride);
-                    b1->stop();
+        Explosion* b1 = new Explosion();
+        b1->init();
+        b1->embody(world, space);
+        b1->setPos(loc[0],loc[1],loc[2]);
+        b1->stop();
 
-                    entities.push_back(b1, b1->getGeom());
-                }
-            }
-        }
+        b1->expand(10,10,10,2,world, space);
+
 
     }
 }

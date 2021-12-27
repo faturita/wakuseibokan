@@ -114,6 +114,8 @@ void Shell::embody(dBodyID myBodySelf)
 
 int Shell::getType()
 {
-    return 5;
+    return EXPLOTABLEACTION;
 }
+
+
 

@@ -121,30 +121,23 @@ int TestCase_106::check(unsigned long timertick)
         _b->enableAuto();
     }
 
-    if (timertick > 4000)
+    if (timertick > 8000)
     {
-        Walrus* _w = findWalrus(BLUE_FACTION);
+        Vehicle* _b = findCarrier(GREEN_FACTION);
 
         isdone = false;
         haspassed = false;
 
-        if (_w)
+        if (!_b)
         {
-            isdone = false;
-            haspassed = false;
+            isdone = true;
+            haspassed = true;
         }
 
-        BoxIsland *is = islands[0];
-
-        if (is->getCommandCenter() == NULL)
-        {
-            isdone = false;
-            haspassed = false;
-        }
     }
 
 
-    if (timertick > 150000)
+    if (timertick > 15000)
     {
         isdone = true;
         haspassed = false;

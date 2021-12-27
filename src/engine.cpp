@@ -420,12 +420,12 @@ bool  isWalrus(Vehicle* vehicle)
 
 bool  isAction(dGeomID body)
 {
-    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION);
+    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION) || isType(body, VehicleTypes::EXPLOTABLEACTION);
 }
 
 bool  isAction(Vehicle* vehicle)
 {
-    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION);
+    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION) || isType(vehicle, VehicleTypes::EXPLOTABLEACTION);
 }
 
 // SYNC
@@ -522,6 +522,26 @@ bool  groundcollisions(Vehicle *vehicle)
     return true;
 }
 
+void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
+{
+    if (dGeomIsEnabled(v->getGeom()))
+    {
+        explosion();
+        Vec3f loc = v->getPos();
+
+        Explosion* b1 = new Explosion();
+        b1->init();
+        b1->embody(world, space);
+        b1->setPos(loc[0],loc[1],loc[2]);
+        b1->stop();
+
+        b1->expand(10,10,10,2,world, space);
+
+        dBodyDisable(v->getBodyID());
+        dGeomDisable(v->getGeom());
+
+    }
+}
 void groundcollisions(dGeomID geom)
 {
     synchronized(entities.m_mutex)
@@ -820,7 +840,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float th
     {
         Vehicle *v=entities[i];
         if (v &&
-                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
                 && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {

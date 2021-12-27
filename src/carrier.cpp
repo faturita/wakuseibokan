@@ -66,6 +66,8 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 
+#include "actions/Explosion.h"
+
 #include "map.h"
 #include "board.h"
 
@@ -747,6 +749,15 @@ void update(int value)
                     if (entities[i]->getType() != VehicleTypes::WEAPON)
                     {
                         explosion();
+                        Vec3f loc = entities[i]->getPos();
+
+                        Explosion* b1 = new Explosion();
+                        b1->init();
+                        b1->embody(world, space);
+                        b1->setPos(loc[0],loc[1],loc[2]);
+                        b1->stop();
+
+                        b1->expand(10,10,10,2,world, space);
                     }
 
                     deleteEntity(i);
