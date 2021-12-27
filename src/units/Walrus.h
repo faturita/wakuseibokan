@@ -55,6 +55,8 @@ public:
     void attack(Vec3f target);
 
     void setNameByNumber(int number);
+
+    void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 };
 
 #endif /* WALRUS_H_ */

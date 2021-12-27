@@ -90,6 +90,8 @@
 #include "units/WheeledManta.h"
 #include "units/Otter.h"
 
+#include "actions/ArtilleryAmmo.h"
+
 #include "map.h"
 
 extern  Camera Camera;
@@ -6831,6 +6833,71 @@ void checktest71(unsigned long timer)
 
 }
 
+void test72()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    Camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest72(unsigned long timer)
+{
+    if (timer == 100)
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        Vec3f pos(10.0f,10.0f,-30.0f);
+        Camera.setPos(pos);
+        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+    }
+
+    if (timer == 300)
+    {
+        Vec3f loc(10.0f, 10.0f, 10.0f);
+        float stride = 0.7;
+
+        for(int i=-3;i<3;i++)
+        {
+            for (int j=-3;j<3;j++)
+            {
+                for (int h=-3;h<3;h++)
+                {
+                    ArtilleryAmmo* b1 = new ArtilleryAmmo();
+                    b1->init();
+                    b1->embody(world, space);
+                    b1->setPos(loc[0]+i*stride,loc[1]+h*stride,loc[2]+j*stride);
+                    b1->stop();
+
+                    entities.push_back(b1, b1->getGeom());
+                }
+            }
+        }
+
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -6948,6 +7015,7 @@ void initWorldModelling(int testcase)
     case 69:test69();break;                         // Test a wheeled version of Walrus which is mandatory from now on.
     case 70:test70();break;                         // Manta lands on island's runway. Check slippage.
     case 71:test71();break;                         // Manta landing on a moving carrier.
+    case 72:test72();break;                         // Testing explosions with ODE.
     default:initIslands();test1();break;
     }
 
@@ -7037,6 +7105,7 @@ void worldStep(int value)
     case 69:checktest69(timer);break;
     case 70:checktest70(timer);break;
     case 71:checktest71(timer);break;
+    case 72:checktest72(timer);break;
 
     default: break;
     }
