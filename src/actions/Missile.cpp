@@ -181,12 +181,12 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     //if (abs((getDeclination(getForward())-getDeclination(T)))<0.1) { //dBodySetAngularVel(me,0,0,0);
     //    r2=0;}
 
-    r1 = max(r1, 2);
-    r1 = min(r1, -2);
-    r2 = max(r2, 8);
-    r2 = min(r2, -8);
-    r3 = max(r3, 20);
-    r3 = min(r3, -20);
+    r1 = clipmax(r1, 2);
+    r1 = clipmin(r1, -2);
+    r2 = clipmax(r2, 8);
+    r2 = clipmin(r2, -8);
+    r3 = clipmax(r3, 20);
+    r3 = clipmin(r3, -20);
 
 
 

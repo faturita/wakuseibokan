@@ -1,5 +1,7 @@
-#include "Explosion.h"
+#include "../math/yamathutil.h"
+#include "../profiling.h"
 #include "../container.h"
+#include "Explosion.h"
 
 extern container<Vehicle*> entities;
 
@@ -14,16 +16,31 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
 
     float stride = 0.5;
 
-    for(int i=-dense;i<dense;i++)
+    float stride_width =  max( (width / 2.0) / dense , stride );
+    float stride_height = max( (height / 2.0) / dense , stride );
+    float stride_length = max( (length / 2.0) / dense, stride );
+
+    dout << "Dimensions:" << Vec3f(width, height, length) << std::endl;
+    dout << "Strides: " << stride_width << "," << stride_height << "," << stride_length << std::endl;
+
+    Vec3f particledim(0.5f,0.5f,0.5f);
+
+    if (stride_width>=10 && stride_height >=10 && stride_length>=10)
+        particledim = Vec3f(10.0f, 10.0f, 10.0f);
+
+    for(int w=-dense;w<dense;w++)
     {
-        for (int j=-dense;j<dense;j++)
+        for (int l=-dense;w<dense;w++)
         {
             for (int h=-dense;h<dense;h++)
             {
                 Debris* b1 = new Debris();
-                b1->init();
+                b1->init(particledim);
+                b1->setTexture(texture);
                 b1->embody(world, space);
-                b1->setPos(loc[0]+i*stride,loc[1]+h*stride,loc[2]+j*stride);
+                Vec3f randloc = Vec3f((rand() % 10 -5 +1)*0.1,(rand() % 10 -5 +1)*0.1,(rand() % 10 -5 +1)*0.1);
+                Vec3f strideloc = Vec3f(loc[0]+w*stride_width,loc[1]+h*stride_height,loc[2]+l*stride_length);
+                b1->setPos(randloc + strideloc);
                 b1->stop();
 
                 Vec3f targ;

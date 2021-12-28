@@ -531,11 +531,17 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 
         Explosion* b1 = new Explosion();
         b1->init();
+        // I am not adding any texture, becuase it looks better on the island (they look white and can be seen from far away).
         b1->embody(world, space);
         b1->setPos(loc[0],loc[1],loc[2]);
         b1->stop();
 
+        entities.push_back(b1, b1->getGeom());
+
         b1->expand(10,10,10,2,world, space);
+
+        Gunshot *g = (Gunshot*)v;
+        g->setVisible(false);
 
         dBodyDisable(v->getBodyID());
         dGeomDisable(v->getGeom());
@@ -1304,8 +1310,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (target->getType() == MANTA || target->getType() == WALRUS)
                         {
                             lb->air();
-                        } else {
+                        } else if (target->getType() == COMMANDCENTER)   {
+                            // @FIXME:  There should be a list of matching targets.
                             lb->ground();
+                        } else {
+                            lb->water();
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(world,space);
 
@@ -1321,7 +1330,8 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action->getType()==CONTROLABLEACTION)
                             {
-                                //switchControl(entities.indexOf(l));
+                                // @NOTE: Uncomment me if you want to see where the missile is going (it is automatically controlled).
+                                //switchControl(l);
 
                             }
 
@@ -1687,8 +1697,8 @@ void landManta(Vehicle *landplace, Manta *m)
     {
         if (m)
         {
-            landplace->stop();                              // @NOTE: I am assumming that the carrier is still.
-            m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
+            if (landplace->getType() == CARRIER) landplace->stop();     // @NOTE: I am assumming that the carrier is still.
+            m->land(landplace->getPos(),landplace->getForward());       // @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }
     }

@@ -30,6 +30,8 @@
 #include <mutex>
 #include <regex>
 
+#include <unordered_map>
+
 #include "ThreeMaxLoader.h"
 
 #include "font/DrawFonts.h"
@@ -93,6 +95,7 @@
 #include "actions/ArtilleryAmmo.h"
 #include "actions/Debris.h"
 #include "actions/Explosion.h"
+#include "actions/Torpedo.h"
 
 #include "map.h"
 
@@ -123,6 +126,8 @@ int gamemode;
 int aiplayer;
 
 extern bool wincondition;
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 /**
  * Collision detection function.
@@ -6869,6 +6874,16 @@ void test72()
 
 void checktest72(unsigned long timer)
 {
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC72: Checking explosions.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
     if (timer == 100)
     {
         controller.controllingid = CONTROLLING_NONE;
@@ -6883,12 +6898,79 @@ void checktest72(unsigned long timer)
 
         Explosion* b1 = new Explosion();
         b1->init();
+        b1->setTexture(textures["land"]);
         b1->embody(world, space);
         b1->setPos(loc[0],loc[1],loc[2]);
         b1->stop();
 
+        entities.push_back(b1, b1->getGeom());
+
         b1->expand(10,10,10,2,world, space);
 
+
+    }
+}
+
+void test73()
+{
+
+
+    Torpedo *t = new Torpedo(GREEN_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(0.0,20.0f,0.0f);
+    t->stop();
+
+    entities.push_back(t, t->getGeom());
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+}
+
+void checktest73(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC73: Testing torpedos.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 100)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+        Torpedo *t = (Torpedo*) entities[0];
+
+        t->goTo(b->getPos());
+        t->enableAuto();
+    }
+
+    if (timer == 3000)
+    {
+        Vehicle *t = findCarrier(GREEN_FACTION);
+
+        if (!t)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Carrier still around.\n");
+            endWorldModelling();
+            exit(1);
+        }
 
     }
 }
@@ -7011,6 +7093,7 @@ void initWorldModelling(int testcase)
     case 70:test70();break;                         // Manta lands on island's runway. Check slippage.
     case 71:test71();break;                         // Manta landing on a moving carrier.
     case 72:test72();break;                         // Testing explosions with ODE.
+    case 73:test73();break;                         // Introducing Torpedos.
     default:initIslands();test1();break;
     }
 
@@ -7101,6 +7184,7 @@ void worldStep(int value)
     case 70:checktest70(timer);break;
     case 71:checktest71(timer);break;
     case 72:checktest72(timer);break;
+    case 73:checktest73(timer);break;
 
     default: break;
     }

@@ -41,6 +41,10 @@ void Balaenidae::init()
 
     setName("Balaenidae");
 
+    width = 100;
+    height = 40;
+    length = 500;
+
 }
 
 void Balaenidae::clean()

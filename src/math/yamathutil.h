@@ -29,11 +29,14 @@ float getAzimuthRadians(Vec3f orientation);
 float getContinuosAzimuthRadians(Vec3f aim);
 float getDeclination(Vec3f aim);
 
-float min(float val, float defval);
-float max(float val, float defval);
+float clipmin(float val, float defval);
+float clipmax(float val, float defval);
 float clipped(float val, float min, float max);
 float sgn(float val);
 float _acos(float val);
+
+float max(float val1, float val2);
+float min(float val1, float val2);
 
 
 Vec3f getRandomCircularSpot(Vec3f origin, float radius);

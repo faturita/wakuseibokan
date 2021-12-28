@@ -26,7 +26,7 @@ enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEAC
 
 enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, OTTER = 9, ARTILLERY = 10, COMMANDCENTER = 11, HANGAR = 12, WAREHOUSE = 13, RUNWAY = 14, LASERTURRET = 15, TURRET = 16, LAUNCHER = 17, FACTORY = 18, DOCK = 19, ANTENNA = 20, RADAR = 21, STRUCTURE = 22};
 
-enum class AutoStatus { FREE=1, DESTINATION, WAYPOINT, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR };
+enum class AutoStatus { FREE=1, DESTINATION, WAYPOINT, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR, WATER };
 
 enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
@@ -88,6 +88,10 @@ protected:
     std::string name;
 
     int number;
+
+    float height;
+    float width;
+    float length;
     
 public:
     bool inert=false;
@@ -194,8 +198,6 @@ public:
     void damage(int d);
     void destroy();
 
-    void setTexture(const GLuint &value);
-
     const Vec3f map(Vec3f);
 
     bool VERIFY(Vec3f newpos, dBodyID who);
@@ -224,6 +226,8 @@ public:
 
     void enableTelemetry();
     void disableTelemetry();
+
+    Vec3f getDimensions();
 
 };
 

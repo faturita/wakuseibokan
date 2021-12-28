@@ -2,6 +2,7 @@
 #include "Launcher.h"
 #include "../actions/Missile.h"
 #include "../actions/AAM.h"
+#include "../actions/Torpedo.h"
 
 #include "../sounds/sounds.h"
 
@@ -180,9 +181,65 @@ Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
         break;
     case AutoStatus::AIR:return fireAir(world, space);
         break;
+    case AutoStatus::WATER:return fireWater(world, space);
+        break;
     }
 
     return NULL;
+}
+
+Vehicle* Launcher::fireWater(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    Torpedo *action = new Torpedo(getFaction());
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    Vec3f fw = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    position = position + 80.0f*fw;
+    fw = -orig+position;
+
+    position[1] =1.0;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, 0,0,0);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+
+    dQfromR(q2,R2);
+
+
+    dQMultiply0(q3,q2,q1);
+
+
+    Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft=Ft*60;
+
+    //dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
+    dBodyAddRelForce(action->getBodyID(),0,0,60);
+    dBodySetQuaternion(action->getBodyID(),q3);
+
+    setTtl(1000);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
 }
 
 Vehicle* Launcher::fireGround(dWorldID world, dSpaceID space)
@@ -274,6 +331,11 @@ void Launcher::ground()
 void Launcher::air()
 {
     autostatus = AutoStatus::AIR;
+}
+
+void Launcher::water()
+{
+    autostatus = AutoStatus::WATER;
 }
 
 int Launcher::getSubType()

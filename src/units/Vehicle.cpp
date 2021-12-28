@@ -439,10 +439,10 @@ void  Vehicle::embody(dBodyID myBodySelf)
     
     float myMass = 1.0f;
     float radius = 2.64f;
-    float length = 7.0f;
+    float boxlength = 7.0f;
     
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
-    //dMassSetBox(&m,1,length,length,length);
+    //dMassSetBox(&m,1,boxlength,boxlength,boxlength);
     dMassSetSphere(&m,1,radius);
     dMassAdjust(&m, myMass*1.0f);
     dBodySetMass(myBodySelf,&m);
@@ -820,4 +820,9 @@ void Vehicle::enableTelemetry()
 void Vehicle::disableTelemetry()
 {
     dotelemetry = false;
+}
+
+Vec3f Vehicle::getDimensions()
+{
+    return Vec3f(width, height, length);
 }

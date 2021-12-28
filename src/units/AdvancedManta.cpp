@@ -18,9 +18,9 @@ void AdvancedManta::init()
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
     }
 
-    AdvancedManta::width=10.0f;
-    AdvancedManta::height=3.0f;
-    AdvancedManta::length=10.0f;
+    width=10.0f;
+    height=3.0f;
+    length=10.0f;
 
     setForward(0,0,1);
 

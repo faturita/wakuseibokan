@@ -6,10 +6,16 @@
 
 class Debris : public ArtilleryAmmo
 {
+protected:
+    GLuint texture;
+
 public:
     Debris();
     void init();
+    void init(Vec3f dimensions);
     void drawModel(float yRot, float xRot, float x, float y, float z);
+
+    void setTexture(const GLuint &value);
 };
 
 #endif // DEBRIS_H

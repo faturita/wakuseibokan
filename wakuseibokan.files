@@ -22,6 +22,8 @@ src/actions/Missile.cpp
 src/actions/Missile.h
 src/actions/Shell.cpp
 src/actions/Shell.h
+src/actions/Torpedo.cpp
+src/actions/Torpedo.h
 src/actions/actions.h
 src/ai.cpp
 src/ai.h

@@ -456,12 +456,12 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
 //                  << " Destination:"
 //                  << std::setw(10) << T.magnitude() << std::endl;
 
-    r1 = max(r1, 5);
-    r1 = min(r1, -5);
-    r2 = max(r2, 40);
-    r2 = min(r2, -40);
-    r3 = max(r3, 20);
-    r3 = min(r3, -20);
+    r1 = clipmax(r1, 5);
+    r1 = clipmin(r1, -5);
+    r2 = clipmax(r2, 40);
+    r2 = clipmin(r2, -40);
+    r3 = clipmax(r3, 20);
+    r3 = clipmin(r3, -20);
 
 
 

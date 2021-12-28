@@ -16,9 +16,6 @@ enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING};
 class Walrus : public Vehicle
 {
 protected:
-    float height;
-    float width;
-    float length;
 
     BoxIsland *island=NULL;
 

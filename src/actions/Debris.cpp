@@ -1,24 +1,27 @@
 #include <unordered_map>
 #include "Debris.h"
 
-extern std::unordered_map<std::string, GLuint> textures;
-
 Debris::Debris()
 {
     Vehicle::setTtl(150);
 }
 
-void Debris::init()
+void Debris::init(Vec3f dimensions)
 {
-    Debris::height=0.5f;
-    Debris::length=0.5f;
-    Debris::width=0.5f;
+    Debris::height=dimensions[0];
+    Debris::length=dimensions[1];
+    Debris::width=dimensions[2];
 
     Debris::mass = 0.01f;
 
     setDamage(5);
 
     setForward(0,0,1);
+}
+
+void Debris::init()
+{
+    init(Vec3f(0.5f,0.5f,0.5f));
 }
 
 void Debris::drawModel(float yRot, float xRot, float x, float y, float z)
@@ -40,9 +43,7 @@ void Debris::drawModel(float yRot, float xRot, float x, float y, float z)
 
         v = v*100;
 
-        //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
-        //drawRedBox(Gunshot::width, Gunshot::height, Gunshot::length);
-        drawTexturedBox(textures["land"],Gunshot::width, Gunshot::height, Gunshot::length);
+        drawTexturedBox(texture,Gunshot::width, Gunshot::height, Gunshot::length);
 
         glPopMatrix();
     }
@@ -50,5 +51,10 @@ void Debris::drawModel(float yRot, float xRot, float x, float y, float z)
     //{
     //    printf ("model is null\n");
     //}
+}
+
+void Debris::setTexture(const GLuint &value)
+{
+    texture = value;
 }
 
