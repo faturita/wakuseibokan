@@ -8,7 +8,6 @@
 #endif
 
 
-
 extern  Controller controller;
 
 /* dynamics and collision objects */
@@ -19,6 +18,8 @@ extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
 extern std::vector<Message> messages;
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom)
@@ -522,6 +523,32 @@ bool  groundcollisions(Vehicle *vehicle)
     return true;
 }
 
+void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
+{
+    if (dGeomIsEnabled(v->getGeom()))
+    {
+        splash();
+        Vec3f loc = v->getPos();
+
+        Explosion* b1 = new Explosion();
+        b1->init();
+        b1->setTexture(textures["water"]);
+        b1->embody(world, space);
+        b1->setPos(loc[0],loc[1],loc[2]);
+        b1->stop();
+
+        entities.push_back(b1, b1->getGeom());
+
+        b1->expand(10,10,10,2,world, space);
+
+        Gunshot *g = (Gunshot*)v;
+        g->setVisible(false);
+
+        dBodyDisable(v->getBodyID());
+        dGeomDisable(v->getGeom());
+
+    }
+}
 void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 {
     if (dGeomIsEnabled(v->getGeom()))
@@ -531,7 +558,7 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 
         Explosion* b1 = new Explosion();
         b1->init();
-        // I am not adding any texture, becuase it looks better on the island (they look white and can be seen from far away).
+        // I am not adding any texture, because it looks better on the island (they look white and can be seen from far away).
         b1->embody(world, space);
         b1->setPos(loc[0],loc[1],loc[2]);
         b1->stop();

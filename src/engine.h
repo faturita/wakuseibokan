@@ -203,5 +203,6 @@ void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID sp
 void wipeEnemyStructures(BoxIsland *island, int faction);
 
 void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
+void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 
 #endif // ENGINE_H
