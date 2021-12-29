@@ -133,6 +133,7 @@ Blender
 
 * Shift+Ctrl+Alt+C -> origin to geometry
 * N: dimensions: from here you can edit global positions and set the objecto to 0,0,0.  draw3DSModel assumes all objects are at the center of coordinates.
+* Ctrl+J: Join selected objects.
 
 Sounds
 ------
