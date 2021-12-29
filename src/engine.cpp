@@ -8,7 +8,6 @@
 #endif
 
 
-
 extern  Controller controller;
 
 /* dynamics and collision objects */
@@ -19,6 +18,8 @@ extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
 extern std::vector<Message> messages;
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom)
@@ -420,12 +421,12 @@ bool  isWalrus(Vehicle* vehicle)
 
 bool  isAction(dGeomID body)
 {
-    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION);
+    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION) || isType(body, VehicleTypes::EXPLOTABLEACTION);
 }
 
 bool  isAction(Vehicle* vehicle)
 {
-    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION);
+    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION) || isType(vehicle, VehicleTypes::EXPLOTABLEACTION);
 }
 
 // SYNC
@@ -522,6 +523,58 @@ bool  groundcollisions(Vehicle *vehicle)
     return true;
 }
 
+void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
+{
+    if (dGeomIsEnabled(v->getGeom()))
+    {
+        splash();
+        Vec3f loc = v->getPos();
+
+        Explosion* b1 = new Explosion();
+        b1->init();
+        b1->setTexture(textures["water"]);
+        b1->embody(world, space);
+        b1->setPos(loc[0],loc[1],loc[2]);
+        b1->stop();
+
+        entities.push_back(b1, b1->getGeom());
+
+        b1->expand(10,10,10,2,world, space);
+
+        Gunshot *g = (Gunshot*)v;
+        g->setVisible(false);
+
+        dBodyDisable(v->getBodyID());
+        dGeomDisable(v->getGeom());
+
+    }
+}
+void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
+{
+    if (dGeomIsEnabled(v->getGeom()))
+    {
+        explosion();
+        Vec3f loc = v->getPos();
+
+        Explosion* b1 = new Explosion();
+        b1->init();
+        // I am not adding any texture, because it looks better on the island (they look white and can be seen from far away).
+        b1->embody(world, space);
+        b1->setPos(loc[0],loc[1],loc[2]);
+        b1->stop();
+
+        entities.push_back(b1, b1->getGeom());
+
+        b1->expand(10,10,10,2,world, space);
+
+        Gunshot *g = (Gunshot*)v;
+        g->setVisible(false);
+
+        dBodyDisable(v->getBodyID());
+        dGeomDisable(v->getGeom());
+
+    }
+}
 void groundcollisions(dGeomID geom)
 {
     synchronized(entities.m_mutex)
@@ -820,7 +873,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float th
     {
         Vehicle *v=entities[i];
         if (v &&
-                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
                 && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
@@ -1284,8 +1337,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (target->getType() == MANTA || target->getType() == WALRUS)
                         {
                             lb->air();
-                        } else {
+                        } else if (target->getType() == COMMANDCENTER)   {
+                            // @FIXME:  There should be a list of matching targets.
                             lb->ground();
+                        } else {
+                            lb->water();
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(world,space);
 
@@ -1301,7 +1357,8 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             if (action->getType()==CONTROLABLEACTION)
                             {
-                                //switchControl(entities.indexOf(l));
+                                // @NOTE: Uncomment me if you want to see where the missile is going (it is automatically controlled).
+                                //switchControl(l);
 
                             }
 
@@ -1667,8 +1724,8 @@ void landManta(Vehicle *landplace, Manta *m)
     {
         if (m)
         {
-            landplace->stop();                              // @NOTE: I am assumming that the carrier is still.
-            m->land(landplace->getPos(),landplace->getForward());// @FIXME: This needs to be performed all the time while manta is landing.
+            if (landplace->getType() == CARRIER) landplace->stop();     // @NOTE: I am assumming that the carrier is still.
+            m->land(landplace->getPos(),landplace->getForward());       // @FIXME: This needs to be performed all the time while manta is landing.
             m->enableAuto();
         }
     }

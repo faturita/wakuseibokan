@@ -239,8 +239,6 @@ void CarrierTurret::doControl()
 
     c.registers = registers;
 
-    dout << "controlling !!!!!!" << std::endl;
-
     CarrierTurret::doControl(c);
 }
 

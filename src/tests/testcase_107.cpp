@@ -1,4 +1,4 @@
-#include "testcase_105.h"
+#include "testcase_107.h"
 
 #include <iostream>
 #include <fstream>
@@ -42,12 +42,12 @@ extern int testing;
 extern  Camera Camera;
 extern int  aiplayer;
 
-TestCase_106::TestCase_106()
+TestCase_107::TestCase_107()
 {
 
 }
 
-void TestCase_106::init()
+void TestCase_107::init()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
@@ -59,19 +59,10 @@ void TestCase_106::init()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     dSpaceID carrier_space = _b->embody_in_space(world, space);
-    _b->setPos(-5000.0,20.5f,-44000.0f);
+    _b->setPos(-5000.0,20.5f,-14000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
-
-
-    Beluga *_bg = new Beluga(BLUE_FACTION);
-    _bg->init();
-    _bg->embody(world,space);
-    _bg->setPos(-4000.0f,20.5f,-11000.0f);
-    _bg->stop();
-
-    entities.push_back(_bg, _bg->getGeom());
 
 
     CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
@@ -91,8 +82,8 @@ void TestCase_106::init()
 
     entities.push_back(_w1, _w1->getGeom());
 
-    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,0,world);
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Launcher(BLUE_FACTION)           ,         0.0f,    -1700.0f,0,world);
     Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,0,world);
     Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,0,world);
@@ -110,13 +101,13 @@ void TestCase_106::init()
 
 }
 
-int TestCase_106::check(unsigned long timertick)
+int TestCase_107::check(unsigned long timertick)
 {
     if (timertick == 200)
     {
         Vehicle* _b = findCarrier(GREEN_FACTION);
 
-        Vec3f dest = Vec3f(-6000.0f, 20.5, -14000.0f);
+        Vec3f dest = Vec3f(-2000.0f, 20.5, -4000.0f);
         _b->goTo(dest);
         _b->enableAuto();
     }
@@ -147,27 +138,27 @@ int TestCase_106::check(unsigned long timertick)
     return 0;
 }
 
-int TestCase_106::number()
+int TestCase_107::number()
 {
-    return 106;
+    return 107;
 
 }
 
-std::string TestCase_106::title()
+std::string TestCase_107::title()
 {
-    return std::string("Carriers find each other and they engage on surface fight.");
+    return std::string("Checking torpedo firing from islands.");
 }
 
 
-bool TestCase_106::done()
+bool TestCase_107::done()
 {
     return isdone;
 }
-bool TestCase_106::passed()
+bool TestCase_107::passed()
 {
     return haspassed;
 }
-std::string TestCase_106::failedMessage()
+std::string TestCase_107::failedMessage()
 {
     return message;
 }
@@ -176,5 +167,5 @@ std::string TestCase_106::failedMessage()
 // -----------
 TestCase *pickTestCase(int testcase)
 {
-    return new TestCase_106();
+    return new TestCase_107();
 }

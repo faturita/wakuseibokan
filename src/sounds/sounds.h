@@ -15,6 +15,7 @@ void firesound(int times);
 void enginestart();
 void takeoff();
 void explosion();
+void splash();
 void honk();
 void gunshot();
 void artilleryshot();

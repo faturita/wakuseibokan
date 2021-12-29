@@ -47,6 +47,11 @@ void explosion()
     if (!mute) playsound("sounds/explosion.mp3");
 }
 
+void splash()
+{
+    if (!mute) playsound("sounds/splash.wav");
+}
+
 void coast()
 {
     if (!mute) playsound("sounds/Coast.m4a");

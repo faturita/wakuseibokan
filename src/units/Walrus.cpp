@@ -53,9 +53,9 @@ void Walrus::init()
 
     setForward(0,0,1);
 
-    Walrus::height=4.0f;
-    Walrus::width=5.0f;
-    Walrus::length=10.0f;
+    height=4.0f;
+    width=5.0f;
+    length=10.0f;
 
 }
 

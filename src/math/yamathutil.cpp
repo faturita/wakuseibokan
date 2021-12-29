@@ -155,7 +155,7 @@ float getDeclination(Vec3f aim)
     return decl*(-1);
 }
 
-float min(float val, float defval)
+float clipmin(float val, float defval)
 {
     if (val < defval)
         return defval;
@@ -163,7 +163,7 @@ float min(float val, float defval)
     return val;
 
 }
-float max(float val, float defval)
+float clipmax(float val, float defval)
 {
     if (val>defval)
         return defval;
@@ -215,4 +215,16 @@ float _acos(float val)
     float out = acos(val);
     if (isnan(out)) out=0.001;
     return out;
+}
+
+float max(float val1, float val2)
+{
+    if (val1>=val2) return val1;
+    else return val2;
+}
+
+float min(float val1, float val2)
+{
+    if (val1<=val2) return val1;
+    else return val2;
 }

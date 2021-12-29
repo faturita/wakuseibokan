@@ -123,7 +123,6 @@ int aiplayer;
 extern bool wincondition;
 
 static int testing=-1;
-
 /**
  * Collision detection function.
  *
@@ -138,6 +137,8 @@ static int testing=-1;
  *
  * This is much faster.  I verified that by doing this procedure (check TEST 26) the fps of 175 entities improves from 25 to 60 almost
  * the highest possible in this platform.
+ *
+ * THIS FUNCTION MUST BE IN THIS FILE.  Otherwise, there are a lot of problems (wellcome to C++).
  *
  *
  * @brief nearCallback
@@ -228,8 +229,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isWalrus(v1) && hit(v1,(Gunshot*)v2)) {}
-                if (isAction(v1) && s2 && hit(s2, (Gunshot*)v1)) {}
-                if (isAction(v2) && s1 && hit(s1, (Gunshot*)v2)) {}
+                if (isAction(v1) && s2 && !isAction(s2) && hit(s2, (Gunshot*)v1)) {}
+                if (isAction(v2) && s1 && !isAction(s1) && hit(s1, (Gunshot*)v2)) {}
             } else
             if ( ( isManta(v1) && isCarrier(v2) && releasecontrol(v1) ) ||
                  ( isManta(v2) && isCarrier(v1) && releasecontrol(v2) ) )
@@ -246,11 +247,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             if  (isRunway(s1) || isRunway(s2))
             {
                 // Manta landing on Runways.
-                contact[i].surface.mode = dContactBounce |
-                dContactApprox1;
+                contact[i].surface.mode = dContactFDir1 | dContactBounce |
+                dContactApprox1 | dContactMu2;
                 //printf("Landing on Runways...\n");
 
-                contact[i].surface.mu = 0.99f;
+                Vec3f f;
+                if      (isManta(v1)) f = v1->getForward();
+                else if (isManta(v2)) f = v2->getForward();
+
+                contact[i].fdir1[0] = f[0];
+                contact[i].fdir1[1] = f[1];
+                contact[i].fdir1[2] = f[2];
+
+                contact[i].surface.mu = 0.99;
                 contact[i].surface.mu2 = dInfinity;             // This prevents the side slipping while landing.
                 contact[i].surface.slip1 = 0.9f;
                 contact[i].surface.slip2 = 0.9f;
@@ -275,7 +284,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.soft_cfm = 0;
             }
             if (isIsland(contact[i].geom.g1) || isIsland(contact[i].geom.g2))
-            {               
+            {
                  // Island reaction
                  contact[i].surface.mode = dContactBounce |
                  dContactApprox1;
@@ -303,15 +312,17 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g2) && isType(v1, WEAPON) && arrived(dGeomGetSpace(contact[i].geom.g1),getIsland(contact[i].geom.g2))) {}
 
 
-
                  if (isIsland(contact[i].geom.g1) && isSubType(v2, CEPHALOPOD) && arrived(v2,getIsland(contact[i].geom.g1))) {}
                  if (isIsland(contact[i].geom.g2) && isSubType(v1, CEPHALOPOD) && arrived(v1,getIsland(contact[i].geom.g2))) {}
 
                  if (isIsland(contact[i].geom.g1) && isManta(v2)  && groundcollisions(v2)) {}
                  if (isIsland(contact[i].geom.g2) && isManta(v1)  && groundcollisions(v1)) {}
 
-                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);}
-                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);}
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);groundexplosion(v2,world, space);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);groundexplosion(v1,world, space);}
+
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {groundexplosion(v2,world, space);}
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {groundexplosion(v1,world, space);}
 
 
             } else
@@ -341,12 +352,25 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (v1 && isWalrus(v1)) { v1->inert = false;}
                  if (v2 && isWalrus(v2)) { v2->inert = false;}
 
+                 if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {waterexplosion(v2,world, space);}
+                 if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {waterexplosion(v1,world, space);}
+
+
             } else {
                 // Object against object collision.
-                 //printf("7\n");
+                //printf("7\n");
                 if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
                 if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
+
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
             }
+
 
             dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
             dJointAttach (c,

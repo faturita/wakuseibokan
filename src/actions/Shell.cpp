@@ -27,7 +27,7 @@ void Shell::init()
     Shell::mass = 1000.0f;
 
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/bomb.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel("units/shell.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
     }
@@ -56,7 +56,7 @@ void Shell::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        //doTransform(f, R);
+        doTransform(f, R);
 
         Vec3f v = dBodyGetLinearVelVec(me);
 
@@ -114,6 +114,8 @@ void Shell::embody(dBodyID myBodySelf)
 
 int Shell::getType()
 {
-    return 5;
+    return EXPLOTABLEACTION;
 }
+
+
 

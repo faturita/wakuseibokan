@@ -8,6 +8,12 @@ src/actions/AAM.cpp
 src/actions/AAM.h
 src/actions/ArtilleryAmmo.cpp
 src/actions/ArtilleryAmmo.h
+src/actions/Bomb.cpp
+src/actions/Bomb.h
+src/actions/Debris.cpp
+src/actions/Debris.h
+src/actions/Explosion.cpp
+src/actions/Explosion.h
 src/actions/Gunshot.cpp
 src/actions/Gunshot.h
 src/actions/LaserBeam.cpp
@@ -18,6 +24,8 @@ src/actions/Missile.cpp
 src/actions/Missile.h
 src/actions/Shell.cpp
 src/actions/Shell.h
+src/actions/Torpedo.cpp
+src/actions/Torpedo.h
 src/actions/actions.h
 src/ai.cpp
 src/ai.h
@@ -138,6 +146,8 @@ src/tests/testcase_105.cpp
 src/tests/testcase_105.h
 src/tests/testcase_106.cpp
 src/tests/testcase_106.h
+src/tests/testcase_107.cpp
+src/tests/testcase_107.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h

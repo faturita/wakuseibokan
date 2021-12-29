@@ -243,8 +243,8 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
         }
     }
 
-    r3 = max(r3, 600);
-    r3 = min(r3, -600);
+    r3 = clipmax(r3, 600);
+    r3 = clipmin(r3, -600);
 
     rt3 = r3;
 

@@ -98,6 +98,6 @@ void ArtilleryAmmo::embody(dBodyID myBodySelf)
 
 int ArtilleryAmmo::getType()
 {
-    return 5;
+    return ACTION;
 }
 

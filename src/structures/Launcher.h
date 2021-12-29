@@ -26,9 +26,11 @@ public:
     Vehicle* fire(dWorldID world, dSpaceID space);
     Vehicle* fireAir(dWorldID world, dSpaceID space);
     Vehicle* fireGround(dWorldID world, dSpaceID space);
+    Vehicle* fireWater(dWorldID world, dSpaceID space);
 
     void ground();
     void air();
+    void water();
 
     void virtual doControl(Controller);
     void virtual doControl();

@@ -66,6 +66,8 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 
+#include "actions/Explosion.h"
+
 #include "map.h"
 #include "board.h"
 
@@ -716,7 +718,7 @@ void update(int value)
                         messages.insert(messages.begin(), m);
 
                         // Check winning condition (if the destroyed carrier is not yours).
-                        if (controller.faction != entities[i]->getFaction())
+                        if (controller.faction != entities[i]->getFaction() && controller.faction != BOTH_FACTION)
                         {
                             wincondition = true;
                         }
@@ -747,6 +749,20 @@ void update(int value)
                     if (entities[i]->getType() != VehicleTypes::WEAPON)
                     {
                         explosion();
+                        Vec3f loc = entities[i]->getPos();
+
+                        Explosion* b1 = new Explosion();
+                        b1->init();
+                        b1->setTexture(textures["metal"]);
+                        b1->embody(world, space);
+                        b1->setPos(loc[0],loc[1],loc[2]);
+                        b1->stop();
+
+                        entities.push_back(b1, b1->getGeom());
+
+                        Vec3f dims = entities[i]->getDimensions();
+
+                        b1->expand(dims[0],dims[1],dims[2],2,world, space);
                     }
 
                     deleteEntity(i);

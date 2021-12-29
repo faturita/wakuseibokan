@@ -17,11 +17,6 @@ enum FlyingStatus {IN_CARRIER=0, ON_DECK, LANDED, TACKINGOFF, FLYING, HOLDING, D
 class Manta : public Vehicle
 {
 
-protected:
-    float height = 10;
-    float width = 10;
-    float length = 10;
-
 public:
     Manta(int newfaction);
 

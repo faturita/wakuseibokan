@@ -45,6 +45,8 @@
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
 
+#include "actions/Explosion.h"
+
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
@@ -200,6 +202,7 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
 void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
 void wipeEnemyStructures(BoxIsland *island, int faction);
 
-
+void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
+void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 
 #endif // ENGINE_H

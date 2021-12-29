@@ -47,6 +47,10 @@ void Manta::init()
     setForward(0,0,1);
 
     status = 0;
+
+    height = 10;
+    width = 10;
+    length = 10;
 }
 
 int Manta::getType()
@@ -117,7 +121,7 @@ void Manta::embody(dBodyID myBodySelf)
 
     float myMass = 10.0f;
     float radius = 2.64f;
-    float length = 7.0f;
+    float mylength = 7.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,8.0f,1.6f,4.0f);
