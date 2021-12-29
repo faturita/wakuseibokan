@@ -56,7 +56,7 @@ void Shell::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        //doTransform(f, R);
+        doTransform(f, R);
 
         Vec3f v = dBodyGetLinearVelVec(me);
 
