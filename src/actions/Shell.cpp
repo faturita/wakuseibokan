@@ -27,7 +27,7 @@ void Shell::init()
     Shell::mass = 1000.0f;
 
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/bomb.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel("units/shell.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
     }

@@ -39,6 +39,11 @@ void Torpedo::init()
     Torpedo::length=7.0f;
     Torpedo::width=1.0f;
 
+    // Let's make Torpedos bigger so that they can more easily hit the target.
+    Torpedo::height=0.5f;
+    Torpedo::length=7.0f;
+    Torpedo::width=10.0f;
+
     Torpedo::mass = 1.0f;
 
     setDamage(10000);

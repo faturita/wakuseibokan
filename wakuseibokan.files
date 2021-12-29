@@ -8,6 +8,8 @@ src/actions/AAM.cpp
 src/actions/AAM.h
 src/actions/ArtilleryAmmo.cpp
 src/actions/ArtilleryAmmo.h
+src/actions/Bomb.cpp
+src/actions/Bomb.h
 src/actions/Debris.cpp
 src/actions/Debris.h
 src/actions/Explosion.cpp

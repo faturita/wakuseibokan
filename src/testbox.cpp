@@ -96,6 +96,7 @@
 #include "actions/Debris.h"
 #include "actions/Explosion.h"
 #include "actions/Torpedo.h"
+#include "actions/Bomb.h"
 
 #include "map.h"
 
@@ -6914,7 +6915,6 @@ void checktest72(unsigned long timer)
 void test73()
 {
 
-
     Torpedo *t = new Torpedo(GREEN_FACTION);
     t->init();
     t->embody(world, space);
@@ -6940,7 +6940,7 @@ void checktest73(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC73: Testing torpedos.");
+        sprintf(msg, "TC74: Testing torpedos chasing walruses.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6968,6 +6968,166 @@ void checktest73(unsigned long timer)
         else
         {
             printf("Test Failed.  Carrier still around.\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+
+void test74()
+{
+
+    Torpedo *t = new Torpedo(GREEN_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(0.0,20.0f,0.0f);
+    t->stop();
+
+    entities.push_back(t, t->getGeom());
+
+    // Entities will be added later in time.
+    AdvancedWalrus *_b = new AdvancedWalrus(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setSignal(4);
+    _b->setNameByNumber(1);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(-8000,-1.0,-8000);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+}
+
+void checktest74(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC73: Testing torpedos chasing Walruses.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 80)
+    {
+        Vehicle *b = findWalrus(GREEN_FACTION);
+
+        b->goTo(Vec3f(0, 0.0, -9000.0));
+        b->enableAuto();
+    }
+
+    if (timer == 100)
+    {
+        Vehicle *b = findWalrus(GREEN_FACTION);
+
+        if (entities.isValid(0))
+        {
+            Torpedo *t = (Torpedo*) entities[0];
+
+            t->goTo(b->getPos());
+            t->enableAuto();
+        }
+    }
+
+    if (timer > 100)
+    {
+        Vehicle *b = findWalrus(GREEN_FACTION);
+
+        if (b)
+            if (entities.isValid(0))
+            {
+                Torpedo *t = (Torpedo*) entities[0];
+
+                t->goTo(b->getPos());
+                t->enableAuto();
+            }
+    }
+
+
+
+
+    if (timer == 3000)
+    {
+        Vehicle *t = findWalrus(GREEN_FACTION);
+
+        if (!t)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Walrus still around.\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+void test75()
+{
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0,-1.0,0);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       20.0f,      -20.0f,  0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+
+    Bomb *t = new Bomb(GREEN_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(0.0,1000.0f,0.0f);
+    t->stop();
+
+    entities.push_back(t, t->getGeom());
+
+}
+
+void checktest75(unsigned long timer)
+{
+
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Testing bombs.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+
+    if (timer == 30000)
+    {
+        Vehicle *t = findWalrus(GREEN_FACTION);
+
+        if (!t)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Walrus still around.\n");
             endWorldModelling();
             exit(1);
         }
@@ -7094,6 +7254,8 @@ void initWorldModelling(int testcase)
     case 71:test71();break;                         // Manta landing on a moving carrier.
     case 72:test72();break;                         // Testing explosions with ODE.
     case 73:test73();break;                         // Introducing Torpedos.
+    case 74:test74();break;                         // Torpedos chasing Walruses.
+    case 75:test75();break;
     default:initIslands();test1();break;
     }
 
@@ -7185,6 +7347,8 @@ void worldStep(int value)
     case 71:checktest71(timer);break;
     case 72:checktest72(timer);break;
     case 73:checktest73(timer);break;
+    case 74:checktest74(timer);break;
+    case 75:checktest75(timer);break;
 
     default: break;
     }
