@@ -48,6 +48,9 @@ public:
 
 
     Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
+    Vehicle* fireAmmo(dWorldID world, dSpaceID space);
+    Vehicle* fireBomb(dWorldID world, dSpaceID space);
+    Vehicle* fireMissile(dWorldID world, dSpaceID space);
     void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);
     void rotateBody(dBodyID);
 

@@ -4,6 +4,7 @@
 #include "../profiling.h"
 #include "../control.h"
 #include "../actions/Gunshot.h"
+#include "../actions/Bomb.h"
 #include "../math/yamathutil.h"
 #include "../messages.h"
 
@@ -1356,6 +1357,58 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
 
 Vehicle* SimplifiedDynamicManta::fire(int weapon, dWorldID world, dSpaceID space)
+{
+
+    switch (weapon) {
+        case 0:default:return fireAmmo(world,space);
+            break;
+        case 1:return fireMissile(world, space);
+            break;
+        case 2:return fireBomb(world,space);
+            break;
+
+    }
+
+}
+
+Vehicle* SimplifiedDynamicManta::fireMissile(dWorldID world, dSpaceID space)
+{
+    return fireAmmo(world, space);
+}
+Vehicle* SimplifiedDynamicManta::fireBomb(dWorldID world, dSpaceID space)
+{
+    Bomb *action = new Bomb(GREEN_FACTION);
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] -= 20;
+
+    action->embody(world, space);
+    action->setPos(position[0], position[1], position[2]);
+
+    forward = getForward();
+    forward = forward.normalize();
+
+    Vec3f f1(0.0,0.0,1.0);
+    Vec3f f2 = forward.cross(f1);
+    f2 = f2.normalize();
+    float alpha = _acos( forward.dot(f1)/(f1.magnitude()*forward.magnitude()));
+
+    dMatrix3 Re;
+    dRSetIdentity(Re);
+    dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
+
+    Vec3f v = dBodyGetLinearVelVec(me);
+
+    dBodySetLinearVel(action->getBodyID(),v[0],v[1],v[2]);
+    dBodySetRotation(action->getBodyID(),Re);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+
+}
+Vehicle* SimplifiedDynamicManta::fireAmmo(dWorldID world, dSpaceID space)
 {
     Gunshot *action = new Gunshot();
     // Need axis conversion.

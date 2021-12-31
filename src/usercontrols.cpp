@@ -672,7 +672,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (action != NULL)
                         {
                             size_t i = entities.push_back(action, action->getGeom());
-                            gunshot();
+                            if (controller.weapon == 0) gunshot();
 
                             if (action->getType()==CONTROLABLEACTION)
                             {
