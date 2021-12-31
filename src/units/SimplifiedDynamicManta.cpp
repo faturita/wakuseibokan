@@ -121,7 +121,7 @@ void SimplifiedDynamicManta::doControlDogFight()
             // Open fire copiously
             if (getTtl() % 5 == 0)
             {
-                Vehicle *action = fire(world,space);
+                Vehicle *action = fire(0,world,space);
 
                 if (action != NULL)
                 {
@@ -176,7 +176,7 @@ void SimplifiedDynamicManta::doControlAttack()
 
             if (getTtl() % 23 == 0)
             {
-                Vehicle *action = fire(world,space);
+                Vehicle *action = fire(0,world,space);
 
                 if (action != NULL)
                 {
@@ -1355,7 +1355,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 **/
 
 
-Vehicle* SimplifiedDynamicManta::fire(dWorldID world, dSpaceID space)
+Vehicle* SimplifiedDynamicManta::fire(int weapon, dWorldID world, dSpaceID space)
 {
     Gunshot *action = new Gunshot();
     // Need axis conversion.

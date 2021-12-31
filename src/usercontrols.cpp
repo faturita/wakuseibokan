@@ -665,7 +665,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                     {
-                        Vehicle *action = (entities[controller.controllingid])->fire(world,space);
+                        Vehicle *action = (entities[controller.controllingid])->fire(controller.weapon, world,space);
                         //int *idx = new int();
                         //*idx = vehicles.push_back(action);
                         //dBodySetData( action->getBodyID(), (void*)idx);

@@ -362,7 +362,7 @@ void AdvancedWalrus::doControlAttack()
         c.pitch = declination;
         setControlRegisters(c);
 
-        Vehicle *action = fire(world,space);
+        Vehicle *action = fire(0,world,space);
 
         if (action != NULL)
         {
@@ -413,7 +413,7 @@ void  AdvancedWalrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward
     viewforward = orig-position;
 }
 
-Vehicle* AdvancedWalrus::fire(dWorldID world, dSpaceID space)
+Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
 {
     if (getTtl()>0)
         return NULL;

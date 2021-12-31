@@ -422,7 +422,7 @@ float Vehicle::getBearing()
     return val;
 }
 
-Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
+Vehicle* Vehicle::fire(int weapon, dWorldID world, dSpaceID space)
 {
     assert(0 || !"This should not be executed.");
 }

@@ -47,7 +47,7 @@ public:
     void virtual enableAuto();
 
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
     void flyingCoefficients(float &Cd, float &CL, float &Cm, float &Cl, float &Cy, float &Cn);
     void rotateBody(dBodyID);
 

@@ -65,13 +65,16 @@ protected:
 
     std::queue<Vec3f> waypoints;
 
+    // Signal determines if the vehicle can be remotely controlled despite of not being close the carrier or a friendly island.
     int signal=3;
 
     // State Machine for handling destinations.
     DestinationStatus dst_status;
     
+    // ODE objects
     dBodyID me=NULL;
     dGeomID geom=NULL;
+    dSpaceID body_space = NULL;
 
     struct controlregister registers;
 
@@ -85,16 +88,17 @@ protected:
 
     void setFaction(int newfaction);
 
-    dSpaceID body_space = NULL;
 
+    // Vehicle name and number
     std::string name;
-
     int number;
 
+    // Bounding box dimensions.
     float height;
     float width;
     float length;
 
+    // Location of the vehicle on the screen coordinates.
     Vec3f onScreen;
     
 public:
@@ -181,7 +185,7 @@ public:
     void setAttitude(Vec3f attit);
     Vec3f getAttitude();
 
-    virtual Vehicle* fire(dWorldID world, dSpaceID space);
+    virtual Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
     virtual int getTtl();
     virtual void tick();

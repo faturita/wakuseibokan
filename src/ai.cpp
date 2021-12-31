@@ -282,7 +282,7 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
         {
             dout << "FIRE!" << std::endl;
 
-            Missile *a = (Missile*) b->fire(world, space);
+            Missile *a = (Missile*) b->fire(0,world, space);
 
             size_t i = CONTROLLING_NONE;
             if (a)

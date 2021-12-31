@@ -124,7 +124,7 @@ void Turret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 
 
 
-Vehicle* Turret::fire(dWorldID world, dSpaceID space)
+Vehicle* Turret::fire(int weapon, dWorldID world, dSpaceID space)
 {
     if (getTtl()>0)
         return NULL;

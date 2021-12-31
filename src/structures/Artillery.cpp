@@ -111,7 +111,7 @@ void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 
 
 
-Vehicle* Artillery::fire(dWorldID world, dSpaceID space)
+Vehicle* Artillery::fire(int weapon, dWorldID world, dSpaceID space)
 {
     if (getTtl()>0)
         return NULL;

@@ -1266,7 +1266,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-                            Vehicle *action = (lb)->fire(world,space);
+                            Vehicle *action = (lb)->fire(0,world,space);
 
                             if (action != NULL)
                             {
@@ -1293,7 +1293,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         lb->setForward((b->getPos())-(firingloc));
 
-                        Vehicle *action = (lb)->fire(world,space);
+                        Vehicle *action = (lb)->fire(0,world,space);
 
                         if (action != NULL)
                         {
@@ -1319,7 +1319,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         lb->setForward((b->getPos())-(firingloc));
 
-                        Vehicle *action = (lb)->fire(world,space);
+                        Vehicle *action = (lb)->fire(0,world,space);
 
                         if (action != NULL)
                         {
@@ -1361,7 +1361,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         } else {
                             lb->water();
                         }
-                        Gunshot* action = (Gunshot*)(lb)->fire(world,space);
+                        Gunshot* action = (Gunshot*)(lb)->fire(0,world,space);
 
                         // @FIXME: AAM missiles guiding sucks.
 

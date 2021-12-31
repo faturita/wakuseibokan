@@ -230,7 +230,7 @@ void Walrus::doControlAttack()
 
         c.registers.thrust = 2.0;
 
-        Vehicle *action = fire(world,space);
+        Vehicle *action = fire(0,world,space);
 
         if (action != NULL)
         {
@@ -530,7 +530,7 @@ void Walrus::doDynamics(dBodyID body)
 }
 
 
-Vehicle* Walrus::fire(dWorldID world, dSpaceID space)
+Vehicle* Walrus::fire(int weapon, dWorldID world, dSpaceID space)
 {
     if (getTtl()>0)
         return NULL;

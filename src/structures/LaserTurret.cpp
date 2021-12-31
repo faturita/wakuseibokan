@@ -52,7 +52,7 @@ void LaserTurret::setForward(Vec3f forw)
     if (LaserTurret::ls) locateLaserRay(LaserTurret::ls);
 }
 
-Vehicle* LaserTurret::fire(dWorldID world, dSpaceID space)
+Vehicle* LaserTurret::fire(int weapon, dWorldID world, dSpaceID space)
 {
     LaserRay *action=NULL;
 

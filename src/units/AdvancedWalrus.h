@@ -41,7 +41,7 @@ public:
     void setAim(Vec3f aim);
     Vec3f getAim();
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
 
     void doAmphibious(dBodyID body);

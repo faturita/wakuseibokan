@@ -370,7 +370,7 @@ void Cephalopod::doDynamics(dBodyID body)
 
 
 
-Vehicle* Cephalopod::fire(dWorldID world, dSpaceID space)
+Vehicle* Cephalopod::fire(int weapon, dWorldID world, dSpaceID space)
 {
     Gunshot *action = new Gunshot();
     // Need axis conversion.
@@ -545,7 +545,7 @@ void Cephalopod::doControlAttack()
             if (getTtl() % 23 == 0)
             {
 
-                Vehicle *action = fire(world,space);
+                Vehicle *action = fire(0,world,space);
 
                 if (action != NULL)
                 {
