@@ -68,6 +68,7 @@
 
 #include "map.h"
 #include "board.h"
+#include "hud.h"
 
 #include "ai.h"
 
@@ -117,74 +118,6 @@ void disclaimer()
 }
 
 
-void drawOverlyMark(int uc, int lc, int w, int h)
-{
-    glLineWidth(2.5);
-
-    glBegin(GL_LINES);
-    glVertex3f(uc,    lc-h, 0);
-    glVertex3f(uc,   lc, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc,     lc, 0);
-    glVertex3f(uc+w,   lc, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc, lc-100+h, 0);
-    glVertex3f(uc, lc-100, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc, lc-100,0);
-    glVertex3f(uc+w, lc-100, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+100-w, lc, 0);
-    glVertex3f(uc+100, lc, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+100, lc ,0);
-    glVertex3f(uc+100, lc-h, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+100, lc-100+h, 0);
-    glVertex3f(uc+100,lc-100,0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+100, lc-100, 0);
-    glVertex3f(uc+100-w, lc-100, 0);
-    glEnd();
-}
-
-void drawCross(int uc, int cc)
-{
-    glBegin(GL_LINES);
-    glVertex3f(uc-10, cc + 0, 0.0);
-    glVertex3f(uc-2, cc + 0, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+0+2, cc + 0, 0.0);
-    glVertex3f(uc+0+10, cc + 0, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+0, cc + 0-10, 0.0);
-    glVertex3f(uc+0, cc + 0-2, 0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(uc+0, cc + 0+10, 0.0);
-    glVertex3f(uc+0, cc + 0+2, 0);
-    glEnd();
-}
-
 
 /**
  * Draw the Head Up Display 
@@ -198,7 +131,7 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-    glOrtho(0, 1200, 800, 0, -1, 1);
+    glOrtho(0, 1200, 800, 0, -1, 1);            // @NOTE: This is the size of the HUD screen, it goes from x=[0,1200] , y=[-400,400]
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -209,7 +142,7 @@ void drawHUD()
 	glRotatef(180.0f,0,0,1);
 	glRotatef(180.0f,0,1,0);
 
-    int aimc=50,crossc=0;
+    int aimc=0,crossc=0;
     
     char str[256];
 
@@ -245,7 +178,7 @@ void drawHUD()
         }
         else if (entities[controller.controllingid]->getType() == MANTA)
         {
-            aimc = 240;
+            aimc = 190;
             crossc = 195;
         }
 
@@ -349,7 +282,7 @@ void drawHUD()
         
         glLineWidth(2.5);
 
-        int uc=550;                     // Horizontal center, screen is 1100 pixels.
+        int uc=600;                     // Horizontal center, screen is 1100 pixels.
         int lc=0+aimc;                   // Center is at 50.
         int w=40;
         int h=40;
@@ -359,6 +292,7 @@ void drawHUD()
         // Center cross
         int cc = crossc;
 
+        /**
         glBegin(GL_LINES);
         glVertex3f(uc+50+Camera.xAngle-10, cc + Camera.yAngle, 0.0);
         glVertex3f(uc+50+Camera.xAngle-2, cc + Camera.yAngle, 0);
@@ -377,7 +311,9 @@ void drawHUD()
         glBegin(GL_LINES);
         glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+10, 0.0);
         glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+2, 0);
-        glEnd();
+        glEnd();**/
+
+        drawCross(uc + Camera.xAngle,lc + Camera.yAngle);
 
         // Bearing arrow
 
@@ -428,16 +364,16 @@ void drawHUD()
         {
             Vehicle *me = entities[controller.controllingid];
             Vec3f meLoc = me->getPos();
-            int friendlyfaction = GREEN_FACTION;
+            int friendlyfaction = me->getFaction();
 
-            int nearesti = -1;
             float closest = 10000.0f;
             float proj = 40.0f;
+
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 Vehicle *v=entities[i];
 
-                if (v && (v->getType() == WEAPON || v->getType() == EXPLOTABLEACTION || v->getType() == CONTROLABLEACTION )
+                if (v && (v->getType() == CONTROLABLEACTION )
                         && v->getFaction()!=friendlyfaction)
                 {
                     Vec3f enemy = v->getPos() - meLoc;enemy[1]=0;
@@ -482,16 +418,17 @@ void drawHUD()
 
                         Vec3f sc = v->screenLocation();
 
-                        dout << sc[0] << "," << sc[2] << std::endl;
+                        //dout << sc[0] << "," << sc[2] << " at " << sc[1] << std::endl;
 
-                        if ((sc[1]>0 && sc[0]>0 && sc[0]<1440) &&
-                            (sc[1]>0 && sc[2]>0 && sc[2]<900) )
+
+                        if ((sc[1]<1 && sc[0]>0 && sc[0]<screen_width) &&
+                            (sc[1]<1 && sc[2]>0 && sc[2]<screen_height) )
                         {
 
                             //drawOverlyMark(550,-300, 10,10);
 
-                            float x = 1200.0/1440.0 * sc[0];
-                            float y = 800.0/900.0 * sc[2] - 400.0;
+                            float x = 1200.0/screen_width * sc[0];
+                            float y = 800.0/screen_height * sc[2] - 400.0;
                             //drawOverlyMark(x,y, 10,10);
                             drawCross(x,y);
                         }
@@ -592,14 +529,6 @@ void drawScene() {
     }
 
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
-
-    //draw3DSModel("units/walrus.3ds",0,100,0,3,0);
-
-    //float winX=0;
-    //float winY=0;
-
-    //getScreenLocation(winX, winY, 0,100,0);
-    //dout << winX << "," << winY << std::endl;
 
     // Movable units, and the camera, carry the living energy.
     // Get a list of points in 3D space where there are movable units and the camera.

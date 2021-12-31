@@ -291,14 +291,17 @@ int BallisticAttack::apply(int state, int faction, unsigned long &timeevent, uns
 
                 CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
-                a->goTo(c->getPos());
-                a->enableAuto();
-
-                if (a->getType()==CONTROLABLEACTION)
+                if (c)
                 {
-                    // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
-                    switchControl(i);
+                    a->goTo(c->getPos());
+                    a->enableAuto();
 
+                    if (a->getType()==CONTROLABLEACTION)
+                    {
+                        // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
+                        switchControl(i);
+
+                    }
                 }
             }
 

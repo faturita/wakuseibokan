@@ -49,6 +49,8 @@ src/engine.cpp
 src/engine.h
 src/font/DrawFonts.cpp
 src/font/DrawFonts.h
+src/hud.cpp
+src/hud.h
 src/imageloader.cpp
 src/imageloader.h
 src/keplerivworld.cpp
