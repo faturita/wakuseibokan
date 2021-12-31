@@ -7,6 +7,15 @@
 
 #include "BoxVehicle.h"
 
+BoxVehicle::BoxVehicle()
+{
+
+}
+
+BoxVehicle::BoxVehicle(int faction )
+{
+    setFaction(faction);
+}
 
 void BoxVehicle::init()
 {

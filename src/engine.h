@@ -204,5 +204,6 @@ void wipeEnemyStructures(BoxIsland *island, int faction);
 
 void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
+bool structurecollisions(Structure *s, Vehicle *vehicle);
 
 #endif // ENGINE_H

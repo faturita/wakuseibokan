@@ -826,3 +826,22 @@ Vec3f Vehicle::getDimensions()
 {
     return Vec3f(width, height, length);
 }
+
+void Vehicle::updateScreenLocation()
+{
+    float winX=0;
+    float winY=0;
+    float winZ=0;
+
+    getScreenLocation(winX, winY, winZ, getPos()[0], getPos()[1], getPos()[2]);
+    //dout << winX << "," << winY << std::endl;
+
+    onScreen[0] = winX;
+    onScreen[1] = winZ; // @NOTE: Checkout here (they are rearranged)
+    onScreen[2] = winY;
+}
+
+Vec3f Vehicle::screenLocation()
+{
+    return onScreen;
+}

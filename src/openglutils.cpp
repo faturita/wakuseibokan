@@ -11,6 +11,12 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#elif __linux
+#include <GL/glut.h>
+#endif
+
 #include "profiling.h"
 #include "math/yamathutil.h"
 
@@ -1001,6 +1007,42 @@ float getFPS()
 	}
     
     return fps;
+}
+
+void getScreenLocation(float &screenX, float &screenY, float &screenZ, float xx, float yy, float zz)
+{
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble viewVector[3];
+    GLdouble projection[16];
+
+    GLdouble winX, winY, winZ;//2D point
+
+    GLdouble posX, posY, posZ;//3D point
+    posX=xx;
+    posY=yy;
+    posZ=zz;
+
+    //get the matrices
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+
+    viewVector[0]=modelview[8];
+    viewVector[1]=modelview[9];
+    viewVector[2]=modelview[10];
+
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+    int res=gluProject(posX,posY,posZ,modelview,projection,viewport,&winX,&winY,&winZ);
+
+    //if(viewVector[0]*posX+viewVector[1]*posY+viewVector[2]*posZ<0){
+            //dout << winX << "," << winY << std::endl;
+    //}
+
+    screenX = winX;
+    screenY = winY;
+    screenZ = winZ;
+
 }
 
 

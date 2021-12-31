@@ -51,4 +51,6 @@ void initTextures();
 
 float getFPS();
 
+void getScreenLocation(float &winX, float &winY, float &winZ, float xx, float zz, float yy);
+
 #endif /* OPENGLUTILS_H_ */

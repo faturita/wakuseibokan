@@ -7136,6 +7136,85 @@ void checktest75(unsigned long timer)
     }
 }
 
+void test76()
+{
+    BoxVehicle * ao= new BoxVehicle(BLUE_FACTION);
+    ao->init();
+    ao->embody(world, space);
+    ao->setPos(0,100,0);
+    ao->setSignal(4);
+    ao->stop();
+
+    entities.push_back(ao, ao->getGeom());
+
+}
+
+void checktest76(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Testing radar HUD.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+}
+
+
+void test77()
+{
+    BoxVehicle * ao= new BoxVehicle(BLUE_FACTION);
+    ao->init();
+    ao->embody(world, space);
+    ao->setPos(0,100,0);
+    ao->setSignal(4);
+    ao->stop();
+
+    entities.push_back(ao, ao->getGeom());
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+}
+
+void checktest77(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Testing radar hud with enemy units.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -7257,6 +7336,8 @@ void initWorldModelling(int testcase)
     case 73:test73();break;                         // Introducing Torpedos.
     case 74:test74();break;                         // Torpedos chasing Walruses.
     case 75:test75();break;
+    case 76:test76();break;                         // Testing Radar HUD
+    case 77:test77();break;                         // Testing Radar HUD with enemy units
     default:initIslands();test1();break;
     }
 
@@ -7350,7 +7431,8 @@ void worldStep(int value)
     case 73:checktest73(timer);break;
     case 74:checktest74(timer);break;
     case 75:checktest75(timer);break;
-
+    case 76:checktest76(timer);break;
+    case 77:checktest77(timer);break;
     default: break;
     }
 

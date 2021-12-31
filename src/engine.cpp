@@ -510,17 +510,35 @@ bool  groundcollisions(Vehicle *vehicle)
     {
         if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
         {
-            //explosion();
             AdvancedManta *s = (AdvancedManta*)vehicle;
             struct controlregister c;
             c.thrust = 0.0f;
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->damage(1);
+            s->damage(10);
         }
     }
     return true;
+}
+
+bool structurecollisions(Structure *s, Vehicle *vehicle)
+{
+    if (vehicle)
+    {
+        if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
+        {
+            AdvancedManta *m = (AdvancedManta*)vehicle;
+            struct controlregister c;
+            c.thrust = 0.0f;
+            c.pitch = 0.0f;
+            m->setControlRegisters(c);
+            m->setThrottle(0.0f);
+            m->damage(10000);
+
+            // @NOTE: The structure is naturally damaged when the unit explodes (and debris fly around).
+        }
+    }
 }
 
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)

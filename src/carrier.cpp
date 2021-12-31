@@ -42,8 +42,6 @@
 #include "usercontrols.h"
 #include "camera.h"
 
-#include "openglutils.h"
-
 #include "sounds/sounds.h"
 
 #include "keplerivworld.h"
@@ -118,6 +116,76 @@ void disclaimer()
     printf ("Warfare on the seas of Kepler IV\n");
 }
 
+
+void drawOverlyMark(int uc, int lc, int w, int h)
+{
+    glLineWidth(2.5);
+
+    glBegin(GL_LINES);
+    glVertex3f(uc,    lc-h, 0);
+    glVertex3f(uc,   lc, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc,     lc, 0);
+    glVertex3f(uc+w,   lc, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc, lc-100+h, 0);
+    glVertex3f(uc, lc-100, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc, lc-100,0);
+    glVertex3f(uc+w, lc-100, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+100-w, lc, 0);
+    glVertex3f(uc+100, lc, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+100, lc ,0);
+    glVertex3f(uc+100, lc-h, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+100, lc-100+h, 0);
+    glVertex3f(uc+100,lc-100,0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+100, lc-100, 0);
+    glVertex3f(uc+100-w, lc-100, 0);
+    glEnd();
+}
+
+void drawCross(int uc, int cc)
+{
+    glBegin(GL_LINES);
+    glVertex3f(uc-10, cc + 0, 0.0);
+    glVertex3f(uc-2, cc + 0, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+0+2, cc + 0, 0.0);
+    glVertex3f(uc+0+10, cc + 0, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+0, cc + 0-10, 0.0);
+    glVertex3f(uc+0, cc + 0-2, 0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glVertex3f(uc+0, cc + 0+10, 0.0);
+    glVertex3f(uc+0, cc + 0+2, 0);
+    glEnd();
+}
+
+
 /**
  * Draw the Head Up Display 
  *
@@ -145,7 +213,7 @@ void drawHUD()
     
     char str[256];
 
-    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There is a numberical error somewhere.");
+    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There are numerical error somewhere.");
     
     fps = getFPS();
     
@@ -286,47 +354,7 @@ void drawHUD()
         int w=40;
         int h=40;
 
-
-        glBegin(GL_LINES);
-        glVertex3f(uc,    lc-h, 0);
-        glVertex3f(uc,   lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc,     lc, 0);
-        glVertex3f(uc+w,   lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc, lc-100+h, 0);
-        glVertex3f(uc, lc-100, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc, lc-100,0);
-        glVertex3f(uc+w, lc-100, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100-w, lc, 0);
-        glVertex3f(uc+100, lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc ,0);
-        glVertex3f(uc+100, lc-h, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc-100+h, 0);
-        glVertex3f(uc+100,lc-100,0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc-100, 0);
-        glVertex3f(uc+100-w, lc-100, 0);
-        glEnd();
-
+        drawOverlyMark(uc,lc,w,h);
 
         // Center cross
         int cc = crossc;
@@ -382,7 +410,95 @@ void drawHUD()
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
 
+        /**
+        Vec3f enemy(5000.0, 0.0f, 5000.0f);
+
+        Vec3f l = Vec3f(30*(enemy[0]/10000.0f),0.0,30*(enemy[2]/10000.0f) );
+
+        glLineWidth(4.5);
+        glBegin(GL_LINES);
+        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+        glEnd();
+        **/
+
         // Nearby units. @NOTE DO IT
+
+        if (controller.controllingid != CONTROLLING_NONE)
+        {
+            Vehicle *me = entities[controller.controllingid];
+            Vec3f meLoc = me->getPos();
+            int friendlyfaction = GREEN_FACTION;
+
+            int nearesti = -1;
+            float closest = 10000.0f;
+            float proj = 40.0f;
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+            {
+                Vehicle *v=entities[i];
+
+                if (v && (v->getType() == WEAPON || v->getType() == EXPLOTABLEACTION || v->getType() == CONTROLABLEACTION )
+                        && v->getFaction()!=friendlyfaction)
+                {
+                    Vec3f enemy = v->getPos() - meLoc;enemy[1]=0;
+                    if ((enemy).magnitude()<closest) {
+
+
+                        Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
+
+                        static int coun=0;
+                        if (int((enemy).magnitude()) <= coun++ )
+                        {
+                            radarbeep();
+                            coun=0;
+                        }
+
+                        glPointSize(4.5);
+                        glColor3f(1.0,0.0,0.0);
+                        glBegin(GL_LINES);
+                        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+                        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+                        glEnd();
+                    }
+                }
+                if (v &&
+                        ( (v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY))
+                        && v->getFaction()!=friendlyfaction)   // Fix this.
+                {
+                    Vec3f enemy = v->getPos() - meLoc;
+                    if ((enemy).magnitude()<closest) {
+
+                        Vec3f enemy = entities[i]->getPos() - meLoc;
+
+                        Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
+
+                        glPointSize(4.5);
+                        glColor3f(1.0,0.0,1.0);
+                        glBegin(GL_LINES);
+                        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+                        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+                        glEnd();
+
+
+                        Vec3f sc = v->screenLocation();
+
+                        dout << sc[0] << "," << sc[2] << std::endl;
+
+                        if ((sc[1]>0 && sc[0]>0 && sc[0]<1440) &&
+                            (sc[1]>0 && sc[2]>0 && sc[2]<900) )
+                        {
+
+                            //drawOverlyMark(550,-300, 10,10);
+
+                            float x = 1200.0/1440.0 * sc[0];
+                            float y = 800.0/900.0 * sc[2] - 400.0;
+                            //drawOverlyMark(x,y, 10,10);
+                            drawCross(x,y);
+                        }
+                    }
+                }
+            }
+        }
 
         
     } glPopMatrix();
@@ -393,7 +509,6 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 }
-
 
 
 void drawScene() {
@@ -478,6 +593,13 @@ void drawScene() {
 
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
 
+    //draw3DSModel("units/walrus.3ds",0,100,0,3,0);
+
+    //float winX=0;
+    //float winY=0;
+
+    //getScreenLocation(winX, winY, 0,100,0);
+    //dout << winX << "," << winY << std::endl;
 
     // Movable units, and the camera, carry the living energy.
     // Get a list of points in 3D space where there are movable units and the camera.
@@ -508,6 +630,8 @@ void drawScene() {
                 glPushAttrib(GL_CURRENT_BIT);
                 (entities[i]->drawModel());
                 glPopAttrib();
+
+                entities[i]->updateScreenLocation();
 
                 if ((entities[i]->getBodyID()))
                     dBodyEnable(entities[i]->getBodyID());
