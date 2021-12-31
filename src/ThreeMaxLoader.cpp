@@ -510,9 +510,9 @@ void calculateCenterOfMass(obj_type &object)
             max[2]=object.vertex[ object.polygon[l_index].c ].z;
     }
 
-    CLog::Write(CLog::Debug,"Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
+    //CLog::Write(CLog::Debug,"Dimensions: %10.5f\t%10.5f\t%10.5f\n",(max[0]-min[0]),(max[1]-min[1]),(max[2]-min[2]));
 
-    CLog::Write(CLog::Debug,"Geometrical offset: %10.5f\t%10.5f\t%10.5f\n",(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2);
+    //CLog::Write(CLog::Debug,"Geometrical offset: %10.5f\t%10.5f\t%10.5f\n",(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2);
 }
 
 int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint _texture)

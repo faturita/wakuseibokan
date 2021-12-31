@@ -107,6 +107,8 @@ clock_t elapsedtime;
 bool wincondition=false;
 
 bool mute=false;
+bool cull=false;
+bool wireframes=false;
 
 int sockfd;
 struct sockaddr_in servaddr;
@@ -425,8 +427,6 @@ void drawHUD()
                             (sc[1]<1 && sc[2]>0 && sc[2]<screen_height) )
                         {
 
-                            //drawOverlyMark(550,-300, 10,10);
-
                             float x = 1200.0/screen_width * sc[0];
                             float y = 800.0/screen_height * sc[2] - 400.0;
                             //drawOverlyMark(x,y, 10,10);
@@ -523,7 +523,7 @@ void drawScene() {
     glPopAttrib();
 
 
-    // Draw islands.
+    // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
     for (int i=0; i<islands.size(); i++) {
         (islands[i]->draw());
     }
@@ -587,7 +587,7 @@ void drawScene() {
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
-    if (Camera.pos[1]<0) // Dark under the water.
+    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developer: I want submarines !)
         glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD
@@ -622,15 +622,15 @@ void initRendering() {
     
     
     // Enable wireframes
-    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    if (wireframes) glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
     
     glShadeModel(GL_SMOOTH); // Type of shading for the polygons
     
     glEnable(GL_COLOR_MATERIAL);
     
-        // Do not show the interior faces....
-        //glEnable(GL_CULL_FACE);
+    // Do not show the interior faces.... (FASTER but uglier.  The sky will dissapear).
+    if (cull) glEnable(GL_CULL_FACE);
     
 	// Blue sky !!!
     //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
@@ -863,6 +863,16 @@ int main(int argc, char** argv) {
         mute = true;
     else
         mute = false;
+
+    if (isPresentCommandLineParameter(argc,argv,"-wire"))
+        wireframes = true;
+    else
+        wireframes = false;
+
+    if (isPresentCommandLineParameter(argc,argv,"-cull"))
+        cull = true;
+    else
+        cull = false;
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)

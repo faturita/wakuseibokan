@@ -83,6 +83,8 @@ public:
     };
 
     int faction;
+
+    int weapon;
 };
 
 

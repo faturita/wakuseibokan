@@ -428,6 +428,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 taxiManta(entities[controller.controllingid]);
             }
             else
+            if (controller.str.find("weapon")!= std::string::npos)
+            {
+                const char *content = controller.str.substr(6).c_str();
+
+                controller.weapon = atoi(content);
+            } else
             if (controller.str.find("telemetry") != std::string::npos)
             {
                 if (controller.str.find("on") != std::string::npos)
