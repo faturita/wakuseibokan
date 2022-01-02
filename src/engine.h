@@ -149,6 +149,7 @@ void  groundcollisions(dGeomID body);
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number);
+Manta* findMantaBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number);
 Manta* findManta(int faction);
 Manta* findManta(int faction, int status);
 Manta* findManta(int faction, int status, Vec3f around);

@@ -621,6 +621,22 @@ Walrus* findWalrusByFactionAndNumber(size_t &index, int faction, int number)
     return NULL;
 }
 
+Manta* findMantaBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getFaction() == faction && v->getSubType() == subtype)
+        {
+            if (number == v->getNumber())
+            {
+                index = i;
+                return (Manta*)v;
+            }
+        }
+    }
+    return NULL;
+}
 
 Manta* findMantaByFactionAndNumber(size_t &index, int faction, int number)
 {
@@ -1126,6 +1142,9 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         }
                         entities[i]->setSignal(2);
                         entities[i]->damage(1);
+                    } else {
+                        // This means that now the unit is again close to the island's antenna so we should put the connection back.
+                        entities[i]->setSignal(3);
                     }
 
                 }

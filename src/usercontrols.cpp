@@ -345,12 +345,34 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(index);
 
             } else
+            if (controller.str.find("cephalopod") != std::string::npos)
+            {
+                const char *content = controller.str.substr(10).c_str();
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CEPHALOPOD,controller.faction, atoi(content));
+
+                printf ("Manta %d\n", index);
+
+                switchControl(index);
+            } else
+            if (controller.str.find("medusa") != std::string::npos)
+            {
+                const char *content = controller.str.substr(6).c_str();
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, atoi(content));
+
+                printf ("Manta %d\n", index);
+
+                switchControl(index);
+            } else
             if (controller.str.find("manta") != std::string::npos)
             {
                 const char *content = controller.str.substr(5).c_str();
 
                 size_t index = CONTROLLING_NONE;
-                findMantaByFactionAndNumber(index, controller.faction, atoi(content));
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, atoi(content));
 
                 printf ("Manta %d\n", index);
 
