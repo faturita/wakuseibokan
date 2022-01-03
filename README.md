@@ -172,3 +172,4 @@ References
 * Rust programming language https://doc.rust-lang.org/book/ch00-00-introduction.html
 * Vulkan Tutorial https://kylemayes.github.io/vulkanalia/introduction.html
 * https://github.com/avikola/fire-and-smoke
+* https://community.khronos.org/t/efficient-smoke/67120/6
