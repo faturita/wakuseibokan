@@ -25,6 +25,11 @@ AAM::~AAM()
     assert(0 || !"Destroying bullets from the Gunshot object. This should not happen now.");
 }
 
+void AAM::clean()
+{
+    smoke.clean();
+}
+
 void AAM::init()
 {
     // -130.46696	 180.85544	   5.74906
@@ -72,6 +77,8 @@ void AAM::drawModel(float yRot, float xRot, float x, float y, float z)
         _model->draw();
 
         glPopMatrix();
+
+        smoke.drawModel(getPos(),getForward());
     }
     //else
     //{

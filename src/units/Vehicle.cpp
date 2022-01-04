@@ -845,3 +845,24 @@ Vec3f Vehicle::screenLocation()
 {
     return onScreen;
 }
+
+void Vehicle::setTheOrientation(Vec3f orientation)
+{
+    dMatrix3 R1,R2;
+    dRSetIdentity(R1);
+    dRSetIdentity(R2);
+
+    dRFromAxisAndAngle(R1,0,1,0,getAzimuthRadians(orientation));
+
+    dRFromAxisAndAngle(R2,1,0,0,getDeclination(orientation)*PI/180.0f);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R1);
+
+    dQfromR(q2,R2);
+
+    dQMultiply0(q3,q2,q1);
+
+    if (!Vehicle::inert)
+        dBodySetQuaternion(me,q3);
+}

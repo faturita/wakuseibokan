@@ -448,6 +448,8 @@ void drawHUD()
 }
 
 
+
+
 void drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -840,6 +842,7 @@ void update(int value)
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
     glutTimerFunc(20, worldStep, 0);
+
 }
 
 

@@ -17,6 +17,8 @@
 #include <GLUT/glut.h>
 #endif
 
+#include <vector>
+#include "math/vec3f.h"
 #include "imageloader.h"
 
 void CheckGLError();
@@ -52,5 +54,31 @@ void initTextures();
 float getFPS();
 
 void getScreenLocation(float &winX, float &winY, float &winZ, float xx, float zz, float yy);
+
+void Draw_Texture(double x, double y, double z, double width, double height, double Angle, GLuint texture);
+
+
+class SmokeParticle
+{
+private:
+    double x,y,z,alpha,size,speed,direction, rotation;
+public:
+    void Move();
+    void Draw();
+    void drawModel(float x, float y, float z, float width, float height, float angle, GLuint texture);
+    SmokeParticle();
+    Vec3f pos;
+    Vec3f axis;
+    float getAlpha();
+};
+
+class Smoke
+{
+private:
+    std::vector<SmokeParticle> Smoke_Vector;
+public:
+    void drawModel(Vec3f pos, Vec3f axis);
+    void clean();
+};
 
 #endif /* OPENGLUTILS_H_ */

@@ -7323,6 +7323,110 @@ void checktest78(unsigned long timer)
     }
 }
 
+void test79()
+{
+    Missile *t = new Missile(GREEN_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(-5000,1000.0f,-5000);
+    t->stop();
+
+    /**
+    dMatrix3 R;
+    dRSetIdentity(R);
+    dQuaternion q;
+    dRFromAxisAndAngle(R,0,1,0,PI/2);
+    dQfromR(q,R);
+    dBodySetQuaternion(t->getBodyID(), q);
+    **/
+
+    t->setTheOrientation(Vec3f(7,8,9));
+
+    entities.push_back(t, t->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0,-1.0,0);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       20.0f,      -20.0f,  0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-8000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+
+
+}
+
+void checktest79(unsigned long timer)
+{
+    Vehicle *v = entities[0];
+    //v->antigravity(v->getBodyID());
+    //v->stop();
+
+
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC79: Visually testing smoke.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 100)
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        Vec3f pos(-5000,1000.0f,-5500);
+        Camera.setPos(pos);
+        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+    }
+
+    if (timer == 30000)
+    {
+        Vehicle *t = findWalrus(GREEN_FACTION);
+
+        if (!t)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Walrus still around.\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
 
 
 static int testing=-1;
@@ -7449,6 +7553,7 @@ void initWorldModelling(int testcase)
     case 76:test76();break;                         // Testing Radar HUD
     case 77:test77();break;                         // Testing Radar HUD with enemy units
     case 78:test78();break;                         // Testing Manta bombing an island.
+    case 79:test79();break;                         // Checking smoke coming out of a missile thruster.
     default:initIslands();test1();break;
     }
 
@@ -7545,6 +7650,7 @@ void worldStep(int value)
     case 76:checktest76(timer);break;
     case 77:checktest77(timer);break;
     case 78:checktest78(timer);break;
+    case 79:checktest79(timer);break;
     default: break;
     }
 
