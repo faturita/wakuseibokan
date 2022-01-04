@@ -19,6 +19,11 @@ Missile::~Missile()
     assert(0 || !"Destroying bullets from the Gunshot object. This should not happen now.");
 }
 
+void Missile::clean()
+{
+    smoke.clean();
+}
+
 void Missile::init()
 {
     // -130.46696	 180.85544	   5.74906
@@ -66,6 +71,8 @@ void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
         _model->draw();
 
         glPopMatrix();
+
+        smoke.drawModel(getPos(),getForward());
     }
     //else
     //{
@@ -293,6 +300,8 @@ void Missile::setVisible(bool val)
     Gunshot::visible = val;
     setTtl(50);
 }
+
+
 
 
 //draw3DSModel("units/missile.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

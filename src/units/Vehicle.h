@@ -240,6 +240,8 @@ public:
     void updateScreenLocation();
     Vec3f screenLocation();
 
+    void setTheOrientation(Vec3f orientation);
+
 };
 
 #endif /* VEHICLE_H_ */

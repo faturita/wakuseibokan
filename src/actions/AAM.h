@@ -26,10 +26,13 @@ protected:
 
     int a=0;
 
+    Smoke smoke;
+
 public:
     AAM(int faction);
     ~AAM();
     void init();
+    void clean();
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void drawModel();
     void doMaterial();

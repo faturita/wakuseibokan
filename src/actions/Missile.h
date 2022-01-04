@@ -2,6 +2,7 @@
 #define MISSILE_H
 
 #include <vector>
+#include "../openglutils.h"
 #include "Gunshot.h"
 
 
@@ -21,6 +22,8 @@ protected:
 
     bool ond;                   // Used for runonce.
 
+    Smoke smoke;
+
 public:
     Missile(int faction);
     ~Missile();
@@ -28,6 +31,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void drawModel();
     void doMaterial();
+    void clean();
 
     void doDynamics(dBodyID body);
 
