@@ -1252,7 +1252,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
         //dGeomSetRotation (ray,R);
 
         LaserTurret *l=(LaserTurret*)entities[1];
-        Vehicle *action = (l)->fire(world,space);
+        Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
         //dBodySetData( action->getBodyID(), (void*)idx);
@@ -1323,7 +1323,7 @@ void checktest12(unsigned long timer)
         //dGeomSetRotation (ray,R);
 
         LaserTurret *l=(LaserTurret*)entities[1];
-        Vehicle *action = (l)->fire(world,space);
+        Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
         //dBodySetData( action->getBodyID(), (void*)idx);
@@ -1565,7 +1565,7 @@ void checktest16(unsigned long timer)
         //dGeomSetRotation (ray,R);
 
         LaserTurret *l=(LaserTurret*)entities[1];
-        Vehicle *action = (l)->fire(world,space);
+        Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
         //dBodySetData( action->getBodyID(), (void*)idx);
@@ -1648,7 +1648,7 @@ void checktest17(unsigned long timer)
         //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
         //dGeomSetRotation (ray,R);
 
-        Vehicle *action = (l)->fire(world,space);
+        Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
         //dBodySetData( action->getBodyID(), (void*)idx);
@@ -1733,7 +1733,7 @@ void checktest18(unsigned long timer)
         //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
         //dGeomSetRotation (ray,R);
 
-        Vehicle *action = (l)->fire(world,space);
+        Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
         //dBodySetData( action->getBodyID(), (void*)idx);
@@ -1802,7 +1802,7 @@ void checktest19(unsigned long timer)
         c.pitch = 0.0;
         l1->setControlRegisters(c);
 
-        Vehicle *action = (l1)->fire(world,space);
+        Vehicle *action = (l1)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -1823,7 +1823,7 @@ void checktest19(unsigned long timer)
         l2->setControlRegisters(c);
 
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -1912,7 +1912,7 @@ void checktest20(unsigned long timer)
         c.pitch = 0.0;
         l1->setControlRegisters(c);
 
-        Vehicle *action = (l1)->fire(world,space);
+        Vehicle *action = (l1)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -1933,7 +1933,7 @@ void checktest20(unsigned long timer)
         l2->setControlRegisters(c);
 
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2082,7 +2082,7 @@ void checktest22(unsigned long timer)
         l2->setControlRegisters(c);
 
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2168,7 +2168,7 @@ void checktest23(unsigned long timer)
         std::cout << "Azimuth: " << azimuth2 << " Inclination: " << inclination2 << std::endl;
 
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2260,7 +2260,7 @@ void checktest24(unsigned long timer)
         **/
 
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2653,7 +2653,7 @@ void checktest28(unsigned long timer)
 
     if (timer == 300)
     {
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2907,7 +2907,7 @@ void checktest30(unsigned long timer)
     if (timer==600)
     {
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2919,7 +2919,7 @@ void checktest30(unsigned long timer)
     if (timer==1800)
     {
 
-        Vehicle *action = (l2)->fire(world,space);
+        Vehicle *action = (l2)->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -3290,7 +3290,7 @@ void checktest35(unsigned long timer)
 
         Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
 
-        Missile *a = (Missile*) b->fire(world, space);
+        Missile *a = (Missile*) b->fire(0,world, space);
 
         size_t i = CONTROLLING_NONE;
         if (a)
@@ -3319,7 +3319,7 @@ void checktest35(unsigned long timer)
 
         Beluga *bg = (Beluga*) findCarrier(BLUE_FACTION);
 
-        Missile *a = (Missile*) b->fire(world, space);
+        Missile *a = (Missile*) b->fire(0,world, space);
         size_t i = CONTROLLING_NONE;
         if (a)
             i = entities.push_back(a, a->getGeom());
@@ -6728,7 +6728,7 @@ void checktest70(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC70: Testing manta landing on islands");
+        sprintf(msg, "TC70: Testing manually manta landing on islands");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6880,7 +6880,7 @@ void checktest72(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC72: Checking explosions.");
+        sprintf(msg, "TC72: Visually Checking explosions.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6908,8 +6908,13 @@ void checktest72(unsigned long timer)
         entities.push_back(b1, b1->getGeom());
 
         b1->expand(10,10,10,2,world, space);
+    }
 
-
+    if (timer == 3000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
     }
 }
 
@@ -6941,7 +6946,7 @@ void checktest73(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC74: Testing torpedos chasing walruses.");
+        sprintf(msg, "TC73: Testing torpedos chasing Carrier.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -7116,9 +7121,9 @@ void checktest75(unsigned long timer)
     }
 
 
-    if (timer == 30000)
+    if (timer == 3000)
     {
-        Vehicle *t = findWalrus(GREEN_FACTION);
+        Structure *t = islands[0]->getCommandCenter();
 
         if (!t)
         {
@@ -7135,6 +7140,306 @@ void checktest75(unsigned long timer)
 
     }
 }
+
+void test76()
+{
+    BoxVehicle * ao= new BoxVehicle(BLUE_FACTION);
+    ao->init();
+    ao->embody(world, space);
+    ao->setPos(0,100,0);
+    ao->setSignal(4);
+    ao->stop();
+
+    entities.push_back(ao, ao->getGeom());
+
+}
+
+void checktest76(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC76: Playground on radar HUD. Move and check position.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+}
+
+
+void test77()
+{
+    BoxVehicle * ao= new BoxVehicle(BLUE_FACTION);
+    ao->init();
+    ao->embody(world, space);
+    ao->setPos(0,100,0);
+    ao->setSignal(4);
+    ao->stop();
+
+    entities.push_back(ao, ao->getGeom());
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+}
+
+void checktest77(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Testing radar hud with enemy units.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 200)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Switch to the carrier or the turret and verify if there is a pink cross on the target");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+}
+
+void test78()
+{
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0,-1.0,0);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       0.0f,      -0.0f,  0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-8000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+}
+
+void checktest78(unsigned long timer)
+{
+
+    static Vehicle* manta = NULL;
+    static bool bombed = false;
+    Vehicle *b = findCarrier(GREEN_FACTION);
+
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Testing Mantas bombing an island.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 500)
+    {
+        size_t idx = 0;
+        Vehicle *m = spawnManta(space,world,b,idx);
+
+        manta = m;
+    }
+
+    if (timer == 800)
+    {
+        // launch
+        launchManta(b);
+    }
+
+    if (timer == 900)
+    {
+        // @FIXME: Automatic AI bombing from Mantas should calculate the bias of the bomb based on the height where it is released, the speed of the airplane
+        // and the location of the real target.  For instance, under this configuration the offset is 360 on positive z.
+        manta->goTo(Vec3f(0,1000,360));
+        manta->enableAuto();
+    }
+
+    if (manta && manta->arrived() && !bombed)
+    {
+        Vehicle *action = manta->fire(2,world, space);
+        if (action != NULL)
+        {
+            entities.push_back(action, action->getGeom());
+            soaring();
+        }
+        bombed = true;
+    }
+
+
+    if (timer == 5000)
+    {
+        Structure *t = islands[0]->getCommandCenter();
+
+        if (!t)
+        {
+            printf("Test Passed\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test Failed.  Somehow the commandcenter survived.\n");
+            endWorldModelling();
+            exit(1);
+        }
+
+    }
+}
+
+void test79()
+{
+    Missile *t = new Missile(GREEN_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(-5000,1000.0f,-5000);
+    t->stop();
+
+    /**
+    dMatrix3 R;
+    dRSetIdentity(R);
+    dQuaternion q;
+    dRFromAxisAndAngle(R,0,1,0,PI/2);
+    dQfromR(q,R);
+    dBodySetQuaternion(t->getBodyID(), q);
+    **/
+
+    t->setTheOrientation(Vec3f(7,8,9));
+
+    entities.push_back(t, t->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0,-1.0,0);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
+
+    islands.push_back(nemesis);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       20.0f,      -20.0f,  0,world);
+    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
+
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-8000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
+
+    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+    _w1->init();
+    _w1->embody(world, space);
+    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
+    _w1->stop();
+
+    entities.push_back(_w1, _w1->getGeom());
+
+
+}
+
+void checktest79(unsigned long timer)
+{
+
+    if (timer == 50)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC79: Visually testing smoke.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 200)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC79: Check if the missile has a smoke tail");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 100)
+    {
+        controller.controllingid = CONTROLLING_NONE;
+        Vec3f pos(-5000,1000.0f,-5500);
+        Camera.setPos(pos);
+        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+    }
+
+    if (timer == 3000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+
+    }
+}
+
+
 
 static int testing=-1;
 
@@ -7256,7 +7561,11 @@ void initWorldModelling(int testcase)
     case 72:test72();break;                         // Testing explosions with ODE.
     case 73:test73();break;                         // Introducing Torpedos.
     case 74:test74();break;                         // Torpedos chasing Walruses.
-    case 75:test75();break;
+    case 75:test75();break;                         // Testing Bombs !
+    case 76:test76();break;                         // Playground Radar HUD
+    case 77:test77();break;                         // Visually Testing Radar HUD with enemy units
+    case 78:test78();break;                         // Testing Manta bombing an island.
+    case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
     default:initIslands();test1();break;
     }
 
@@ -7350,7 +7659,10 @@ void worldStep(int value)
     case 73:checktest73(timer);break;
     case 74:checktest74(timer);break;
     case 75:checktest75(timer);break;
-
+    case 76:checktest76(timer);break;
+    case 77:checktest77(timer);break;
+    case 78:checktest78(timer);break;
+    case 79:checktest79(timer);break;
     default: break;
     }
 

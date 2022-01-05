@@ -34,7 +34,7 @@ public:
     void doDynamics(dBodyID body);
 
     void doControl(controlregister regs);
-    Vehicle *fire(dWorldID world, dSpaceID space);
+    Vehicle *fire(int weapon, dWorldID world, dSpaceID space);
     void doControl();
     void hoover(float sp3);
     void doControlDestination(Vec3f target, float threshold);

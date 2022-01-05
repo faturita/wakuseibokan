@@ -345,12 +345,34 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(index);
 
             } else
+            if (controller.str.find("cephalopod") != std::string::npos)
+            {
+                const char *content = controller.str.substr(10).c_str();
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CEPHALOPOD,controller.faction, atoi(content));
+
+                printf ("Manta %d\n", index);
+
+                switchControl(index);
+            } else
+            if (controller.str.find("medusa") != std::string::npos)
+            {
+                const char *content = controller.str.substr(6).c_str();
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, atoi(content));
+
+                printf ("Manta %d\n", index);
+
+                switchControl(index);
+            } else
             if (controller.str.find("manta") != std::string::npos)
             {
                 const char *content = controller.str.substr(5).c_str();
 
                 size_t index = CONTROLLING_NONE;
-                findMantaByFactionAndNumber(index, controller.faction, atoi(content));
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, atoi(content));
 
                 printf ("Manta %d\n", index);
 
@@ -428,6 +450,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 taxiManta(entities[controller.controllingid]);
             }
             else
+            if (controller.str.find("weapon")!= std::string::npos)
+            {
+                const char *content = controller.str.substr(6).c_str();
+
+                controller.weapon = atoi(content);
+            } else
             if (controller.str.find("telemetry") != std::string::npos)
             {
                 if (controller.str.find("on") != std::string::npos)
@@ -659,14 +687,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                     {
-                        Vehicle *action = (entities[controller.controllingid])->fire(world,space);
+                        Vehicle *action = (entities[controller.controllingid])->fire(controller.weapon, world,space);
                         //int *idx = new int();
                         //*idx = vehicles.push_back(action);
                         //dBodySetData( action->getBodyID(), (void*)idx);
                         if (action != NULL)
                         {
                             size_t i = entities.push_back(action, action->getGeom());
-                            gunshot();
+                            if (controller.weapon == 0) gunshot();
 
                             if (action->getType()==CONTROLABLEACTION)
                             {

@@ -155,17 +155,17 @@ Vehicle* CarrierArtillery::aimAndFire(dWorldID world, dSpaceID space, Vec3f targ
     Weapon::elevation = getDeclination(aim);
 
 
-    Vehicle *action = fire(world,space,100);
+    Vehicle *action = fire(0,world,space,100);
 
     return action;
 }
 
-Vehicle* CarrierArtillery::fire(dWorldID world, dSpaceID space)
+Vehicle* CarrierArtillery::fire(int weapon, dWorldID world, dSpaceID space)
 {
-    return fire(world, space, 1);
+    return fire(0,world, space, 1);
 }
 
-Vehicle* CarrierArtillery::fire(dWorldID world, dSpaceID space, int shellloadingtime)
+Vehicle* CarrierArtillery::fire(int weapon, dWorldID world, dSpaceID space, int shellloadingtime)
 {
     if (getTtl()>0)
         return NULL;

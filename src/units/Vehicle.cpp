@@ -422,7 +422,7 @@ float Vehicle::getBearing()
     return val;
 }
 
-Vehicle* Vehicle::fire(dWorldID world, dSpaceID space)
+Vehicle* Vehicle::fire(int weapon, dWorldID world, dSpaceID space)
 {
     assert(0 || !"This should not be executed.");
 }
@@ -825,4 +825,44 @@ void Vehicle::disableTelemetry()
 Vec3f Vehicle::getDimensions()
 {
     return Vec3f(width, height, length);
+}
+
+void Vehicle::updateScreenLocation()
+{
+    float winX=0;
+    float winY=0;
+    float winZ=0;
+
+    getScreenLocation(winX, winY, winZ, getPos()[0], getPos()[1], getPos()[2]);
+    //dout << winX << "," << winY << std::endl;
+
+    onScreen[0] = winX;
+    onScreen[1] = winZ; // @NOTE: Checkout here (they are rearranged)
+    onScreen[2] = winY;
+}
+
+Vec3f Vehicle::screenLocation()
+{
+    return onScreen;
+}
+
+void Vehicle::setTheOrientation(Vec3f orientation)
+{
+    dMatrix3 R1,R2;
+    dRSetIdentity(R1);
+    dRSetIdentity(R2);
+
+    dRFromAxisAndAngle(R1,0,1,0,getAzimuthRadians(orientation));
+
+    dRFromAxisAndAngle(R2,1,0,0,getDeclination(orientation)*PI/180.0f);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R1);
+
+    dQfromR(q2,R2);
+
+    dQMultiply0(q3,q2,q1);
+
+    if (!Vehicle::inert)
+        dBodySetQuaternion(me,q3);
 }

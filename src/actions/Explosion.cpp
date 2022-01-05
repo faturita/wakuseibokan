@@ -16,15 +16,17 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
 
     float stride = 0.5;
 
+    // Calculate the strides to distribuite all the explosion along the size of the bounding box of the exploding object.
     float stride_width =  max( (width / 2.0) / dense , stride );
     float stride_height = max( (height / 2.0) / dense , stride );
     float stride_length = max( (length / 2.0) / dense, stride );
 
-    dout << "Dimensions:" << Vec3f(width, height, length) << std::endl;
-    dout << "Strides: " << stride_width << "," << stride_height << "," << stride_length << std::endl;
+    //dout << "Dimensions:" << Vec3f(width, height, length) << std::endl;
+    //dout << "Strides: " << stride_width << "," << stride_height << "," << stride_length << std::endl;
 
     Vec3f particledim(0.5f,0.5f,0.5f);
 
+    // This is a performance restriction to limit the size of each particle to 10^3.
     if (stride_width>=10 && stride_height >=10 && stride_length>=10)
         particledim = Vec3f(10.0f, 10.0f, 10.0f);
 
@@ -47,10 +49,11 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
                 targ = -loc + b1->getPos();
                 targ = targ*1;
 
+                // This is another alternative.
                 //targ = Vec3f(loc[0], loc[1]+(-dense)*stride, loc[2]) - b1->getPos();
                 //targ = targ*10;
 
-
+                // Set a radial force.
                 dBodyAddForce(b1->getBodyID(), targ[0],targ[1],targ[2]);
 
                 entities.push_back(b1, b1->getGeom());

@@ -42,8 +42,6 @@
 #include "usercontrols.h"
 #include "camera.h"
 
-#include "openglutils.h"
-
 #include "sounds/sounds.h"
 
 #include "keplerivworld.h"
@@ -70,6 +68,7 @@
 
 #include "map.h"
 #include "board.h"
+#include "hud.h"
 
 #include "ai.h"
 
@@ -108,6 +107,8 @@ clock_t elapsedtime;
 bool wincondition=false;
 
 bool mute=false;
+bool cull=false;
+bool wireframes=false;
 
 int sockfd;
 struct sockaddr_in servaddr;
@@ -117,6 +118,8 @@ void disclaimer()
     printf ("惑星母艦\n");
     printf ("Warfare on the seas of Kepler IV\n");
 }
+
+
 
 /**
  * Draw the Head Up Display 
@@ -130,7 +133,7 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-    glOrtho(0, 1200, 800, 0, -1, 1);
+    glOrtho(0, 1200, 800, 0, -1, 1);            // @NOTE: This is the size of the HUD screen, it goes from x=[0,1200] , y=[-400,400]
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -141,11 +144,11 @@ void drawHUD()
 	glRotatef(180.0f,0,0,1);
 	glRotatef(180.0f,0,1,0);
 
-    int aimc=50,crossc=0;
+    int aimc=0,crossc=0;
     
     char str[256];
 
-    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There is a numberical error somewhere.");
+    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There are numerical error somewhere.");
     
     fps = getFPS();
     
@@ -177,7 +180,7 @@ void drawHUD()
         }
         else if (entities[controller.controllingid]->getType() == MANTA)
         {
-            aimc = 240;
+            aimc = 190;
             crossc = 195;
         }
 
@@ -281,56 +284,17 @@ void drawHUD()
         
         glLineWidth(2.5);
 
-        int uc=550;                     // Horizontal center, screen is 1100 pixels.
+        int uc=600;                     // Horizontal center, screen is 1100 pixels.
         int lc=0+aimc;                   // Center is at 50.
         int w=40;
         int h=40;
 
-
-        glBegin(GL_LINES);
-        glVertex3f(uc,    lc-h, 0);
-        glVertex3f(uc,   lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc,     lc, 0);
-        glVertex3f(uc+w,   lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc, lc-100+h, 0);
-        glVertex3f(uc, lc-100, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc, lc-100,0);
-        glVertex3f(uc+w, lc-100, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100-w, lc, 0);
-        glVertex3f(uc+100, lc, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc ,0);
-        glVertex3f(uc+100, lc-h, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc-100+h, 0);
-        glVertex3f(uc+100,lc-100,0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+100, lc-100, 0);
-        glVertex3f(uc+100-w, lc-100, 0);
-        glEnd();
-
+        drawOverlyMark(uc,lc,w,h);
 
         // Center cross
         int cc = crossc;
 
+        /**
         glBegin(GL_LINES);
         glVertex3f(uc+50+Camera.xAngle-10, cc + Camera.yAngle, 0.0);
         glVertex3f(uc+50+Camera.xAngle-2, cc + Camera.yAngle, 0);
@@ -349,7 +313,9 @@ void drawHUD()
         glBegin(GL_LINES);
         glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+10, 0.0);
         glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+2, 0);
-        glEnd();
+        glEnd();**/
+
+        drawCross(uc + Camera.xAngle,lc + Camera.yAngle);
 
         // Bearing arrow
 
@@ -382,7 +348,94 @@ void drawHUD()
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
 
+        /**
+        Vec3f enemy(5000.0, 0.0f, 5000.0f);
+
+        Vec3f l = Vec3f(30*(enemy[0]/10000.0f),0.0,30*(enemy[2]/10000.0f) );
+
+        glLineWidth(4.5);
+        glBegin(GL_LINES);
+        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+        glEnd();
+        **/
+
         // Nearby units. @NOTE DO IT
+
+        if (controller.controllingid != CONTROLLING_NONE)
+        {
+            Vehicle *me = entities[controller.controllingid];
+            Vec3f meLoc = me->getPos();
+            int friendlyfaction = me->getFaction();
+
+            float closest = 10000.0f;
+            float proj = 40.0f;
+
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+            {
+                Vehicle *v=entities[i];
+
+                if (v && (v->getType() == CONTROLABLEACTION )
+                        && v->getFaction()!=friendlyfaction)
+                {
+                    Vec3f enemy = v->getPos() - meLoc;enemy[1]=0;
+                    if ((enemy).magnitude()<closest) {
+
+
+                        Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
+
+                        static int coun=0;
+                        if (int((enemy).magnitude()) <= coun++ )
+                        {
+                            radarbeep();
+                            coun=0;
+                        }
+
+                        glPointSize(4.5);
+                        glColor3f(1.0,0.0,0.0);
+                        glBegin(GL_LINES);
+                        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+                        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+                        glEnd();
+                    }
+                }
+                if (v &&
+                        ( (v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY))
+                        && v->getFaction()!=friendlyfaction)   // Fix this.
+                {
+                    Vec3f enemy = v->getPos() - meLoc;
+                    if ((enemy).magnitude()<closest) {
+
+                        Vec3f enemy = entities[i]->getPos() - meLoc;
+
+                        Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
+
+                        glPointSize(4.5);
+                        glColor3f(1.0,0.0,1.0);
+                        glBegin(GL_LINES);
+                        glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
+                        glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
+                        glEnd();
+
+
+                        Vec3f sc = v->screenLocation();
+
+                        //dout << sc[0] << "," << sc[2] << " at " << sc[1] << std::endl;
+
+
+                        if ((sc[1]<1 && sc[0]>0 && sc[0]<screen_width) &&
+                            (sc[1]<1 && sc[2]>0 && sc[2]<screen_height) )
+                        {
+
+                            float x = 1200.0/screen_width * sc[0];
+                            float y = 800.0/screen_height * sc[2] - 400.0;
+                            //drawOverlyMark(x,y, 10,10);
+                            drawCross(x,y);
+                        }
+                    }
+                }
+            }
+        }
 
         
     } glPopMatrix();
@@ -393,6 +446,7 @@ void drawHUD()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 }
+
 
 
 
@@ -471,13 +525,12 @@ void drawScene() {
     glPopAttrib();
 
 
-    // Draw islands.
+    // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
     for (int i=0; i<islands.size(); i++) {
         (islands[i]->draw());
     }
 
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
-
 
     // Movable units, and the camera, carry the living energy.
     // Get a list of points in 3D space where there are movable units and the camera.
@@ -509,6 +562,8 @@ void drawScene() {
                 (entities[i]->drawModel());
                 glPopAttrib();
 
+                entities[i]->updateScreenLocation();
+
                 if ((entities[i]->getBodyID()))
                     dBodyEnable(entities[i]->getBodyID());
                 else
@@ -534,7 +589,7 @@ void drawScene() {
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
-    if (Camera.pos[1]<0) // Dark under the water.
+    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developer: I want submarines !)
         glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD
@@ -569,15 +624,15 @@ void initRendering() {
     
     
     // Enable wireframes
-    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    if (wireframes) glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
     
     glShadeModel(GL_SMOOTH); // Type of shading for the polygons
     
     glEnable(GL_COLOR_MATERIAL);
     
-        // Do not show the interior faces....
-        //glEnable(GL_CULL_FACE);
+    // Do not show the interior faces.... (FASTER but uglier.  The sky will dissapear).
+    if (cull) glEnable(GL_CULL_FACE);
     
 	// Blue sky !!!
     //glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
@@ -787,6 +842,7 @@ void update(int value)
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
     glutTimerFunc(20, worldStep, 0);
+
 }
 
 
@@ -810,6 +866,16 @@ int main(int argc, char** argv) {
         mute = true;
     else
         mute = false;
+
+    if (isPresentCommandLineParameter(argc,argv,"-wire"))
+        wireframes = true;
+    else
+        wireframes = false;
+
+    if (isPresentCommandLineParameter(argc,argv,"-cull"))
+        cull = true;
+    else
+        cull = false;
 
     // Switch up OpenGL version (at the time of writing compatible with 2.1)
     if (true)

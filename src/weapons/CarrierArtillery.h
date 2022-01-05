@@ -27,8 +27,8 @@ public:
 
     int getSubType();
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
-    Vehicle* fire(dWorldID world, dSpaceID space, int shellloadingtime);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space, int shellloadingtime);
     Vehicle* aimAndFire(dWorldID world, dSpaceID space, Vec3f target);
 
     void setForward(Vec3f forw);

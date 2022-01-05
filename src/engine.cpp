@@ -510,17 +510,35 @@ bool  groundcollisions(Vehicle *vehicle)
     {
         if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
         {
-            //explosion();
             AdvancedManta *s = (AdvancedManta*)vehicle;
             struct controlregister c;
             c.thrust = 0.0f;
             c.pitch = 0.0f;
             s->setControlRegisters(c);
             s->setThrottle(0.0f);
-            s->damage(1);
+            s->damage(10);
         }
     }
     return true;
+}
+
+bool structurecollisions(Structure *s, Vehicle *vehicle)
+{
+    if (vehicle)
+    {
+        if (vehicle->getSpeed()>10 and vehicle->getType() == MANTA)
+        {
+            AdvancedManta *m = (AdvancedManta*)vehicle;
+            struct controlregister c;
+            c.thrust = 0.0f;
+            c.pitch = 0.0f;
+            m->setControlRegisters(c);
+            m->setThrottle(0.0f);
+            m->damage(10000);
+
+            // @NOTE: The structure is naturally damaged when the unit explodes (and debris fly around).
+        }
+    }
 }
 
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
@@ -603,6 +621,22 @@ Walrus* findWalrusByFactionAndNumber(size_t &index, int faction, int number)
     return NULL;
 }
 
+Manta* findMantaBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == MANTA && v->getFaction() == faction && v->getSubType() == subtype)
+        {
+            if (number == v->getNumber())
+            {
+                index = i;
+                return (Manta*)v;
+            }
+        }
+    }
+    return NULL;
+}
 
 Manta* findMantaByFactionAndNumber(size_t &index, int faction, int number)
 {
@@ -1108,6 +1142,9 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         }
                         entities[i]->setSignal(2);
                         entities[i]->damage(1);
+                    } else {
+                        // This means that now the unit is again close to the island's antenna so we should put the connection back.
+                        entities[i]->setSignal(3);
                     }
 
                 }
@@ -1248,7 +1285,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                             dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
-                            Vehicle *action = (lb)->fire(world,space);
+                            Vehicle *action = (lb)->fire(0,world,space);
 
                             if (action != NULL)
                             {
@@ -1275,7 +1312,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         lb->setForward((b->getPos())-(firingloc));
 
-                        Vehicle *action = (lb)->fire(world,space);
+                        Vehicle *action = (lb)->fire(0,world,space);
 
                         if (action != NULL)
                         {
@@ -1301,7 +1338,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         lb->setForward((b->getPos())-(firingloc));
 
-                        Vehicle *action = (lb)->fire(world,space);
+                        Vehicle *action = (lb)->fire(0,world,space);
 
                         if (action != NULL)
                         {
@@ -1343,7 +1380,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         } else {
                             lb->water();
                         }
-                        Gunshot* action = (Gunshot*)(lb)->fire(world,space);
+                        Gunshot* action = (Gunshot*)(lb)->fire(0,world,space);
 
                         // @FIXME: AAM missiles guiding sucks.
 

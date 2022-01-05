@@ -23,7 +23,7 @@ public:
 
     Vec3f getFiringPort();
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
     void virtual doControl(Controller);
     void virtual doControl();

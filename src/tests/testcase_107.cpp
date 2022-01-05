@@ -1,5 +1,3 @@
-#include "testcase_107.h"
-
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -28,7 +26,7 @@
 #include "../weapons/CarrierArtillery.h"
 #include "../weapons/CarrierTurret.h"
 
-#include "testcase_106.h"
+#include "testcase_107.h"
 
 
 extern unsigned long timer;

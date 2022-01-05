@@ -149,6 +149,7 @@ void  groundcollisions(dGeomID body);
 CommandCenter* findCommandCenter(Island *island);
 Manta* findMantaByOrder(int faction, int order);
 Manta* findMantaByFactionAndNumber(size_t &pos, int faction, int number);
+Manta* findMantaBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number);
 Manta* findManta(int faction);
 Manta* findManta(int faction, int status);
 Manta* findManta(int faction, int status, Vec3f around);
@@ -204,5 +205,6 @@ void wipeEnemyStructures(BoxIsland *island, int faction);
 
 void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
+bool structurecollisions(Structure *s, Vehicle *vehicle);
 
 #endif // ENGINE_H

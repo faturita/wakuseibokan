@@ -173,7 +173,7 @@ Vehicle* Launcher::fireAir(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
-Vehicle* Launcher::fire(dWorldID world, dSpaceID space)
+Vehicle* Launcher::fire(int weapon, dWorldID world, dSpaceID space)
 {
 
     switch (autostatus) {

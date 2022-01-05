@@ -24,6 +24,8 @@ void soaring();
 void bullethit();
 void droneflying();
 
+void radarbeep();
+
 void intro();
 
 

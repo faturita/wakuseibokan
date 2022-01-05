@@ -387,7 +387,7 @@ void Manta::airspeddrarestoration()
 
 
 
-Vehicle* Manta::fire(dWorldID world, dSpaceID space)
+Vehicle* Manta::fire(int weapon, dWorldID world, dSpaceID space)
 {
     Gunshot *action = new Gunshot();
     // Need axis conversion.

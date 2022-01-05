@@ -64,7 +64,7 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
     void setNameByNumber(int number);
 

@@ -21,6 +21,8 @@ class BoxVehicle : public Vehicle
     bool repelling = false;
     
 public:
+    BoxVehicle();
+    BoxVehicle(int faction );
 	void  init();
     int   getType();
 	void  drawModel(float yRot, float xRot, float x, float y, float z);

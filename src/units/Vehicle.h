@@ -20,9 +20,9 @@
 #include "../usercontrols.h"
 
 /**
- * @brief Structures are identified if they type number is greater than or equal to COLLISIONABLE.
+ * @brief Structures are identified if their type number is greater than or equal to COLLISIONABLE.
  */
-enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEACTION = 6 , WEAPON = 7, COLLISIONABLE=8, LANDINGABLE = 9, CONTROL=10, EXPLOTABLEACTION = 11};
+enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEACTION = 6 , EXPLOTABLEACTION = 7, WEAPON = 8, COLLISIONABLE=15, LANDINGABLE = 16, CONTROL=17};
 
 enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, OTTER = 9, ARTILLERY = 10, COMMANDCENTER = 11, HANGAR = 12, WAREHOUSE = 13, RUNWAY = 14, LASERTURRET = 15, TURRET = 16, LAUNCHER = 17, FACTORY = 18, DOCK = 19, ANTENNA = 20, RADAR = 21, STRUCTURE = 22};
 
@@ -35,6 +35,8 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
 enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
+
+enum class WEAPONS { GUNSHOT=1, MISSILE=2, BOMB=3 };
 
 class Vehicle : Observable
 {
@@ -63,13 +65,16 @@ protected:
 
     std::queue<Vec3f> waypoints;
 
+    // Signal determines if the vehicle can be remotely controlled despite of not being close the carrier or a friendly island.
     int signal=3;
 
     // State Machine for handling destinations.
     DestinationStatus dst_status;
     
+    // ODE objects
     dBodyID me=NULL;
     dGeomID geom=NULL;
+    dSpaceID body_space = NULL;
 
     struct controlregister registers;
 
@@ -83,15 +88,18 @@ protected:
 
     void setFaction(int newfaction);
 
-    dSpaceID body_space = NULL;
 
+    // Vehicle name and number
     std::string name;
-
     int number;
 
+    // Bounding box dimensions.
     float height;
     float width;
     float length;
+
+    // Location of the vehicle on the screen coordinates.
+    Vec3f onScreen;
     
 public:
     bool inert=false;
@@ -177,7 +185,7 @@ public:
     void setAttitude(Vec3f attit);
     Vec3f getAttitude();
 
-    virtual Vehicle* fire(dWorldID world, dSpaceID space);
+    virtual Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
     virtual int getTtl();
     virtual void tick();
@@ -228,6 +236,11 @@ public:
     void disableTelemetry();
 
     Vec3f getDimensions();
+
+    void updateScreenLocation();
+    Vec3f screenLocation();
+
+    void setTheOrientation(Vec3f orientation);
 
 };
 

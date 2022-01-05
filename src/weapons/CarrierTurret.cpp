@@ -173,17 +173,17 @@ Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
     Weapon::elevation = getDeclination(aim);
 
 
-    Vehicle *action = fire(world,space,100);
+    Vehicle *action = fire(0,world,space,100);
 
     return action;
 }
 
-Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space)
+Vehicle* CarrierTurret::fire(int weapon, dWorldID world, dSpaceID space)
 {
-    return fire(world, space, 1);
+    return fire(0,world, space, 1);
 }
 
-Vehicle* CarrierTurret::fire(dWorldID world, dSpaceID space, int shellloadingtime)
+Vehicle* CarrierTurret::fire(int weapon, dWorldID world, dSpaceID space, int shellloadingtime)
 {
     if (getTtl()>0)
         return NULL;

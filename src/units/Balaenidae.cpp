@@ -488,7 +488,7 @@ void Balaenidae::launch(Manta* m)
 }
 
 
-Vehicle* Balaenidae::fire(dWorldID world, dSpaceID space)
+Vehicle* Balaenidae::fire(int weapon, dWorldID world, dSpaceID space)
 {
     Missile *action = new Missile(getFaction());
     // Need axis conversion.

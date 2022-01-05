@@ -1,5 +1,3 @@
-#include "testcase_105.h"
-
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>

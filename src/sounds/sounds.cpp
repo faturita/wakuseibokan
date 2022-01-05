@@ -47,6 +47,11 @@ void explosion()
     if (!mute) playsound("sounds/explosion.mp3");
 }
 
+void radarbeep()
+{
+    if (!mute) playsound("sounds/radarbeep.wav");
+}
+
 void splash()
 {
     if (!mute) playsound("sounds/splash.wav");

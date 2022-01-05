@@ -42,7 +42,7 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
-    Vehicle* fire(dWorldID world, dSpaceID space);
+    Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
 
     BoxIsland *getIsland() const;
     void setIsland(BoxIsland *value);
