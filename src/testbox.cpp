@@ -6728,7 +6728,7 @@ void checktest70(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC70: Testing manta landing on islands");
+        sprintf(msg, "TC70: Testing manually manta landing on islands");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6880,7 +6880,7 @@ void checktest72(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC72: Checking explosions.");
+        sprintf(msg, "TC72: Visually Checking explosions.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -6908,8 +6908,13 @@ void checktest72(unsigned long timer)
         entities.push_back(b1, b1->getGeom());
 
         b1->expand(10,10,10,2,world, space);
+    }
 
-
+    if (timer == 3000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
     }
 }
 
@@ -6941,7 +6946,7 @@ void checktest73(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC74: Testing torpedos chasing walruses.");
+        sprintf(msg, "TC73: Testing torpedos chasing Carrier.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -7116,9 +7121,9 @@ void checktest75(unsigned long timer)
     }
 
 
-    if (timer == 30000)
+    if (timer == 3000)
     {
-        Vehicle *t = findWalrus(GREEN_FACTION);
+        Structure *t = islands[0]->getCommandCenter();
 
         if (!t)
         {
@@ -7155,7 +7160,7 @@ void checktest76(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Testing radar HUD.");
+        sprintf(msg, "TC76: Playground on radar HUD. Move and check position.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -7213,6 +7218,16 @@ void checktest77(unsigned long timer)
         messages.insert(messages.begin(), mg);
     }
 
+    if (timer == 200)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC75: Switch to the carrier or the turret and verify if there is a pink cross on the target");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
 }
 
 void test78()
@@ -7225,7 +7240,7 @@ void test78()
 
     islands.push_back(nemesis);
 
-    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       20.0f,      -20.0f,  0,world);
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       0.0f,      -0.0f,  0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
 
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -7265,7 +7280,7 @@ void checktest78(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Testing mantas bombing an island.");
+        sprintf(msg, "TC75: Testing Mantas bombing an island.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -7287,7 +7302,9 @@ void checktest78(unsigned long timer)
 
     if (timer == 900)
     {
-        manta->goTo(Vec3f(0,1000,0));
+        // @FIXME: Automatic AI bombing from Mantas should calculate the bias of the bomb based on the height where it is released, the speed of the airplane
+        // and the location of the real target.  For instance, under this configuration the offset is 360 on positive z.
+        manta->goTo(Vec3f(0,1000,360));
         manta->enableAuto();
     }
 
@@ -7303,9 +7320,9 @@ void checktest78(unsigned long timer)
     }
 
 
-    if (timer == 30000)
+    if (timer == 5000)
     {
-        Vehicle *t = findWalrus(GREEN_FACTION);
+        Structure *t = islands[0]->getCommandCenter();
 
         if (!t)
         {
@@ -7315,7 +7332,7 @@ void checktest78(unsigned long timer)
         }
         else
         {
-            printf("Test Failed.  Walrus still around.\n");
+            printf("Test Failed.  Somehow the commandcenter survived.\n");
             endWorldModelling();
             exit(1);
         }
@@ -7384,16 +7401,22 @@ void test79()
 
 void checktest79(unsigned long timer)
 {
-    Vehicle *v = entities[0];
-    //v->antigravity(v->getBodyID());
-    //v->stop();
-
 
     if (timer == 50)
     {
         char msg[256];
         Message mg;
         sprintf(msg, "TC79: Visually testing smoke.");
+        mg.faction = BOTH_FACTION;
+        mg.msg = std::string(msg);
+        messages.insert(messages.begin(), mg);
+    }
+
+    if (timer == 200)
+    {
+        char msg[256];
+        Message mg;
+        sprintf(msg, "TC79: Check if the missile has a smoke tail");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg);
         messages.insert(messages.begin(), mg);
@@ -7407,22 +7430,11 @@ void checktest79(unsigned long timer)
         Camera.fw = Vec3f(0.0f,0.0f,1.0f);
     }
 
-    if (timer == 30000)
+    if (timer == 3000)
     {
-        Vehicle *t = findWalrus(GREEN_FACTION);
-
-        if (!t)
-        {
-            printf("Test Passed\n");
-            endWorldModelling();
-            exit(1);
-        }
-        else
-        {
-            printf("Test Failed.  Walrus still around.\n");
-            endWorldModelling();
-            exit(1);
-        }
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
 
     }
 }
@@ -7549,11 +7561,11 @@ void initWorldModelling(int testcase)
     case 72:test72();break;                         // Testing explosions with ODE.
     case 73:test73();break;                         // Introducing Torpedos.
     case 74:test74();break;                         // Torpedos chasing Walruses.
-    case 75:test75();break;
-    case 76:test76();break;                         // Testing Radar HUD
-    case 77:test77();break;                         // Testing Radar HUD with enemy units
+    case 75:test75();break;                         // Testing Bombs !
+    case 76:test76();break;                         // Playground Radar HUD
+    case 77:test77();break;                         // Visually Testing Radar HUD with enemy units
     case 78:test78();break;                         // Testing Manta bombing an island.
-    case 79:test79();break;                         // Checking smoke coming out of a missile thruster.
+    case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
     default:initIslands();test1();break;
     }
 
