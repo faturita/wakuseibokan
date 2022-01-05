@@ -58,6 +58,10 @@ void getScreenLocation(float &winX, float &winY, float &winZ, float xx, float zz
 void Draw_Texture(double x, double y, double z, double width, double height, double Angle, GLuint texture);
 
 
+/**
+ * @brief Smoke Particle.  A smoke pipe, wake or plume, it is composed of several particles that are represented by a 2D squeare box.
+ * Each box travels across a cone axis, on a rotating plane, diminishes its alpha, and increase its size.
+ */
 class SmokeParticle
 {
 private:
@@ -67,14 +71,20 @@ public:
     void Draw();
     void drawModel(float x, float y, float z, float width, float height, float angle, GLuint texture);
     SmokeParticle();
+
+    // Initial position and cone axis where each particle is being located (and moved).
     Vec3f pos;
     Vec3f axis;
     float getAlpha();
 };
 
+/**
+ * @brief The Smoke class.  This represents a smoke pipe, wake or plume, depending how they are used.
+ */
 class Smoke
 {
 private:
+    const size_t number_of_particles = 100;
     std::vector<SmokeParticle> Smoke_Vector;
 public:
     void drawModel(Vec3f pos, Vec3f axis);

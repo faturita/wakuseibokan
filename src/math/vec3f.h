@@ -64,6 +64,8 @@ class Vec3f {
 
         Vec3f rotateOn(Vec3f u, float alpha);
 
+        Vec3f rotateTo(Vec3f originalDirection, Vec3f newDirection);
+
         char * toString(char *) const;
 };
 
