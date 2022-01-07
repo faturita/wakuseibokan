@@ -114,7 +114,7 @@ bool departed(dSpaceID space)
         dGeomID g = dSpaceGetGeom(space,gids);
         Vehicle *v = gVehicle(g);
 
-        if (v->getType() == WALRUS)
+        if (v && v->getType() == WALRUS)
             departed(v);
     }
 }

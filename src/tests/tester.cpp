@@ -123,6 +123,8 @@ int aiplayer;
 extern bool wincondition;
 
 static int testing=-1;
+
+
 /**
  * Collision detection function.
  *
@@ -359,8 +361,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
             } else {
                 // Object against object collision.
                 //printf("7\n");
-                if (v1 && !isRunway(s2) && isManta(v1) && groundcollisions(v1)) {}
-                if (v2 && !isRunway(s1) && isManta(v2) && groundcollisions(v2)) {}
+                if (v1 && !isRunway(s2) && isManta(v1) && s2 && structurecollisions(s2,v1)) {}
+                if (v2 && !isRunway(s1) && isManta(v2) && s1 && structurecollisions(s1,v2)) {}
 
                 contact[i].surface.mu = 0.9;  //dInfinity;
                 contact[i].surface.bounce = 0.2f;

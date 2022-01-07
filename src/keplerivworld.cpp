@@ -549,17 +549,6 @@ void initWorldPopulation()
 
         entities.push_back(_b, _b->getGeom());
 
-
-        Beluga *_bg = new Beluga(BLUE_FACTION);
-        _bg->init();
-        _bg->embody(world,space);
-        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
-        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
-        _bg->stop();
-
-        entities.push_back(_bg, _bg->getGeom());
-
-
         CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
         _bo->init();
         _bo->embody(world, carrier_space);
@@ -576,6 +565,52 @@ void initWorldPopulation()
         _w1->stop();
 
         entities.push_back(_w1, _w1->getGeom());
+
+
+        Beluga *_bg = new Beluga(BLUE_FACTION);
+        _bg->init();
+        dSpaceID carrier_spaceb = _bg->embody_in_space(world, space);
+        _bg->embody(world,space);
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        _bg->stop();
+
+        entities.push_back(_bg, _bg->getGeom());
+
+
+        CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+        _bl->init();
+        _bl->embody(world, carrier_spaceb);
+        _bl->attachTo(world,_bg, +30.0f, 20.0f - 3, +204.0f);
+        _bl->stop();
+
+        entities.push_back(_bl, _bl->getGeom());
+
+        CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+        _br->init();
+        _br->embody(world, carrier_spaceb);
+        _br->attachTo(world,_bg, -45.0f, 20.0f - 3, +204.0f);
+        _br->stop();
+
+        entities.push_back(_br, _br->getGeom());
+
+
+        CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+        _wr->init();
+        _wr->embody(world, carrier_spaceb);
+        _wr->attachTo(world,_bg, -40.0, 27.0f+5, -230.0f);
+        _wr->stop();
+
+        entities.push_back(_wr, _wr->getGeom());
+
+        CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+        _wl->init();
+        _wl->embody(world, carrier_spaceb);
+        _wl->attachTo(world,_bg, +40.0, 27.0f+2, -230.0f);
+        _wl->stop();
+
+        entities.push_back(_wl, _wl->getGeom());
+
 
     }
     else if (gamemode == ACTIONGAME)

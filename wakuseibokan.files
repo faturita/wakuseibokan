@@ -150,6 +150,8 @@ src/tests/testcase_106.cpp
 src/tests/testcase_106.h
 src/tests/testcase_107.cpp
 src/tests/testcase_107.h
+src/tests/testcase_108.cpp
+src/tests/testcase_108.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h
@@ -206,6 +208,8 @@ src/water/noise.h
 src/water/water
 src/weapons/CarrierArtillery.cpp
 src/weapons/CarrierArtillery.h
+src/weapons/CarrierLauncher.cpp
+src/weapons/CarrierLauncher.h
 src/weapons/CarrierTurret.cpp
 src/weapons/CarrierTurret.h
 src/weapons/Weapon.cpp
