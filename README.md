@@ -173,3 +173,4 @@ References
 * Vulkan Tutorial https://kylemayes.github.io/vulkanalia/introduction.html
 * https://github.com/avikola/fire-and-smoke
 * https://community.khronos.org/t/efficient-smoke/67120/6
+* http://www.inf.ufsc.br/~aldo.vw/grafica/apostilas/openGL/lesson19/lesson19.html
