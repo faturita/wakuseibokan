@@ -69,6 +69,7 @@ void savegame()
 {
     std::ofstream ss("savegame.w", std::ios_base::binary);
 
+    // @FIXME: Include a .h that is generated on compile time that calculates the hash of this .cpp, that is the version.
     // Version
     ss << 0x01 << std::endl;
 
@@ -230,6 +231,7 @@ void loadgame()
 
     std::ifstream ss("savegame.w", std::ios_base::binary);
 
+    // @FIXME: Verify the version when loading.
     int version;
     ss >> version;
 
