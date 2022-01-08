@@ -132,7 +132,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 
     Vec3f position = getPos();
     position[1] += .5f; // Move upwards to the center of the real rotation.
-    Vec3f fw = getForward();
+    Vec3f fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
@@ -144,7 +144,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 
 
     position = orig;
-    position[1] += 40;
+    position[1] += firingpos[1];
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
 
@@ -156,7 +156,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 
     dQuaternion q1,q2,q3;
     dQfromR(q1,R);
-    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(fw));
 
     dQfromR(q2,R2);
 
@@ -228,7 +228,7 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
 
     Vec3f position = getPos();
     position[1] += .5f; // Move upwards to the center of the real rotation.
-    Vec3f fw = getForward();
+    Vec3f fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
@@ -249,7 +249,7 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
 
     dQuaternion q1,q2,q3;
     dQfromR(q1,R);
-    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(fw));
 
     dQfromR(q2,R2);
 

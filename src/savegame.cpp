@@ -42,6 +42,7 @@
 
 #include "weapons/CarrierArtillery.h"
 #include "weapons/CarrierTurret.h"
+#include "weapons/CarrierLauncher.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -306,13 +307,55 @@ void loadgame()
                     b = new Beluga(faction);
                     v = b;
                     b->init();
-                    b->embody(world,space);
+                    dSpaceID carrier_space_beluga = b->embody_in_space(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
                     float R[12];
                     for(int j=0;j<12;j++) ss >> R[j];
                     v->setRotation(R);
                     entities.push_back(b, b->getGeom());
+
+
+                    CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+                    _bl->init();
+                    _bl->embody(world, carrier_space_beluga);
+                    _bl->attachTo(world,b, +30.0f, 20.0f - 3, +204.0f);
+                    _bl->stop();
+
+                    entities.push_back(_bl, _bl->getGeom());
+
+                    CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+                    _br->init();
+                    _br->embody(world, carrier_space_beluga);
+                    _br->attachTo(world,b, -45.0f, 20.0f - 3, +204.0f);
+                    _br->stop();
+
+                    entities.push_back(_br, _br->getGeom());
+
+
+                    CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+                    _wr->init();
+                    _wr->embody(world, carrier_space_beluga);
+                    _wr->attachTo(world,b, -40.0, 27.0f+5, -230.0f);
+                    _wr->stop();
+
+                    entities.push_back(_wr, _wr->getGeom());
+
+                    CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+                    _wl->init();
+                    _wl->embody(world, carrier_space_beluga);
+                    _wl->attachTo(world,b, +40.0, 27.0f+2, -230.0f);
+                    _wl->stop();
+
+                    entities.push_back(_wl, _wl->getGeom());
+
+                    CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
+                    _cf->init();
+                    _cf->embody(world, carrier_space_beluga);
+                    _cf->attachTo(world,b, +40.0, 27.0f+2, 0.0);
+                    _cf->stop();
+
+                    entities.push_back(_cf, _cf->getGeom());
 
                 }
                 v = b;

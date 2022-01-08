@@ -106,14 +106,31 @@ void TestCase_108::init()
 
     entities.push_back(_cf, _cf->getGeom());
 
-    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Launcher(BLUE_FACTION)           ,         0.0f,    -1700.0f,0,world);
-    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,0,world);
-    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,0,world);
-    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,0,world);
-    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
-    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
-    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    _bg->BackArtilleryLeft = _wl;
+    _bg->BackArtilleryRight = _wr;
+    _bg->FrontTurretLeft = _bl;
+    _bg->FrontTurretRight = _br;
+    _bg->Launcher = _cf;
+
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Launcher(GREEN_FACTION)           ,         0.0f,    -1700.0f,0,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(0.0f,20.5f,-2000);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setSignal(4);
+
+    entities.push_back(_walrus, _walrus->getGeom());
 
 
     //Vec3f pos(0.0,1.32, - 3500);
@@ -129,17 +146,59 @@ int TestCase_108::check(unsigned long timertick)
 {
     if (timertick == 200)
     {
+        Vehicle* _b = findCarrier(BLUE_FACTION);
 
+        Vehicle* _w = findWalrus(GREEN_FACTION);
+
+        if (_w && _b)
+        {
+            _w->attack(_b->getPos());
+            _w->enableAuto();
+        }
+
+    }
+
+    if (timertick > 1000)
+    {
+        Vehicle* _b = findCarrier(BLUE_FACTION);
+
+        Vehicle* _w = findWalrus(GREEN_FACTION);
+
+        if (_w && _b)
+        {
+            Beluga *bb = (Beluga*) _b;
+
+            CarrierTurret* cb = (CarrierTurret*)bb->FrontTurretRight;
+            Vehicle *action = cb->aimAndFire(world, space, _w->getPos());
+
+            if (action != NULL)
+            {
+                entities.push_back(action, action->getGeom());
+                gunshot();
+            }
+        }
     }
 
     if (timertick > 8000)
     {
-        Vehicle* _b = findCarrier(GREEN_FACTION);
+        Vehicle* _b = findCarrier(BLUE_FACTION);
 
         isdone = false;
         haspassed = false;
 
         if (!_b)
+        {
+            isdone = true;
+            haspassed = true;
+        }
+
+
+        Vehicle* _d = findWalrus(GREEN_FACTION);
+
+        isdone = false;
+        haspassed = false;
+
+        if (!_d)
         {
             isdone = true;
             haspassed = true;
