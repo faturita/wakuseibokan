@@ -260,6 +260,8 @@ void switchControl(size_t id)
     //}
     //size_t id = entities.indexAt(controlposition);
 
+    printf("Switching to:%d\n", id);
+
     if (id == CONTROLLING_NONE)
         return;
 
@@ -385,16 +387,22 @@ void handleKeypress(unsigned char key, int x, int y) {
                 std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
                 const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
 
-                dout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
+                int number = atoi(structurenumber) ;
+
+                dout << "Island-" << islandname << "-structure " << number << std::endl;
 
                 size_t index = CONTROLLING_NONE;
 
                 for (int j=0;j<islands.size();j++)
                 {
-                    if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>atoi(structurenumber))
+                    if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>number)
                     {
-                        dout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
-                        index = islands[j]->getStructures()[atoi(structurenumber)];
+                        dout << "Found-" << islandname << "-structure " << number << std::endl;
+                        index = islands[j]->getStructures()[number];
+
+                        // @NOTE: For some strange reason on Linux, the value of structurenumber 
+                        // was being modified inside this loop ! Even if it was a constant !
+                        // Totally weird.
                     }
                 }
                 switchControl(index);
