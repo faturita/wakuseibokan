@@ -10,7 +10,11 @@
 #include <stdarg.h>
 #include <math.h>
 
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#elif __linux
 #include <GL/glut.h>
+#endif
 
 #include <ode/ode.h>
 
@@ -20,7 +24,7 @@
 #include "terrain/Terrain.h"
 #include "font/DrawFonts.h"
 
-#include "carrier/yamathutil.cpp"
+#include "math/yamathutil.cpp"
 
 using namespace std;
 
@@ -909,11 +913,11 @@ void initRendering() {
 	glEnable(GL_CULL_FACE);
 
 	//Load the model
-    _modelManta = MD2Model::load("units/manta.md2");
+    _modelManta = MD2Model::loadModel("units/manta.md2");
     if (_modelManta != NULL)
         _modelManta->setAnimation("run");
 
-    _modelWalrus = MD2Model::load("units/walrus.md2");
+    _modelWalrus = MD2Model::loadModel("units/walrus.md2");
     if (_modelWalrus != NULL)
         _modelWalrus->setAnimation("run");
 

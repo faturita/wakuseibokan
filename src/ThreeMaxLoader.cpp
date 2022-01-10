@@ -460,7 +460,7 @@ void calculateCenterOfMass(obj_type &object)
     centerOfMass[1] = centerOfMass[1]/(3*((float)object.polygons_qty));
     centerOfMass[2] = centerOfMass[2]/(3*((float)object.polygons_qty));
 
-    CLog::Write(CLog::Debug,"Offset: %10.5f\t%10.5f\t%10.5f\n",(centerOfMass[0]),(centerOfMass[1]),(centerOfMass[2]));
+    //CLog::Write(CLog::Debug,"Offset: %10.5f\t%10.5f\t%10.5f\n",(centerOfMass[0]),(centerOfMass[1]),(centerOfMass[2]));
 
     for (l_index=0;l_index<object.polygons_qty;l_index++)
     {
@@ -787,7 +787,7 @@ T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z
 T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z, float scalex, float scaley, float scalez,GLuint texture)
 {
     T3DSModel* td = new T3DSModel();
-    CLog::Write(CLog::Debug,"Model:%s\n",p_filename);
+    //CLog::Write(CLog::Debug,"Model:%s\n",p_filename);
     td->setFilename(p_filename);
     td->setLocation(x,y,z);
     td->setScale(scalex,scaley,scalez);

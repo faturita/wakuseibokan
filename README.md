@@ -105,11 +105,14 @@ Characteristics
 ---------------
 * Floor
     * The floor is squared.  Horizon works according the fulcrum representation.
-    * Sea is good.  Works as a texture that is shifted based on the camera position.  
+    * Sea is good.  Works as a texture that is shifted based on the camera position.
+    * Reflections are missing.
+    * Waves and boat wakes are missing.  
 * Sky
-    * Sky does not work at all.
+    * The Sky is a far-away-box with textures on the insides.
+    * It works well, but the representation relies on the camera view and there are issues with how they look like from certain viewports.
 * Islands
-    * The engine is calculating the islands perfectly.
+    * The engine is calculating the islands perfectly.  What you see is what you feel.
     * Islands are BMP heightmaps 60x60.  These values are hardcoded to 3600x3600 in the model.
     * Max height (255) is 60. Hardcoded.
     * Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement->Some Z Fighting.
@@ -121,7 +124,7 @@ Characteristics
 * Walruses
     * Two models.  They work very nicely on water.  The thrust simulates and offboard engine.
 * Sound
-    * I am using TEMPORARILY system calls and afplay.
+    * Using TEMPORARILY system calls and afplay.
     * STK
 * Manta
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
@@ -173,3 +176,4 @@ References
 * Vulkan Tutorial https://kylemayes.github.io/vulkanalia/introduction.html
 * https://github.com/avikola/fire-and-smoke
 * https://community.khronos.org/t/efficient-smoke/67120/6
+* http://www.inf.ufsc.br/~aldo.vw/grafica/apostilas/openGL/lesson19/lesson19.html

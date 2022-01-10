@@ -5,6 +5,9 @@
 #include "../control.h"
 #include "../actions/Gunshot.h"
 #include "../actions/Bomb.h"
+#include "../actions/Missile.h"
+#include "../actions/AAM.h"
+#include "../actions/Torpedo.h"
 #include "../math/yamathutil.h"
 #include "../messages.h"
 
@@ -1366,15 +1369,182 @@ Vehicle* SimplifiedDynamicManta::fire(int weapon, dWorldID world, dSpaceID space
             break;
         case 2:return fireBomb(world,space);
             break;
+        case 3:return fireAAM(world, space);
+            break;
+        case 4:return fireTorpedo(world, space);
+            break;
 
     }
 
 }
 
+Vehicle* SimplifiedDynamicManta::fireTorpedo(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    Torpedo *action = new Torpedo(getFaction());
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    Vec3f fw = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    position = position + 80.0f*fw;
+    fw = -orig+position;
+
+    position[1] =1.0;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, 0,0,0);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+
+    dQfromR(q2,R2);
+
+
+    dQMultiply0(q3,q2,q1);
+
+
+    Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft=Ft*60;
+
+    //dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
+    dBodyAddRelForce(action->getBodyID(),0,0,60);
+    dBodySetQuaternion(action->getBodyID(),q3);
+
+    setTtl(1000);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+
+
+Vehicle* SimplifiedDynamicManta::fireAAM(dWorldID world, dSpaceID space)
+{
+    if (getTtl()>0)
+        return NULL;
+
+    AAM *action = new AAM(getFaction());
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    Vec3f fw = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    position = position + 60.0f*fw;
+    fw = -orig+position;
+
+
+    position = orig;
+    position[1] += 40;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, 0,0,
+                      0);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+
+    dQfromR(q2,R2);
+
+
+    dQMultiply0(q3,q2,q1);
+
+
+    Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft=Ft*1;
+
+    dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
+    dBodySetQuaternion(action->getBodyID(),q3);
+
+    //setTtl(1000);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
+}
+
 Vehicle* SimplifiedDynamicManta::fireMissile(dWorldID world, dSpaceID space)
 {
-    return fireAmmo(world, space);
+    if (getTtl()>0)
+        return NULL;
+
+    Missile *action = new Missile(getFaction());
+    // Need axis conversion.
+    action->init();
+    action->setOrigin(me);
+
+    Vec3f position = getPos();
+    position[1] += .5f; // Move upwards to the center of the real rotation.
+    Vec3f fw = getForward();
+    Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    position = position + 60.0f*fw;
+    fw = -orig+position;
+
+
+    position = orig;
+    position[1] += 40;
+    action->embody(world,space);
+    action->setPos(position[0],position[1],position[2]);
+
+
+    dMatrix3 R,R2;
+    dRSetIdentity(R);
+    dRFromEulerAngles (R, 0,0,
+                      0);
+
+    dQuaternion q1,q2,q3;
+    dQfromR(q1,R);
+    dRFromAxisAndAngle(R2,0,1,0,getAzimuthRadians(getForward()));
+
+    dQfromR(q2,R2);
+
+
+    dQMultiply0(q3,q2,q1);
+
+
+    Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft=Ft*250;
+
+    dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
+    dBodySetQuaternion(action->getBodyID(),q3);
+
+    //setTtl(1000);
+
+    // I can set power or something here.
+    return (Vehicle*)action;
 }
+
 Vehicle* SimplifiedDynamicManta::fireBomb(dWorldID world, dSpaceID space)
 {
     Bomb *action = new Bomb(GREEN_FACTION);

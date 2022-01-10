@@ -236,6 +236,21 @@ Vec3f Vec3f::rotateOn(Vec3f u, float alpha)
     return vec3f;
 }
 
+Vec3f Vec3f::rotateTo(Vec3f Up, Vec3f nd)
+{
+    nd = nd.normalize();
+    Up = Up.normalize();
+
+    Vec3f rot = Up.cross(nd);
+
+    float a = _acos(  Up.dot(nd)  );
+
+    Vec3f trans = rotateOn(rot, a);
+
+    if (isnan(v[0])) return Vec3f(v[0],v[1],v[2]);
+
+    return trans;
+}
 
 
 

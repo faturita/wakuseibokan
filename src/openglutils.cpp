@@ -1079,6 +1079,7 @@ void SmokeParticle::drawModel(float x, float y, float z, float width, float heig
     glPopAttrib();
 }
 
+
 void SmokeParticle::Move(void)
 {
     x += cos(direction) * speed;
@@ -1093,10 +1094,9 @@ void SmokeParticle::Draw(void)
 {
     glColor4d(1, 1, 1, alpha);
 
-    //Vec3f tran,rot(x,y,z);
-    //tran = rot.rotateOn(Vec3f(0,0,1),PI/2.0);
 
-
+    // Each particle grows in a cone with axis (0,1,0), this is Up.
+    // So the idea is to pick the axis where you want to make it grow, and rotate x,y,z towards it.
     Vec3f Up(0,1,0);
     Vec3f rot,fw = axis;
     fw = fw.normalize();
@@ -1110,7 +1110,7 @@ void SmokeParticle::Draw(void)
 
     if (isnan(tran[0])) tran = Vec3f(x,y,z);
 
-    dout << tran << std::endl;
+    //dout << tran << std::endl;
 
     drawModel(pos[0]+tran[0], pos[1]+tran[1], pos[2]+tran[2], size, size, rotation, textures["smoke"]);
 }
@@ -1140,17 +1140,18 @@ void Smoke::drawModel(Vec3f pos, Vec3f axis)
 
     Smoke_Vector.push_back(s);
 
-    if (Smoke_Vector.size()>100)
+    if (Smoke_Vector.size()>number_of_particles)
     {
         Smoke_Vector.erase(Smoke_Vector.begin());
     }
 
-    for( int i = 0 ; i < Smoke_Vector.size() ; ++i )
+    for( size_t i = 0 ; i < Smoke_Vector.size() ; ++i )
         {
         Smoke_Vector[i].Draw();
         Smoke_Vector[i].Move();
         }
 }
+
 
 void Smoke::clean()
 {
