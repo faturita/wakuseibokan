@@ -20,6 +20,8 @@
 #elif __APPLE__
 #endif
 
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierTurret.h"
 #include "profiling.h"
 #include "engine.h"
 #include "ai.h"
@@ -132,7 +134,7 @@ int AirDefense::apply(int state, int faction, unsigned long &timeevent, unsigned
 
 
 // Spawn walruses to defend the carrier of incoming boats.
-int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+int NavalDefense::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
 
@@ -141,26 +143,43 @@ int NavalDeffense::apply(int state, int faction, unsigned long &timeevent, unsig
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
     dout << "read" << v->getPos() << std::endl;
-    Walrus* w1 = spawnWalrus(space,world,b);
 
-    Walrus* w2 = spawnWalrus(space,world,b);
+    Walrus *w1 = findWalrusByOrder(faction,1);
 
-    //w1->attack(b->getPos());
-    w1->enableAuto();
+    if (!w1)
+    {
+        set(timer);
+        dout << "Spawn ! " << std::endl;
+        w1 = spawnWalrus(space,world,b);
+        w1->enableAuto();
+    }
 
-    //w2->attack(b->getPos());
-    w2->enableAuto();
+    for(int i=1;i<5;i++)
+    {
+        Walrus *w1 = findWalrusByOrder(faction,i);
+
+        if (w1) continue;
+
+        if (delay(timer,100))
+        {
+            set(timer);
+            dout << "Spawn ! " << std::endl;
+            w1 = spawnWalrus(space,world,b);
+            w1->enableAuto();
+        }
+
+        timeevent=timer;return state;
+    }
 
 
     timeevent=timer;return 21;
 
-    return state;
 }
 
 
 
 // Control the walruses and instruct them to defend the carrier.
-int NavalDeffending::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
 
@@ -168,20 +187,75 @@ int NavalDeffending::apply(int state, int faction, unsigned long &timeevent, uns
 
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
-    Walrus *w1 = findWalrusByOrder(faction,1);
-    Walrus *w2 = findWalrusByOrder(faction,2);
 
     if (v)
     {
-        if (w1) w1->attack(v->getPos());
-        if (w2) w2->attack(v->getPos());
+        bool all = true;
+        for(int i=1;i<5;i++)
+        {
+            Walrus *w = findWalrusByOrder(faction,i);
+            if (w) {w->attack(v->getPos());all=false;}
 
-        if (!w1 && !w2) {timeevent=timer;return 20;}
+        }
+
+        if (all) {timeevent=timer;return 20;} // No More walruses, spawn more.
     }
     else
     {
+        for(int i=1;i<5;i++)
+        {
+            Walrus *w = findWalrusByOrder(faction,i);
+            if (w) w->goTo(b->getPos());
+
+        }
         timeevent= timer;return 3;
     }
+
+    /**
+    if (v)
+    {
+        if(Beluga* lb = dynamic_cast<Beluga*>(b))
+        {
+            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+
+            if (t) {
+                Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                if (action)
+                {
+                    entities.push_back(action, action->getGeom());
+                }
+            }
+
+            CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
+
+            if (t2)
+            {
+                Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+
+                if (action)
+                {
+                    entities.push_back(action, action->getGeom());
+                }
+            }
+        }
+        else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
+        {
+            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+            if (t)
+            {
+                Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                if (action)
+                {
+                    entities.push_back(action, action->getGeom());
+                }
+            }
+        }
+    }
+    **/
+
+
     return state;
 }
 
@@ -770,8 +844,8 @@ Player::Player(int faction)
     for(int i=0;i<25;i++) qactions[i] = new QAction();
 
     qactions[22] = new AirDefense();
-    qactions[20] = new NavalDeffense();
-    qactions[21] = new NavalDeffending();
+    qactions[20] = new NavalDefense();
+    qactions[21] = new NavalDefending();
     qactions[9]  = new ApproachEnemyIsland();
     qactions[10] = new ApproachingEnemyIsland();
     qactions[11] = new BallisticAttack();

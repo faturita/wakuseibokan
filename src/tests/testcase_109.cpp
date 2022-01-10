@@ -28,7 +28,7 @@
 #include "../weapons/CarrierLauncher.h"
 
 
-#include "testcase_108.h"
+#include "testcase_109.h"
 
 
 extern unsigned long timer;
@@ -42,12 +42,12 @@ extern int testing;
 extern  Camera Camera;
 extern int  aiplayer;
 
-TestCase_108::TestCase_108()
+TestCase_109::TestCase_109()
 {
 
 }
 
-void TestCase_108::init()
+void TestCase_109::init()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
@@ -62,7 +62,7 @@ void TestCase_108::init()
     _bg->setPos(-5000.0,20.5f,-14000.0f);
     _bg->stop();
 
-    _bg->addWeapon(entities.push_back(_bg, _bg->getGeom()));
+    entities.push_back(_bg, _bg->getGeom());
 
 
     CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
@@ -71,7 +71,7 @@ void TestCase_108::init()
     _bl->attachTo(world,_bg, +30.0f, 20.0f - 3, +204.0f);
     _bl->stop();
 
-    _bg->addWeapon(entities.push_back(_bl, _bl->getGeom()));
+    entities.push_back(_bl, _bl->getGeom());
 
     CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
     _br->init();
@@ -79,7 +79,7 @@ void TestCase_108::init()
     _br->attachTo(world,_bg, -45.0f, 20.0f - 3, +204.0f);
     _br->stop();
 
-    _bg->addWeapon(entities.push_back(_br, _br->getGeom()));
+    entities.push_back(_br, _br->getGeom());
 
 
     CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
@@ -88,7 +88,7 @@ void TestCase_108::init()
     _wr->attachTo(world,_bg, -40.0, 27.0f+5, -230.0f);
     _wr->stop();
 
-    _bg->addWeapon(entities.push_back(_wr, _wr->getGeom()));
+    entities.push_back(_wr, _wr->getGeom());
 
     CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
     _wl->init();
@@ -96,7 +96,7 @@ void TestCase_108::init()
     _wl->attachTo(world,_bg, +40.0, 27.0f+2, -230.0f);
     _wl->stop();
 
-    _bg->addWeapon(entities.push_back(_wl, _wl->getGeom()));
+    entities.push_back(_wl, _wl->getGeom());
 
     CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
     _cf->init();
@@ -104,73 +104,54 @@ void TestCase_108::init()
     _cf->attachTo(world,_bg, +40.0, 27.0f+2, 0.0);
     _cf->stop();
 
-    _bg->addWeapon(entities.push_back(_cf, _cf->getGeom()));
+    entities.push_back(_cf, _cf->getGeom());
+
+    _bg->BackArtilleryLeft = _wl;
+    _bg->BackArtilleryRight = _wr;
+    _bg->FrontTurretLeft = _bl;
+    _bg->FrontTurretRight = _br;
+    _bg->Launcher = _cf;
 
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Launcher(GREEN_FACTION)           ,         0.0f,    -1700.0f,0,world);
-    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Dock(GREEN_FACTION)           ,         0.0f,    -1700.0f,0,world);
+    Structure *t3 = islands[0]->addStructure(new Antenna(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
     Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
     Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
 
-    Walrus *_walrus = new Walrus(GREEN_FACTION);
-
-    _walrus->init();
-    _walrus->embody(world, space);
-    _walrus->setPos(0.0f,20.5f,-2000);
-    _walrus->setStatus(SailingStatus::SAILING);
-    _walrus->setSignal(4);
-
-    entities.push_back(_walrus, _walrus->getGeom());
 
 
     //Vec3f pos(0.0,1.32, - 3500);
     Vec3f pos(-10,1.32,10);
     Camera.setPos(pos);
 
-    aiplayer = BLUE_AI;
+    aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
 
 }
 
-int TestCase_108::check(unsigned long timertick)
+int TestCase_109::check(unsigned long timertick)
 {
-    if (timertick == 200)
+    if (timertick == 400)
     {
-        Vehicle* _b = findCarrier(BLUE_FACTION);
+        Vehicle* _b = entities[islands[0]->getStructures()[1]];
 
-        Vehicle* _w = findWalrus(GREEN_FACTION);
+        Vehicle *t = _b->spawn(world,space,WALRUS,1);
 
-        if (_w && _b)
-        {
-            _w->attack(_b->getPos());
-            _w->enableAuto();
-        }
+        entities.push_back(t, t->getGeom());
 
     }
 
-    if (timertick > 1000)
+    if (timertick == 1000)
     {
-        Vehicle* _b = findCarrier(BLUE_FACTION);
+        Vehicle* _b = entities[islands[0]->getStructures()[1]];
 
-        Vehicle* _w = findWalrus(GREEN_FACTION);
+        Vehicle *t = _b->spawn(world,space,WALRUS,2);
 
-        if (_w && _b)
-        {
-            Beluga *bb = (Beluga*) _b;
-
-            CarrierTurret* cb = (CarrierTurret*)entities[bb->getWeapons()[0]];
-            Vehicle *action = cb->aimAndFire(world, space, _w->getPos());
-
-            if (action != NULL)
-            {
-                entities.push_back(action, action->getGeom());
-                gunshot();
-            }
-        }
+        entities.push_back(t, t->getGeom());
     }
 
     if (timertick > 8000)
@@ -211,27 +192,27 @@ int TestCase_108::check(unsigned long timertick)
     return 0;
 }
 
-int TestCase_108::number()
+int TestCase_109::number()
 {
     return 108;
 
 }
 
-std::string TestCase_108::title()
+std::string TestCase_109::title()
 {
     return std::string("Check the new weapons of Beluga.");
 }
 
 
-bool TestCase_108::done()
+bool TestCase_109::done()
 {
     return isdone;
 }
-bool TestCase_108::passed()
+bool TestCase_109::passed()
 {
     return haspassed;
 }
-std::string TestCase_108::failedMessage()
+std::string TestCase_109::failedMessage()
 {
     return message;
 }
@@ -240,6 +221,6 @@ std::string TestCase_108::failedMessage()
 // -----------
 TestCase *pickTestCase(int testcase)
 {
-    return new TestCase_108();
+    return new TestCase_109();
 }
 

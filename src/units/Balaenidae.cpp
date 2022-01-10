@@ -388,13 +388,18 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         dSpaceID car_space = _walrus->embody_in_space(world, space);
         Vec3f p;
         p = p.normalize();
-        p = getForward().normalize()*450;
-        _walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
+        p = getForward().normalize()*(getDimensions()[2]/2.0+15.0);
+        //_walrus->setPos(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]);
+        _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+1,pos[2]-p[2]);
         _walrus->stop();
         _walrus->setNameByNumber(number);
         _walrus->setStatus(SailingStatus::SAILING);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
         v = (Vehicle*)_walrus;
+
+        p = getForward().normalize()*(1000);
+        _walrus->goTo(Vec3f(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]));
+        _walrus->enableAuto();
 
         Vec3f dimensions(5.0f,4.0f,10.0f);
 
@@ -426,6 +431,10 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         entities.push_back(_br, _br->getGeom());
 
 
+
+
+
+
         Wheel * _bl= new Wheel(getFaction(), 0.001, 30.0);
         _bl->init();
         _bl->embody(world, car_space);
@@ -439,7 +448,12 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _fl->setSteering(true);
         _fr->setSteering(true);
 
-        alignToMe(_walrus->getBodyID());
+        alignToMyBody(_walrus->getBodyID());
+
+        dMatrix3 Re2;
+        dRSetIdentity(Re2);
+        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,PI);
+        dBodySetRotation(_walrus->getBodyID(),Re2);
 
     }
 
@@ -531,4 +545,14 @@ Vehicle* Balaenidae::fire(int weapon, dWorldID world, dSpaceID space)
 
     // I can set power or something here.
     return (Vehicle*)action;
+}
+
+std::vector<size_t> Balaenidae::getWeapons()
+{
+    return weapons;
+}
+
+void Balaenidae::addWeapon(size_t w)
+{
+    weapons.push_back(w);
 }

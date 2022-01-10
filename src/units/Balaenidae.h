@@ -1,6 +1,7 @@
 #ifndef BALAENIDAE_H
 #define BALAENIDAE_H
 
+#include "../weapons/Weapon.h"
 #include "Vehicle.h"
 #include "Manta.h"
 
@@ -10,6 +11,7 @@ protected:
     float rudder;
     int offshoring = 0;
     Vec3f ap;
+    std::vector<size_t> weapons;
 
 public:
 
@@ -47,6 +49,9 @@ public:
     void taxi(Manta *m);
 
     Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
+
+    std::vector<size_t> getWeapons();
+    void addWeapon(size_t w);
 };
 
 #endif // BALAENIDAE_H

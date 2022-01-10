@@ -13,6 +13,8 @@ public:
     int getSubType() override;
 
     bool checkHeightOffset(int heightOffset) override;
+    void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd);
+    Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };
 
 #endif // DOCK_H

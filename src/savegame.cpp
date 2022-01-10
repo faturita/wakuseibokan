@@ -287,7 +287,7 @@ void loadgame()
                     _bo->attachTo(world,b, -40.0f, 20.0f + 5, -210.0f);
                     _bo->stop();
 
-                    entities.push_back(_bo, _bo->getGeom());
+                    b->addWeapon(entities.push_back(_bo, _bo->getGeom()));
 
 
                     CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
@@ -296,11 +296,12 @@ void loadgame()
                     _w1->attachTo(world,b, -40.0, 27.0f, +210.0f);
                     _w1->stop();
 
-                    entities.push_back(_w1, _w1->getGeom());
+                    b->addWeapon(entities.push_back(_w1, _w1->getGeom()));
 
                     float R[12];
                     for(int j=0;j<12;j++) ss >> R[j];
                     v->setRotation(R);
+
                 }
                 else if (subtype==VehicleSubTypes::BELUGA)
                 {
@@ -322,7 +323,7 @@ void loadgame()
                     _bl->attachTo(world,b, +30.0f, 20.0f - 3, +204.0f);
                     _bl->stop();
 
-                    entities.push_back(_bl, _bl->getGeom());
+                    b->addWeapon(entities.push_back(_bl, _bl->getGeom()));
 
                     CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
                     _br->init();
@@ -330,7 +331,7 @@ void loadgame()
                     _br->attachTo(world,b, -45.0f, 20.0f - 3, +204.0f);
                     _br->stop();
 
-                    entities.push_back(_br, _br->getGeom());
+                    b->addWeapon(entities.push_back(_br, _br->getGeom()));
 
 
                     CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
@@ -339,7 +340,7 @@ void loadgame()
                     _wr->attachTo(world,b, -40.0, 27.0f+5, -230.0f);
                     _wr->stop();
 
-                    entities.push_back(_wr, _wr->getGeom());
+                    b->addWeapon(entities.push_back(_wr, _wr->getGeom()));
 
                     CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
                     _wl->init();
@@ -347,7 +348,7 @@ void loadgame()
                     _wl->attachTo(world,b, +40.0, 27.0f+2, -230.0f);
                     _wl->stop();
 
-                    entities.push_back(_wl, _wl->getGeom());
+                    b->addWeapon(entities.push_back(_wl, _wl->getGeom()));
 
                     CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
                     _cf->init();
@@ -355,7 +356,7 @@ void loadgame()
                     _cf->attachTo(world,b, +40.0, 27.0f+2, 0.0);
                     _cf->stop();
 
-                    entities.push_back(_cf, _cf->getGeom());
+                    b->addWeapon(entities.push_back(_cf, _cf->getGeom()));
 
                 }
                 v = b;
