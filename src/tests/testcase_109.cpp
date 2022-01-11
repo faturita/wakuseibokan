@@ -71,7 +71,7 @@ void TestCase_109::init()
     _bl->attachTo(world,_bg, +30.0f, 20.0f - 3, +204.0f);
     _bl->stop();
 
-    entities.push_back(_bl, _bl->getGeom());
+    _bg->addWeapon(entities.push_back(_bl, _bl->getGeom()));
 
     CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
     _br->init();
@@ -79,7 +79,7 @@ void TestCase_109::init()
     _br->attachTo(world,_bg, -45.0f, 20.0f - 3, +204.0f);
     _br->stop();
 
-    entities.push_back(_br, _br->getGeom());
+    _bg->addWeapon(entities.push_back(_br, _br->getGeom()));
 
 
     CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
@@ -88,7 +88,7 @@ void TestCase_109::init()
     _wr->attachTo(world,_bg, -40.0, 27.0f+5, -230.0f);
     _wr->stop();
 
-    entities.push_back(_wr, _wr->getGeom());
+    _bg->addWeapon(entities.push_back(_wr, _wr->getGeom()));
 
     CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
     _wl->init();
@@ -96,7 +96,7 @@ void TestCase_109::init()
     _wl->attachTo(world,_bg, +40.0, 27.0f+2, -230.0f);
     _wl->stop();
 
-    entities.push_back(_wl, _wl->getGeom());
+    _bg->addWeapon(entities.push_back(_wl, _wl->getGeom()));
 
     CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
     _cf->init();
@@ -104,17 +104,11 @@ void TestCase_109::init()
     _cf->attachTo(world,_bg, +40.0, 27.0f+2, 0.0);
     _cf->stop();
 
-    entities.push_back(_cf, _cf->getGeom());
-
-    _bg->BackArtilleryLeft = _wl;
-    _bg->BackArtilleryRight = _wr;
-    _bg->FrontTurretLeft = _bl;
-    _bg->FrontTurretRight = _br;
-    _bg->Launcher = _cf;
+    _bg->addWeapon(entities.push_back(_cf, _cf->getGeom()));
 
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Dock(GREEN_FACTION)           ,         0.0f,    -1700.0f,0,world);
+    Structure *t2 = islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION), world, 0);
     Structure *t3 = islands[0]->addStructure(new Antenna(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);

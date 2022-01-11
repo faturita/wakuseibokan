@@ -261,7 +261,7 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
     adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
 
 
-    for(int radius = 0;radius<2500;radius++)
+    for(int radius = 2500;radius>0;radius--)
     {
         x = cos(t);
         z = sin(t);
@@ -279,15 +279,14 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
         // @FIXME Put this line in a different function and use it from there.  Repeated code here.
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
 
-        CLog::Write(CLog::Debug,"(%10.5f - %10.5f  %d: %10.5f,%10.5f) Desired %10.5f vs Height %10.5f\n", t*180.0/PI, adjusted, radius,x,z,desiredHeight, heightOffset);
-
         if (  abs(heightOffset-desiredHeight)<0.5 )
         {
-            return addStructure(structure,x,z,adjusted, world);
+            return addStructure(structure,x,z,-t+3*(PI/2), world);
         }
     }
 
-    return addStructure(structure,x,z,adjusted, world);
+    // @NOTE Give up.
+    return addStructure(structure,x,z,-t+3*(PI/2), world);
 }
 
 
@@ -340,6 +339,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
  * @param structure
  * @param x
  * @param z
+ * @param angle in Radians !
  * @param space
  * @param world
  * @return

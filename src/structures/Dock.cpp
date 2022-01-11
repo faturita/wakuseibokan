@@ -19,9 +19,9 @@ void Dock::init()
 
     }
 
-    Structure::height=50;
-    Structure::length=2;
     Structure::width=20;
+    Structure::height=5;
+    Structure::length=500;
 
     setForward(0,0,1);
 }
