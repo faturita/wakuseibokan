@@ -606,6 +606,11 @@ void Vehicle::wrapDynamics(dBodyID body)
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
     }
 }
+void Vehicle::alignToMyBody(dBodyID fBodyID)
+{
+    const dReal *dBodyRotation = dBodyGetRotation(me);
+    dBodySetRotation(fBodyID,dBodyRotation);
+}
 
 void Vehicle::alignToMe(dBodyID fBodyID)
 {
@@ -634,7 +639,6 @@ void Vehicle::alignToMe(dBodyID fBodyID)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
     dBodySetRotation(fBodyID,Re);
-
 }
 
 void Vehicle::setFaction(int newfaction)

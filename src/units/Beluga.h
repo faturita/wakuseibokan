@@ -8,12 +8,6 @@ class Beluga : public Balaenidae
 {
 
 public:
-    Weapon* FrontTurretLeft;
-    Weapon* FrontTurretRight;
-    Weapon* BackArtilleryLeft;
-    Weapon* BackArtilleryRight;
-    Weapon* Launcher;
-
     Beluga(int faction);
 
     void drawModel(float yRot, float xRot, float x, float y, float z);

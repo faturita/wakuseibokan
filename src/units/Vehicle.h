@@ -131,6 +131,7 @@ public:
     void getR(float retR[12]);
     void setR(float newR[12]);
     void alignToMe(dBodyID fBodyID);
+    void alignToMyBody(dBodyID fBodyID);
 
     void setRotation(float newR[12]);
 

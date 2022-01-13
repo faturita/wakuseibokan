@@ -8,8 +8,20 @@
 
 class QAction
 {
+private:
+    unsigned long timerdelay;
 public:
     QAction() {}
+
+    void set(unsigned long timer)
+    {
+        timerdelay = timer;
+    }
+
+    bool delay(unsigned long timer, unsigned long delay)
+    {
+        return timer > (timerdelay + delay);
+    }
 
     int virtual apply(const int status,int faction,unsigned long &timerevent, unsigned long timer)
     {
@@ -33,17 +45,17 @@ public:
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
-class NavalDeffense : public QAction
+class NavalDefense : public QAction
 {
 public:
-    NavalDeffense() { }
+    NavalDefense() { }
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
-class NavalDeffending : public QAction
+class NavalDefending : public QAction
 {
 public:
-    NavalDeffending() { }
+    NavalDefending() { }
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 class ApproachEnemyIsland : public QAction

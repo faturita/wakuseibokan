@@ -3888,6 +3888,7 @@ void test41()
     _b->setPos(0.0f,20.5f,-16000.0f);
     _b->stop();
 
+
     entities.push_back(_b, _b->getGeom());
 
     Beluga *_bg = new Beluga(BLUE_FACTION);
