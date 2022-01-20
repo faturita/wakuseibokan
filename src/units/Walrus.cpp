@@ -346,7 +346,7 @@ void Walrus::doControlDestination()
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "Walrus has arrived to destination.");
+            sprintf(str, "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");

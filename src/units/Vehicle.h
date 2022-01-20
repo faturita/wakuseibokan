@@ -111,6 +111,8 @@ public:
     int virtual getType();
     int virtual getSubType();
 
+
+
     void setAutoStatus(AutoStatus au);
     
     void virtual init();                                        // Init, when the entity is created.

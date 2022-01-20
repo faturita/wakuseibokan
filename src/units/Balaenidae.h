@@ -13,6 +13,7 @@ protected:
     Vec3f ap;
     std::vector<size_t> weapons;
 
+
 public:
 
     static const int OFFSHORING = 1;

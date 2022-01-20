@@ -1256,6 +1256,17 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         m->dogfight(b->getPos());
                     }
+
+                    Walrus *w = findWalrusByOrder(sc->getFaction(), DEFEND_ISLAND);
+
+                    if (w)
+                    {
+                        if (!w->isAuto())
+                            w->enableAuto();
+
+                        w->attack(b->getPos());
+
+                    }
                 }
             }
 
@@ -1428,6 +1439,26 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         }
                     } else
+                    if(Dock *d = dynamic_cast<Dock*>(entities[str[i]]))
+                    {
+                        unsigned long timeevent = sc->getTimer();
+
+                        if (timer==(timeevent + 200))
+                        {
+                            // Spawn 1 walrus @FIXME: Recode all this.
+                            Walrus *w = findWalrusByOrder(d->getFaction(), DEFEND_ISLAND);
+
+                            if (!w && (b->getType() == CARRIER || b->getType() == WALRUS))
+                            {
+                                int walrusNumber = findNextNumber(d->getFaction(), WALRUS, SIMPLEWALRUS);
+                                Vehicle *walrus = (d)->spawn(world, space, WALRUS, walrusNumber);
+
+                                size_t l = entities.push_back(walrus, walrus->getGeom());
+
+                                walrus->setOrder(DEFEND_ISLAND);
+                            }
+                        }
+                    }
                     if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
                     {
                         // Launch airplanes to attack incoming mantas.

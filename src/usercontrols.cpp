@@ -260,8 +260,6 @@ void switchControl(size_t id)
     //}
     //size_t id = entities.indexAt(controlposition);
 
-    printf("Switching to:%d\n", id);
-
     if (id == CONTROLLING_NONE)
         return;
 
@@ -314,12 +312,11 @@ void handleKeypress(unsigned char key, int x, int y) {
 
             if (n != std::string::npos)
             {
-                // @FIXME input data should be verified.
-                const char *content = controller.str.substr(7).c_str();
+                int content = atoi( controller.str.substr(7).c_str() );
 
-                CLog::Write(CLog::Debug,"Controlling %s\n", content);
+                CLog::Write(CLog::Debug,"Controlling %d\n", content);
 
-                switchControl(atoi(content));
+                switchControl(content);
 
             } else
             if (controller.str.find("set") != std::string::npos)
@@ -338,45 +335,45 @@ void handleKeypress(unsigned char key, int x, int y) {
             else if (controller.str.find("walrus") != std::string::npos)
             {
                 // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
-                const char *content = controller.str.substr(6).c_str();
+                int content = atoi(controller.str.substr(6).c_str());
 
-                printf ("Walrus %s\n", content);
+                printf ("Walrus %d\n", content);
 
                 size_t index = CONTROLLING_NONE;
-                findWalrusByFactionAndNumber(index, controller.faction, atoi(content));
+                findWalrusByFactionAndNumber(index, controller.faction, content);
                 switchControl(index);
 
             } else
             if (controller.str.find("cephalopod") != std::string::npos)
             {
-                const char *content = controller.str.substr(10).c_str();
+                int content = atoi(controller.str.substr(10).c_str());
 
                 size_t index = CONTROLLING_NONE;
-                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CEPHALOPOD,controller.faction, atoi(content));
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CEPHALOPOD,controller.faction, content);
 
-                printf ("Manta %d\n", index);
+                printf ("Manta %ld\n", index);
 
                 switchControl(index);
             } else
             if (controller.str.find("medusa") != std::string::npos)
             {
-                const char *content = controller.str.substr(6).c_str();
+                int content = atoi(controller.str.substr(6).c_str());
 
                 size_t index = CONTROLLING_NONE;
-                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, atoi(content));
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, content);
 
-                printf ("Manta %d\n", index);
+                printf ("Manta %ld\n", index);
 
                 switchControl(index);
             } else
             if (controller.str.find("manta") != std::string::npos)
             {
-                const char *content = controller.str.substr(5).c_str();
+                int content = atoi(controller.str.substr(5).c_str());
 
                 size_t index = CONTROLLING_NONE;
-                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, atoi(content));
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
-                printf ("Manta %d\n", index);
+                printf ("Manta %ld\n", index);
 
                 switchControl(index);
 
@@ -385,20 +382,18 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 std::string islandcode = controller.str.substr(3+controller.str.substr(3).find(" "));
                 std::string islandname = islandcode.substr(1,islandcode.find("#")-1);
-                const char *structurenumber = controller.str.substr(controller.str.find("#")+1).c_str();
+                int structurenumber = atoi(controller.str.substr(controller.str.find("#")+1).c_str());
 
-                int number = atoi(structurenumber) ;
-
-                dout << "Island-" << islandname << "-structure " << number << std::endl;
+                dout << "Island-" << islandname << "-structure " << structurenumber << std::endl;
 
                 size_t index = CONTROLLING_NONE;
 
-                for (int j=0;j<islands.size();j++)
+                for (size_t j=0;j<islands.size();j++)
                 {
-                    if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>number)
+                    if (islandname == islands[j]->getName() && islands[j]->getStructures().size()>structurenumber)
                     {
-                        dout << "Found-" << islandname << "-structure " << number << std::endl;
-                        index = islands[j]->getStructures()[number];
+                        dout << "Found-" << islandname << "-structure " << structurenumber << std::endl;
+                        index = islands[j]->getStructures()[structurenumber];
 
                         // @NOTE: For some strange reason on Linux, the value of structurenumber 
                         // was being modified inside this loop ! Even if it was a constant !
@@ -424,7 +419,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 dout << "Island-" << islandname << std::endl;
 
-                for (int j=0;j<islands.size();j++)
+                for (size_t j=0;j<islands.size();j++)
                 {
                     if (islandname == islands[j]->getName())
                     {
@@ -460,9 +455,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             else
             if (controller.str.find("weapon")!= std::string::npos)
             {
-                const char *content = controller.str.substr(6).c_str();
+                int content = atoi(controller.str.substr(6).c_str());
 
-                controller.weapon = atoi(content);
+                controller.weapon = content;
             } else
             if (controller.str.find("telemetry") != std::string::npos)
             {

@@ -79,7 +79,7 @@ Vehicle* Dock::spawn(dWorldID  world,dSpaceID space,int type, int number)
     _walrus->stop();
     _walrus->inert = true;
 
-    p = getForward().normalize()*(1000);
+    p = getForward().normalize()*(1500);
     _walrus->goTo(Vec3f(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]));
     _walrus->enableAuto();
 
