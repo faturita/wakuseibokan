@@ -362,7 +362,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, content);
 
-                printf ("Manta %ld\n", index);
+                printf ("Medusa %ld\n", index);
 
                 switchControl(index);
             } else
@@ -374,6 +374,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
                 printf ("Manta %ld\n", index);
+
+                switchControl(index);
+
+            } else
+            if (controller.str.find("stingray") != std::string::npos)
+            {
+                int content = atoi(controller.str.substr(8).c_str());
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::STINGRAY, controller.faction, content);
+
+                printf ("Stingray %ld\n", index);
 
                 switchControl(index);
 

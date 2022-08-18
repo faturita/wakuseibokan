@@ -64,6 +64,13 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 
+#include "weapons/CarrierTurret.h"
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierLauncher.h"
+
+#include "units/Stingray.h"
+#include "units/Medusa.h"
+
 #include "actions/Explosion.h"
 
 #include "map.h"
@@ -73,6 +80,7 @@
 #include "ai.h"
 
 #include "networking/telemetry.h"
+#include "networking/ledger.h"
 
 extern  Controller controller;
 extern  Camera Camera;
@@ -112,6 +120,8 @@ bool wireframes=false;
 
 int sockfd;
 struct sockaddr_in servaddr;
+
+FILE *ledger;
 
 void disclaimer()
 {
@@ -662,6 +672,190 @@ void handleResize(int w, int h) {
 
 static bool didODEInit=false;
 
+void updates(int value)
+{
+    if (controller.isInterrupted())
+    {
+        endWorldModelling();
+        // Do extra wrap up
+        msgboardfile.close();
+        fclose(ledger);
+        exit(0);
+    }
+    if (!controller.pause)
+    {
+        // I assume the file is open
+
+        TickRecord record;
+
+        int ret = 1;
+        while (ret>0)
+        {
+            ret = fread(&record, sizeof(TickRecord),1,ledger);
+
+
+            if (ret>0)
+            {
+                printf(" %ld vs %ld \n", record.timerparam, timer);
+
+                if (!entities.isValid(record.id))
+                {
+                    if (record.subtype == VehicleSubTypes::BALAENIDAE)
+                    {
+                        Balaenidae* b = new Balaenidae(record.faction);
+                        b->init();
+                        dSpaceID carrier_space = b->embody_in_space(world, space);
+                        b->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+                        b->stop();
+
+                        entities.push_back(b, b->getGeom());
+
+
+                        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+                        _bo->init();
+                        _bo->embody(world, carrier_space);
+                        _bo->attachTo(world,b, -40.0f, 20.0f + 5, -210.0f);
+                        _bo->stop();
+
+                        b->addWeapon(entities.push_back(_bo, _bo->getGeom()));
+
+
+                        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+                        _w1->init();
+                        _w1->embody(world, carrier_space);
+                        _w1->attachTo(world,b, -40.0, 27.0f, +210.0f);
+                        _w1->stop();
+
+                        b->addWeapon(entities.push_back(_w1, _w1->getGeom()));
+
+                    }
+
+                    if (record.subtype == VehicleSubTypes::BELUGA)
+                    {
+                        Beluga* b = new Beluga(BLUE_FACTION);
+                        b->init();
+                        dSpaceID carrier_space_beluga = b->embody_in_space(world, space);
+                        b->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+                        entities.push_back(b, b->getGeom());
+
+
+                        CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+                        _bl->init();
+                        _bl->embody(world, carrier_space_beluga);
+                        _bl->attachTo(world,b, +30.0f, 20.0f - 3, +204.0f);
+                        _bl->stop();
+
+                        b->addWeapon(entities.push_back(_bl, _bl->getGeom()));
+
+                        CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+                        _br->init();
+                        _br->embody(world, carrier_space_beluga);
+                        _br->attachTo(world,b, -45.0f, 20.0f - 3, +204.0f);
+                        _br->stop();
+
+                        b->addWeapon(entities.push_back(_br, _br->getGeom()));
+
+
+                        CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+                        _wr->init();
+                        _wr->embody(world, carrier_space_beluga);
+                        _wr->attachTo(world,b, -40.0, 27.0f+5, -230.0f);
+                        _wr->stop();
+
+                        b->addWeapon(entities.push_back(_wr, _wr->getGeom()));
+
+                        CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+                        _wl->init();
+                        _wl->embody(world, carrier_space_beluga);
+                        _wl->attachTo(world,b, +40.0, 27.0f+2, -230.0f);
+                        _wl->stop();
+
+                        b->addWeapon(entities.push_back(_wl, _wl->getGeom()));
+
+                        CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
+                        _cf->init();
+                        _cf->embody(world, carrier_space_beluga);
+                        _cf->attachTo(world,b, +40.0, 27.0f+2, 0.0);
+                        _cf->stop();
+
+                        b->addWeapon(entities.push_back(_cf, _cf->getGeom()));
+
+                    }
+                    if (record.type == VehicleTypes::MANTA)
+                    {
+                        Manta *_manta1 = NULL;
+
+                        if (record.subtype == VehicleSubTypes::MEDUSA)
+                            _manta1 = new Medusa(record.faction);
+                        else if (record.subtype == VehicleSubTypes::STINGRAY)
+                            _manta1 = new Stingray(record.faction);
+                        else if (record.subtype == VehicleSubTypes::SIMPLEMANTA)
+                            _manta1 = new AdvancedManta(record.faction);
+                        else if (record.subtype == VehicleSubTypes::CEPHALOPOD)
+                            _manta1 = new Cephalopod(record.faction);
+
+                        _manta1->init();
+                        _manta1->embody(world, space);
+                        _manta1->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+                        _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
+                        _manta1->inert = true;
+
+                        entities.push_back(_manta1, _manta1->getGeom());
+
+                    }
+                }
+
+                if (record.subtype == VehicleSubTypes::BALAENIDAE ||
+                        record.subtype == VehicleSubTypes::BELUGA ||
+                        record.type == VehicleTypes::WEAPON ||
+                        record.type == VehicleTypes::MANTA)
+                {
+                    Vehicle *v = entities[record.id];
+
+                    if (v)
+                    {
+                        float dBodyRotation[12];
+
+                        v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+                        dBodyRotation[0] = record.location.r1;
+                        dBodyRotation[1] = record.location.r2;
+                        dBodyRotation[2] = record.location.r3;
+                        dBodyRotation[3] = record.location.r4;
+                        dBodyRotation[4] = record.location.r5;
+                        dBodyRotation[5] = record.location.r6;
+                        dBodyRotation[6] = record.location.r7;
+                        dBodyRotation[7] = record.location.r8;
+                        dBodyRotation[8] = record.location.r9;
+                        dBodyRotation[9] = record.location.r10;
+                        dBodyRotation[10] = record.location.r11;
+                        dBodyRotation[11] = record.location.r12;
+
+                        v->setRotation(dBodyRotation);
+
+                    }
+
+                    if (record.type == MANTA)
+                    {
+                        Manta *m = (Manta*) v;
+                        m->release(v->getForward());
+                    }
+
+                }
+
+                if (record.timerparam != timer)
+                    break;
+            }
+        }
+
+
+    }
+    glutPostRedisplay();
+    // @NOTE: update time should be adapted to real FPS (lower is faster).
+    glutTimerFunc(20, worldStep, 0);
+}
+
 void update(int value)
 {
 	// Derive the control to the correct object
@@ -677,6 +871,7 @@ void update(int value)
         endWorldModelling();
         // Do extra wrap up
         msgboardfile.close();
+        fclose(ledger);
         exit(0);
     }
     if (!controller.pause)
@@ -732,6 +927,8 @@ void update(int value)
             }
             entities[i]->doDynamics();
             entities[i]->tick();
+
+            record(timer,i, entities[i]);
         }
 
 
@@ -941,8 +1138,13 @@ int main(int argc, char** argv) {
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
     else if (isPresentCommandLineParameter(argc,argv,"-load"))
         loadgame();
+    else if (isPresentCommandLineParameter(argc,argv,"-replay"))
+    {
+        ledger = fopen("ledger.bin","rb");
+    }
     else
     {
+        ledger = fopen("ledger.bin","wb+");
         initWorldModelling();
     }
 
