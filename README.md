@@ -178,3 +178,4 @@ References
 * https://community.khronos.org/t/efficient-smoke/67120/6
 * http://www.inf.ufsc.br/~aldo.vw/grafica/apostilas/openGL/lesson19/lesson19.html
 * http://lua-users.org/wiki/CppObjectBinding
+* https://www-robotics.jpl.nasa.gov/how-we-do-it/facilities/the-darts-simulation-laboratory/
