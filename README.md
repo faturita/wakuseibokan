@@ -180,3 +180,4 @@ References
 * http://lua-users.org/wiki/CppObjectBinding
 * https://www-robotics.jpl.nasa.gov/how-we-do-it/facilities/the-darts-simulation-laboratory/
 * MuJoCo https://github.com/deepmind/mujoco
+* https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers
