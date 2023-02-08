@@ -41,6 +41,8 @@ void loadgame();
 
 enum gamemodes { ACTIONGAME, STRATEGYGAME };
 
+enum tracemodes { NOTRACE, RECORD, REPLAY };
+
 #include "messages.h"
 
 

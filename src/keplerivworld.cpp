@@ -83,6 +83,8 @@ std::vector<Message> messages;
 
 int gamemode;
 
+int tracemode;
+
 int aiplayer;
 
 
@@ -769,16 +771,20 @@ void initWorldModelling()
 {
     initIslands();
 
-    initWorldPopulation();
+   if (tracemode != REPLAY) initWorldPopulation();
 }
 
 
 void update(int value);
+void replayupdate(int value);
 
 void worldStep(int value)
 {
     timer++;
-    update(value);
+    if (tracemode==REPLAY)
+        replayupdate(value);
+    else
+        update(value);
 }
 
 void endWorldModelling()

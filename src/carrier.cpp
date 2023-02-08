@@ -70,6 +70,7 @@
 
 #include "units/Stingray.h"
 #include "units/Medusa.h"
+#include "units/Otter.h"
 
 #include "actions/Explosion.h"
 
@@ -105,6 +106,8 @@ extern std::vector<Message> messages;
 extern int aiplayer;
 
 extern int gamemode;
+
+extern int tracemode;
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -672,16 +675,23 @@ void handleResize(int w, int h) {
 
 static bool didODEInit=false;
 
-void updates(int value)
+// Go through all the elements that appear each time on the trackrecord.
+// Those who are new, create them.
+// Those wo are already there, update them.
+// Those who are no longer there, destroy them.
+void replayupdate(int value)
 {
     if (controller.isInterrupted())
     {
         endWorldModelling();
         // Do extra wrap up
         msgboardfile.close();
-        fclose(ledger);
+        if (tracemode == RECORD || tracemode == REPLAY) fclose(ledger);
         exit(0);
     }
+
+    std::vector<size_t> visited;
+
     if (!controller.pause)
     {
         // I assume the file is open
@@ -697,6 +707,8 @@ void updates(int value)
             if (ret>0)
             {
                 printf(" %ld vs %ld \n", record.timerparam, timer);
+
+                visited.push_back(record.id);
 
                 if (!entities.isValid(record.id))
                 {
@@ -804,12 +816,81 @@ void updates(int value)
                         entities.push_back(_manta1, _manta1->getGeom());
 
                     }
+
+//                    if (record.type == VehicleTypes::WALRUS)
+//                    {
+//                        Otter *_walrus = new Otter(record.faction);
+//                        _walrus->init();
+//                        dSpaceID car_space = _walrus->embody_in_space(world, space);
+
+//                        _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+//                        //_walrus->setNameByNumber(number);
+//                        _walrus->setStatus(SailingStatus::SAILING);
+
+//                        Vec3f dimensions(5.0f,4.0f,10.0f);
+
+
+//                        Wheel * _fr= new Wheel(record.faction, 0.001, 30.0);
+//                        _fr->init();
+//                        _fr->embody(world, car_space);
+//                        _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
+//                        _fr->stop();
+
+//                        entities.push_back(_fr, _fr->getGeom());
+
+
+//                        Wheel * _fl= new Wheel(record.faction, 0.001, 30.0);
+//                        _fl->init();
+//                        _fl->embody(world, car_space);
+//                        _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
+//                        _fl->stop();
+
+//                        entities.push_back(_fl, _fl->getGeom());
+
+
+//                        Wheel * _br= new Wheel(record.faction, 0.001, 30.0);
+//                        _br->init();
+//                        _br->embody(world, car_space);
+//                        _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
+//                        _br->stop();
+
+//                        entities.push_back(_br, _br->getGeom());
+
+//                        Wheel * _bl= new Wheel(record.faction, 0.001, 30.0);
+//                        _bl->init();
+//                        _bl->embody(world, car_space);
+//                        _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
+//                        _bl->stop();
+
+//                        entities.push_back(_bl, _bl->getGeom());
+
+//                        _walrus->addWheels(_fl, _fr, _bl, _br);
+
+//                        _fl->setSteering(true);
+//                        _fr->setSteering(true);
+
+//                        entities.push_back(_walrus, _walrus->getGeom());
+//                    }
+
+                    if (record.type == VehicleTypes::ACTION)
+                    {
+                        Gunshot *action = new Gunshot();
+                        // Need axis conversion.
+                        action->init();
+                        action->embody(world,space);
+                        action->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+                        entities.push_back(action, action->getGeom());
+                    }
+
+
                 }
 
                 if (record.subtype == VehicleSubTypes::BALAENIDAE ||
                         record.subtype == VehicleSubTypes::BELUGA ||
                         record.type == VehicleTypes::WEAPON ||
-                        record.type == VehicleTypes::MANTA)
+                        record.type == VehicleTypes::MANTA ||
+                        record.type == VehicleTypes::ACTION )
                 {
                     Vehicle *v = entities[record.id];
 
@@ -844,8 +925,20 @@ void updates(int value)
 
                 }
 
+
                 if (record.timerparam != timer)
                     break;
+            }
+
+        }
+
+        synchronized(entities.m_mutex)
+        {
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
+                if ( std::find(visited.begin(), visited.end(), i) == visited.end() )
+                {
+                    deleteEntity(i);
+                }
             }
         }
 
@@ -928,7 +1021,7 @@ void update(int value)
             entities[i]->doDynamics();
             entities[i]->tick();
 
-            record(timer,i, entities[i]);
+            if (tracemode == RECORD) record(timer,i, entities[i]);
         }
 
 
@@ -1129,6 +1222,15 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
 
+
+    if (isPresentCommandLineParameter(argc,argv,"-record"))
+        tracemode = RECORD;
+    else if (isPresentCommandLineParameter(argc,argv,"-replay"))
+        tracemode = REPLAY;
+    else
+        tracemode = NOTRACE;
+
+
     setupWorldModelling();
 
     // Initialize ODE, create islands, structures and populate the world.
@@ -1138,13 +1240,14 @@ int main(int argc, char** argv) {
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
     else if (isPresentCommandLineParameter(argc,argv,"-load"))
         loadgame();
-    else if (isPresentCommandLineParameter(argc,argv,"-replay"))
+    else if (tracemode == REPLAY)
     {
+        initWorldModelling();
         ledger = fopen("ledger.bin","rb");
     }
     else
     {
-        ledger = fopen("ledger.bin","wb+");
+        if (tracemode == RECORD) ledger = fopen("ledger.bin","wb+");
         initWorldModelling();
     }
 
