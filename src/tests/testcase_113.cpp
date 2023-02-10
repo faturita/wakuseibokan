@@ -57,7 +57,7 @@ void TestCase_113::init()
     //_b->embody(world, space);
     dSpaceID carrier_space = _b->embody_in_space(world, space);
     //_b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-    _b->setPos(0 kmf, 0, 0 kmf - 12000.0f);
+    _b->setPos(0 kmf, 0, 0 kmf - 14000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
@@ -107,7 +107,7 @@ int TestCase_113::check(unsigned long timertick)
         }
     }
 
-    if (timertick > 300)
+    if (timertick > 300 && timertick < 600)
     {
         Vehicle *action = entities[missile];
         action->stop();
@@ -152,6 +152,21 @@ int TestCase_113::check(unsigned long timertick)
         Camera.setPos(pos);
         Camera.fw = Vec3f(0.0f,0.0f,1.0f);
 
+    }
+
+    if (timertick == 600)
+    {
+        CommandCenter *c = (CommandCenter*)islands[0]->getCommandCenter();
+
+        Missile *a = (Missile*)entities[missile];
+
+        if (c && a)
+        {
+            a->goTo(c->getPos());
+            a->enableAuto();
+        }
+
+        switchControl(missile);
     }
 
 
