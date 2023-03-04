@@ -36,8 +36,8 @@ make install
 That's all folks.
 
 
-ODE 0.14 Compilation on Mac Sierra
-----------------------------------
+ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
+----------------------------------------------------------
 
 * Run the following script to install automake tools for Mac
 
@@ -95,9 +95,10 @@ echo "Installation complete."
 ```
 
 * Now download the ode-0.14.tar tarball.
+* Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 * ./bootstrap
-* ./configure
+* ./configure --disable-asserts
 * make clean && make && sudo make install
 
 
