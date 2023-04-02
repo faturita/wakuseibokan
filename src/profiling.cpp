@@ -1,8 +1,15 @@
 #include "profiling.h"
 
+#ifdef _WIN32
+#include <string>
+#endif
 #include <iostream>
 #include <cstdio>
 #include <cstdarg>
+#ifdef _WIN32
+#include <cstdlib>
+#include <cwchar>
+#endif
 
 #ifdef DEBUG
 std::ostream &dout = std::cout;

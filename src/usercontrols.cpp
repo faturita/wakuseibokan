@@ -7,9 +7,10 @@
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
-#elif __linux
+#else
 #include <GL/glut.h>
 #endif
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,6 +18,11 @@
 
 #include <vector>
 #include <iostream>
+
+#ifdef _WIN32
+#include <mutex>
+#include <shared_mutex>
+#endif
 
 #include "math/yamathutil.h"
 
@@ -810,6 +816,7 @@ GLbyte *gltReadTGABits(const char *szFileName, GLint *iWidth, GLint *iHeight,
 
 	}
 
+#ifndef _WIN32
 	switch (sDepth)
 	{
 	case 3:
@@ -827,6 +834,23 @@ GLbyte *gltReadTGABits(const char *szFileName, GLint *iWidth, GLint *iHeight,
 	default:
 		break;
 	}
+#else
+	switch (sDepth)
+	{
+	case 3:
+		*iComponents = GL_RGB;
+		break;
+	case 4:
+		*iComponents = GL_RGBA;
+		break;
+	case 1:
+		*eFormat = GL_LUMINANCE;
+		*iComponents = GL_LUMINANCE;
+		break;
+	default:
+		break;
+	}
+#endif
 
 	fclose(pFile);
 
@@ -862,7 +886,9 @@ GLint gltWriteTGA(const char *szFileName)
 
 	glGetIntegerv(GL_READ_BUFFER, &lastBuffer);
 	glReadBuffer(GL_FRONT);
+#ifndef _WIN32
 	glReadPixels(0,0,iViewport[2], iViewport[3], GL_BGR, GL_UNSIGNED_BYTE, pBits);
+#endif
 	glReadBuffer(lastBuffer);
 
 	tgaHeader.imageTypeCode = 2;

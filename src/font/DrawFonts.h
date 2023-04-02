@@ -1,4 +1,4 @@
-/*
+/**
  * DrawFonts.h
  *
  *  Created on: Jan 10, 2011
@@ -8,7 +8,7 @@
 #ifndef DRAWFONTS_H_
 #define DRAWFONTS_H_
 
-#ifdef __linux
+#ifdef __linux || _WIN32
 #include <GL/glut.h>
 #elif __APPLE__
 #include <GLUT/glut.h>

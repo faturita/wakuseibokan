@@ -19,7 +19,7 @@
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
-#elif __linux
+#else
 #include <GL/glut.h>
 #endif
 
@@ -72,7 +72,6 @@
 
 #include "ai.h"
 
-#include "networking/telemetry.h"
 
 extern  Controller controller;
 extern  Camera Camera;
@@ -111,7 +110,7 @@ bool cull=false;
 bool wireframes=false;
 
 int sockfd;
-struct sockaddr_in servaddr;
+//struct sockaddr_in servaddr;
 
 void disclaimer()
 {
@@ -892,7 +891,7 @@ int main(int argc, char** argv) {
         glutFullScreen();
 
     // Connects a socket to a UDP Server.  Keep in mind that the server must exist at this point for this to work.
-    inittelemetry();
+    //inittelemetry();
 
     // OpenGL Configuration information
     /* get version info */
@@ -952,8 +951,11 @@ int main(int argc, char** argv) {
     CLog::Write(CLog::Debug,"ODE Configuration: %s\n", conf);
 
     // Draw vehicles and objects
+
     CLog::Write(CLog::Debug,"Size %d\n", entities.size());
+#ifndef _WIN32
     synchronized(entities.m_mutex)
+#endif
     {
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {

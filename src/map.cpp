@@ -13,7 +13,7 @@
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
-#elif __linux
+#elif __linux || _WIN32
 #include <GL/glut.h>
 #endif
 

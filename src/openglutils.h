@@ -17,6 +17,8 @@
 #include <GLUT/glut.h>
 #endif
 
+#include <GL/glut.h>
+
 #include <vector>
 #include "math/vec3f.h"
 #include "imageloader.h"

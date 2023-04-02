@@ -609,7 +609,11 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
             if (c->getIsland() != NULL)
             {
                 // @FIXME: Decide which island to create
+#ifdef _WIN32
+                int which = (rand() % 3);
+#else
                 int which = (arc4random() % 3);
+#endif
                 captureIsland(c,is,m->getFaction(),which,space, world);
                 //landManta(b,c);
 

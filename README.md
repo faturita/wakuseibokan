@@ -28,6 +28,11 @@ make install
 
  libbsd-dev  freeglut3-dev
 
+# Windows
+
+mingw32, g++ 9.2.0
+
+
 # Compiling
 
  make

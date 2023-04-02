@@ -38,8 +38,8 @@ typedef struct{
 typedef struct {
 	char name[20];
     
-	int vertices_qty;
-    int polygons_qty;
+	int vertices_qty=0;
+    int polygons_qty=0;
 
     vertex_type vertex[MAX_VERTICES]; 
     polygon_type polygon[MAX_POLYGONS];
@@ -75,7 +75,8 @@ typedef struct {
          void setLocation(float x,float y,float z);
          void setScale(float scalex,float scaley, float scalez);
          void virtual setTexture(GLuint texture);
-         void setObject(obj_type object);
+         void load3DSModel(const char* p_filename);
+         void calculateCenterOfMass();
 
          //Switches to the given animation
          void setAnimation(const char* name);

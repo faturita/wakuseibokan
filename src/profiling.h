@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <iomanip>
 
 // Comment the following define to allow quick suppression of all debug printfs or couts.
 #define DEBUG

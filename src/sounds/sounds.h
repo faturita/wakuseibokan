@@ -9,7 +9,7 @@
 #include <GLUT/glut.h>
 #endif
 
-
+#define PLAYSOUNDCOMMAND "play"
 
 void firesound(int times);
 void enginestart();

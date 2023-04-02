@@ -11,7 +11,8 @@ void playsound(char *filename)
 {
     // @FIXME: This is extremly risky !!!
     char temp[200];
-    sprintf(temp, "%s %s &",PLAYSOUNDCOMMAND, filename);
+    sprintf(temp, "powershell -c \"(New-Object Media.SoundPlayer %s).PlaySync()\"", filename);
+    //sprintf(temp, "%s %s &",PLAYSOUNDCOMMAND, filename);
     system(temp);
 }
 

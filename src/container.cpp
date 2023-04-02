@@ -23,12 +23,16 @@ template<class T> bool container<T>::isSafe()
 template<class T> void container<T>::lock()
 {
     printf("<<");
+#ifndef _WIN32
     mlock.lock();
+#endif
 }
 
 template<class T> void container<T>::unlock()
 {
+#ifndef _WIN32
     mlock.unlock();
+#endif
     printf(">>");
 }
 

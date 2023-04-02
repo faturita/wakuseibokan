@@ -16,7 +16,6 @@
 #include <assert.h>
 #include "../profiling.h"
 #include "../md2model.h"
-#include "../networking/telemetry.h"
 
 
 
@@ -577,6 +576,7 @@ void Vehicle::wrapDynamics(dBodyID body)
         CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
+    /**
     if (dotelemetry)
     {
 
@@ -598,6 +598,7 @@ void Vehicle::wrapDynamics(dBodyID body)
 
         telemetryme((float *)dBodyPosition, (float *)dBodyRotation);
     }
+    **/
 
 
     // @NOTE:  Keep the following line if you want the game to be more stable.
