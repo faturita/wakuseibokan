@@ -19,6 +19,34 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
+struct LogStructure {
+    float pos1;
+    float pos2;
+    float pos3;
+    float r1;
+    float r2;
+    float r3;
+    float r4;
+    float r5;
+    float r6;
+    float r7;
+    float r8;
+    float r9;
+    float r10;
+    float r11;
+    float r12;
+
+};
+
+struct TickRecord {
+    unsigned long timerparam;
+    size_t id;
+    int type;
+    int subtype;
+    int faction;
+    LogStructure location;
+};
+
 /**
  * @brief Structures are identified if their type number is greater than or equal to COLLISIONABLE.
  */
@@ -244,6 +272,9 @@ public:
     Vec3f screenLocation();
 
     void setTheOrientation(Vec3f orientation);
+
+    TickRecord  serialize();
+    void        deserialize(TickRecord);
 
 };
 

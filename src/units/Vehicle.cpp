@@ -870,3 +870,64 @@ void Vehicle::setTheOrientation(Vec3f orientation)
     if (!Vehicle::inert)
         dBodySetQuaternion(me,q3);
 }
+
+TickRecord Vehicle::serialize()
+{
+    TickRecord tickrecord;
+
+    float dBodyRotation[12];
+
+    getR(dBodyRotation);
+
+    Vec3f dBodyPosition = getPos();
+
+    tickrecord.type = getType();
+    tickrecord.subtype = getSubType();
+
+
+    tickrecord.location.pos1 = dBodyPosition[0];
+    tickrecord.location.pos2 = dBodyPosition[1];
+    tickrecord.location.pos3 = dBodyPosition[2];
+    tickrecord.location.r1 = dBodyRotation[0];
+    tickrecord.location.r2 = dBodyRotation[1];
+    tickrecord.location.r3 = dBodyRotation[2];
+    tickrecord.location.r4 = dBodyRotation[3];
+    tickrecord.location.r5 = dBodyRotation[4];
+    tickrecord.location.r6 = dBodyRotation[5];
+    tickrecord.location.r7 = dBodyRotation[6];
+    tickrecord.location.r8 = dBodyRotation[7];
+    tickrecord.location.r9 = dBodyRotation[8];
+    tickrecord.location.r10 = dBodyRotation[9];
+    tickrecord.location.r11 = dBodyRotation[10];
+    tickrecord.location.r12 = dBodyRotation[11];
+
+    return tickrecord;
+}
+
+void Vehicle::deserialize(TickRecord record)
+{
+    float dBodyRotation[12];
+
+    setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+    dBodyRotation[0] = record.location.r1;
+    dBodyRotation[1] = record.location.r2;
+    dBodyRotation[2] = record.location.r3;
+    dBodyRotation[3] = record.location.r4;
+    dBodyRotation[4] = record.location.r5;
+    dBodyRotation[5] = record.location.r6;
+    dBodyRotation[6] = record.location.r7;
+    dBodyRotation[7] = record.location.r8;
+    dBodyRotation[8] = record.location.r9;
+    dBodyRotation[9] = record.location.r10;
+    dBodyRotation[10] = record.location.r11;
+    dBodyRotation[11] = record.location.r12;
+
+    setRotation(dBodyRotation);
+
+    //if (record.type == MANTA)
+    //{
+    //    ((Manta*)this)->release(getForward());
+    //}
+
+}
