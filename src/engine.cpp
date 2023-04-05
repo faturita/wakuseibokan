@@ -2097,10 +2097,13 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
     if (record.type == VehicleTypes::ACTION)
     {
         Gunshot *action = new Gunshot();
+
         // Need axis conversion.
         action->init();
+        action->setOrigin(entities[1]->getBodyID());
         action->embody(world,space);
         action->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+        action->setVisible(true);
 
         entities.push_back(action, action->getGeom());
     }

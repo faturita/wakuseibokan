@@ -557,6 +557,8 @@ void drawScene() {
     Vec3f carrierloc2(0,0,0);
     Vec3f cameraloc = Camera.getPos();
 
+    //drawLine(cameraloc[0]+10,cameraloc[1]+10,cameraloc[1]+10,1.0,0.0,0.0);
+
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
     // This is a very easy enhancement with tremendous consequences in fps stability.
@@ -724,6 +726,7 @@ void replayupdate(int value)
 
                     if (v)
                     {
+
                         v->deserialize(record);
 
                     }
@@ -1039,6 +1042,7 @@ int main(int argc, char** argv) {
 
 
     setupWorldModelling();
+    initRendering();
 
     // Initialize ODE, create islands, structures and populate the world.
     if (isPresentCommandLineParameter(argc,argv,"-testcase"))
@@ -1079,7 +1083,7 @@ int main(int argc, char** argv) {
     //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
     
     //Initialize all the models and structures.
-    initRendering();
+    //initRendering();
 
     //intro();
 

@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "Gunshot.h"
 
 float Gunshot::getDamage() const
@@ -51,10 +52,13 @@ dBodyID Gunshot::getOrigin()
     return origin;
 }
 
+
+extern std::unordered_map<std::string, GLuint> textures;
 void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
+
 
     //Draw the saved model
     if (visible)
@@ -70,8 +74,11 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 
         v = v*1.0/10.0;
 
+        //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0,3.0);
         drawLine(v[0],v[1],v[2],1.0,0.0,0.0);
         //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
+        //drawRectangularBox(v[0]+2,v[1]+2,v[2]+10);
+        //drawTexturedBox(textures["metal"],v[0]+2,v[1]+2,v[2]+10);
 
         glPopMatrix();
     }
