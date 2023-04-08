@@ -2107,6 +2107,67 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         entities.push_back(action, action->getGeom());
     }
+
+    if (record.type == VehicleTypes::COLLISIONABLE ||
+            record.type == VehicleTypes::CONTROL ||
+            record.type == VehicleTypes::LANDINGABLE)
+    {
+        Structure *v = NULL;
+
+        int typeofisland=0;
+
+        switch (record.subtype) {
+        case 10:
+            v = new Artillery(record.faction);
+            break;
+        case 11:
+            v = new CommandCenter(record.faction,typeofisland);
+            break;
+        case 12:
+            v = new Hangar(record.faction);
+            break;
+        case 13:
+            v = new Warehouse(record.faction);
+            break;
+        case 14:
+            v = new Runway(record.faction);
+            break;
+        case 15:
+            v = new LaserTurret(record.faction);
+            break;
+        case 16:
+            v = new Turret(record.faction);
+            break;
+        case 17:
+            v = new Launcher(record.faction);
+            break;
+        case 18:
+            v = new Factory(record.faction);
+            break;
+        case 19:
+            v = new Dock(record.faction);
+            break;
+        case 20:
+            v = new Antenna(record.faction);
+            break;
+        case 21:
+            v = new Radar(record.faction);
+            break;
+        case 22:default:
+            v = new Structure(record.faction);
+            break;
+        }
+        // Need axis conversion.
+        v->init();
+        v->embody(world,space); //islandspace
+        v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+
+        //v->rotate(angle);
+        //v->onIsland(this);
+        entities.push_back(v, v->getGeom());
+
+    }
 }
 
 

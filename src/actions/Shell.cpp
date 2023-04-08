@@ -58,10 +58,6 @@ void Shell::drawModel(float yRot, float xRot, float x, float y, float z)
 
         doTransform(f, R);
 
-        Vec3f v = dBodyGetLinearVelVec(me);
-
-        v = v*100;
-
         //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
         //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
         _model->setTexture(textures["metal"]);

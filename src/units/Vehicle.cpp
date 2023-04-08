@@ -136,6 +136,14 @@ void Vehicle::setPos(float x, float y, float z)
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 
+
+void Vehicle::setVelocity(float vx, float vy, float vz)
+{
+    Vehicle::vel[0] = vx;
+    Vehicle::vel[1] = vy;
+    Vehicle::vel[2] = vz;
+}
+
 void Vehicle::setRotation(float *newR)
 {
     setR(newR);
@@ -196,6 +204,12 @@ void Vehicle::disableAuto()
 {
     Vehicle::aienable = false;
 }
+
+Vec3f Vehicle::getVelocity()
+{
+    return vel;
+}
+
 
 Vec3f Vehicle::dBodyGetLinearVelVec(dBodyID body)
 {
@@ -577,6 +591,7 @@ void Vehicle::wrapDynamics(dBodyID body)
         CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
+    // @FIXME: This should not be really here.
     if (dotelemetry)
     {
 
@@ -604,6 +619,7 @@ void Vehicle::wrapDynamics(dBodyID body)
     if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
+        setVelocity(linearVel[0],linearVel[1],linearVel[2]);
     }
 }
 void Vehicle::alignToMyBody(dBodyID fBodyID)
@@ -884,6 +900,9 @@ TickRecord Vehicle::serialize()
     tickrecord.type = getType();
     tickrecord.subtype = getSubType();
 
+    tickrecord.faction = getFaction();
+    tickrecord.health = getHealth();
+    tickrecord.power = getPower();
 
     tickrecord.location.pos1 = dBodyPosition[0];
     tickrecord.location.pos2 = dBodyPosition[1];
@@ -900,6 +919,10 @@ TickRecord Vehicle::serialize()
     tickrecord.location.r10 = dBodyRotation[9];
     tickrecord.location.r11 = dBodyRotation[10];
     tickrecord.location.r12 = dBodyRotation[11];
+
+    tickrecord.location.vel1 = getVelocity()[0];
+    tickrecord.location.vel2 = getVelocity()[1];
+    tickrecord.location.vel3 = getVelocity()[2];
 
     return tickrecord;
 }
@@ -923,7 +946,13 @@ void Vehicle::deserialize(TickRecord record)
     dBodyRotation[10] = record.location.r11;
     dBodyRotation[11] = record.location.r12;
 
-    setRotation(dBodyRotation);
+    if (me != NULL) setRotation(dBodyRotation);  // Not for structures that do not contain a body
+
+    setVelocity(record.location.vel1, record.location.vel2, record.location.vel3);
+
+    setPower(record.power);
+    health = record.health;
+    setFaction(record.faction);
 
     //if (record.type == MANTA)
     //{

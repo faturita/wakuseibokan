@@ -36,6 +36,10 @@ struct LogStructure {
     float r11;
     float r12;
 
+    float vel1;
+    float vel2;
+    float vel3;
+
 };
 
 struct TickRecord {
@@ -44,6 +48,8 @@ struct TickRecord {
     int type;
     int subtype;
     int faction;
+    int health;
+    int power;
     LogStructure location;
 };
 
@@ -80,6 +86,7 @@ private:
 
 protected:
     Vec3f pos;
+    Vec3f vel;
     Model* _model;
     Model* _topModel;
 	float speed;
@@ -140,7 +147,6 @@ public:
     int virtual getSubType();
 
 
-
     void setAutoStatus(AutoStatus au);
     
     void virtual init();                                        // Init, when the entity is created.
@@ -152,6 +158,8 @@ public:
     void virtual setPos(const Vec3f &newpos);
     void virtual setPos(float x, float y, float z);
 	Vec3f getPos();
+    Vec3f getVelocity();
+    void setVelocity(float vx,float vy, float vz);
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
 	Vec3f getForward();

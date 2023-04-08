@@ -557,7 +557,6 @@ void drawScene() {
     Vec3f carrierloc2(0,0,0);
     Vec3f cameraloc = Camera.getPos();
 
-    //drawLine(cameraloc[0]+10,cameraloc[1]+10,cameraloc[1]+10,1.0,0.0,0.0);
 
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
