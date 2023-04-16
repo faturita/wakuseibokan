@@ -192,3 +192,13 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
         printf ("model is null\n");
     }
 }
+
+
+TickRecord Structure::serialize()
+{
+    TickRecord t = Vehicle::serialize();
+
+    t.orientation = getAzimuthRadians(getForward());
+
+    return t;
+}

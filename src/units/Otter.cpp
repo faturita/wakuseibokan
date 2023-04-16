@@ -151,7 +151,10 @@ void Otter::doDynamics()
 }
 
 
-
+int Otter::getSubType()
+{
+    return VehicleSubTypes::OTTER;
+}
 
 void Otter::doDynamics(dBodyID body)
 {

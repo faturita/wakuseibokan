@@ -1945,7 +1945,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         entities.push_back(b, b->getGeom());
 
 
-        CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
+        CarrierTurret * _bo= new CarrierTurret(record.faction);
         _bo->init();
         _bo->embody(world, carrier_space);
         _bo->attachTo(world,b, -40.0f, 20.0f + 5, -210.0f);
@@ -1954,7 +1954,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         b->addWeapon(entities.push_back(_bo, _bo->getGeom()));
 
 
-        CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
+        CarrierArtillery * _w1= new CarrierArtillery(record.faction);
         _w1->init();
         _w1->embody(world, carrier_space);
         _w1->attachTo(world,b, -40.0, 27.0f, +210.0f);
@@ -1966,7 +1966,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
     if (record.subtype == VehicleSubTypes::BELUGA)
     {
-        Beluga* b = new Beluga(BLUE_FACTION);
+        Beluga* b = new Beluga(record.faction);
         b->init();
         dSpaceID carrier_space_beluga = b->embody_in_space(world, space);
         b->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
@@ -1974,7 +1974,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         entities.push_back(b, b->getGeom());
 
 
-        CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+        CarrierTurret * _bl= new CarrierTurret(record.faction);
         _bl->init();
         _bl->embody(world, carrier_space_beluga);
         _bl->attachTo(world,b, +30.0f, 20.0f - 3, +204.0f);
@@ -1982,7 +1982,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         b->addWeapon(entities.push_back(_bl, _bl->getGeom()));
 
-        CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+        CarrierTurret * _br= new CarrierTurret(record.faction);
         _br->init();
         _br->embody(world, carrier_space_beluga);
         _br->attachTo(world,b, -45.0f, 20.0f - 3, +204.0f);
@@ -1991,7 +1991,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         b->addWeapon(entities.push_back(_br, _br->getGeom()));
 
 
-        CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+        CarrierArtillery * _wr= new CarrierArtillery(record.faction);
         _wr->init();
         _wr->embody(world, carrier_space_beluga);
         _wr->attachTo(world,b, -40.0, 27.0f+5, -230.0f);
@@ -1999,7 +1999,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         b->addWeapon(entities.push_back(_wr, _wr->getGeom()));
 
-        CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+        CarrierArtillery * _wl= new CarrierArtillery(record.faction);
         _wl->init();
         _wl->embody(world, carrier_space_beluga);
         _wl->attachTo(world,b, +40.0, 27.0f+2, -230.0f);
@@ -2007,7 +2007,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         b->addWeapon(entities.push_back(_wl, _wl->getGeom()));
 
-        CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
+        CarrierLauncher * _cf= new CarrierLauncher(record.faction);
         _cf->init();
         _cf->embody(world, carrier_space_beluga);
         _cf->attachTo(world,b, +40.0, 27.0f+2, 0.0);
@@ -2029,6 +2029,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         else if (record.subtype == VehicleSubTypes::CEPHALOPOD)
             _manta1 = new Cephalopod(record.faction);
 
+        assert( _manta1 != NULL && !"Unrecognized manta type on ledger.");
         _manta1->init();
         _manta1->embody(world, space);
         _manta1->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
@@ -2039,59 +2040,88 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
     }
 
+    if (record.type == VehicleTypes::WEAPON)
+    {
+        // ignore
+        return;
+    }
+
     if (record.type == VehicleTypes::WALRUS)
     {
-        Otter *_walrus = new Otter(record.faction);
-        _walrus->init();
-        dSpaceID car_space = _walrus->embody_in_space(world, space);
+        if (record.subtype == VehicleSubTypes::ADVANCEDWALRUS)
+        {
+            Walrus *_walrus = new AdvancedWalrus(record.faction);
+            _walrus->init();
+            _walrus->embody(world, space);
+            _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
 
-        _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
-        //_walrus->setNameByNumber(number);
-        _walrus->setStatus(SailingStatus::SAILING);
+            entities.push_back(_walrus, _walrus->getGeom());
 
-        Vec3f dimensions(5.0f,4.0f,10.0f);
+        }
+        else if (record.subtype == VehicleSubTypes::SIMPLEWALRUS)
+        {
+            Walrus *_walrus = new Walrus(record.faction);
+            _walrus->init();
+            _walrus->embody(world, space);
+            _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+            entities.push_back(_walrus, _walrus->getGeom());
+
+        }
+        else if (record.subtype == VehicleSubTypes::OTTER)
+        {
+            Otter *_walrus = new Otter(record.faction);
+            _walrus->init();
+            dSpaceID car_space = _walrus->embody_in_space(world, space);
+
+            _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+            //_walrus->setNameByNumber(number);
+            _walrus->setStatus(SailingStatus::SAILING);
+
+            Vec3f dimensions(5.0f,4.0f,10.0f);
 
 
-        Wheel * _fr= new Wheel(record.faction, 0.001, 30.0);
-        _fr->init();
-        _fr->embody(world, car_space);
-        _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
-        _fr->stop();
+            Wheel * _fr= new Wheel(record.faction, 0.001, 30.0);
+            _fr->init();
+            _fr->embody(world, car_space);
+            _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
+            _fr->stop();
 
-        entities.push_back(_fr, _fr->getGeom());
-
-
-        Wheel * _fl= new Wheel(record.faction, 0.001, 30.0);
-        _fl->init();
-        _fl->embody(world, car_space);
-        _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
-        _fl->stop();
-
-        entities.push_back(_fl, _fl->getGeom());
+            entities.push_back(_fr, _fr->getGeom());
 
 
-        Wheel * _br= new Wheel(record.faction, 0.001, 30.0);
-        _br->init();
-        _br->embody(world, car_space);
-        _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
-        _br->stop();
+            Wheel * _fl= new Wheel(record.faction, 0.001, 30.0);
+            _fl->init();
+            _fl->embody(world, car_space);
+            _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
+            _fl->stop();
 
-        entities.push_back(_br, _br->getGeom());
+            entities.push_back(_fl, _fl->getGeom());
 
-        Wheel * _bl= new Wheel(record.faction, 0.001, 30.0);
-        _bl->init();
-        _bl->embody(world, car_space);
-        _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
-        _bl->stop();
 
-        entities.push_back(_bl, _bl->getGeom());
+            Wheel * _br= new Wheel(record.faction, 0.001, 30.0);
+            _br->init();
+            _br->embody(world, car_space);
+            _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
+            _br->stop();
 
-        _walrus->addWheels(_fl, _fr, _bl, _br);
+            entities.push_back(_br, _br->getGeom());
 
-        _fl->setSteering(true);
-        _fr->setSteering(true);
+            Wheel * _bl= new Wheel(record.faction, 0.001, 30.0);
+            _bl->init();
+            _bl->embody(world, car_space);
+            _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
+            _bl->stop();
 
-        entities.push_back(_walrus, _walrus->getGeom());
+            entities.push_back(_bl, _bl->getGeom());
+
+            _walrus->addWheels(_fl, _fr, _bl, _br);
+
+            _fl->setSteering(true);
+            _fr->setSteering(true);
+
+            entities.push_back(_walrus, _walrus->getGeom());
+        }
     }
 
     if (record.type == VehicleTypes::ACTION)
@@ -2159,11 +2189,11 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         }
         // Need axis conversion.
         v->init();
-        v->embody(world,space); //islandspace
+        v->embody(world,space); //islandspace, Island is missing
         v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
 
 
-        //v->rotate(angle);
+        v->rotate(record.orientation);
         //v->onIsland(this);
         entities.push_back(v, v->getGeom());
 

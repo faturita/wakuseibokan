@@ -50,7 +50,10 @@ struct TickRecord {
     int faction;
     int health;
     int power;
+    int status;
     LogStructure location;
+
+    float orientation;  // For structures
 };
 
 /**
@@ -281,8 +284,8 @@ public:
 
     void setTheOrientation(Vec3f orientation);
 
-    TickRecord  serialize();
-    void        deserialize(TickRecord);
+    virtual TickRecord  serialize();
+    virtual void        deserialize(TickRecord);
 
 };
 
