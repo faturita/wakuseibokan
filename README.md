@@ -36,8 +36,8 @@ make install
 That's all folks.
 
 
-ODE 0.14 Compilation on Mac Sierra
-----------------------------------
+ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
+----------------------------------------------------------
 
 * Run the following script to install automake tools for Mac
 
@@ -95,9 +95,10 @@ echo "Installation complete."
 ```
 
 * Now download the ode-0.14.tar tarball.
+* Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 * ./bootstrap
-* ./configure
+* ./configure --disable-asserts
 * make clean && make && sudo make install
 
 
@@ -178,3 +179,6 @@ References
 * https://community.khronos.org/t/efficient-smoke/67120/6
 * http://www.inf.ufsc.br/~aldo.vw/grafica/apostilas/openGL/lesson19/lesson19.html
 * http://lua-users.org/wiki/CppObjectBinding
+* https://www-robotics.jpl.nasa.gov/how-we-do-it/facilities/the-darts-simulation-laboratory/
+* MuJoCo https://github.com/deepmind/mujoco
+* https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers
