@@ -125,7 +125,8 @@ void processMouse(int button, int state, int x, int y) {
 
         _xoffset = _yoffset = 0;
 
-        if (GLUT_RIGHT_BUTTON == button)
+        // @NOTE: On linux the right button on the touchpad sometimes do not work.
+        if (GLUT_RIGHT_BUTTON == button || GLUT_MIDDLE_BUTTON == button)
         {
         	//buttonState = 0;
             zoommapout();
