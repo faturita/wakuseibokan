@@ -121,9 +121,6 @@ bool mute=false;
 bool cull=false;
 bool wireframes=false;
 
-int sockfd;
-struct sockaddr_in servaddr;
-
 FILE *ledger;
 
 void disclaimer()

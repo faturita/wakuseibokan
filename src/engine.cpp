@@ -2029,7 +2029,8 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         else if (record.subtype == VehicleSubTypes::CEPHALOPOD)
             _manta1 = new Cephalopod(record.faction);
 
-        assert( _manta1 != NULL && !"Unrecognized manta type on ledger.");
+        assert( _manta1 != NULL || !"Unrecognized manta type on ledger.");
+
         _manta1->init();
         _manta1->embody(world, space);
         _manta1->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));

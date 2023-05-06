@@ -611,7 +611,7 @@ void Vehicle::wrapDynamics(dBodyID body)
         Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
         dout << s << std::endl;
 
-        telemetryme((float *)dBodyPosition, (float *)dBodyRotation);
+        telemetryme(number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
     }
 
 

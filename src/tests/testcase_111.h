@@ -1,5 +1,5 @@
-#ifndef TELEMETRY_H
-#define TELEMETRY_H
+#ifndef TESTCASE_111_H
+#define TESTCASE_111_H
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -22,13 +22,24 @@
 #include <pthread.h>
 #include <sys/ioctl.h>
 
-typedef struct sockaddr SA;
+#include "testcase.h"
 
-char *Sock_ntop (const struct sockaddr *sa, socklen_t salen) ;
+class TestCase_111 : public TestCase
+{
+private:
+    struct sockaddr_in servaddr, cliaddr;
+    int sockfd;
+public:
+    TestCase_111();
+    void init();
+    int check(unsigned long timertick);
+    std::string title();
+    int number();
+    bool done();
+    bool passed();
+    std::string failedMessage();
+};
 
-void telemetryme(int number, int health, int power, float bearing, float *dBodyPosition, float *dBodyRotation);
-
-void inittelemetry();
 
 
-#endif // TELEMETRY_H
+#endif // TESTCASE_111_H
