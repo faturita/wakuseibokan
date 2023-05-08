@@ -19,7 +19,7 @@ void ArtilleryAmmo::init()
     ArtilleryAmmo::length=0.5f;
     ArtilleryAmmo::width=0.5f;
 
-    ArtilleryAmmo::mass = 0.01f;
+    ArtilleryAmmo::mass = 10.01f;
 
     setDamage(80);
 

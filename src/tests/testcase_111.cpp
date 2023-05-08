@@ -69,7 +69,7 @@ void TestCase_111::init()
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(5400);
+    servaddr.sin_port = htons(4500);
 
     bind(sockfd, (SA *) &servaddr, sizeof(servaddr));
 
@@ -170,7 +170,7 @@ void TestCase_111::init()
         dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/4*10+PI,(int)PI/4*10)/10.0+PI);
         dBodySetRotation(_otter->getBodyID(),Re2);
 
-        _otter->goTo(Vec3f(0,0,340));
+        //_otter->goTo(Vec3f(0,0,340));
         _otter->enableAuto();
         _otter->enableTelemetry();
     }
@@ -242,7 +242,7 @@ void TestCase_111::init()
         dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/4*10,(int)PI/4*10)/10.0);
         dBodySetRotation(_otter->getBodyID(),Re2);
 
-        _otter->goTo(Vec3f(0,0,340));
+        //_otter->goTo(Vec3f(0,0,340));
         _otter->enableAuto();
         _otter->enableTelemetry();
     }
@@ -254,6 +254,8 @@ void TestCase_111::init()
 
     aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
+
+    endtimer = 0;
 
 }
 
@@ -283,7 +285,7 @@ int TestCase_111::check(unsigned long timertick)
 
         if (n!=-1)
         {
-            sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
+            //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
 
             printf("%d:roll %10.2f thrust %10.2f\n", mesg.id, mesg.roll, mesg.thrust);
 
@@ -334,29 +336,48 @@ int TestCase_111::check(unsigned long timertick)
 
         }
 
-        if (!_b1)
+        if (!_b1 && endtimer==0)
         {
-            isdone = true;
-            haspassed = true;
-            printf("GREEN(1) WINS\n");
+            endtimer = timertick + 300;
+            whowon=2;
         }
 
-        if (!_b2)
+        if (!_b2 && endtimer==0)
         {
-            isdone = true;
-            haspassed = true;
-            printf("BLUE(2) WINS\n");
+            endtimer = timertick + 300;
+            whowon = 1;
         }
 
 
     }
 
+    if (timertick > endtimer && endtimer!=0)
+    {
+        isdone = true;
+        haspassed = true;
+        printf("Walrus %d won.", whowon);
+    }
 
-    if (timertick > 50000)
+    if (timertick > 6000)
     {
         isdone = true;
         haspassed = false;
-        message = std::string("Timeout for parking....");
+        message = std::string("Match is over.");
+
+        Vehicle *_b1 = findWalrus(GREEN_FACTION);
+
+        Vehicle *_b2 = findWalrus(BLUE_FACTION);
+
+        if (_b1)
+        {
+            printf("GREEN 1 : Health:%d\n", _b1->getHealth());
+        }
+
+        if (_b2)
+        {
+            printf("BLUE 2 : Health:%d\n", _b2->getHealth());
+        }
+
     }
 
     return 0;
