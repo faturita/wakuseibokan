@@ -21,6 +21,7 @@
 #include <GLUT/glut.h>
 #elif __linux
 #include <GL/glut.h>
+#include <algorithm>
 #endif
 
 #include <ode/ode.h>
