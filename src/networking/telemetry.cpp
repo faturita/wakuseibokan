@@ -59,7 +59,9 @@ Connection addNewTelemetryListener(char ip[], int port)
 
 void inittelemetry()
 {
-    connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
+    // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
+    // (who has joined the game)
+    //connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
 }
 
 

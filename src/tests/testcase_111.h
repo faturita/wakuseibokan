@@ -29,6 +29,8 @@ class TestCase_111 : public TestCase
 private:
     struct sockaddr_in servaddr, cliaddr;
     int sockfd;
+    unsigned long endtimer;
+    int whowon;
 public:
     TestCase_111();
     void init();

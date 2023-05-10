@@ -696,6 +696,8 @@ void replayupdate(int value)
     {
         // I assume the file is open
 
+        // Check the controller structure and send it through a client socket to the server.
+
         TickRecord record;
 
         int ret = 1;
@@ -783,6 +785,14 @@ void update(int value)
             pb.playFaction(timer);
         if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
             pg.playFaction(timer);
+
+
+        // 1: Read the information from the sockets with the controller information that is being sent from
+        //    each client
+        // 2: update a Control vector with all the controllers that I have now.  This is fixed or somehow created
+        //    by a joining process at the beginning of the game.  Control is a dynamic vector of Controller.
+        // 3: Now go through all the objects (including Control[0] which is the person playing on the server)
+        //    and execute the doControl(Control[i])
 
 
         // Auto Control: The controller can be controlled by the user or by the AI

@@ -30,13 +30,19 @@ print ('Starting up on %s port %s' % server_address)
 
 sock.bind(server_address)
 
+length = 76
+unpackcode = 'iiiffffffffffffffff'
 
 address = ''
 while True:
     # read
-    length = 256
+
     data, address = sock.recvfrom(length)
 
     print (f'Data Received:{data}')
+
+    new_values = unpack(unpackcode,data)
+
+    print(new_values[0])
 
 print ('Everything successfully closed.')
