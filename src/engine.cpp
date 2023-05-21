@@ -2131,7 +2131,8 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         // Need axis conversion.
         action->init();
-        action->setOrigin(entities[1]->getBodyID());
+        // @FIXME: Set the right origin.
+        //action->setOrigin(entities[1]->getBodyID());
         action->embody(world,space);
         action->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
         action->setVisible(true);

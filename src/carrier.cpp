@@ -685,7 +685,11 @@ void replayupdate(int value)
         endWorldModelling();
         // Do extra wrap up
         msgboardfile.close();
-        if (tracemode == RECORD || tracemode == REPLAY) fclose(ledger);
+        if (tracemode == RECORD || tracemode == REPLAY)
+        {
+            fclose(ledger);
+            disconnect();
+        }
         exit(0);
     }
 
@@ -702,8 +706,12 @@ void replayupdate(int value)
         int ret = 1;
         while (ret>0)
         {
-            ret = fread(&record, sizeof(TickRecord),1,ledger);
 
+            // Read from the remote connection.
+
+            //ret = receive(&record);
+
+            ret = fread(&record, sizeof(TickRecord),1,ledger);
 
             if (ret>0)
             {
@@ -837,7 +845,11 @@ void update(int value)
             entities[i]->doDynamics();
             entities[i]->tick();
 
-            if (tracemode == RECORD) record(timer,i, entities[i]);
+            if (tracemode == RECORD)
+            {
+                record(timer,i, entities[i]);
+                notify(timer, i, entities[i]);
+            }
         }
 
 
@@ -1061,10 +1073,11 @@ int main(int argc, char** argv) {
     {
         initWorldModelling();
         ledger = fopen("ledger.bin","rb");
+        join_lobby();
     }
     else
     {
-        if (tracemode == RECORD) ledger = fopen("ledger.bin","wb+");
+        if (tracemode == RECORD) {ledger = fopen("ledger.bin","wb+");        init_lobby();}
         initWorldModelling();
     }
 

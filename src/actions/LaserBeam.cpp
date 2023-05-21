@@ -95,6 +95,6 @@ void LaserBeam::embody(dBodyID myBodySelf)
 
 int LaserBeam::getType()
 {
-    return 5;
+    return ACTION;
 }
 

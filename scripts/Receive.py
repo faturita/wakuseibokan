@@ -21,7 +21,7 @@ port = 5400
 
 if (len(sys.argv)>=2):
     ip = sys.argv[1]
-    port = sys.argv[2]
+    port = int(sys.argv[2])
 
 # UDP SERVER Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
