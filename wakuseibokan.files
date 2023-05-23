@@ -160,6 +160,8 @@ src/tests/testcase_110.cpp
 src/tests/testcase_110.h
 src/tests/testcase_111.cpp
 src/tests/testcase_111.h
+src/tests/testcase_112.cpp
+src/tests/testcase_112.h
 src/tests/testcase_113.cpp
 src/tests/testcase_113.h
 src/tests/tester.cpp

@@ -51,6 +51,7 @@ struct TickRecord {
     int health;
     int power;
     int status;
+    int ttl;
     LogStructure location;
 
     float orientation;  // For structures

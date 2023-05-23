@@ -906,6 +906,8 @@ TickRecord Vehicle::serialize()
 
     tickrecord.status = getStatus();
 
+    tickrecord.ttl = getTtl();
+
     tickrecord.location.pos1 = dBodyPosition[0];
     tickrecord.location.pos2 = dBodyPosition[1];
     tickrecord.location.pos3 = dBodyPosition[2];
@@ -957,6 +959,8 @@ void Vehicle::deserialize(TickRecord record)
     setFaction(record.faction);
 
     setStatus(record.status);
+
+    setTtl(record.ttl);
 
     //if (record.type == MANTA)
     //{

@@ -749,12 +749,26 @@ void replayupdate(int value)
 
         synchronized(entities.m_mutex)
         {
-            // Delete the entries that were not updated at all, they are not existing any more.
+            // Delete the entries that fulfill the delete condition.
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
-                if ( std::find(visited.begin(), visited.end(), i) == visited.end() )
+
+                if ( ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) &&
+                        entities[i]->getTtl()<=0) ||
+                    (entities[i]->getHealth()<=0)
+                    )
                 {
+                    if (controller.controllingid == i)
+                    {
+                        controller.controllingid = CONTROLLING_NONE;
+                        controller.reset();
+                    }
                     deleteEntity(i);
                 }
+
+                //if ( std::find(visited.begin(), visited.end(), i) == visited.end() )
+                //{
+                //    deleteEntity(i);
+                //}
             }
         }
 
