@@ -97,3 +97,8 @@ int ArtilleryAmmo::getType()
     return ACTION;
 }
 
+EntityTypeId ArtilleryAmmo::getTypeId()
+{
+    return EntityTypeId::TArtilleryAmmo;
+}
+

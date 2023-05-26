@@ -486,3 +486,8 @@ int AdvancedWalrus::getSubType()
 {
     return VehicleSubTypes::ADVANCEDWALRUS;
 }
+
+EntityTypeId AdvancedWalrus::getTypeId()
+{
+    return EntityTypeId::TAdvancedWalrus;
+}

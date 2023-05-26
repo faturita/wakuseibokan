@@ -70,6 +70,11 @@ int Medusa::getSubType()
     return MEDUSA;
 }
 
+EntityTypeId Medusa::getTypeId()
+{
+    return EntityTypeId::TMedusa;
+}
+
 void Medusa::setNameByNumber(int number)
 {
     setNumber(number);

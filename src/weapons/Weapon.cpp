@@ -40,6 +40,11 @@ int Weapon::getSubType()
     return STRUCTURE;
 }
 
+EntityTypeId Weapon::getTypeId()
+{
+    return EntityTypeId::TWeapon;
+}
+
 void Weapon::setPos(const Vec3f &newpos)
 {
     pos[0] = newpos[0];

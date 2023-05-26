@@ -29,6 +29,11 @@ void SimplifiedManta::doControl(Controller controller)
 
 }
 
+EntityTypeId SimplifiedManta::getTypeId()
+{
+    return EntityTypeId::TSimplifiedManta;
+}
+
 
 void SimplifiedManta::doDynamics(dBodyID body)
 {

@@ -283,6 +283,12 @@ int Vehicle::getSubType()
     return 0;
 }
 
+EntityTypeId Vehicle::getTypeId()
+{
+    assert(0 || !"Vehicle should not be instantiated.\n");
+    return EntityTypeId::TWeapon;
+}
+
 void Vehicle::setVector(float* V, dVector3 v)
 {
     V[0] = v[0];
@@ -897,6 +903,7 @@ TickRecord Vehicle::serialize()
 
     Vec3f dBodyPosition = getPos();
 
+    tickrecord.typeId = (int)getTypeId();
     tickrecord.type = getType();
     tickrecord.subtype = getSubType();
 
@@ -907,6 +914,8 @@ TickRecord Vehicle::serialize()
     tickrecord.status = getStatus();
 
     tickrecord.ttl = getTtl();
+
+    tickrecord.number = getNumber();
 
     tickrecord.location.pos1 = dBodyPosition[0];
     tickrecord.location.pos2 = dBodyPosition[1];
@@ -957,6 +966,7 @@ void Vehicle::deserialize(TickRecord record)
     setPower(record.power);
     health = record.health;
     setFaction(record.faction);
+    setNumber(record.number);
 
     setStatus(record.status);
 

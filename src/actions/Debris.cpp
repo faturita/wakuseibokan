@@ -54,3 +54,9 @@ void Debris::setTexture(const GLuint &value)
     texture = value;
 }
 
+
+EntityTypeId Debris::getTypeId()
+{
+    return EntityTypeId::TDebris;
+}
+

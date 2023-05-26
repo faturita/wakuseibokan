@@ -123,6 +123,11 @@ int Gunshot::getType()
     return ACTION;
 }
 
+EntityTypeId Gunshot::getTypeId()
+{
+    return EntityTypeId::TGunshot;
+}
+
 void Gunshot::setVisible(bool val)
 {
     Gunshot::visible = val;

@@ -214,6 +214,4 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 bool structurecollisions(Structure *s, Vehicle *vehicle);
 
-void createEntity(TickRecord record,dSpaceID space, dWorldID world);
-
 #endif // ENGINE_H

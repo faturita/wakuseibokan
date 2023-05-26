@@ -53,6 +53,8 @@ public:
 
     std::vector<size_t> getWeapons();
     void addWeapon(size_t w);
+
+    virtual EntityTypeId getTypeId();
 };
 
 #endif // BALAENIDAE_H

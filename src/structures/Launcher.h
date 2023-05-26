@@ -36,6 +36,7 @@ public:
     void virtual doControl();
 
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 };
 
 

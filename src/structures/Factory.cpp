@@ -56,3 +56,8 @@ int Factory::getSubType()
 {
     return FACTORY;
 }
+
+EntityTypeId Factory::getTypeId()
+{
+    return EntityTypeId::TFactory;
+}

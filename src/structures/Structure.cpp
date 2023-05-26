@@ -38,16 +38,6 @@ void Structure::init()
     setForward(0,0,1);
 }
 
-int Structure::getType()
-{
-    return COLLISIONABLE;
-}
-
-int Structure::getSubType()
-{
-    return STRUCTURE;
-}
-
 void Structure::setPos(const Vec3f &newpos)
 {
     pos[0] = newpos[0];
@@ -201,4 +191,19 @@ TickRecord Structure::serialize()
     t.orientation = getAzimuthRadians(getForward());
 
     return t;
+}
+
+int Structure::getType()
+{
+    return COLLISIONABLE;
+}
+
+int Structure::getSubType()
+{
+    return STRUCTURE;
+}
+
+EntityTypeId Structure::getTypeId()
+{
+    return EntityTypeId::TStructure;
 }

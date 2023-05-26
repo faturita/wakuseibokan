@@ -92,6 +92,11 @@ int LaserRay::getType()
     return RAY;
 }
 
+EntityTypeId LaserRay::getTypeId()
+{
+    return EntityTypeId::TLaserRay;
+}
+
 void LaserRay::disable()
 {
     setTtl(1);

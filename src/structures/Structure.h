@@ -41,6 +41,7 @@ public:
 
     int getType();
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 
     void onIsland(Island* island);
 

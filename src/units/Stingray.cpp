@@ -72,6 +72,11 @@ int Stingray::getSubType()
     return STINGRAY;
 }
 
+EntityTypeId Stingray::getTypeId()
+{
+    return EntityTypeId::TStingray;
+}
+
 void Stingray::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);

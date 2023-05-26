@@ -11,7 +11,8 @@ public:
 
     void  init();
 
-    int virtual getSubType();
+    virtual int getSubType();
+    virtual EntityTypeId getTypeId();
 
     void drawModel(float yRot, float xRot, float x, float y, float z);
 

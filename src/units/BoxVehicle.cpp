@@ -35,6 +35,11 @@ int BoxVehicle::getType()
     return WALRUS;
 }
 
+EntityTypeId BoxVehicle::getTypeId()
+{
+    return EntityTypeId::TBoxVehicle;
+}
+
 
 void BoxVehicle::embody(dWorldID world, dSpaceID space)
 {

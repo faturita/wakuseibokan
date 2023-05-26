@@ -11,6 +11,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 
     bool checkHeightOffset(int heightOffset) override;
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd);

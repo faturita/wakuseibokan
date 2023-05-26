@@ -112,3 +112,8 @@ int LaserTurret::getSubType()
 {
     return LASERTURRET;
 }
+
+EntityTypeId LaserTurret::getTypeId()
+{
+    return EntityTypeId::TLaserTurret;
+}

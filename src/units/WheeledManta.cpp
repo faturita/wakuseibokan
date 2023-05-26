@@ -50,7 +50,10 @@ void WheeledManta::doDynamics()
     doDynamics(getBodyID());
 }
 
-
+EntityTypeId WheeledManta::getTypeId()
+{
+    return EntityTypeId::TWheeledManta;
+}
 
 
 void WheeledManta::doDynamics(dBodyID body)

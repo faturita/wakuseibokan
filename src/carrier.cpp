@@ -56,6 +56,7 @@
 #include "terrain/Terrain.h"
 
 #include "engine.h"
+#include "entities.h"
 
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
@@ -716,7 +717,7 @@ void replayupdate(int value)
 
             if (ret>0)
             {
-                printf(" %ld vs %ld \n", record.timerparam, timer);
+                //printf(" %ld vs %ld \n", record.timerparam, timer);
 
                 visited.push_back(record.id);
 

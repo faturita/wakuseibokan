@@ -33,6 +33,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int  virtual getSubType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // OTTER_H

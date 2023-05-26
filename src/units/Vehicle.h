@@ -45,6 +45,7 @@ struct LogStructure {
 struct TickRecord {
     unsigned long timerparam;
     size_t id;
+    int typeId;
     int type;
     int subtype;
     int faction;
@@ -52,10 +53,64 @@ struct TickRecord {
     int power;
     int status;
     int ttl;
+    int number;
     LogStructure location;
 
     float orientation;  // For structures
 };
+
+
+// TypeId for serialization.  It recognizes each one of the C++ classes.
+enum EntityTypeId {
+    TBalaenidae = 1,
+    TBeluga = 2,
+    TWalrus = 3,
+    TAdvancedWalrus = 4,
+    TSimplifiedManta = 5,
+    TMedusa = 6,
+    TStingray = 7,
+    TCephalopod = 8,
+    TOtter = 9,
+    TArtillery = 10,
+    TCommandCenter = 11,
+    THangar = 12,
+    TWarehouse = 13,
+    TRunway = 14,
+    TLaserTurret = 15,
+    TTurret = 16,
+    TLauncher = 17,
+    TFactory = 18,
+    TDock = 19,
+    TAntenna = 20,
+    TRadar = 21,
+    TStructure = 22,
+    TAdvancedManta = 23,
+    TBoxVehicle = 24,
+    TBuggy = 25,
+    TManta = 26,
+    TMultiBodyVehicle = 27,
+    TSimplifiedDynamicManta = 28,
+    TWheel = 29,
+    TWheeledManta = 30,
+    TCarrierArtillery = 31,
+    TCarrierLauncher = 32,
+    TCarrierTurret = 33,
+    TWeapon = 34,
+    TAAM = 35,
+    TArtilleryAmmo = 36,
+    TBomb = 37,
+    TDebris = 38,
+    TExplosion = 39,
+    TGunshot = 40,
+    TLaserBeam = 41,
+    TLaserRay = 42,
+    TMissile = 43,
+    TShell = 44,
+    TTorpedo = 45
+
+
+};
+
 
 /**
  * @brief Structures are identified if their type number is greater than or equal to COLLISIONABLE.
@@ -287,6 +342,8 @@ public:
 
     virtual TickRecord  serialize();
     virtual void        deserialize(TickRecord);
+
+    virtual EntityTypeId getTypeId();
 
 };
 

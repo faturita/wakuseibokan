@@ -56,3 +56,8 @@ int Antenna::getSubType()
 {
     return ANTENNA;
 }
+
+EntityTypeId Antenna::getTypeId()
+{
+    return EntityTypeId::TAntenna;
+}

@@ -170,4 +170,9 @@ int Beluga::getSubType()
     return BELUGA;
 }
 
+EntityTypeId Beluga::getTypeId()
+{
+    return EntityTypeId::TBeluga;
+}
+
 //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

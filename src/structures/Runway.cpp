@@ -129,3 +129,8 @@ int Runway::getSubType()
 {
     return RUNWAY;
 }
+
+EntityTypeId Runway::getTypeId()
+{
+    return EntityTypeId::TRunway;
+}

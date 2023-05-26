@@ -40,6 +40,11 @@ int CarrierArtillery::getSubType()
     return ARTILLERY;
 }
 
+EntityTypeId CarrierArtillery::getTypeId()
+{
+    return EntityTypeId::TCarrierArtillery;
+}
+
 
 void CarrierArtillery::embody(dWorldID world, dSpaceID space)
 {

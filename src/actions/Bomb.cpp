@@ -18,10 +18,6 @@ Bomb::~Bomb()
     assert(0 || !"Destroying bullets from the Gunshot object. This should not happen now.");
 }
 
-int Bomb::getType()
-{
-    return EXPLOTABLEACTION;
-}
 
 void Bomb::init()
 {
@@ -99,4 +95,14 @@ void  Bomb::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
     Up[0]=Up[2]=0;Up[1]=40;
     position = position - 40*viewforward + Up;
     viewforward = orig-position;
+}
+
+int Bomb::getType()
+{
+    return EXPLOTABLEACTION;
+}
+
+EntityTypeId Bomb::getTypeId()
+{
+    return EntityTypeId::TBomb;
 }

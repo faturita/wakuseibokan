@@ -370,3 +370,8 @@ int CarrierLauncher::getSubType()
 {
     return LAUNCHER;
 }
+
+EntityTypeId CarrierLauncher::getTypeId()
+{
+    return EntityTypeId::TCarrierLauncher;
+}

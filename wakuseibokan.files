@@ -47,6 +47,8 @@ src/e.cpp
 src/e.h
 src/engine.cpp
 src/engine.h
+src/entities.cpp
+src/entities.h
 src/font/DrawFonts.cpp
 src/font/DrawFonts.h
 src/hud.cpp

@@ -16,6 +16,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };

@@ -34,6 +34,11 @@ void Wheel::init()
 
 }
 
+EntityTypeId Wheel::getTypeId()
+{
+    return EntityTypeId::TWheel;
+}
+
 int Wheel::getType()
 {
     return WEAPON;

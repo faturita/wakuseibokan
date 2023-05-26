@@ -113,5 +113,10 @@ int Shell::getType()
     return EXPLOTABLEACTION;
 }
 
+EntityTypeId Shell::getTypeId()
+{
+    return EntityTypeId::TShell;
+}
+
 
 

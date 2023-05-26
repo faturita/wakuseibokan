@@ -342,3 +342,8 @@ int Launcher::getSubType()
 {
     return LAUNCHER;
 }
+
+EntityTypeId Launcher::getTypeId()
+{
+    return EntityTypeId::TLauncher;
+}

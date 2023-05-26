@@ -98,3 +98,8 @@ int LaserBeam::getType()
     return ACTION;
 }
 
+EntityTypeId LaserBeam::getTypeId()
+{
+    return EntityTypeId::TLaserBeam;
+}
+

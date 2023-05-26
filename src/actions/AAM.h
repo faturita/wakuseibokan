@@ -44,6 +44,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId getTypeId() override;
 
     void release(Vec3f orientation);
     void doControlFlipping(Vec3f target, float thrust);
