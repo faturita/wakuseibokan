@@ -39,7 +39,8 @@ void init_lobby()
 {
     // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
     // (who has joined the game)
-    lobby.push_back(newplayer("127.0.0.1",4500));
+    //lobby.push_back(newplayer("127.0.0.1",4500));
+    lobby.push_back(newplayer("192.168.1.195",4500));
 }
 
 
