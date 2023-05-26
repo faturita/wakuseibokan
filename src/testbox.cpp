@@ -7441,7 +7441,52 @@ void checktest79(unsigned long timer)
     }
 }
 
+void test80()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0,-1.0,0);
+    nemesis->buildTerrainModel(space,"terrain/goku.bmp");
 
+    islands.push_back(nemesis);
+
+
+}
+
+void checktest80(unsigned long timer)
+{
+
+    CommandOrder co;
+
+    co.command = Command::SpawnOrder;
+    co.parameters.spawnid = VehicleSubTypes::CEPHALOPOD;
+
+    Controller cont;
+    cont.push(co);
+
+
+    CommandOrder cnew;
+    cnew = cont.pop();
+
+    printf("Expected: %d\n", cnew.command);
+    printf("Parameter: %d\n", cnew.parameters.spawnid);
+
+
+    CommandOrder clast;
+    clast = cont.pop();
+
+    if (clast.command == Command::None)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+    } else {
+        printf("Test Not passed \n");
+        endWorldModelling();
+        exit(0);
+    }
+
+}
 
 static int testing=-1;
 
@@ -7568,6 +7613,7 @@ void initWorldModelling(int testcase)
     case 77:test77();break;                         // Visually Testing Radar HUD with enemy units
     case 78:test78();break;                         // Testing Manta bombing an island.
     case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
+    case 80:test80();break;                         // Check multiple controllers and the command order.
     default:initIslands();test1();break;
     }
 
@@ -7665,6 +7711,7 @@ void worldStep(int value)
     case 77:checktest77(timer);break;
     case 78:checktest78(timer);break;
     case 79:checktest79(timer);break;
+    case 80:checktest80(timer);break;
     default: break;
     }
 

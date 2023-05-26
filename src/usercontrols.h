@@ -5,6 +5,37 @@
 #include <string>
 #include <iostream>
 
+
+enum class Command {
+    None=0,
+    AttackOrder,
+    DestinationOrder,
+    TaxiOrder,
+    TelemetryOrder,
+    LaunchOrder,
+    CaptureOrder,
+    AutoOrder,
+    StopOrder,
+    SpawnOrder,
+    DockOrder,
+    FireOrder};
+
+struct commandparameters
+{
+    int spawnid;
+    float x;
+    float y;
+    float z;
+    int weapon;
+};
+
+struct CommandOrder
+{
+    Command command;
+    commandparameters parameters;
+};
+
+
 #define CONTROLLING_NONE (size_t)-1
 
 struct controlregister
@@ -30,6 +61,8 @@ struct controlregister
 
 class Controller
 {
+private:
+    CommandOrder corder;
 public:
     
 	// Device ID to be controller.
@@ -55,6 +88,22 @@ public:
     bool teletype=false;
 
     std::string str;
+
+
+    void push(CommandOrder co)
+    {
+        corder = co;
+    }
+
+    CommandOrder pop()
+    {
+        CommandOrder cr = corder;
+
+        corder.command = Command::None;
+
+        return cr;
+    }
+
     
     void reset()
     {

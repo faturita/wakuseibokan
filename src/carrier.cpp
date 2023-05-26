@@ -725,9 +725,9 @@ void replayupdate(int value)
 
             // Read from the remote connection.
 
-            ret = receive(&record);
+            //ret = receive(&record);
 
-            //ret = fread(&record, sizeof(TickRecord),1,ledger);
+            ret = fread(&record, sizeof(TickRecord),1,ledger);
 
             if (ret>0)
             {
