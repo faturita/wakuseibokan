@@ -725,9 +725,9 @@ void replayupdate(int value)
 
             // Read from the remote connection.
 
-            //ret = receive(&record);
+            ret = receive(&record);
 
-            ret = fread(&record, sizeof(TickRecord),1,ledger);
+            //ret = fread(&record, sizeof(TickRecord),1,ledger);
 
             if (ret>0)
             {
@@ -860,11 +860,11 @@ void update(int value)
         {
             Controller co = *controllers[1];
 
-            co.controllingid = mesg.controllingid;
-            co.registers.thrust = mesg.thrust;
-            co.registers.roll = mesg.roll;
-            co.registers.pitch = mesg.pitch;
-            co.registers.precesion = mesg.precesion;
+            controllers[1]->controllingid = mesg.controllingid;
+            controllers[1]->registers.thrust = mesg.thrust;
+            controllers[1]->registers.roll = mesg.roll;
+            controllers[1]->registers.pitch = mesg.pitch;
+            controllers[1]->registers.precesion = mesg.precesion;
 
         }
 
