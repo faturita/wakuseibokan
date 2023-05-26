@@ -127,6 +127,18 @@ FILE *ledger;
 
 std::vector<Controller*> controllers;
 
+struct sockaddr_in controllerserveraddr;
+int controllersockfd;
+
+struct ControlStructure {
+    int controllingid;
+    float roll;
+    float thrust;
+    float pitch;
+    float precesion;
+    int openfire;
+};
+
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -750,6 +762,19 @@ void replayupdate(int value)
 
         }
 
+        {
+
+            ControlStructure mesg;
+            Controller co = controller;
+
+            mesg.controllingid = co.controllingid;
+            mesg.thrust = co.registers.thrust;
+            mesg.roll = co.registers.roll;
+            mesg.pitch = co.registers.pitch;
+            mesg.precesion = co.registers.precesion;
+
+            sendto(controllersockfd, &mesg, sizeof(mesg), 0, (SA *)&controllerserveraddr, sizeof(controllerserveraddr));
+        }
         synchronized(entities.m_mutex)
         {
             // Delete the entries that fulfill the delete condition.
@@ -819,6 +844,29 @@ void update(int value)
         // 3: Now go through all the objects (including Control[0] which is the person playing on the server)
         //    and execute the doControl(Control[i])
 
+        socklen_t len;
+        ControlStructure mesg;
+
+        SA pcliaddr;
+        struct sockaddr_in cliaddr;
+
+        socklen_t clilen=sizeof(cliaddr);
+        int n;
+
+        len = clilen;
+        n = recvfrom(controllersockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
+
+        if (n!=-1)
+        {
+            Controller co = *controllers[1];
+
+            co.controllingid = mesg.controllingid;
+            co.registers.thrust = mesg.thrust;
+            co.registers.roll = mesg.roll;
+            co.registers.pitch = mesg.pitch;
+            co.registers.precesion = mesg.precesion;
+
+        }
 
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
@@ -1121,6 +1169,45 @@ int main(int argc, char** argv) {
 
 
     controllers.push_back(&controller);
+
+
+
+    if (tracemode==RECORD)
+    {
+        controllers.push_back(new Controller());
+
+
+        controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
+        fcntl(controllersockfd, F_SETFL, O_NONBLOCK);
+
+        bzero(&controllerserveraddr, sizeof(controllerserveraddr));
+        controllerserveraddr.sin_family = AF_INET;
+        controllerserveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
+        controllerserveraddr.sin_port = htons(5000);
+
+        bind(controllersockfd, (SA *) &controllerserveraddr, sizeof(controllerserveraddr));
+
+    }
+
+
+    if (tracemode == REPLAY)
+    {
+        char ip[256];
+        strcpy(ip, "192.168.1.186");
+        int port = 5000;
+
+        /* Clean up */
+        bzero(&controllerserveraddr, sizeof(controllerserveraddr));
+
+        /* Initialize the client to connect to the server on local port 4500 */
+        controllerserveraddr.sin_family = AF_INET;
+        controllerserveraddr.sin_port = htons(port);
+        inet_pton(AF_INET, ip, &controllerserveraddr.sin_addr);
+
+        /* Bring up the client socket */
+        controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    }
+
 
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
