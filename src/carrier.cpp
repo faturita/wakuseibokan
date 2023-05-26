@@ -125,6 +125,8 @@ bool wireframes=false;
 
 FILE *ledger;
 
+std::vector<Controller*> controllers;
+
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -822,15 +824,19 @@ void update(int value)
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
         // to control each object as if it were exactly the user (with doControl() in the loop ahead).
-        if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
+        for (size_t j = 0; j < controllers.size(); j++)
         {
-            if (!entities[controller.controllingid]->isAuto())
+            Controller *ctroler = controllers[j];
+            if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
             {
-                entities[controller.controllingid]->doControl(controller);
-            }
-            else
-            {
-                controller.registers = entities[controller.controllingid]->getControlRegisters();
+                if (!entities[ctroler->controllingid]->isAuto())
+                {
+                    entities[ctroler->controllingid]->doControl(*ctroler);
+                }
+                else
+                {
+                    ctroler->registers = entities[ctroler->controllingid]->getControlRegisters();
+                }
             }
         }
 
@@ -1112,6 +1118,10 @@ int main(int argc, char** argv) {
         }
 
     }
+
+
+    controllers.push_back(&controller);
+
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
