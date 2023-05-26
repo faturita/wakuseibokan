@@ -18,15 +18,18 @@ enum class Command {
     StopOrder,
     SpawnOrder,
     DockOrder,
-    FireOrder};
+    FireOrder,
+    LandOrder};
 
 struct commandparameters
 {
     int spawnid;
+    int typeofisland;
     float x;
     float y;
     float z;
     int weapon;
+    bool bit;
 };
 
 struct CommandOrder

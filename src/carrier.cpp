@@ -764,6 +764,9 @@ void replayupdate(int value)
 
         {
 
+            // @FIXME: Add a CRC to the mesg to see if there are no changes DO NOT SEND IT.
+            // @FIXME: Add a mark to send the current timer to the server to measure the latency.
+            // @FIXME: Add a mark on the HUD to show current latency.
             ControlStructure mesg;
             Controller co = controller;
 
@@ -807,6 +810,123 @@ void replayupdate(int value)
     glutTimerFunc(20, worldStep, 0);
 }
 
+void inline processCommandOrders()
+{
+    for (size_t j = 0; j < controllers.size(); j++)
+    {
+        Controller *ctroler = controllers[j];
+        if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
+        {
+            CommandOrder co = ctroler->pop();
+            if (co.command == Command::StopOrder)
+            {
+                Vehicle *v = entities[ctroler->controllingid];
+                v->stop();
+            } else if (co.command == Command::AttackOrder)
+            {
+                Vec3f pos(co.parameters.x,co.parameters.y, co.parameters.z);
+
+                entities[ctroler->controllingid]->attack(pos);
+                entities[ctroler->controllingid]->enableAuto();
+            } else if (co.command == Command::DestinationOrder)
+            {
+                Vec3f target(co.parameters.x,co.parameters.y, co.parameters.z);
+
+                entities[ctroler->controllingid]->goTo(target);
+            } else if (co.command == Command::TaxiOrder)
+            {
+                taxiManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::TelemetryOrder)
+            {
+                if (co.parameters.bit)
+                    entities[ctroler->controllingid]->enableTelemetry();
+                else
+                    entities[ctroler->controllingid]->disableTelemetry();
+            } else if (co.command == Command::LaunchOrder)
+            {
+                launchManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::LandOrder)
+            {
+                landManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::CaptureOrder)
+            {
+                BoxIsland *island = NULL;
+                if (entities[ctroler->controllingid]->getSubType()==CEPHALOPOD)
+                {
+                    Cephalopod *w = (Cephalopod*) entities[ctroler->controllingid];
+                    // Check if this invading unit is already on the island
+                    island = w->getIsland();
+                } else if (entities[ctroler->controllingid]->getType()==WALRUS)
+                {
+
+                    Walrus *w = (Walrus*) entities[ctroler->controllingid];
+                    // Check if this invading unit is already on the island
+                    island = w->getIsland();
+                }
+                Vehicle *w = entities[ctroler->controllingid];
+
+                if (w && island)
+                    captureIsland(w,island,w->getFaction(),co.parameters.typeofisland,space, world);
+            } else if (co.command == Command::AutoOrder)
+            {
+                if (co.parameters.bit)
+                    entities[ctroler->controllingid]->enableAuto();
+                else
+                    entities[ctroler->controllingid]->disableAuto();
+            } else if (co.command == Command::DockOrder)
+            {
+                if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
+                {
+                    // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
+                    dockWalrus(entities[ctroler->controllingid]);
+                } else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
+                    dockManta();
+
+            } else if (co.command == Command::SpawnOrder)
+            {
+                if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
+                    spawnWalrus(space,world,entities[ctroler->controllingid]);
+                else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
+                {
+                    if (entities[ctroler->controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
+                    {
+                        size_t idx = 0;
+                        spawnManta(space,world,entities[ctroler->controllingid],idx);
+                    }
+                }
+                else if (co.parameters.spawnid == VehicleSubTypes::CEPHALOPOD)
+                {
+                    if (entities[ctroler->controllingid]->getType()==CARRIER || entities[ctroler->controllingid]->getType()==LANDINGABLE )
+                    {
+                        Cephalopod* m = (Cephalopod*)(entities[ctroler->controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(entities[ctroler->controllingid]->getFaction(),MANTA,CEPHALOPOD)));
+
+                        size_t idx = entities.push_back(m, m->getGeom());
+                    }
+                }
+            } else if (co.command == Command::FireOrder)
+            {
+                if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
+                {
+                    // @FIXME: Check if ctroler->weapon or co.parameters.weapon ??
+                    Vehicle *action = (entities[ctroler->controllingid])->fire(ctroler->weapon, world,space);
+                    //int *idx = new int();
+                    //*idx = vehicles.push_back(action);
+                    //dBodySetData( action->getBodyID(), (void*)idx);
+                    if (action != NULL)
+                    {
+                        size_t i = entities.push_back(action, action->getGeom());
+
+                    }
+
+                    // @FIXME: At this point I need to notify the controller that the fire action was executed,
+                    //   which can be used to control a missile or to make a sound.
+
+                }
+            }
+        }
+
+    }
+}
 
 void update(int value)
 {
@@ -867,6 +987,11 @@ void update(int value)
             controllers[1]->registers.precesion = mesg.precesion;
 
         }
+
+        // Process the orders
+
+        processCommandOrders();
+
 
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
