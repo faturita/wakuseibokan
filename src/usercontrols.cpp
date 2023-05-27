@@ -688,11 +688,11 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 't':controller.teletype = true;break;
         case 'S':
             {
-            CommandOrder co;
-            co.command = Command::StopOrder;
+                CommandOrder co;
+                co.command = Command::StopOrder;
 
-            controller.push(co);
-            break;
+                controller.push(co);
+                break;
             }
         case 'l':
             {
@@ -701,6 +701,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 co.parameters.spawnid = VehicleSubTypes::CEPHALOPOD;
                 controller.push(co);
             }
+            break;
         case 'm':
             {
                 CommandOrder co;
@@ -716,7 +717,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 co.parameters.spawnid = VehicleSubTypes::SIMPLEMANTA;
                 controller.push(co);
             }
-        break;
+            break;
         case 'o':
             {
                 CommandOrder co;
@@ -734,7 +735,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 controller.push(co);
             }
-        break;
+            break;
         case 'h':
             {
                 if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))

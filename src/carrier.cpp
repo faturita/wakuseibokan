@@ -761,13 +761,12 @@ void replayupdate(int value)
             // @FIXME: Add a mark to send the current timer to the server to measure the latency.
             // @FIXME: Add a mark on the HUD to show current latency.
             ControlStructure mesg;
-            Controller ctroler = controller;
 
-            mesg.controllingid = ctroler.controllingid;
-            mesg.registers = ctroler.registers;
-            mesg.faction = ctroler.faction;
+            mesg.controllingid = controller.controllingid;
+            mesg.registers = controller.registers;
+            mesg.faction = controller.faction;
 
-            CommandOrder co = ctroler.pop();
+            CommandOrder co = controller.pop();
             mesg.order = co;
 
             static crc arethereanychange = 0;
@@ -776,6 +775,7 @@ void replayupdate(int value)
 
             if (val != arethereanychange)
             {
+                printf("Command Order: %d\n", mesg.order.command);
                 sendCommand(mesg);
                 arethereanychange = val;
             }
@@ -883,7 +883,30 @@ void inline processCommandOrders()
                     // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
                     dockWalrus(entities[ctroler->controllingid]);
                 } else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
-                    dockManta();
+                {
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+                    {
+                        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==FlyingStatus::ON_DECK)
+                        {
+                            char str[256];
+                            Message mg;
+                            mg.faction = entities[i]->getFaction();
+                            sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
+                            mg.msg = std::string(str);
+                            messages.insert(messages.begin(), mg);
+                            //CLog::Write(CLog::Debug,"Eliminating....\n");
+
+                            entities[i]->damage(1000);
+                            if (peermode == SERVER)
+                            {
+                                notify(timer, i, entities[i]);
+                            }
+
+                            deleteEntity(i);
+                        }
+                    }
+                }
 
             } else if (co.command == Command::SpawnOrder)
             {
