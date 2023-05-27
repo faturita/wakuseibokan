@@ -126,6 +126,7 @@ extern clock_t elapsedtime;
 int gamemode;
 int aiplayer;
 int tracemode;
+int peermode;
 
 extern bool wincondition;
 
@@ -7474,6 +7475,22 @@ void checktest80(unsigned long timer)
 
     CommandOrder clast;
     clast = cont.pop();
+
+
+    struct controlregister cr;
+
+    cr.pitch = 9.2;
+
+    crc val = crcSlow((uint8_t *) &cr,  sizeof(struct controlregister));
+
+    printf("Crc: %d\n", val);
+
+    cr.precesion = 34.2;
+
+    val = crcSlow((uint8_t *) &cr,  sizeof(struct controlregister));
+
+    printf("Crc: %d\n", val);
+
 
     if (clast.command == Command::None)
     {

@@ -84,6 +84,7 @@
 
 #include "networking/telemetry.h"
 #include "networking/ledger.h"
+#include "networking/lobby.h"
 
 extern  Controller controller;
 extern  Camera Camera;
@@ -110,6 +111,7 @@ extern int aiplayer;
 extern int gamemode;
 
 extern int tracemode;
+extern int peermode;
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -127,24 +129,11 @@ FILE *ledger;
 
 std::vector<Controller*> controllers;
 
-struct sockaddr_in controllerserveraddr;
-int controllersockfd;
-
-struct ControlStructure {
-    int controllingid;
-    float roll;
-    float thrust;
-    float pitch;
-    float precesion;
-    int openfire;
-};
-
 void disclaimer()
 {
     printf ("惑星母艦\n");
     printf ("Warfare on the seas of Kepler IV\n");
 }
-
 
 
 /**
@@ -704,6 +693,9 @@ void replayupdate(int value)
         if (tracemode == RECORD || tracemode == REPLAY)
         {
             fclose(ledger);
+        }
+        if (peermode == CLIENT || peermode == SERVER)
+        {
             disconnect();
         }
         exit(0);
@@ -725,9 +717,10 @@ void replayupdate(int value)
 
             // Read from the remote connection.
 
-            //ret = receive(&record);
-
-            ret = fread(&record, sizeof(TickRecord),1,ledger);
+            if (peermode == CLIENT)
+                ret = receive(&record);
+            else if (tracemode == REPLAY)
+                ret = fread(&record, sizeof(TickRecord),1,ledger);
 
             if (ret>0)
             {
@@ -768,15 +761,25 @@ void replayupdate(int value)
             // @FIXME: Add a mark to send the current timer to the server to measure the latency.
             // @FIXME: Add a mark on the HUD to show current latency.
             ControlStructure mesg;
-            Controller co = controller;
+            Controller ctroler = controller;
 
-            mesg.controllingid = co.controllingid;
-            mesg.thrust = co.registers.thrust;
-            mesg.roll = co.registers.roll;
-            mesg.pitch = co.registers.pitch;
-            mesg.precesion = co.registers.precesion;
+            mesg.controllingid = ctroler.controllingid;
+            mesg.registers = ctroler.registers;
+            mesg.faction = ctroler.faction;
 
-            sendto(controllersockfd, &mesg, sizeof(mesg), 0, (SA *)&controllerserveraddr, sizeof(controllerserveraddr));
+            CommandOrder co = ctroler.pop();
+            mesg.order = co;
+
+            static crc arethereanychange = 0;
+
+            crc val = crcSlow((uint8_t *) &mesg,  sizeof(struct ControlStructure));
+
+            if (val != arethereanychange)
+            {
+                sendCommand(mesg);
+                arethereanychange = val;
+            }
+
         }
         synchronized(entities.m_mutex)
         {
@@ -964,27 +967,16 @@ void update(int value)
         // 3: Now go through all the objects (including Control[0] which is the person playing on the server)
         //    and execute the doControl(Control[i])
 
-        socklen_t len;
         ControlStructure mesg;
 
-        SA pcliaddr;
-        struct sockaddr_in cliaddr;
-
-        socklen_t clilen=sizeof(cliaddr);
-        int n;
-
-        len = clilen;
-        n = recvfrom(controllersockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
+        int n = receiveCommand(&mesg);
 
         if (n!=-1)
         {
-            Controller co = *controllers[1];
-
             controllers[1]->controllingid = mesg.controllingid;
-            controllers[1]->registers.thrust = mesg.thrust;
-            controllers[1]->registers.roll = mesg.roll;
-            controllers[1]->registers.pitch = mesg.pitch;
-            controllers[1]->registers.precesion = mesg.precesion;
+            controllers[1]->faction = mesg.faction;
+            controllers[1]->registers = mesg.registers;
+            controllers[1]->push(mesg.order);
 
         }
 
@@ -1043,6 +1035,10 @@ void update(int value)
             if (tracemode == RECORD)
             {
                 record(timer,i, entities[i]);
+            }
+
+            if (peermode == SERVER)
+            {
                 notify(timer, i, entities[i]);
             }
         }
@@ -1254,6 +1250,14 @@ int main(int argc, char** argv) {
         tracemode = NOTRACE;
 
 
+    if (isPresentCommandLineParameter(argc,argv,"-client"))
+        peermode = CLIENT;
+    else if (isPresentCommandLineParameter(argc,argv,"-server"))
+        peermode = SERVER;
+    else
+        peermode = SERVER;
+
+
     setupWorldModelling();
     initRendering();
 
@@ -1268,13 +1272,17 @@ int main(int argc, char** argv) {
     {
         initWorldModelling();
         ledger = fopen("ledger.bin","rb");
-        join_lobby();
     }
     else
     {
-        if (tracemode == RECORD) {ledger = fopen("ledger.bin","wb+");        init_lobby();}
+        if (tracemode == RECORD) {ledger = fopen("ledger.bin","wb+");}
         initWorldModelling();
     }
+
+    if (peermode == CLIENT)
+        join_lobby();
+    else if (peermode == SERVER)
+        init_lobby();
 
 
     const char *conf = dGetConfiguration ();
@@ -1297,40 +1305,18 @@ int main(int argc, char** argv) {
 
 
 
-    if (tracemode==RECORD)
+    if (peermode==SERVER)
     {
         controllers.push_back(new Controller());
 
-
-        controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
-        fcntl(controllersockfd, F_SETFL, O_NONBLOCK);
-
-        bzero(&controllerserveraddr, sizeof(controllerserveraddr));
-        controllerserveraddr.sin_family = AF_INET;
-        controllerserveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
-        controllerserveraddr.sin_port = htons(5000);
-
-        bind(controllersockfd, (SA *) &controllerserveraddr, sizeof(controllerserveraddr));
+        setupControllerServer();
 
     }
 
 
-    if (tracemode == REPLAY)
+    if (peermode == CLIENT)
     {
-        char ip[256];
-        strcpy(ip, "192.168.1.186");
-        int port = 5000;
-
-        /* Clean up */
-        bzero(&controllerserveraddr, sizeof(controllerserveraddr));
-
-        /* Initialize the client to connect to the server on local port 4500 */
-        controllerserveraddr.sin_family = AF_INET;
-        controllerserveraddr.sin_port = htons(port);
-        inet_pton(AF_INET, ip, &controllerserveraddr.sin_addr);
-
-        /* Bring up the client socket */
-        controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
+        setupControllerClient();
     }
 
 

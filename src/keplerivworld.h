@@ -43,6 +43,8 @@ enum gamemodes { ACTIONGAME, STRATEGYGAME };
 
 enum tracemodes { NOTRACE, RECORD, REPLAY };
 
+enum peermodes { CLIENT, SERVER };
+
 #include "messages.h"
 
 

@@ -85,6 +85,8 @@ int gamemode;
 
 int tracemode;
 
+int peermode;
+
 int aiplayer;
 
 
@@ -771,7 +773,7 @@ void initWorldModelling()
 {
     initIslands();
 
-   if (tracemode != REPLAY) initWorldPopulation();
+   if (tracemode != REPLAY && peermode != CLIENT) initWorldPopulation();
 }
 
 
@@ -781,7 +783,7 @@ void replayupdate(int value);
 void worldStep(int value)
 {
     timer++;
-    if (tracemode==REPLAY)
+    if (tracemode==REPLAY || peermode==CLIENT)
         replayupdate(value);
     else
         update(value);

@@ -42,4 +42,12 @@ float min(float val1, float val2);
 Vec3f getRandomCircularSpot(Vec3f origin, float radius);
 int getRandomInteger(int min, int max);
 
+typedef uint8_t crc;
+
+#define POLYNOMIAL 0xD8  /* 11011 followed by 0's */
+#define CRC_WIDTH  (8 * sizeof(crc))
+#define TOPBIT (1 << (CRC_WIDTH - 1))
+
+crc crcSlow(uint8_t const message[], int nBytes);
+
 #endif /* YAMATHUTIL_H_ */

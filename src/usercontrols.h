@@ -5,61 +5,9 @@
 #include <string>
 #include <iostream>
 
-
-enum class Command {
-    None=0,
-    AttackOrder,
-    DestinationOrder,
-    TaxiOrder,
-    TelemetryOrder,
-    LaunchOrder,
-    CaptureOrder,
-    AutoOrder,
-    StopOrder,
-    SpawnOrder,
-    DockOrder,
-    FireOrder,
-    LandOrder};
-
-struct commandparameters
-{
-    int spawnid;
-    int typeofisland;
-    float x;
-    float y;
-    float z;
-    int weapon;
-    bool bit;
-};
-
-struct CommandOrder
-{
-    Command command;
-    commandparameters parameters;
-};
-
+#include "commandorder.h"
 
 #define CONTROLLING_NONE (size_t)-1
-
-struct controlregister
-{
-    // R+,F-
-    float thrust=0;
-
-    // ModAngleX
-    float roll=0;
-
-    // ModAngleY
-    float pitch=0;
-
-    // ModAngleZ
-    float yaw=0;
-
-    // ModAngleP
-    float precesion=0;
-
-    float bank=0;
-};
 
 
 class Controller

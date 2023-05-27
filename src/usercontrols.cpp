@@ -741,7 +741,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     CommandOrder co;
                     co.command = Command::FireOrder;
-                    co.parameters.weapon = controller.weapon;
                     controller.push(co);
                 } else {
                     controller.controllingid = CONTROLLING_NONE;

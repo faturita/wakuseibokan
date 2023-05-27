@@ -39,6 +39,7 @@ src/carrier.cpp
 src/carrier.h
 src/commandline.cpp
 src/commandline.h
+src/commandorder.h
 src/container.cpp
 src/container.h
 src/control.cpp
@@ -75,6 +76,8 @@ src/messages.h
 src/model.h
 src/networking/ledger.cpp
 src/networking/ledger.h
+src/networking/lobby.cpp
+src/networking/lobby.h
 src/networking/telemetry.cpp
 src/networking/telemetry.h
 src/observable.h
