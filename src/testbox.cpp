@@ -100,6 +100,8 @@
 
 #include "map.h"
 
+#include "math/uuid.h"
+
 extern  Camera Camera;
 
 extern  Controller controller;
@@ -7490,6 +7492,9 @@ void checktest80(unsigned long timer)
     val = crcSlow((uint8_t *) &cr,  sizeof(struct controlregister));
 
     printf("Crc: %d\n", val);
+
+    std::string uuid = generate_hex(10);
+    printf("UUID: %s\n", uuid.c_str());
 
 
     if (clast.command == Command::None)

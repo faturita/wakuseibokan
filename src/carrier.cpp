@@ -116,6 +116,7 @@ extern int peermode;
 extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
+float latency=0;
 extern unsigned long timer;
 clock_t elapsedtime;
 
@@ -167,7 +168,7 @@ void drawHUD()
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
+    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -722,6 +723,12 @@ void replayupdate(int value)
             else if (tracemode == REPLAY)
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
+            // Sync timers
+            if (timer == 0)
+            {
+                timer = record.timerparam;
+            }
+
             if (ret>0)
             {
                 //printf(" %ld vs %ld \n", record.timerparam, timer);
@@ -749,6 +756,7 @@ void replayupdate(int value)
                 }
 
 
+                // @FIXME Check what happen with timer if they are synchronized between server and clients.
                 if (record.timerparam != timer)
                     break;
             }
@@ -765,6 +773,7 @@ void replayupdate(int value)
             mesg.controllingid = controller.controllingid;
             mesg.registers = controller.registers;
             mesg.faction = controller.faction;
+            mesg.sourcetimer = timer;
 
             CommandOrder co = controller.pop();
             mesg.order = co;
@@ -880,8 +889,32 @@ void inline processCommandOrders()
             {
                 if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
                 {
+                    Vehicle *dock = entities[ctroler->controllingid];
+
                     // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
-                    dockWalrus(entities[ctroler->controllingid]);
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+                    {
+                        // @FIXME: Only put back the walrus that is close to the carrier.
+                        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==SailingStatus::SAILING &&
+                                entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
+                        {
+                            char msg[256];
+                            Message mg;
+                            mg.faction = entities[i]->getFaction();
+                            sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
+                            mg.msg = std::string(msg);
+                            messages.insert(messages.begin(), mg);
+
+                            entities[i]->damage(1000);
+                            if (peermode == SERVER)
+                            {
+                                notify(timer, i, entities[i]);
+                            }
+
+                            deleteEntity(i);
+                        }
+                    }
                 } else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
                 {
                     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))

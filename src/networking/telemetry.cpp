@@ -7,7 +7,7 @@
 #include <vector>
 
 
-struct LogStructure {
+struct ModelRecord {
     int number;
     int health;
     int power;
@@ -67,7 +67,7 @@ void inittelemetry()
 
 void telemetryme(int number, int health, int power, float bearing, float *dBodyPosition, float *dBodyRotation)
 {
-    LogStructure logstructure;
+    ModelRecord logstructure;
 
     logstructure.number = number;
     logstructure.health = health;

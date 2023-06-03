@@ -57,6 +57,7 @@ struct ControlStructure {
     int controllingid;
     struct controlregister registers;
     int faction;
+    unsigned long sourcetimer;
     CommandOrder order;
 };
 

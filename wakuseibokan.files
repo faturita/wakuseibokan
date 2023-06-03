@@ -66,6 +66,8 @@ src/map.h
 src/math/kdtree.cpp
 src/math/splines.hpp
 src/math/splines.inl
+src/math/uuid.cpp
+src/math/uuid.h
 src/math/vec3f.cpp
 src/math/vec3f.h
 src/math/yamathutil.cpp

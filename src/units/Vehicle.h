@@ -19,7 +19,7 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
-struct LogStructure {
+struct ModelRecord {
     float pos1;
     float pos2;
     float pos3;
@@ -54,7 +54,8 @@ struct TickRecord {
     int status;
     int ttl;
     int number;
-    LogStructure location;
+
+    ModelRecord location;
 
     float orientation;  // For structures
 };
