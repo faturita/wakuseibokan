@@ -1359,22 +1359,17 @@ int main(int argc, char** argv) {
 
     controllers.push_back(&controller);
 
-
-
     if (peermode==SERVER)
     {
         controllers.push_back(new Controller());
-
         setupControllerServer();
 
     }
-
 
     if (peermode == CLIENT)
     {
         setupControllerClient();
     }
-
 
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());

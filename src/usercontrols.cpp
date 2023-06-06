@@ -567,6 +567,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     co.parameters.z = target[2];
 
                     controller.push(co);
+
                 }
             } else
             if (controller.str.find("godmode") != std::string::npos)

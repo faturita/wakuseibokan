@@ -73,7 +73,7 @@ void deleteEntity(size_t i)
 
         CLog::Write(CLog::Debug,"Cleaning up multibody object.\n");
 
-        v->destroy();
+        if (v) v->destroy();
     }
 
     // Disable bodies and geoms.  The update will take care of the object later to delete it.
