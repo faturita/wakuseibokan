@@ -266,7 +266,13 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500) //@FIXME Add a variable here error
+    float roundederror = 500;
+
+    if (getStatus() == SailingStatus::ROLLING)
+        roundederror = 5;
+
+
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>roundederror)
     {
         float distance = T.magnitude();
 

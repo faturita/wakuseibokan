@@ -34,6 +34,7 @@ void doTransform (float pos[3], float R[12]);
 void doTransform(float R[12]);
 void drawRectangularBox(float width, float height, float length);
 void drawRectangularBox(float width, float height, float length, GLuint _textureId);
+void drawRectangularBox(float width, float height, float length, Vec3f green, Vec3f yellow, Vec3f blue, Vec3f magenta);
 void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz);
 void drawTexturedBox(GLuint _textureId, float xx, float yy, float zz);
 void drawBox(GLuint texturedId, float xx, float yy, float zz);
