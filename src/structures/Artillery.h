@@ -29,6 +29,7 @@ public:
     void virtual doControl();
 
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // ARTILLERY_H

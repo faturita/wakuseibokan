@@ -17,6 +17,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // SHELL_H

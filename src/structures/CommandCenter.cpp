@@ -86,6 +86,11 @@ int CommandCenter::getSubType()
     return COMMANDCENTER;
 }
 
+EntityTypeId CommandCenter::getTypeId()
+{
+    return EntityTypeId::TCommandCenter;
+}
+
 void CommandCenter::restart()
 {
     setTtl(CommandCenter::BUILDING_TIME);

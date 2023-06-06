@@ -33,6 +33,7 @@ class MultiBodyVehicle : public Vehicle
 public:
     void virtual init();
     int  virtual getType();
+    EntityTypeId virtual getTypeId();
     void virtual drawModel(float yRot, float xRot, float x, float y, float z);
     void virtual drawModel();
     void virtual drawDirectModel();

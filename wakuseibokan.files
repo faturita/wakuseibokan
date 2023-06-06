@@ -39,6 +39,7 @@ src/carrier.cpp
 src/carrier.h
 src/commandline.cpp
 src/commandline.h
+src/commandorder.h
 src/container.cpp
 src/container.h
 src/control.cpp
@@ -47,6 +48,8 @@ src/e.cpp
 src/e.h
 src/engine.cpp
 src/engine.h
+src/entities.cpp
+src/entities.h
 src/font/DrawFonts.cpp
 src/font/DrawFonts.h
 src/hud.cpp
@@ -63,6 +66,8 @@ src/map.h
 src/math/kdtree.cpp
 src/math/splines.hpp
 src/math/splines.inl
+src/math/uuid.cpp
+src/math/uuid.h
 src/math/vec3f.cpp
 src/math/vec3f.h
 src/math/yamathutil.cpp
@@ -71,6 +76,10 @@ src/md2model.cpp
 src/md2model.h
 src/messages.h
 src/model.h
+src/networking/ledger.cpp
+src/networking/ledger.h
+src/networking/lobby.cpp
+src/networking/lobby.h
 src/networking/telemetry.cpp
 src/networking/telemetry.h
 src/observable.h
@@ -156,6 +165,10 @@ src/tests/testcase_109.cpp
 src/tests/testcase_109.h
 src/tests/testcase_110.cpp
 src/tests/testcase_110.h
+src/tests/testcase_111.cpp
+src/tests/testcase_111.h
+src/tests/testcase_112.cpp
+src/tests/testcase_112.h
 src/tests/testcase_113.cpp
 src/tests/testcase_113.h
 src/tests/testcase_114.cpp

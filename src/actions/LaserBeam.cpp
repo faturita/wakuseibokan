@@ -42,7 +42,7 @@ void LaserBeam::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //doTransform(f, R);
 
-        Vec3f v = dBodyGetLinearVelVec(me);
+        Vec3f v = getVelocity();
 
         v = v*range;
 
@@ -63,6 +63,8 @@ void LaserBeam::doDynamics(dBodyID body)
 {
     //dBodyAddForce(body,0,9.81f,0);
     //wrapDynamics(body);
+    Vec3f v = dBodyGetLinearVelVec(me);
+    setVelocity(v[0],v[1],v[2]);
 }
 
 
@@ -93,6 +95,11 @@ void LaserBeam::embody(dBodyID myBodySelf)
 
 int LaserBeam::getType()
 {
-    return 5;
+    return ACTION;
+}
+
+EntityTypeId LaserBeam::getTypeId()
+{
+    return EntityTypeId::TLaserBeam;
 }
 

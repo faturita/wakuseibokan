@@ -205,3 +205,8 @@ int Turret::getSubType()
 {
     return TURRET;
 }
+
+EntityTypeId Turret::getTypeId()
+{
+    return EntityTypeId::TTurret;
+}

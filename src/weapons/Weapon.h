@@ -34,6 +34,7 @@ public:
 
     int getType();
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 
     void  attachTo(dWorldID world, Vehicle *attacher, float x, float y, float z);
     void  embody(dBodyID);

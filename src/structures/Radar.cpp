@@ -55,3 +55,8 @@ int Radar::getSubType()
 {
     return RADAR;
 }
+
+EntityTypeId Radar::getTypeId()
+{
+    return EntityTypeId::TRadar;
+}

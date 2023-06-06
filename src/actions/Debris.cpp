@@ -39,10 +39,6 @@ void Debris::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //doTransform(f, R);
 
-        Vec3f v = dBodyGetLinearVelVec(me);
-
-        v = v*100;
-
         drawTexturedBox(texture,Gunshot::width, Gunshot::height, Gunshot::length);
 
         glPopMatrix();
@@ -56,5 +52,11 @@ void Debris::drawModel(float yRot, float xRot, float x, float y, float z)
 void Debris::setTexture(const GLuint &value)
 {
     texture = value;
+}
+
+
+EntityTypeId Debris::getTypeId()
+{
+    return EntityTypeId::TDebris;
 }
 

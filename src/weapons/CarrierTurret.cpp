@@ -39,6 +39,11 @@ int CarrierTurret::getSubType()
     return TURRET;
 }
 
+EntityTypeId CarrierTurret::getTypeId()
+{
+    return EntityTypeId::TCarrierTurret;
+}
+
 
 void CarrierTurret::embody(dWorldID world, dSpaceID space)
 {

@@ -61,6 +61,11 @@ int Dock::getSubType()
     return DOCK;
 }
 
+EntityTypeId Dock::getTypeId()
+{
+    return EntityTypeId::TDock;
+}
+
 bool Dock::checkHeightOffset(int heightOffset)
 {
     return (heightOffset < 1) ;

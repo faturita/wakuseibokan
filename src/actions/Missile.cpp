@@ -301,6 +301,10 @@ void Missile::setVisible(bool val)
     setTtl(50);
 }
 
+EntityTypeId Missile::getTypeId()
+{
+    return EntityTypeId::TMissile;
+}
 
 
 

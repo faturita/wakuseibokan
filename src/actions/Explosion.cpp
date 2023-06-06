@@ -61,3 +61,9 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
         }
     }
 }
+
+
+EntityTypeId Explosion::getTypeId()
+{
+    return EntityTypeId::TExplosion;
+}

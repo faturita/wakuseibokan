@@ -72,6 +72,11 @@ int AdvancedManta::getSubType()
     return SIMPLEMANTA;
 }
 
+EntityTypeId AdvancedManta::getTypeId()
+{
+    return EntityTypeId::TAdvancedManta;
+}
+
 void AdvancedManta::embody(dWorldID world, dSpaceID space)
 {
     me = dBodyCreate(world);

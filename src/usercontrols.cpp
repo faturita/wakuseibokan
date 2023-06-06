@@ -98,7 +98,8 @@ void processMouse(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
-                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) || (entities[controller.controllingid]->getType() == CONTROLABLEACTION) ||
+                ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) ||
+                 (entities[controller.controllingid]->getType() == CONTROLABLEACTION)   ||
                  (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ) )
         {
             CLog::Write(CLog::Debug,"Active control\n");
@@ -140,14 +141,18 @@ void processMouse(int button, int state, int x, int y) {
                 if (specialKey == GLUT_ACTIVE_SHIFT && commandmode == ATTACK_MODE)
                 {
                     Vec3f target = setLocationOnMap(x,y);
-
-
                     Vehicle *s = findNearestEnemyVehicle(entities[controller.controllingid]->getFaction(),target,2000);
 
                     if (s)
                     {
-                        entities[controller.controllingid]->attack(s->getPos());
-                        entities[controller.controllingid]->enableAuto();
+                        CommandOrder co;
+                        co.command = Command::AttackOrder;
+                        co.parameters.x = s->getPos()[0];
+                        co.parameters.y = s->getPos()[1];
+                        co.parameters.z = s->getPos()[2];
+
+                        controller.push(co);
+
                     }
 
                     CLog::Write(CLog::Debug,"Attack set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
@@ -156,7 +161,14 @@ void processMouse(int button, int state, int x, int y) {
                 {
                     Vec3f target = setLocationOnMap(x,y);
                     //@FIXME
-                    entities[controller.controllingid]->goTo(target);
+
+                    CommandOrder co;
+                    co.command = Command::DestinationOrder;
+                    co.parameters.x = target[0];
+                    co.parameters.y = target[1];
+                    co.parameters.z = target[2];
+
+                    controller.push(co);
 
                     CLog::Write(CLog::Debug,"Destination set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);
 
@@ -363,7 +375,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, content);
 
-                printf ("Manta %ld\n", index);
+                printf ("Medusa %ld\n", index);
 
                 switchControl(index);
             } else
@@ -375,6 +387,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
                 printf ("Manta %ld\n", index);
+
+                switchControl(index);
+
+            } else
+            if (controller.str.find("stingray") != std::string::npos)
+            {
+                int content = atoi(controller.str.substr(8).c_str());
+
+                size_t index = CONTROLLING_NONE;
+                findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::STINGRAY, controller.faction, content);
+
+                printf ("Stingray %ld\n", index);
 
                 switchControl(index);
 
@@ -451,7 +475,11 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("taxi") != std::string::npos)
             {
-                taxiManta(entities[controller.controllingid]);
+
+                CommandOrder co;
+                co.command = Command::TaxiOrder;
+
+                controller.push(co);
             }
             else
             if (controller.str.find("weapon")!= std::string::npos)
@@ -462,22 +490,31 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("telemetry") != std::string::npos)
             {
+                CommandOrder co;
+                co.command = Command::TelemetryOrder;
+
                 if (controller.str.find("on") != std::string::npos)
-                    entities[controller.controllingid]->enableTelemetry();
+                    co.parameters.bit = true;
                 else
-                    entities[controller.controllingid]->disableTelemetry();
+                    co.parameters.bit = false;
+
+                controller.push(co);
             }
             else
             if (controller.str.find("launch") != std::string::npos)
             {
-                //const char* content = controller.str.substr(7).c_str();
+                CommandOrder co;
+                co.command = Command::LaunchOrder;
 
-                launchManta(entities[controller.controllingid]);
+                controller.push(co);
 
             } else
             if (controller.str.find("land") != std::string::npos)
             {
-                landManta(entities[controller.controllingid]);
+                CommandOrder co;
+                co.command = Command::LandOrder;
+
+                controller.push(co);
 
             } else
             if (controller.str.find("command") != std::string::npos)
@@ -492,26 +529,20 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
                 {
-                    Walrus *w = (Walrus*) entities[controller.controllingid];
-                    // Check if walrus is on island.
-                    BoxIsland *island = w->getIsland();
-
-                    if (island)
-                    {
-                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
-                    }
+                    CommandOrder co;
+                    co.command = Command::CaptureOrder;
+                    co.parameters.typeofisland = typeofisland;
+                    controller.push(co);
                 }
 
                 if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getSubType()==CEPHALOPOD)
                 {
-                    Cephalopod *w = (Cephalopod*) entities[controller.controllingid];
-                    // Check if this invading unit is already on the island
-                    BoxIsland *island = w->getIsland();
 
-                    if (island)
-                    {
-                        captureIsland(w,island,w->getFaction(),typeofisland,space, world);
-                    }
+                    CommandOrder co;
+                    co.command = Command::CaptureOrder;
+                    co.parameters.typeofisland = typeofisland;
+                    controller.push(co);
+
                 }
             } else
             if (controller.str.find("goback") != std::string::npos)
@@ -528,8 +559,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    w->goTo(b->getPos()+(b->getForward().normalize()*150));
-                    w->enableAuto();
+                    Vec3f target = b->getPos()+(b->getForward().normalize()*150);
+
+                    CommandOrder co;
+                    co.command = Command::DestinationOrder;
+                    co.parameters.x = target[0];
+                    co.parameters.y = target[1];
+                    co.parameters.z = target[2];
+
+                    controller.push(co);
+
                 }
             } else
             if (controller.str.find("godmode") != std::string::npos)
@@ -607,8 +646,22 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'F':controller.registers.thrust-=10.00;break;
         case 'q':controller.reset();break;
         case 'Q':controller.stabilize();break;
-        case 'j':entities[controller.controllingid]->enableAuto();break;
-        case 'J':entities[controller.controllingid]->disableAuto();break;
+        case 'j':
+        {
+            CommandOrder co;
+            co.command = Command::AutoOrder;
+            co.parameters.bit = true;
+            controller.push(co);
+        }
+        break;
+        case 'J':
+        {
+            CommandOrder co;
+            co.command = Command::AutoOrder;
+            co.parameters.bit = false;
+            controller.push(co);
+        }
+        break;
 
         case '0':
             controller.controllingid = CONTROLLING_NONE;
@@ -637,82 +690,73 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 't':controller.teletype = true;break;
         case 'S':
             {
-            Vehicle *v = entities[controller.controllingid];
-            v->stop();
-            break;
+                CommandOrder co;
+                co.command = Command::StopOrder;
+
+                controller.push(co);
+                break;
             }
         case 'l':
-            synchronized(entities.m_mutex)
             {
-                if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
-                {
-                    Cephalopod* m = (Cephalopod*)(entities[controller.controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(entities[controller.controllingid]->getFaction(),MANTA,CEPHALOPOD)));
-
-                    size_t idx = entities.push_back(m, m->getGeom());
-                }
+                CommandOrder co;
+                co.command = Command::SpawnOrder;
+                co.parameters.spawnid = VehicleSubTypes::CEPHALOPOD;
+                controller.push(co);
             }
+            break;
         case 'm':
             {
-            synchronized(entities.m_mutex)
-            {
-                if (entities[controller.controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
-                {
-                    size_t idx = 0;
-                    spawnManta(space,world,entities[controller.controllingid],idx);
-                }
-            }
+                CommandOrder co;
+                co.command = Command::SpawnOrder;
+                co.parameters.spawnid = VehicleSubTypes::SIMPLEMANTA;
+                controller.push(co);
             }
             break;
         case 'M':
             {
-            synchronized(entities.m_mutex)
-            {
-                dockManta();
+                CommandOrder co;
+                co.command = Command::DockOrder;
+                co.parameters.spawnid = VehicleSubTypes::SIMPLEMANTA;
+                controller.push(co);
             }
-            }
-        break;
+            break;
         case 'o':
             {
-                spawnWalrus(space,world,entities[controller.controllingid]);
+                CommandOrder co;
+                co.command = Command::SpawnOrder;
+                co.parameters.spawnid = VehicleSubTypes::ADVANCEDWALRUS;
+
+                controller.push(co);
             }
             break;
         case 'O':
             {
-                // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
-                synchronized(entities.m_mutex)
-                {
-                    dockWalrus(entities[controller.controllingid]);
-                }
+                CommandOrder co;
+                co.command = Command::DockOrder;
+                co.parameters.spawnid = VehicleSubTypes::ADVANCEDWALRUS;
+
+                controller.push(co);
             }
-        break;
+            break;
         case 'h':
             {
-                synchronized(entities.m_mutex)
+                if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                 {
-                    if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
-                    {
-                        Vehicle *action = (entities[controller.controllingid])->fire(controller.weapon, world,space);
-                        //int *idx = new int();
-                        //*idx = vehicles.push_back(action);
-                        //dBodySetData( action->getBodyID(), (void*)idx);
-                        if (action != NULL)
-                        {
-                            size_t i = entities.push_back(action, action->getGeom());
-                            if (controller.weapon == 0) gunshot();
-
-                            if (action->getType()==CONTROLABLEACTION)
-                            {
-                                switchControl(i);
-
-                            }
-                        }
-
-
-                    } else
-                    {
-                        controller.controllingid = CONTROLLING_NONE;
-                    }
+                    CommandOrder co;
+                    co.command = Command::FireOrder;
+                    controller.push(co);
+                } else {
+                    controller.controllingid = CONTROLLING_NONE;
                 }
+
+                // @FIXME: I need a way to propagate this back to the controller (who now can be remote).
+                //if (controller.weapon == 0) gunshot();
+
+                //if (action->getType()==CONTROLABLEACTION)
+                //{
+                //    switchControl(i);
+
+                //}
             }
 
         break;

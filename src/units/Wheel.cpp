@@ -34,6 +34,11 @@ void Wheel::init()
 
 }
 
+EntityTypeId Wheel::getTypeId()
+{
+    return EntityTypeId::TWheel;
+}
+
 int Wheel::getType()
 {
     return WEAPON;
@@ -80,7 +85,7 @@ void Wheel::doDynamics()
         if (v < -0.1) v = -0.1;
         v *= -5.0;
 
-        printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
+        //printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
 
 
         dJointSetHinge2Param (joint,dParamVel,v);

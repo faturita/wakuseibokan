@@ -25,6 +25,9 @@
 #include "units/Beluga.h"
 #include "units/AdvancedManta.h"
 #include "units/Cephalopod.h"
+#include "units/Medusa.h"
+#include "units/Stingray.h"
+#include "units/Otter.h"
 
 #include "terrain/Terrain.h"
 
@@ -46,6 +49,10 @@
 #include "actions/Missile.h"
 
 #include "actions/Explosion.h"
+
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierLauncher.h"
+#include "weapons/CarrierTurret.h"
 
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};

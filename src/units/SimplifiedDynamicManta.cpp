@@ -1620,3 +1620,7 @@ Vehicle* SimplifiedDynamicManta::fireAmmo(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
+EntityTypeId SimplifiedDynamicManta::getTypeId()
+{
+    return EntityTypeId::TSimplifiedDynamicManta;
+}

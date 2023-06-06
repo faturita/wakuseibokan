@@ -19,6 +19,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // ARTILLERYAMMO_H

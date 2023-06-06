@@ -29,6 +29,7 @@ public:
     void virtual doControl();
 
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // TURRET_H

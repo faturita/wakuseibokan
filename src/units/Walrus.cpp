@@ -69,6 +69,11 @@ int Walrus::getSubType()
     return SIMPLEWALRUS;
 }
 
+EntityTypeId Walrus::getTypeId()
+{
+    return EntityTypeId::TWalrus;
+}
+
 void Walrus::doMaterial()
 {
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};

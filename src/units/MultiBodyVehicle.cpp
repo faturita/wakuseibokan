@@ -25,6 +25,11 @@ int MultiBodyVehicle::getType()
     return 4;
 }
 
+EntityTypeId MultiBodyVehicle::getTypeId()
+{
+    return EntityTypeId::TMultiBodyVehicle;
+}
+
 void MultiBodyVehicle::doMaterial()
 {
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};

@@ -43,6 +43,8 @@ public:
     void embody(dBodyID myBodySelf);
 
     void addWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backright);
+
+    EntityTypeId virtual getTypeId();
 };
 
 #endif //BUGGY_H

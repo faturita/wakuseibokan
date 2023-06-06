@@ -25,6 +25,7 @@ public:
     void tick();
 
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // LASERTURRET_H

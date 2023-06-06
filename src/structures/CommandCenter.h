@@ -43,6 +43,7 @@ public:
 
     int getType();
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 
     void restart();
     void setUnderAttack(bool isunderattack);

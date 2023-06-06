@@ -123,7 +123,7 @@ void TestCase_110::init()
     dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/4*10,(int)PI/4*10)/10.0);
     dBodySetRotation(_otter->getBodyID(),Re2);
 
-    _otter->goTo(Vec3f(0,0,140));
+    _otter->goTo(Vec3f(0,0,340));
     _otter->enableAuto();
 
 
@@ -165,17 +165,6 @@ int TestCase_110::check(unsigned long timertick)
             Vec3f pos = _b->getPos();
 
             dout << (pos-Vec3f(45,pos[1],340)).magnitude() <<  ":-: " << (pos-Vec3f(-45,pos[1],340)).magnitude() << std::endl;
-
-
-
-            // This only happen between the two warehouses.
-            if ( ((pos-Vec3f(0,pos[1],140)).magnitude()<60) &&
-                ((pos-Vec3f(0,pos[1],140)).magnitude()<60)  )
-            {
-                _b->goTo(Vec3f(0,0,340));
-                _b->enableAuto();
-            }
-
 
             // This only happen between the two warehouses.
             if ( ((pos-Vec3f(45,pos[1],340)).magnitude()<60) &&

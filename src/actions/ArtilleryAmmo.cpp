@@ -19,7 +19,7 @@ void ArtilleryAmmo::init()
     ArtilleryAmmo::length=0.5f;
     ArtilleryAmmo::width=0.5f;
 
-    ArtilleryAmmo::mass = 0.01f;
+    ArtilleryAmmo::mass = 10.01f;
 
     setDamage(80);
 
@@ -45,10 +45,6 @@ void ArtilleryAmmo::drawModel(float yRot, float xRot, float x, float y, float z)
         glScalef(1.0f,1.0f,1.0f);
 
         //doTransform(f, R);
-
-        Vec3f v = dBodyGetLinearVelVec(me);
-
-        v = v*100;
 
         //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
         drawRedBox(Gunshot::width, Gunshot::height, Gunshot::length);
@@ -99,5 +95,10 @@ void ArtilleryAmmo::embody(dBodyID myBodySelf)
 int ArtilleryAmmo::getType()
 {
     return ACTION;
+}
+
+EntityTypeId ArtilleryAmmo::getTypeId()
+{
+    return EntityTypeId::TArtilleryAmmo;
 }
 

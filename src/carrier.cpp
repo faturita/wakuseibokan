@@ -21,6 +21,7 @@
 #include <GLUT/glut.h>
 #elif __linux
 #include <GL/glut.h>
+#include <algorithm>
 #endif
 
 #include <ode/ode.h>
@@ -55,6 +56,7 @@
 #include "terrain/Terrain.h"
 
 #include "engine.h"
+#include "entities.h"
 
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
@@ -63,6 +65,14 @@
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
+
+#include "weapons/CarrierTurret.h"
+#include "weapons/CarrierArtillery.h"
+#include "weapons/CarrierLauncher.h"
+
+#include "units/Stingray.h"
+#include "units/Medusa.h"
+#include "units/Otter.h"
 
 #include "actions/Explosion.h"
 
@@ -73,6 +83,8 @@
 #include "ai.h"
 
 #include "networking/telemetry.h"
+#include "networking/ledger.h"
+#include "networking/lobby.h"
 
 extern  Controller controller;
 extern  Camera Camera;
@@ -98,9 +110,13 @@ extern int aiplayer;
 
 extern int gamemode;
 
+extern int tracemode;
+extern int peermode;
+
 extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
+float latency=0;
 extern unsigned long timer;
 clock_t elapsedtime;
 
@@ -110,15 +126,15 @@ bool mute=false;
 bool cull=false;
 bool wireframes=false;
 
-int sockfd;
-struct sockaddr_in servaddr;
+FILE *ledger;
+
+std::vector<Controller*> controllers;
 
 void disclaimer()
 {
     printf ("惑星母艦\n");
     printf ("Warfare on the seas of Kepler IV\n");
 }
-
 
 
 /**
@@ -152,7 +168,7 @@ void drawHUD()
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
+    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -544,6 +560,7 @@ void drawScene() {
     Vec3f carrierloc2(0,0,0);
     Vec3f cameraloc = Camera.getPos();
 
+
     // Draw vehicles and objects
     // FPS: OpenGL is dead if I draw all the entities.  So I am just drawing objects 10k away.
     // This is a very easy enhancement with tremendous consequences in fps stability.
@@ -662,6 +679,314 @@ void handleResize(int w, int h) {
 
 static bool didODEInit=false;
 
+
+// Go through all the elements that appear each time on the trackrecord.
+// Those who are new, create them.
+// Those wo are already there, update them.
+// Those who are no longer there, destroy them.
+void replayupdate(int value)
+{
+    if (controller.isInterrupted())
+    {
+        endWorldModelling();
+        // Do extra wrap up
+        msgboardfile.close();
+        if (tracemode == RECORD || tracemode == REPLAY)
+        {
+            fclose(ledger);
+        }
+        if (peermode == CLIENT || peermode == SERVER)
+        {
+            disconnect();
+        }
+        exit(0);
+    }
+
+    std::vector<size_t> visited;
+
+    if (!controller.pause)
+    {
+        // I assume the file is open
+
+        // Check the controller structure and send it through a client socket to the server.
+
+        TickRecord record;
+
+        int ret = 1;
+        while (ret>0)
+        {
+
+            // Read from the remote connection.
+
+            if (peermode == CLIENT)
+                ret = receive(&record);
+            else if (tracemode == REPLAY)
+                ret = fread(&record, sizeof(TickRecord),1,ledger);
+
+            // Sync timers
+            if (timer == 0)
+            {
+                timer = record.timerparam;
+            }
+
+            if (ret>0)
+            {
+                //printf(" %ld vs %ld \n", record.timerparam, timer);
+
+                visited.push_back(record.id);
+
+                if (!entities.isValid(record.id))
+                {
+                    // Create a new entity which I didn't see it yet
+                    createEntity(record,space,world);
+                }
+
+                if ( entities.isValid(record.id) )
+                {
+                    // Update the data from current entities
+                    Vehicle *v = entities[record.id];
+
+                    if (v)
+                    {
+
+                        v->deserialize(record);
+
+                    }
+
+                }
+
+
+                // @FIXME Check what happen with timer if they are synchronized between server and clients.
+                if (record.timerparam != timer)
+                    break;
+            }
+
+        }
+
+        {
+
+            // @FIXME: Add a CRC to the mesg to see if there are no changes DO NOT SEND IT.
+            // @FIXME: Add a mark to send the current timer to the server to measure the latency.
+            // @FIXME: Add a mark on the HUD to show current latency.
+            ControlStructure mesg;
+
+            mesg.controllingid = controller.controllingid;
+            mesg.registers = controller.registers;
+            mesg.faction = controller.faction;
+            mesg.sourcetimer = timer;
+
+            CommandOrder co = controller.pop();
+            mesg.order = co;
+
+            static crc arethereanychange = 0;
+
+            crc val = crcSlow((uint8_t *) &mesg,  sizeof(struct ControlStructure));
+
+            if (val != arethereanychange)
+            {
+                printf("Command Order: %d\n", mesg.order.command);
+                sendCommand(mesg);
+                arethereanychange = val;
+            }
+
+        }
+        synchronized(entities.m_mutex)
+        {
+            // Delete the entries that fulfill the delete condition.
+            for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
+
+                if ( ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) &&
+                        entities[i]->getTtl()<=0) ||
+                    (entities[i]->getHealth()<=0)
+                    )
+                {
+                    if (controller.controllingid == i)
+                    {
+                        controller.controllingid = CONTROLLING_NONE;
+                        controller.reset();
+                    }
+                    deleteEntity(i);
+                }
+
+                //if ( std::find(visited.begin(), visited.end(), i) == visited.end() )
+                //{
+                //    deleteEntity(i);
+                //}
+            }
+        }
+
+
+    }
+    glutPostRedisplay();
+    // @NOTE: update time should be adapted to real FPS (lower is faster).
+    glutTimerFunc(20, worldStep, 0);
+}
+
+void inline processCommandOrders()
+{
+    for (size_t j = 0; j < controllers.size(); j++)
+    {
+        Controller *ctroler = controllers[j];
+        if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
+        {
+            CommandOrder co = ctroler->pop();
+            if (co.command == Command::StopOrder)
+            {
+                Vehicle *v = entities[ctroler->controllingid];
+                v->stop();
+            } else if (co.command == Command::AttackOrder)
+            {
+                Vec3f pos(co.parameters.x,co.parameters.y, co.parameters.z);
+
+                entities[ctroler->controllingid]->attack(pos);
+                entities[ctroler->controllingid]->enableAuto();
+            } else if (co.command == Command::DestinationOrder)
+            {
+                Vec3f target(co.parameters.x,co.parameters.y, co.parameters.z);
+
+                entities[ctroler->controllingid]->goTo(target);
+            } else if (co.command == Command::TaxiOrder)
+            {
+                taxiManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::TelemetryOrder)
+            {
+                if (co.parameters.bit)
+                    entities[ctroler->controllingid]->enableTelemetry();
+                else
+                    entities[ctroler->controllingid]->disableTelemetry();
+            } else if (co.command == Command::LaunchOrder)
+            {
+                launchManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::LandOrder)
+            {
+                landManta(entities[ctroler->controllingid]);
+            } else if (co.command == Command::CaptureOrder)
+            {
+                BoxIsland *island = NULL;
+                if (entities[ctroler->controllingid]->getSubType()==CEPHALOPOD)
+                {
+                    Cephalopod *w = (Cephalopod*) entities[ctroler->controllingid];
+                    // Check if this invading unit is already on the island
+                    island = w->getIsland();
+                } else if (entities[ctroler->controllingid]->getType()==WALRUS)
+                {
+
+                    Walrus *w = (Walrus*) entities[ctroler->controllingid];
+                    // Check if this invading unit is already on the island
+                    island = w->getIsland();
+                }
+                Vehicle *w = entities[ctroler->controllingid];
+
+                if (w && island)
+                    captureIsland(w,island,w->getFaction(),co.parameters.typeofisland,space, world);
+            } else if (co.command == Command::AutoOrder)
+            {
+                if (co.parameters.bit)
+                    entities[ctroler->controllingid]->enableAuto();
+                else
+                    entities[ctroler->controllingid]->disableAuto();
+            } else if (co.command == Command::DockOrder)
+            {
+                if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
+                {
+                    Vehicle *dock = entities[ctroler->controllingid];
+
+                    // @FIXME: Find the walrus that is actually closer to the dock bay.  This force all the walruses to dock.
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+                    {
+                        // @FIXME: Only put back the walrus that is close to the carrier.
+                        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==SailingStatus::SAILING &&
+                                entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
+                        {
+                            char msg[256];
+                            Message mg;
+                            mg.faction = entities[i]->getFaction();
+                            sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
+                            mg.msg = std::string(msg);
+                            messages.insert(messages.begin(), mg);
+
+                            entities[i]->damage(1000);
+                            if (peermode == SERVER)
+                            {
+                                notify(timer, i, entities[i]);
+                            }
+
+                            deleteEntity(i);
+                        }
+                    }
+                } else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
+                {
+                    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+                    {
+                        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+                        if (entities[i]->getType()==MANTA && entities[i]->getStatus()==FlyingStatus::ON_DECK)
+                        {
+                            char str[256];
+                            Message mg;
+                            mg.faction = entities[i]->getFaction();
+                            sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
+                            mg.msg = std::string(str);
+                            messages.insert(messages.begin(), mg);
+                            //CLog::Write(CLog::Debug,"Eliminating....\n");
+
+                            entities[i]->damage(1000);
+                            if (peermode == SERVER)
+                            {
+                                notify(timer, i, entities[i]);
+                            }
+
+                            deleteEntity(i);
+                        }
+                    }
+                }
+
+            } else if (co.command == Command::SpawnOrder)
+            {
+                if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
+                    spawnWalrus(space,world,entities[ctroler->controllingid]);
+                else if (co.parameters.spawnid == VehicleSubTypes::SIMPLEMANTA)
+                {
+                    if (entities[ctroler->controllingid]->getType()==CARRIER || entities[controller.controllingid]->getType()==LANDINGABLE )
+                    {
+                        size_t idx = 0;
+                        spawnManta(space,world,entities[ctroler->controllingid],idx);
+                    }
+                }
+                else if (co.parameters.spawnid == VehicleSubTypes::CEPHALOPOD)
+                {
+                    if (entities[ctroler->controllingid]->getType()==CARRIER || entities[ctroler->controllingid]->getType()==LANDINGABLE )
+                    {
+                        Cephalopod* m = (Cephalopod*)(entities[ctroler->controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(entities[ctroler->controllingid]->getFaction(),MANTA,CEPHALOPOD)));
+
+                        size_t idx = entities.push_back(m, m->getGeom());
+                    }
+                }
+            } else if (co.command == Command::FireOrder)
+            {
+                if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
+                {
+                    // @FIXME: Check if ctroler->weapon or co.parameters.weapon ??
+                    Vehicle *action = (entities[ctroler->controllingid])->fire(ctroler->weapon, world,space);
+                    //int *idx = new int();
+                    //*idx = vehicles.push_back(action);
+                    //dBodySetData( action->getBodyID(), (void*)idx);
+                    if (action != NULL)
+                    {
+                        size_t i = entities.push_back(action, action->getGeom());
+
+                    }
+
+                    // @FIXME: At this point I need to notify the controller that the fire action was executed,
+                    //   which can be used to control a missile or to make a sound.
+
+                }
+            }
+        }
+
+    }
+}
+
 void update(int value)
 {
 	// Derive the control to the correct object
@@ -677,6 +1002,7 @@ void update(int value)
         endWorldModelling();
         // Do extra wrap up
         msgboardfile.close();
+        fclose(ledger);
         exit(0);
     }
     if (!controller.pause)
@@ -690,19 +1016,48 @@ void update(int value)
             pg.playFaction(timer);
 
 
+        // 1: Read the information from the sockets with the controller information that is being sent from
+        //    each client
+        // 2: update a Control vector with all the controllers that I have now.  This is fixed or somehow created
+        //    by a joining process at the beginning of the game.  Control is a dynamic vector of Controller.
+        // 3: Now go through all the objects (including Control[0] which is the person playing on the server)
+        //    and execute the doControl(Control[i])
+
+        ControlStructure mesg;
+
+        int n = receiveCommand(&mesg);
+
+        if (n!=-1)
+        {
+            controllers[1]->controllingid = mesg.controllingid;
+            controllers[1]->faction = mesg.faction;
+            controllers[1]->registers = mesg.registers;
+            controllers[1]->push(mesg.order);
+
+        }
+
+        // Process the orders
+
+        processCommandOrders();
+
+
         // Auto Control: The controller can be controlled by the user or by the AI
         // Each object is responsible for generating their own controlregisters as if it were a user playing
         // Hence this code gets the controlregisters if AUTO is enabled.  And then it uses the controlregister
         // to control each object as if it were exactly the user (with doControl() in the loop ahead).
-        if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
+        for (size_t j = 0; j < controllers.size(); j++)
         {
-            if (!entities[controller.controllingid]->isAuto())
+            Controller *ctroler = controllers[j];
+            if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
             {
-                entities[controller.controllingid]->doControl(controller);
-            }
-            else
-            {
-                controller.registers = entities[controller.controllingid]->getControlRegisters();
+                if (!entities[ctroler->controllingid]->isAuto())
+                {
+                    entities[ctroler->controllingid]->doControl(*ctroler);
+                }
+                else
+                {
+                    ctroler->registers = entities[ctroler->controllingid]->getControlRegisters();
+                }
             }
         }
 
@@ -732,6 +1087,16 @@ void update(int value)
             }
             entities[i]->doDynamics();
             entities[i]->tick();
+
+            if (tracemode == RECORD)
+            {
+                record(timer,i, entities[i]);
+            }
+
+            if (peermode == SERVER)
+            {
+                notify(timer, i, entities[i]);
+            }
         }
 
 
@@ -932,7 +1297,25 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
 
+
+    if (isPresentCommandLineParameter(argc,argv,"-record"))
+        tracemode = RECORD;
+    else if (isPresentCommandLineParameter(argc,argv,"-replay"))
+        tracemode = REPLAY;
+    else
+        tracemode = NOTRACE;
+
+
+    if (isPresentCommandLineParameter(argc,argv,"-client"))
+        peermode = CLIENT;
+    else if (isPresentCommandLineParameter(argc,argv,"-server"))
+        peermode = SERVER;
+    else
+        peermode = SERVER;
+
+
     setupWorldModelling();
+    initRendering();
 
     // Initialize ODE, create islands, structures and populate the world.
     if (isPresentCommandLineParameter(argc,argv,"-testcase"))
@@ -941,10 +1324,21 @@ int main(int argc, char** argv) {
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
     else if (isPresentCommandLineParameter(argc,argv,"-load"))
         loadgame();
-    else
+    else if (tracemode == REPLAY)
     {
         initWorldModelling();
+        ledger = fopen("ledger.bin","rb");
     }
+    else
+    {
+        if (tracemode == RECORD) {ledger = fopen("ledger.bin","wb+");}
+        initWorldModelling();
+    }
+
+    if (peermode == CLIENT)
+        join_lobby();
+    else if (peermode == SERVER)
+        init_lobby();
 
 
     const char *conf = dGetConfiguration ();
@@ -962,12 +1356,28 @@ int main(int argc, char** argv) {
 
     }
 
+
+    controllers.push_back(&controller);
+
+    if (peermode==SERVER)
+    {
+        controllers.push_back(new Controller());
+        setupControllerServer();
+
+    }
+
+    if (peermode == CLIENT)
+    {
+        setupControllerClient();
+    }
+
+
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
     //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
     
     //Initialize all the models and structures.
-    initRendering();
+    //initRendering();
 
     //intro();
 

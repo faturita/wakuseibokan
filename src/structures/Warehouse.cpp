@@ -55,3 +55,8 @@ int Warehouse::getSubType()
 {
     return WAREHOUSE;
 }
+
+EntityTypeId Warehouse::getTypeId()
+{
+    return EntityTypeId::TWarehouse;
+}

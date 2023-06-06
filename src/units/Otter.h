@@ -31,6 +31,9 @@ public:
     dSpaceID embody_in_space(dWorldID world, dSpaceID space);
 
     void drawModel(float yRot, float xRot, float x, float y, float z);
+
+    int  virtual getSubType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // OTTER_H

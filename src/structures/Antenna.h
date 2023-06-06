@@ -11,6 +11,8 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
 
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
+
 };
 
 #endif // ANTENNA_H
