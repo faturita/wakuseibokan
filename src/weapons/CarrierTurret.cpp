@@ -27,6 +27,8 @@ void CarrierTurret::init()
     Weapon::length=11.68;
     Weapon::width=11.68;
 
+    setName("Turret");
+
     setForward(0,0,1);
 
     Weapon::azimuth = 0;

@@ -1,9 +1,23 @@
-//
-//  carrier.cpp
-//  Wakuseibokan
-//
-//  Created by Rodrigo Ramele on 22/05/14.
-//
+/* ============================================================================
+**
+** Main Program - Wakuseiboukan - 22/05/2014
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #include <iostream>
 #include <stdlib.h>
@@ -168,7 +182,7 @@ void drawHUD()
     
     fps = getFPS();
     
-    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%10.2f,%10.2f,%10.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
+    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -824,9 +838,9 @@ void replayupdate(int value)
 
 void inline processCommandOrders()
 {
-    for (size_t j = 0; j < controllers.size(); j++)
+    for (size_t controllerindex = 0; controllerindex < controllers.size(); controllerindex++)
     {
-        Controller *ctroler = controllers[j];
+        Controller *ctroler = controllers[controllerindex];
         if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
         {
             CommandOrder co = ctroler->pop();
@@ -971,14 +985,32 @@ void inline processCommandOrders()
                     //int *idx = new int();
                     //*idx = vehicles.push_back(action);
                     //dBodySetData( action->getBodyID(), (void*)idx);
+                    size_t actionid = CONTROLLING_NONE;
                     if (action != NULL)
                     {
-                        size_t i = entities.push_back(action, action->getGeom());
+                        actionid = entities.push_back(action, action->getGeom());
 
                     }
 
                     // @FIXME: At this point I need to notify the controller that the fire action was executed,
-                    //   which can be used to control a missile or to make a sound.
+                    //   which can be used to switch to control a missile or to make a sound.
+                    if (controllerindex == 0 && action != NULL && action->getType() == VehicleTypes::CONTROLABLEACTION)
+                    {
+
+                        Vehicle *_b = findNearestEnemyVehicle(entities[ctroler->controllingid]->getFaction(),entities[ctroler->controllingid]->getPos(),10000.0);
+                        Island *island = findNearestEnemyIsland(entities[ctroler->controllingid]->getPos(),false);
+                        _b = findCommandCenter(island);
+
+                        if (_b)
+                        {
+                                action->goTo(_b->getPos());
+                                action->enableAuto();
+
+                                // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
+                                //switchControl(actionid);
+                        }
+
+                    }
 
                 }
             }
@@ -1016,9 +1048,9 @@ void update(int value)
             pg.playFaction(timer);
 
 
-        // 1: Read the information from the sockets with the controller information that is being sent from
+        // 1: Read the information from the sockets containing the controller information that is being sent from
         //    each client
-        // 2: update a Control vector with all the controllers that I have now.  This is fixed or somehow created
+        // 2: Update a Control vector with all the controllers that I have now.  This is fixed or somehow created
         //    by a joining process at the beginning of the game.  Control is a dynamic vector of Controller.
         // 3: Now go through all the objects (including Control[0] which is the person playing on the server)
         //    and execute the doControl(Control[i])
@@ -1029,6 +1061,7 @@ void update(int value)
 
         if (n!=-1)
         {
+            // @FIXME: I need to go through all the registered users and get the informaiton from their controllers.
             controllers[1]->controllingid = mesg.controllingid;
             controllers[1]->faction = mesg.faction;
             controllers[1]->registers = mesg.registers;
@@ -1068,7 +1101,6 @@ void update(int value)
 
         commLink(GREEN_FACTION, space,world);
         commLink(BLUE_FACTION, space, world);
-
 
 
         //CLog::Write(CLog::Debug,"Elements alive now: %d\n", vehicles.size());

@@ -5661,9 +5661,9 @@ void test58()
     srand (time(NULL));
 
     BoxIsland *nemesis = new BoxIsland(&entities);
-    nemesis->setName("Baltimore");
+    nemesis->setName("Tristan-Da-Cunha");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/parentum.bmp");
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
 
     islands.push_back(nemesis);
 
@@ -5695,7 +5695,66 @@ void checktest58(unsigned int timer)
         Structure *t = islands[0]->getCommandCenter();
         if (t)
         {
-            Walrus *w = (Walrus*)findWalrus(BLUE_FACTION);
+            printf("Test failed: It seems like the island has not been conquered.\n");
+            endWorldModelling();
+            exit(0);
+        } else {
+            printf("Test passed OK!\n");
+            endWorldModelling();
+            exit(1);
+        }
+    }
+
+
+
+    if (timer > starttime + 20000)
+    {
+        printf("Test failed: It seems like Walrus has been destroyed.\n");
+        endWorldModelling();
+        exit(0);
+    }
+}
+
+void test81()
+{
+    srand (time(NULL));
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Baltimore");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(getRandomCircularSpot(Vec3f(0.0f,20.5f,0),16000.0f));
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Vec3f pos(0.0,1.32, - 60);
+    Camera.setPos(pos);
+
+    aiplayer = GREEN_AI;
+    controller.faction = BOTH_FACTION;
+
+
+}
+
+void checktest81(unsigned int timer)
+{
+    long unsigned starttime = 150;
+
+
+    if (timer > starttime + 8000)
+    {
+        Structure *t = islands[0]->getCommandCenter();
+        if (t)
+        {
+            Walrus *w = (Walrus*)findWalrus(GREEN_FACTION);
 
             if (w)
             {
@@ -5722,6 +5781,7 @@ void checktest58(unsigned int timer)
         exit(0);
     }
 }
+
 
 void test59()
 {
@@ -5953,7 +6013,20 @@ void test62()
     _b->embody(world,space);
     _b->setPos(0.0f,20.5f,-4600.0f);
     _b->stop();
-    _b->damage(-9000);
+    _b->damage(-19000);
+
+    entities.push_back(_b, _b->getGeom());
+
+
+
+
+    // Entities will be added later in time.
+    _b = new Beluga(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(1000.0f,20.5f,-4600.0f);
+    _b->stop();
+    _b->damage(-19000);
 
     entities.push_back(_b, _b->getGeom());
 
@@ -5984,6 +6057,7 @@ void checktest62(unsigned int timer)
         fpsfile.open ("fps.dat");
     }
 
+    // Elapsedtime is the time taken for ODE to process one step
     fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
     fpsfile.flush();
 
@@ -6015,6 +6089,8 @@ void checktest62(unsigned int timer)
             _manta1->enableAuto();
             _manta1->attack(b->getPos());
             _manta1->setOrder(ATTACK_ISLAND);
+            //_manta1->setNameByNumber(findNextNumber(GREEN_FACTION,VehicleTypes::MANTA,VehicleSubTypes::SIMPLEMANTA));
+            _manta1->setNameByNumber(1);
 
             entities.push_back(_manta1, _manta1->getGeom());
             }
@@ -6041,6 +6117,7 @@ void checktest62(unsigned int timer)
             _manta1->enableAuto();
             _manta1->attack(b->getPos());
             _manta1->setOrder(ATTACK_ISLAND);
+            _manta1->setNameByNumber(1);
 
             entities.push_back(_manta1, _manta1->getGeom());
 
@@ -7636,6 +7713,7 @@ void initWorldModelling(int testcase)
     case 78:test78();break;                         // Testing Manta bombing an island.
     case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
     case 80:test80();break;                         // Check multiple controllers and the command order.
+    case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     default:initIslands();test1();break;
     }
 
@@ -7734,6 +7812,7 @@ void worldStep(int value)
     case 78:checktest78(timer);break;
     case 79:checktest79(timer);break;
     case 80:checktest80(timer);break;
+    case 81:checktest81(timer);break;
     default: break;
     }
 

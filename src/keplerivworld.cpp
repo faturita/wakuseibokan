@@ -548,8 +548,8 @@ void initWorldPopulation()
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
         _b->init();
         dSpaceID carrier_space = _b->embody_in_space(world, space);
-        _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-        //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
+        //b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
+        _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
         entities.push_back(_b, _b->getGeom());
@@ -576,8 +576,9 @@ void initWorldPopulation()
         _bg->init();
         dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
         _bg->embody(world,space);
-        //_bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
-        _bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        // @NOTE Let the carriers fight against each other.
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
         _bg->stop();
 
         _bg->addWeapon(entities.push_back(_bg, _bg->getGeom()));

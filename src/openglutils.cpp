@@ -731,6 +731,11 @@ void initTextures()
     textures["solar"] = _texture;
     delete image;
 
+    image = loadBMP("terrain/boat.bmp");
+    _texture = loadTexture(image);
+    textures["boat"] = _texture;
+    delete image;
+
     image = loadBMP("terrain/smoke.bmp");
     _texture = loadTexture(image);
     textures["solar"] = _texture;
@@ -760,6 +765,9 @@ void drawFloor(float x, float y, float z)
     glBindTexture(GL_TEXTURE_2D, textures["sea"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //glEnable(GL_BLEND);
+    //glColor4f (0.0, 0.0, 0.6, 0.2);
     
     glBegin(GL_QUADS);
     
