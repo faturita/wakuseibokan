@@ -21,6 +21,8 @@ void Hangar::init()
     Structure::length=64.90;
     Structure::width=85.72;
 
+    setName("Hangar");
+
     setForward(0,0,1);
 }
 

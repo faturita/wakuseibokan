@@ -785,6 +785,19 @@ Walrus* findWalrusByName(size_t &index, std::string name)
     return NULL;
 }
 
+Walrus* findWalrusByOrder2(int faction, int order)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction)
+        {
+            if (v->getOrder()==order)
+                return (Walrus*)v;
+        }
+    }
+    return NULL;
+}
 
 Walrus* findWalrusByOrder(int faction, int order)
 {
@@ -1158,12 +1171,10 @@ void commLink(int faction, dSpaceID space, dWorldID world)
     }
 }
 
-using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeomID)>>;
-std::vector<TrackRecord>   track;
+extern std::vector<TrackRecord>   track;
 
-void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
+void trackTargets()
 {
-
     // @NOTE: Going in reverse order because if the element is deleted from track, the indexes of all the other elements change too.
     for (int i = track.size() - 1; i >= 0; i--)
     {
@@ -1173,8 +1184,11 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
         auto lambda = std::get<2>(m);
         if (!lambda(sender, recv))
             track.erase(track.begin() + i);
-
     }
+}
+
+void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
+{
 
     for (size_t j = 0; j < islands.size(); j++)
     {
@@ -1229,6 +1243,58 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                 }
 
 
+                // Find marauding walruses and bring them back.  @FIXME:  Need to do something more.
+                Walrus *w = findWalrusByOrder2(sc->getFaction(), DEFEND_ISLAND);
+
+                if (w)
+                {
+                    if (timer==(sc->getTimer() + 10))
+                    {
+                        std::vector<size_t> str = island->getStructures();
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==sc->getFaction())
+                            {
+                                // RTTI Stuff
+                                if(Dock* lb = dynamic_cast<Dock*>(entities[str[i]]))
+                                {
+                                    Vec3f islandpos = lb->getPos();
+                                    w->goTo(islandpos);
+                                    w->enableAuto();
+
+                                }
+                            }
+                        }
+                    }
+
+                    // Let's try to dock the walrus only once.
+                    if (timer==(sc->getTimer() + 4000))
+                    {
+                        std::vector<size_t> str = island->getStructures();
+
+                        for(size_t i=0;i<str.size();i++)
+                        {
+                            if (entities[str[i]]->getFaction()==sc->getFaction())
+                            {
+                                // RTTI Stuff
+                                if(Dock* lb = dynamic_cast<Dock*>(entities[str[i]]))
+                                {
+                                    synchronized(entities.m_mutex)
+                                    {
+                                        dout << "Docked triggered" << std::endl;
+                                        dockWalrus(lb);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+
+
                 continue;
             }
             if (!sc->isUnderAttack())
@@ -1242,6 +1308,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
             {
                 if (timer>(sc->getTimer() + 500))                // Update position of the enemy.
                 {
+                    //@FIXME: This assumes only one manta and walrus per defending island.
 
                     Manta *m = findMantaByOrder(sc->getFaction(), DEFEND_ISLAND);
 
@@ -1257,7 +1324,8 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         m->dogfight(b->getPos());
                     }
 
-                    Walrus *w = findWalrusByOrder(sc->getFaction(), DEFEND_ISLAND);
+                    // @FIXME Using a different function because here the other was not working
+                    Walrus *w = findWalrusByOrder2(sc->getFaction(), DEFEND_ISLAND);
 
                     if (w)
                     {
@@ -1417,13 +1485,13 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                                 if (snd != NULL && rec != NULL)
                                 {
-                                    printf ("Updating....\n");
+                                    //printf ("Updating....\n");
                                     rec->setDestination(snd->getPos());
                                     return true;
                                 }
                                 else
                                 {
-                                    printf ("End");
+                                    //printf ("End");
                                     return false;
                                 }
 
@@ -1443,10 +1511,10 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                     {
                         unsigned long timeevent = sc->getTimer();
 
-                        if (timer==(timeevent + 200))
+                        if (timer>=(timeevent + 200))
                         {
                             // Spawn 1 walrus @FIXME: Recode all this.
-                            Walrus *w = findWalrusByOrder(d->getFaction(), DEFEND_ISLAND);
+                            Walrus *w = findWalrusByOrder2(d->getFaction(), DEFEND_ISLAND);
 
                             if (!w && (b->getType() == CARRIER || b->getType() == WALRUS))
                             {

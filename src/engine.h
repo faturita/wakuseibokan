@@ -54,6 +54,7 @@
 #include "weapons/CarrierLauncher.h"
 #include "weapons/CarrierTurret.h"
 
+using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeomID)>>;
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
@@ -165,6 +166,7 @@ Walrus* findWalrus(int status, int faction);
 Walrus* findWalrus(int faction);
 Walrus* findWalrus(int status, int faction, int order);
 Walrus* findWalrusByOrder(int faction, int order);
+Walrus* findWalrusByOrder2(int faction, int order);
 Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number);
 Walrus* findNearestWalrus(int faction, Vec3f l, float threshold);
 void list();
@@ -213,5 +215,7 @@ void wipeEnemyStructures(BoxIsland *island, int faction);
 void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 bool structurecollisions(Structure *s, Vehicle *vehicle);
+
+void trackTargets();
 
 #endif // ENGINE_H

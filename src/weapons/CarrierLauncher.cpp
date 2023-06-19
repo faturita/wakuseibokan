@@ -30,6 +30,8 @@ void CarrierLauncher::init()
     Weapon::length=11.68;
     Weapon::width=11.68;
 
+    setName("Launcher");
+
     autostatus = AutoStatus::WATER;
 
     setForward(Vec3f(0,0,1));
@@ -179,6 +181,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 Vehicle* CarrierLauncher::fire(int weapon, dWorldID world, dSpaceID space)
 {
 
+    // @FIXME Check here if it is not better to use weapon instaed of the status.
     switch (autostatus) {
     case AutoStatus::GROUND:return fireGround(world,space);
         break;
@@ -235,7 +238,7 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
 
     fw = fw.normalize();
     orig = position;
-    position = position + 80.0f*fw;
+    position = position + 50.0f*fw;
     fw = -orig+position;
 
     position[1] =1.0;
@@ -257,12 +260,14 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
     dQMultiply0(q3,q2,q1);
 
 
-    Vec3f Ft=fw + Vec3f(0,20,0);
-    Ft=Ft*60;
+    //Vec3f Ft=fw + Vec3f(0,20,0);
+    //Ft=Ft*600;
+
 
     //dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
-    dBodyAddRelForce(action->getBodyID(),0,0,60);
+
     dBodySetQuaternion(action->getBodyID(),q3);
+    dBodyAddRelForce(action->getBodyID(),0,0,60);
 
     setTtl(1000);
 

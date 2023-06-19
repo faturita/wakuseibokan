@@ -7,7 +7,7 @@
 
 LaserTurret::LaserTurret(int faction) : Turret(faction)
 {
-
+    setName("Laser");
 }
 
 

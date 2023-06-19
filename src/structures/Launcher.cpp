@@ -31,6 +31,8 @@ void Launcher::init()
 
     autostatus = AutoStatus::GROUND;
 
+    setName("Launcher");
+
     setForward(Vec3f(0,0,1));
 }
 

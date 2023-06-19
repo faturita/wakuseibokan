@@ -266,7 +266,7 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    float roundederror = 500;
+    float roundederror = 400;
 
     if (getStatus() == SailingStatus::ROLLING)
         roundederror = 5;

@@ -29,6 +29,8 @@ void Artillery::init()
 
     Artillery::firingpos = Vec3f(0.0f,19.0f,0.0f);
 
+    setName("Artillery");
+
     setForward(Vec3f(0,0,1));
 }
 

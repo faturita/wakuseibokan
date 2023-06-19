@@ -33,6 +33,7 @@ extern  Controller controller;
 extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 extern std::vector<Message> messages;
+extern std::vector<TrackRecord>   track;
 
 extern dWorldID world;
 extern dSpaceID space;
@@ -144,6 +145,7 @@ int NavalDefense::apply(int state, int faction, unsigned long &timeevent, unsign
 
     dout << "read" << v->getPos() << std::endl;
 
+    // @FIXME Check why this is actually working with the faulty function findWalrusByOrder
     Walrus *w1 = findWalrusByOrder(faction,1);
 
     if (!w1)
@@ -211,32 +213,150 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
         timeevent= timer;return 3;
     }
 
-    /**
     if (v)
     {
         if(Beluga* lb = dynamic_cast<Beluga*>(b))
         {
-            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+            Vec3f Po = lb->getPos();
+            Vec3f Pf = v->getPos();
+            Vec3f T = Pf-Po;
 
-            if (t) {
-                Vehicle *action = t->aimAndFire(world, space, v->getPos());
-
-                if (action)
-                {
-                    entities.push_back(action, action->getGeom());
-                }
-            }
-
-            CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
-
-            if (t2)
+            if (T.magnitude()>500)
             {
-                Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+                float distance = T.magnitude();
 
-                if (action)
+                Vec3f F = lb->getForward();
+                F = F.normalize();
+                T = T.normalize();
+                float e = _acos( T.dot(F) );
+                float signn = T.cross(F)[1];
+
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
                 {
-                    entities.push_back(action, action->getGeom());
+
+                    CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+
+                    if (t) {
+                        Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
                 }
+
+
+                if (Pf[1]<50.0 && signn<0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[3]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn>0))
+                {
+                    CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
+
+                    if (t2)
+                    {
+                        Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]<50.0 && signn>0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[2]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                CarrierLauncher* ct = (CarrierLauncher*)entities[lb->getWeapons()[4]];
+
+                if (ct) {
+
+                    Vec3f firingloc = ct->getPos();
+                    float elevation = -5;
+                    float azimuth = getAzimuth(v->getPos()-firingloc);
+                    ct->setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+                    Vehicle *action = NULL;
+
+                    if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
+                    {
+                        ct->water();
+                        action = ct->fire(0,world, space);
+                    } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
+                        ct->ground();
+                        action = ct->fire(0,world, space);
+                    } else {
+                        ct->air();
+                        action = ct->fire(0,world, space);
+                    }
+
+                    if (action)
+                    {
+                        entities.push_back(action, action->getGeom());
+                        action->goTo(v->getPos());
+                        action->enableAuto();
+
+                        // @FIXME: This is to avoid the carrier being damaged by missiles.
+                        ((Gunshot*)action)->setOrigin(lb->getBodyID());
+
+
+                        auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                            Vehicle *snd = entities.find(sender);
+                            Vehicle *rec = entities.find(recv);
+
+                            if (snd != NULL && rec != NULL)
+                            {
+                                //printf ("Updating....\n");
+                                rec->setDestination(snd->getPos());
+                                return true;
+                            }
+                            else
+                            {
+                                //printf ("End");
+                                return false;
+                            }
+
+
+                        };
+
+                        TrackRecord val;
+                        std::get<0>(val) = v->getGeom();
+                        std::get<1>(val) = action->getGeom();
+                        std::get<2>(val) = lambda;
+                        track.push_back(val);
+                    }
+                }
+
+
+
+
             }
         }
         else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
@@ -253,7 +373,6 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
             }
         }
     }
-    **/
 
 
     return state;

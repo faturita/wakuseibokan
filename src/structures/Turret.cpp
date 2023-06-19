@@ -25,6 +25,8 @@ void Turret::init()
     Structure::length=11.68;
     Structure::width=11.68;
 
+    setName("Turret");
+
     setForward(0,0,1);
 }
 

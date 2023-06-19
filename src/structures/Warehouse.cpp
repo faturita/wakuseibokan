@@ -22,6 +22,8 @@ void Warehouse::init()
     Structure::length=70;
     Structure::width=40;
 
+    setName("Warehouse");
+
     setForward(0,0,1);
 }
 

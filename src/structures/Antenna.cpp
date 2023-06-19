@@ -22,6 +22,8 @@ void Antenna::init()
     Structure::length=40;
     Structure::width=40;
 
+    setName("Antenna");
+
     setForward(0,0,1);
 }
 

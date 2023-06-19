@@ -167,7 +167,7 @@ Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
     Weapon::elevation = getDeclination(aim);
 
 
-    Vehicle *action = fire(0,world,space,100);
+    Vehicle *action = fire(0,world,space,5);
 
     return action;
 }

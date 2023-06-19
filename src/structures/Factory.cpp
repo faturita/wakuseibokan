@@ -23,6 +23,8 @@ void Factory::init()
     Structure::length=200;
     Structure::width=200;
 
+    setName("Factory");
+
     setForward(0,0,1);
 }
 
