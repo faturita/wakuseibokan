@@ -912,6 +912,26 @@ int findNextNumber(int faction, int type, int subtype)
     assert(!"No more available numbers !!!!!");
 }
 
+std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
+{
+    std::vector<size_t> enemies;
+    float closest = threshold;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v &&
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                && v->getFaction()!=friendlyfaction)   // Fix this.
+        {
+            if ((v->getPos()-l).magnitude()<closest) {
+                enemies.push_back(i);
+            }
+        }
+    }
+
+    return enemies;
+}
+
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold)
 {
     int nearesti = -1;

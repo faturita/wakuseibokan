@@ -47,35 +47,55 @@ void TestCase_102::init()
 
     islands.push_back(nemesis);
 
-    // Strategy Game
-    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
-    _b->init();
-    //dSpaceID carrier_space = space;
-    //_b->embody(world, space);
-    dSpaceID carrier_space = _b->embody_in_space(world, space);
-    //_b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-    _b->setPos(0 kmf, 0, 0 kmf - 4000.0f);
-    _b->stop();
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
+    _bg->setPos(0.0,20.5f,-4000.0f);
+    _bg->stop();
 
-    entities.push_back(_b, _b->getGeom());
+    entities.push_back(_bg, _bg->getGeom());
 
 
-    CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
-    _bo->init();
-    _bo->embody(world, carrier_space);
-    _bo->attachTo(world,_b, -40.0f, 20.0f + 5, -210.0f);
-    _bo->stop();
+    CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+    _bl->init();
+    _bl->embody(world, carrier_space_beluga);
+    _bl->attachTo(world,_bg, +30.0f, 20.0f - 3, +204.0f);
+    _bl->stop();
 
-    entities.push_back(_bo, _bo->getGeom());
+    _bg->addWeapon(entities.push_back(_bl, _bl->getGeom()));
+
+    CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+    _br->init();
+    _br->embody(world, carrier_space_beluga);
+    _br->attachTo(world,_bg, -45.0f, 20.0f - 3, +204.0f);
+    _br->stop();
+
+    _bg->addWeapon(entities.push_back(_br, _br->getGeom()));
 
 
-    CarrierArtillery * _w1= new CarrierArtillery(GREEN_FACTION);
-    _w1->init();
-    _w1->embody(world, carrier_space);
-    _w1->attachTo(world,_b, -40.0, 27.0f, +210.0f);
-    _w1->stop();
+    CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+    _wr->init();
+    _wr->embody(world, carrier_space_beluga);
+    _wr->attachTo(world,_bg, -40.0, 27.0f+5, -230.0f);
+    _wr->stop();
 
-    entities.push_back(_w1, _w1->getGeom());
+    _bg->addWeapon(entities.push_back(_wr, _wr->getGeom()));
+
+    CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+    _wl->init();
+    _wl->embody(world, carrier_space_beluga);
+    _wl->attachTo(world,_bg, +40.0, 27.0f+2, -230.0f);
+    _wl->stop();
+
+    _bg->addWeapon(entities.push_back(_wl, _wl->getGeom()));
+
+    CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
+    _cf->init();
+    _cf->embody(world, carrier_space_beluga);
+    _cf->attachTo(world,_bg, +40.0, 27.0f+2, 0.0);
+    _cf->stop();
+
+    _bg->addWeapon(entities.push_back(_cf, _cf->getGeom()));
 
 }
 
@@ -84,7 +104,7 @@ int TestCase_102::check(unsigned long timertick)
 
     if (timertick == 1000)
     {
-        Vehicle *_b = findCarrier(GREEN_FACTION);
+        Vehicle *_b = findCarrier(BLUE_FACTION);
 
         if (_b)
         {
@@ -92,7 +112,7 @@ int TestCase_102::check(unsigned long timertick)
         }
     }
 
-    if (timertick > 1000)
+    if (timertick > 1200)
     {
         bool foundOne = false;
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))

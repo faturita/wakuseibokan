@@ -48,7 +48,214 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
     if (!b) return state;
 
-    Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
+    // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
+    std::vector<size_t> enemies = findNearestEnemyVehicles(faction,VehicleTypes::CARRIER, b->getPos(),DEFENSE_RANGE);
+
+    Vehicle *v = NULL;
+    if (enemies.size()>0)
+    {
+        v = entities[enemies[0]];
+    }
+
+    if (v)
+    {
+        Vec3f Po = b->getPos();
+        Vec3f Pf = v->getPos();
+        Vec3f T = Pf-Po;
+
+        for (size_t i: enemies)
+        {
+            if (entities[i]->getType() == CARRIER)
+            {
+                b->disableAuto();
+                b->setThrottle(0.0);
+            }
+        }
+
+        if (b->getHealth()<500.0)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos());
+            b->setDestination( is->getPos() + Vec3f(0.0,20.0,-10000.0));
+            b->enableAuto();
+            // @FIXME: Activate evasive action.
+        }
+
+        float distance = T.magnitude();
+
+        Vec3f F = b->getForward();
+        F = F.normalize();
+        T = T.normalize();
+        float e = _acos( T.dot(F) );
+        float signn = T.cross(F)[1];
+
+        if(Beluga* lb = dynamic_cast<Beluga*>(b))
+        {
+
+            if (distance>500 && entities[lb->getWeapons()[0]] != NULL)
+            {
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
+                {
+
+                    CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+
+                    if (t) {
+                        Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+
+                if (Pf[1]<50.0 && signn<0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[3]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn>0))
+                {
+                    CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
+
+                    if (t2)
+                    {
+                        Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]<50.0 && signn>0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[2]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                CarrierLauncher* ct = (CarrierLauncher*)entities[lb->getWeapons()[4]];
+
+                if (ct) {
+
+                    Vec3f firingloc = ct->getPos();
+                    float elevation = -5;
+                    float azimuth = getAzimuth(v->getPos()-firingloc);
+                    ct->setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+                    Vehicle *action = NULL;
+
+                    if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
+                    {
+                        ct->water();
+                        action = ct->fire(0,world, space);
+                    } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
+                        ct->ground();
+                        action = ct->fire(0,world, space);
+                    } else {
+                        ct->air();
+                        action = ct->fire(0,world, space);
+                    }
+
+                    if (action)
+                    {
+                        entities.push_back(action, action->getGeom());
+                        action->goTo(v->getPos());
+                        action->enableAuto();
+
+                        // @FIXME: This is to avoid the carrier being damaged by missiles.
+                        ((Gunshot*)action)->setOrigin(lb->getBodyID());
+
+
+                        auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                            Vehicle *snd = entities.find(sender);
+                            Vehicle *rec = entities.find(recv);
+
+                            if (snd != NULL && rec != NULL)
+                            {
+                                //printf ("Updating....\n");
+                                rec->setDestination(snd->getPos());
+                                return true;
+                            }
+                            else
+                            {
+                                //printf ("End");
+                                return false;
+                            }
+
+
+                        };
+
+                        TrackRecord val;
+                        std::get<0>(val) = v->getGeom();
+                        std::get<1>(val) = action->getGeom();
+                        std::get<2>(val) = lambda;
+                        track.push_back(val);
+                    }
+                }
+
+
+
+
+            }
+        }
+        else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
+        {
+
+            if (distance>500 && lb->getWeapons().size()>0 && entities[lb->getWeapons()[0]] != NULL)
+            {
+
+
+                CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+                if (t)
+                {
+                    Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                    if (action)
+                    {
+                        entities.push_back(action, action->getGeom());
+                    }
+                }
+
+                if (Pf[1]<50.0 && e<PI/6.0)
+                {
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[1]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     if (v && (v->getType() == CARRIER || v->getType() == WALRUS) && state != 20 && state != 21)
     {
@@ -187,6 +394,7 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
 
     if (!b) return state;
 
+    // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
 
@@ -213,172 +421,8 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
         timeevent= timer;return 3;
     }
 
-    if (v)
-    {
-        if(Beluga* lb = dynamic_cast<Beluga*>(b))
-        {
-            Vec3f Po = lb->getPos();
-            Vec3f Pf = v->getPos();
-            Vec3f T = Pf-Po;
-
-            if (T.magnitude()>500)
-            {
-                float distance = T.magnitude();
-
-                Vec3f F = lb->getForward();
-                F = F.normalize();
-                T = T.normalize();
-                float e = _acos( T.dot(F) );
-                float signn = T.cross(F)[1];
-
-
-                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
-                {
-
-                    CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
-
-                    if (t) {
-                        Vehicle *action = t->aimAndFire(world, space, v->getPos());
-
-                        if (action)
-                        {
-                            entities.push_back(action, action->getGeom());
-                        }
-                    }
-                }
-
-
-                if (Pf[1]<50.0 && signn<0 && e>PI/6.0)
-                {
-
-                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[3]];
-
-                    if (at) {
-                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
-
-                        if (action)
-                        {
-                            entities.push_back(action, action->getGeom());
-                        }
-                    }
-                }
-
-                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn>0))
-                {
-                    CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
-
-                    if (t2)
-                    {
-                        Vehicle *action = t2->aimAndFire(world, space, v->getPos());
-
-                        if (action)
-                        {
-                            entities.push_back(action, action->getGeom());
-                        }
-                    }
-                }
-
-                if (Pf[1]<50.0 && signn>0 && e>PI/6.0)
-                {
-
-                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[2]];
-
-                    if (at) {
-                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
-
-                        if (action)
-                        {
-                            entities.push_back(action, action->getGeom());
-                        }
-                    }
-                }
-
-                CarrierLauncher* ct = (CarrierLauncher*)entities[lb->getWeapons()[4]];
-
-                if (ct) {
-
-                    Vec3f firingloc = ct->getPos();
-                    float elevation = -5;
-                    float azimuth = getAzimuth(v->getPos()-firingloc);
-                    ct->setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
-
-                    Vehicle *action = NULL;
-
-                    if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
-                    {
-                        ct->water();
-                        action = ct->fire(0,world, space);
-                    } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
-                        ct->ground();
-                        action = ct->fire(0,world, space);
-                    } else {
-                        ct->air();
-                        action = ct->fire(0,world, space);
-                    }
-
-                    if (action)
-                    {
-                        entities.push_back(action, action->getGeom());
-                        action->goTo(v->getPos());
-                        action->enableAuto();
-
-                        // @FIXME: This is to avoid the carrier being damaged by missiles.
-                        ((Gunshot*)action)->setOrigin(lb->getBodyID());
-
-
-                        auto lambda = [](dGeomID sender,dGeomID recv) {
-
-                            Vehicle *snd = entities.find(sender);
-                            Vehicle *rec = entities.find(recv);
-
-                            if (snd != NULL && rec != NULL)
-                            {
-                                //printf ("Updating....\n");
-                                rec->setDestination(snd->getPos());
-                                return true;
-                            }
-                            else
-                            {
-                                //printf ("End");
-                                return false;
-                            }
-
-
-                        };
-
-                        TrackRecord val;
-                        std::get<0>(val) = v->getGeom();
-                        std::get<1>(val) = action->getGeom();
-                        std::get<2>(val) = lambda;
-                        track.push_back(val);
-                    }
-                }
-
-
-
-
-            }
-        }
-        else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
-        {
-            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
-            if (t)
-            {
-                Vehicle *action = t->aimAndFire(world, space, v->getPos());
-
-                if (action)
-                {
-                    entities.push_back(action, action->getGeom());
-                }
-            }
-        }
-    }
-
-
     return state;
 }
-
-
 
 // Find a closer enemy island and attack it.
 int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
