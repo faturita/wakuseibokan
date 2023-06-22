@@ -8,7 +8,7 @@
 #ifndef DRAWFONTS_H_
 #define DRAWFONTS_H_
 
-#ifdef __linux || _WIN32
+#if defined(_WIN32) || defined(__linux)
 #include <GL/glut.h>
 #elif __APPLE__
 #include <GLUT/glut.h>

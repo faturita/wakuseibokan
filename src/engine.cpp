@@ -103,20 +103,24 @@ bool stranded(Vehicle *carrier, Island *island)
         sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
         mg.msg = std::string(str);
         messages.insert(messages.begin(), mg);
+
+        return true;
     }
+    return false;
 }
 
 bool departed(dSpaceID space)
 {
-    for(int gids=0;gids<dSpaceGetNumGeoms(space);gids++)
-    {
+    //for(int gids=0;gids<dSpaceGetNumGeoms(space);gids++)
+    //{
 
-        dGeomID g = dSpaceGetGeom(space,gids);
-        Vehicle *v = gVehicle(g);
+    //    dGeomID g = dSpaceGetGeom(space,gids);
+    //    Vehicle *v = gVehicle(g);
 
-        if (v && v->getType() == WALRUS)
-            departed(v);
-    }
+    //    if (v && v->getType() == WALRUS)
+    //        return departed(v);
+    //}
+    return false;
 }
 
 bool departed(Vehicle *walrus)
@@ -134,8 +138,9 @@ bool departed(Vehicle *walrus)
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
+        return true;
     }
-    return true;
+    return false;
 }
 
 // SYNC
@@ -148,8 +153,9 @@ bool arrived(dSpaceID s, Island *island)
         Vehicle *v = gVehicle(g);
 
         if (v->getType() == WALRUS)
-            arrived(v,island);
+            return arrived(v,island);
     }
+    return false;
 }
 
 bool arrived(Vehicle *invadingunit, Island *island)
@@ -166,6 +172,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
+        return true;
     }
 
     if (island && invadingunit && invadingunit->getSubType() == CEPHALOPOD)
@@ -182,11 +189,13 @@ bool arrived(Vehicle *invadingunit, Island *island)
             mg.msg = std::string(str);
             mg.faction = c->getFaction();
             messages.insert(messages.begin(), mg);
+            return true;
         }
+
     }
 
 
-    return true;
+    return false;
 }
 
 // SYNC
@@ -213,9 +222,10 @@ bool landed(Vehicle *manta, Island *island)
             sprintf(str, "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 // SYNC
@@ -288,6 +298,7 @@ bool hit(Structure* structure, Gunshot *g)
         g->setVisible(false);
         structure->damage(g->getDamage());
     }
+    return true;
 }
 
 // SYNC

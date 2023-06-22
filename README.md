@@ -26,11 +26,16 @@ make install
 
 # Ubuntu Packages
 
- libbsd-dev  freeglut3-dev
+ libbsd-dev  freeglut3-dev (freeglut mingw 3.0.0-1)
 
 # Windows
 
-mingw32, g++ 9.2.0
+## Requirements
+freeglut32,  mingw32 with g++ 9.2.0
+
+
+ make
+ ./waku
 
 
 # Compiling

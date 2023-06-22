@@ -88,6 +88,8 @@ template<class T> T container<T>::operator[](size_t index)
 
 template<class T> T container<T>::find(dGeomID geom)
 {
+    if (geom == NULL) { return NULL; }
+
     std::unordered_map<dGeomID, size_t>::const_iterator got = geomidmap.find (geom);
 
     if ( got == geomidmap.end() )
