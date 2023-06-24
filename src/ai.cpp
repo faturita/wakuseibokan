@@ -1,17 +1,33 @@
-/**
-  ai.cpp
-  wakuseibokan
+/* ============================================================================
+**
+** AI - Wakuseiboukan - Around 2020
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** This is a general state machine, on top of all the others that drive any
+** individual unit. It is raw.  I've found that it is much more difficult to
+** do something generic, nice, that actually works.
+** When you need something workable you have to cook up a lot of details.
+** Player represent an AI that tries to behave like a human player.  This has
+** been a mantra on this project. Hence each class is a state in the sequence
+** of steps that you need to perform to win the game, and each transition
+** represent some action.  The idea was to model like state-action diagram,
+** able for use in a RL model.
+** ========================================================================= */
 
-  Created around 2020.
-
-  This is a general state machine, on top of all the others that drive any individual unit.
-  It is raw.  I've found that it is much more difficult to do something generic, nice, that actually works.
-  When you need something workable you have to cook up a lot of details.
-  Player represent an AI that tries to behave like a human player.  This has been a mantra on this project.
-  Hence each class is a state in the sequence of steps that you need to perform to win the game, and each transition
-  represent some action.  The idea was to model like state-action diagram, able for use in a RL model.
-
-**/
 
 #include <assert.h>
 
@@ -49,7 +65,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
     if (!b) return state;
 
     // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
-    std::vector<size_t> enemies = findNearestEnemyVehicles(faction,VehicleTypes::CARRIER, b->getPos(),DEFENSE_RANGE);
+    std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
 
     Vehicle *v = NULL;
     if (enemies.size()>0)
@@ -74,10 +90,14 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
         if (b->getHealth()<500.0)
         {
+            // @NOTE: The idea is to perfom an evasive action and move the carrier away tangential to the island encircle.
             BoxIsland *is = findNearestIsland(b->getPos());
-            b->setDestination( is->getPos() + Vec3f(0.0,20.0,-10000.0));
+            Vec3f target = is->getPos() - Po;
+            target = target.normalize();
+            target = target.cross(Vec3f(0.0,1.0,0.0));
+            b->setDestination( Po + target * 10000.0);
             b->enableAuto();
-            // @FIXME: Activate evasive action.
+
         }
 
         float distance = T.magnitude();
@@ -120,6 +140,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                         if (action)
                         {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
                             entities.push_back(action, action->getGeom());
                         }
                     }
@@ -150,6 +171,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                         if (action)
                         {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
                             entities.push_back(action, action->getGeom());
                         }
                     }
@@ -248,6 +270,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                         if (action)
                         {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
                             entities.push_back(action, action->getGeom());
                         }
                     }
@@ -443,7 +466,9 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 
         vector = vector.normalize();
 
-        b->goTo(is->getPos()+Vec3f(12500.0f * vector));
+        Vec3f approachaddress = getRandomCircularSpot(is->getPos()+Vec3f(12500.0f * vector),400.0);
+
+        b->goTo(approachaddress);
         b->enableAuto();
         timeevent=timer;return 10;
     }
@@ -677,7 +702,9 @@ int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, 
 
             vector = vector.normalize();
 
-            b->goTo(is->getPos()+Vec3f(3500.0f * vector));
+            Vec3f finaldestiny = getRandomCircularSpot(is->getPos()+Vec3f(3500.0f * vector),150.0);
+
+            b->goTo(finaldestiny);
             b->enableAuto();
             timeevent = timer; return 1;
         } else {
@@ -816,7 +843,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
             {
                 w = spawnWalrus(space,world,b);
             }
-            w->goTo(is->getPos());
+            w->goTo(getRandomCircularSpot(is->getPos(),200.0));
             w->enableAuto();
 
             timeevent = timer;return 2;
