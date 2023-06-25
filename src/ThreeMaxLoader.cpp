@@ -379,11 +379,11 @@ int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float 
     glRotatef(180,1.0,0.0,0.0);
 
 
-    //glEnable(GL_TEXTURE_2D);
-    //glBindTexture(GL_TEXTURE_2D, _texture);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glColor3f(1.0f, 1.0f, 1.0f);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
 
 
     Vec3f centerOfMass;
