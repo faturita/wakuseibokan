@@ -31,6 +31,8 @@ void CarrierArtillery::init()
 
     setForward(Vec3f(0,0,1));
 
+    setName("Artillery");
+
     Weapon::azimuth = 0;
     Weapon::elevation = 0;
 }
@@ -38,6 +40,11 @@ void CarrierArtillery::init()
 int CarrierArtillery::getSubType()
 {
     return ARTILLERY;
+}
+
+EntityTypeId CarrierArtillery::getTypeId()
+{
+    return EntityTypeId::TCarrierArtillery;
 }
 
 

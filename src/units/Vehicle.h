@@ -19,6 +19,100 @@
 #include "../observable.h"
 #include "../usercontrols.h"
 
+struct ModelRecord {
+    float pos1;
+    float pos2;
+    float pos3;
+    float r1;
+    float r2;
+    float r3;
+    float r4;
+    float r5;
+    float r6;
+    float r7;
+    float r8;
+    float r9;
+    float r10;
+    float r11;
+    float r12;
+
+    float vel1;
+    float vel2;
+    float vel3;
+
+};
+
+struct TickRecord {
+    unsigned long timerparam;
+    size_t id;
+    int typeId;
+    int type;
+    int subtype;
+    int faction;
+    int health;
+    int power;
+    int status;
+    int ttl;
+    int number;
+
+    ModelRecord location;
+
+    float orientation;  // For structures
+};
+
+
+// TypeId for serialization.  It recognizes each one of the C++ classes.
+enum EntityTypeId {
+    TBalaenidae = 1,
+    TBeluga = 2,
+    TWalrus = 3,
+    TAdvancedWalrus = 4,
+    TSimplifiedManta = 5,
+    TMedusa = 6,
+    TStingray = 7,
+    TCephalopod = 8,
+    TOtter = 9,
+    TArtillery = 10,
+    TCommandCenter = 11,
+    THangar = 12,
+    TWarehouse = 13,
+    TRunway = 14,
+    TLaserTurret = 15,
+    TTurret = 16,
+    TLauncher = 17,
+    TFactory = 18,
+    TDock = 19,
+    TAntenna = 20,
+    TRadar = 21,
+    TStructure = 22,
+    TAdvancedManta = 23,
+    TBoxVehicle = 24,
+    TBuggy = 25,
+    TManta = 26,
+    TMultiBodyVehicle = 27,
+    TSimplifiedDynamicManta = 28,
+    TWheel = 29,
+    TWheeledManta = 30,
+    TCarrierArtillery = 31,
+    TCarrierLauncher = 32,
+    TCarrierTurret = 33,
+    TWeapon = 34,
+    TAAM = 35,
+    TArtilleryAmmo = 36,
+    TBomb = 37,
+    TDebris = 38,
+    TExplosion = 39,
+    TGunshot = 40,
+    TLaserBeam = 41,
+    TLaserRay = 42,
+    TMissile = 43,
+    TShell = 44,
+    TTorpedo = 45
+
+
+};
+
+
 /**
  * @brief Structures are identified if their type number is greater than or equal to COLLISIONABLE.
  */
@@ -52,6 +146,7 @@ private:
 
 protected:
     Vec3f pos;
+    Vec3f vel;
     Model* _model;
     Model* _topModel;
 	float speed;
@@ -111,6 +206,7 @@ public:
     int virtual getType();
     int virtual getSubType();
 
+
     void setAutoStatus(AutoStatus au);
     
     void virtual init();                                        // Init, when the entity is created.
@@ -122,6 +218,8 @@ public:
     void virtual setPos(const Vec3f &newpos);
     void virtual setPos(float x, float y, float z);
 	Vec3f getPos();
+    Vec3f getVelocity();
+    void setVelocity(float vx,float vy, float vz);
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
 	Vec3f getForward();
@@ -242,6 +340,11 @@ public:
     Vec3f screenLocation();
 
     void setTheOrientation(Vec3f orientation);
+
+    virtual TickRecord  serialize();
+    virtual void        deserialize(TickRecord);
+
+    virtual EntityTypeId getTypeId();
 
 };
 

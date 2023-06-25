@@ -119,6 +119,8 @@ extern clock_t elapsedtime;
 
 int gamemode;
 int aiplayer;
+int tracemode;
+int peermode;
 
 extern bool wincondition;
 

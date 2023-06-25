@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.1, 2022-01-11T00:38:46. -->
+<!-- Written by QtCreator 4.14.1, 2023-06-15T16:25:51. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -207,6 +207,7 @@
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">/Users/rramele/work/wakuseibokan/waku</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey"></value>
+    <value type="QString" key="RunConfiguration.OverrideDebuggerStartup">-replay -godmode -d</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>

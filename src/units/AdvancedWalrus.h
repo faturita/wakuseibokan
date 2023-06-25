@@ -45,6 +45,10 @@ public:
 
 
     void doAmphibious(dBodyID body);
+
+    int  virtual getSubType();
+
+    EntityTypeId virtual getTypeId();
 };
 
 

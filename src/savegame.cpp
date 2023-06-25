@@ -311,9 +311,8 @@ void loadgame()
                     dSpaceID carrier_space_beluga = b->embody_in_space(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);
-                    float R[12];
-                    for(int j=0;j<12;j++) ss >> R[j];
-                    v->setRotation(R);
+                    v->stop();
+
                     entities.push_back(b, b->getGeom());
 
 
@@ -357,6 +356,11 @@ void loadgame()
                     _cf->stop();
 
                     b->addWeapon(entities.push_back(_cf, _cf->getGeom()));
+
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
+
 
                 }
                 v = b;

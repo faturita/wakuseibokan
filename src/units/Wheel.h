@@ -42,6 +42,7 @@ public:
 
     int getType();
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 
     void  attachTo(dWorldID world, Vehicle *attacher, Vec3f dimensions, WheelLocations loc);
     void  attachTo(dWorldID world, Vehicle *attacher, float x, float y, float z);

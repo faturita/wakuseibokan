@@ -27,6 +27,8 @@ void CarrierTurret::init()
     Weapon::length=11.68;
     Weapon::width=11.68;
 
+    setName("Turret");
+
     setForward(0,0,1);
 
     Weapon::azimuth = 0;
@@ -37,6 +39,11 @@ void CarrierTurret::init()
 int CarrierTurret::getSubType()
 {
     return TURRET;
+}
+
+EntityTypeId CarrierTurret::getTypeId()
+{
+    return EntityTypeId::TCarrierTurret;
 }
 
 
@@ -85,8 +92,7 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
         //_model->draw(textures["metal"]);
         drawRectangularBox(Weapon::width, Weapon::height, Weapon::length);
 
-        //glTranslatef(0.0f,27.97f-8.140f,0.0f);
-        glTranslatef(0.0f,firingpos[1]+0.83f,0.0f);
+        glTranslatef(0.0f,firingpos[1]+0.83f,0.0f); // The nozzle location is a little bit up from the viewport.
 
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
 
@@ -96,24 +102,9 @@ void  CarrierTurret::drawModel(float yRot, float xRot, float x, float y, float z
         _topModel->setTexture(textures["metal"]);
         _topModel->draw();
 
-        // Gun shots
-        //glTranslatef((firing+=100),0.0f,0.0f);
-        //drawArrow(100.0f,0.0f,0.0f,0.0,1.0,0.0);
 
-
-        // Laser Beam
-        //drawArrow(10000.0f,0.0f,0.0f,0.0,1.0,0.0);
-
-        //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glPopMatrix();
 
-        /**glPushMatrix();
-        glLoadIdentity();
-        glLoadMatrixf(modelview);
-        glTranslatef((firing+=50),0.0f,0.0f);
-        drawArrow(100.0f,0.0f,0.0f,1.0,0.0,0.0);
-
-        glPopMatrix();**/
     }
     else
     {
@@ -157,7 +148,7 @@ void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 
     fw = fw.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=4;// poner en 4 si queres que este un toque arriba desde atras.
+    Up[0]=Up[2]=0;Up[1]=1;
     position = position + (abs(zoom))*fw;
 
     //forward = -orig+position;
@@ -165,8 +156,11 @@ void CarrierTurret::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 
 Vehicle* CarrierTurret::aimAndFire(dWorldID world, dSpaceID space, Vec3f target)
 {
-    Vec3f aimTarget = target - getPos();
+    Vec3f aimTarget = target - (getPos() + firingpos);
     Vec3f aim = toBody(me,aimTarget);
+
+    // You need to account of the firing position.
+    //aim[1] = aim[1]-firingpos[1];
 
     setForward((aim));
     Weapon::azimuth = getAzimuth(aim);
@@ -193,12 +187,11 @@ Vehicle* CarrierTurret::fire(int weapon, dWorldID world, dSpaceID space, int she
     action->init();
 
     Vec3f position = getPos();
-    position[1] += firingpos[1]; // Move upwards to the center of the real rotation.
+    position[1] += (firingpos[1]); // Move upwards to the center of the real rotation.
     Vec3f fw = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
     Vec3f orig;
-
     fw = fw.normalize();
     orig = position;
     position = position + 40*fw;

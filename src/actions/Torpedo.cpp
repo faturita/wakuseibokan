@@ -269,3 +269,8 @@ void Torpedo::setVisible(bool val)
     setTtl(50);
 }
 
+EntityTypeId Torpedo::getTypeId()
+{
+    return EntityTypeId::TTorpedo;
+}
+

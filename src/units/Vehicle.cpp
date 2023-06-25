@@ -135,6 +135,14 @@ void Vehicle::setPos(float x, float y, float z)
     if (me) dBodySetPosition(me, pos[0], pos[1], pos[2]);
 }
 
+
+void Vehicle::setVelocity(float vx, float vy, float vz)
+{
+    Vehicle::vel[0] = vx;
+    Vehicle::vel[1] = vy;
+    Vehicle::vel[2] = vz;
+}
+
 void Vehicle::setRotation(float *newR)
 {
     setR(newR);
@@ -195,6 +203,12 @@ void Vehicle::disableAuto()
 {
     Vehicle::aienable = false;
 }
+
+Vec3f Vehicle::getVelocity()
+{
+    return vel;
+}
+
 
 Vec3f Vehicle::dBodyGetLinearVelVec(dBodyID body)
 {
@@ -266,6 +280,12 @@ int Vehicle::getType()
 int Vehicle::getSubType()
 {
     return 0;
+}
+
+EntityTypeId Vehicle::getTypeId()
+{
+    assert(0 || !"Vehicle should not be instantiated.\n");
+    return EntityTypeId::TWeapon;
 }
 
 void Vehicle::setVector(float* V, dVector3 v)
@@ -576,7 +596,7 @@ void Vehicle::wrapDynamics(dBodyID body)
         CLog::Write(CLog::Debug,"Carrier  %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
     **/
 
-    /**
+    // @FIXME: This should not be really here.
     if (dotelemetry)
     {
 
@@ -596,15 +616,15 @@ void Vehicle::wrapDynamics(dBodyID body)
         Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
         dout << s << std::endl;
 
-        telemetryme((float *)dBodyPosition, (float *)dBodyRotation);
+        //telemetryme(number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
     }
-    **/
 
 
     // @NOTE:  Keep the following line if you want the game to be more stable.
     if (VERIFY(newpos, body)) {
         setPos(dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
         setLocation((float *)dBodyPosition, (float *)dBodyRotation);
+        setVelocity(linearVel[0],linearVel[1],linearVel[2]);
     }
 }
 void Vehicle::alignToMyBody(dBodyID fBodyID)
@@ -870,4 +890,90 @@ void Vehicle::setTheOrientation(Vec3f orientation)
 
     if (!Vehicle::inert)
         dBodySetQuaternion(me,q3);
+}
+
+TickRecord Vehicle::serialize()
+{
+    TickRecord tickrecord;
+
+    float dBodyRotation[12];
+
+    getR(dBodyRotation);
+
+    Vec3f dBodyPosition = getPos();
+
+    tickrecord.typeId = (int)getTypeId();
+    tickrecord.type = getType();
+    tickrecord.subtype = getSubType();
+
+    tickrecord.faction = getFaction();
+    tickrecord.health = getHealth();
+    tickrecord.power = getPower();
+
+    tickrecord.status = getStatus();
+
+    tickrecord.ttl = getTtl();
+
+    tickrecord.number = getNumber();
+
+    tickrecord.location.pos1 = dBodyPosition[0];
+    tickrecord.location.pos2 = dBodyPosition[1];
+    tickrecord.location.pos3 = dBodyPosition[2];
+    tickrecord.location.r1 = dBodyRotation[0];
+    tickrecord.location.r2 = dBodyRotation[1];
+    tickrecord.location.r3 = dBodyRotation[2];
+    tickrecord.location.r4 = dBodyRotation[3];
+    tickrecord.location.r5 = dBodyRotation[4];
+    tickrecord.location.r6 = dBodyRotation[5];
+    tickrecord.location.r7 = dBodyRotation[6];
+    tickrecord.location.r8 = dBodyRotation[7];
+    tickrecord.location.r9 = dBodyRotation[8];
+    tickrecord.location.r10 = dBodyRotation[9];
+    tickrecord.location.r11 = dBodyRotation[10];
+    tickrecord.location.r12 = dBodyRotation[11];
+
+    tickrecord.location.vel1 = getVelocity()[0];
+    tickrecord.location.vel2 = getVelocity()[1];
+    tickrecord.location.vel3 = getVelocity()[2];
+
+    return tickrecord;
+}
+
+void Vehicle::deserialize(TickRecord record)
+{
+    float dBodyRotation[12];
+
+    setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+
+    dBodyRotation[0] = record.location.r1;
+    dBodyRotation[1] = record.location.r2;
+    dBodyRotation[2] = record.location.r3;
+    dBodyRotation[3] = record.location.r4;
+    dBodyRotation[4] = record.location.r5;
+    dBodyRotation[5] = record.location.r6;
+    dBodyRotation[6] = record.location.r7;
+    dBodyRotation[7] = record.location.r8;
+    dBodyRotation[8] = record.location.r9;
+    dBodyRotation[9] = record.location.r10;
+    dBodyRotation[10] = record.location.r11;
+    dBodyRotation[11] = record.location.r12;
+
+    if (me != NULL) setRotation(dBodyRotation);  // Not for structures that do not contain a body
+
+    setVelocity(record.location.vel1, record.location.vel2, record.location.vel3);
+
+    setPower(record.power);
+    health = record.health;
+    setFaction(record.faction);
+    setNumber(record.number);
+
+    setStatus(record.status);
+
+    setTtl(record.ttl);
+
+    //if (record.type == MANTA)
+    //{
+    //    ((Manta*)this)->release(getForward());
+    //}
+
 }

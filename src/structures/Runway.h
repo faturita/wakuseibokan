@@ -16,6 +16,7 @@ public:
 
     int getType();
     int getSubType() override;
+    EntityTypeId virtual getTypeId();
 
     void taxi(Manta *m);
     void launch(Manta* m);

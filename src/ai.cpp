@@ -553,6 +553,8 @@ int AirborneInvadeIsland::apply(int state, int faction, unsigned long &timeevent
             //m->setDestination(is->getPos());
             //m->enableAuto();
 
+            assert( m!=NULL || !"The carrier seems to have the wrong faction.");
+
             m->setOrder(CONQUEST_ISLAND);
 
         }

@@ -30,6 +30,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 
     void setOrigin(dBodyID);
     dBodyID getOrigin();

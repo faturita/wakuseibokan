@@ -69,6 +69,11 @@ int Walrus::getSubType()
     return SIMPLEWALRUS;
 }
 
+EntityTypeId Walrus::getTypeId()
+{
+    return EntityTypeId::TWalrus;
+}
+
 void Walrus::doMaterial()
 {
     GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
@@ -261,7 +266,13 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    if (dst_status != DestinationStatus::REACHED && T.magnitude()>500)
+    float roundederror = 500;
+
+    if (getStatus() == SailingStatus::ROLLING)
+        roundederror = 5;
+
+
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>roundederror)
     {
         float distance = T.magnitude();
 
@@ -282,7 +293,7 @@ void Walrus::doControlDestination()
 
         BoxIsland *b = findNearestIsland(Po);
         float closest = (b->getPos() - Po).magnitude();
-        if (closest > 1600 && closest < 2100)
+        if (closest > 1600 && closest < 2200)
         {
             c.registers.thrust = 15.0f;
 
@@ -346,7 +357,7 @@ void Walrus::doControlDestination()
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "Walrus has arrived to destination.");
+            sprintf(str, "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");

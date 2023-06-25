@@ -24,6 +24,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 
     void release(Vec3f orientation);
     void doControl();

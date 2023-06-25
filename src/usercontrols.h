@@ -5,31 +5,15 @@
 #include <string>
 #include <iostream>
 
+#include "commandorder.h"
+
 #define CONTROLLING_NONE (size_t)-1
-
-struct controlregister
-{
-    // R+,F-
-    float thrust=0;
-
-    // ModAngleX
-    float roll=0;
-
-    // ModAngleY
-    float pitch=0;
-
-    // ModAngleZ
-    float yaw=0;
-
-    // ModAngleP
-    float precesion=0;
-
-    float bank=0;
-};
 
 
 class Controller
 {
+private:
+    CommandOrder corder;
 public:
     
 	// Device ID to be controller.
@@ -55,6 +39,22 @@ public:
     bool teletype=false;
 
     std::string str;
+
+
+    void push(CommandOrder co)
+    {
+        corder = co;
+    }
+
+    CommandOrder pop()
+    {
+        CommandOrder cr = corder;
+
+        corder.command = Command::None;
+
+        return cr;
+    }
+
     
     void reset()
     {

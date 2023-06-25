@@ -481,3 +481,13 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
     // I can set power or something here.
     return (Vehicle*)action;
 }
+
+int AdvancedWalrus::getSubType()
+{
+    return VehicleSubTypes::ADVANCEDWALRUS;
+}
+
+EntityTypeId AdvancedWalrus::getTypeId()
+{
+    return EntityTypeId::TAdvancedWalrus;
+}

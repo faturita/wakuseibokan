@@ -20,6 +20,7 @@ public:
     void setPos(const Vec3f &newpos);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 
     void disable();
 };

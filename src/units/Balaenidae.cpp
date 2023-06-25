@@ -556,3 +556,8 @@ void Balaenidae::addWeapon(size_t w)
 {
     weapons.push_back(w);
 }
+
+EntityTypeId Balaenidae::getTypeId()
+{
+    return EntityTypeId::TBalaenidae;
+}

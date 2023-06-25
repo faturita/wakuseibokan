@@ -51,10 +51,12 @@ dBodyID Gunshot::getOrigin()
     return origin;
 }
 
+
 void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
+
 
     //Draw the saved model
     if (visible)
@@ -66,12 +68,12 @@ void Gunshot::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //doTransform(f, R);
 
-        Vec3f v = dBodyGetLinearVelVec(me);
+        //Vec3f v = dBodyGetLinearVelVec(me);
+        Vec3f v = getVelocity();
 
         v = v*1.0/10.0;
 
         drawLine(v[0],v[1],v[2],1.0,0.0,0.0);
-        //drawRectangularBox(Gunshot::width, Gunshot::height, Gunshot::length);
 
         glPopMatrix();
     }
@@ -119,6 +121,11 @@ void Gunshot::embody(dBodyID myBodySelf)
 int Gunshot::getType()
 {
     return ACTION;
+}
+
+EntityTypeId Gunshot::getTypeId()
+{
+    return EntityTypeId::TGunshot;
 }
 
 void Gunshot::setVisible(bool val)

@@ -46,8 +46,8 @@ freeglut32,  mingw32 with g++ 9.2.0
 That's all folks.
 
 
-ODE 0.14 Compilation on Mac Sierra
-----------------------------------
+ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
+----------------------------------------------------------
 
 * Run the following script to install automake tools for Mac
 
@@ -105,18 +105,25 @@ echo "Installation complete."
 ```
 
 * Now download the ode-0.14.tar tarball.
+* Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 * ./bootstrap
-* ./configure
+* ./configure --disable-asserts
 * make clean && make && sudo make install
 
+Objective and design guidelines
+-------------------------------
+
+The purpose was to create an multiplatform simple game engine based on physics dynamic engine and a fluid simulation solver, and a testbed platform to simulate manipulators and mobile robots.
+
+The game is a remake of an old and amazing game, which uses the engine as platform.  The desgin guideline for the game was to create a networked game where it is possible to control indepentendly all of the entities that are available.
 
 Characteristics
 ---------------
 * Floor
-    * The floor is squared.  Horizon works according the fulcrum representation.
+    * The floor is a square flat box that extends to the horizon.  Horizon works according the fulcrum representation.
     * Sea is good.  Works as a texture that is shifted based on the camera position.
-    * Reflections are missing.
+    * Reflections and alpha are missing.
     * Waves and boat wakes are missing.  
 * Sky
     * The Sky is a far-away-box with textures on the insides.
@@ -127,18 +134,18 @@ Characteristics
     * Max height (255) is 60. Hardcoded.
     * Island floor, which can be less than zero, or greater than zero, need to be adjusted manually for each island. Need improvement->Some Z Fighting.
 * Collision detection
-    * Island heights works PERFECT for Walruses. 
+    * Island heights works PERFECT for Walruses and Turtles.  Watching the bullets ricochetting on the floor is awesome.
 * Models
     * MDModel: Unreal.
     * 3DSModel: it works only when you have just one object and without textures.
 * Walruses
-    * Two models.  They work very nicely on water.  The thrust simulates and offboard engine.
+    * There are several models now.  They work very nicely on water as boats following the buyoncy model.  On land they work as Ackerman driving.  When they enter or leave an island, the model changes.  The thrust simulates and offboard engine.
 * Sound
     * Using TEMPORARILY system calls and afplay.
     * STK
 * Manta
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.
-    * Current implementation is a new mixed model which handle the forces form the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
+    * Current implementation is a new mixed model which handle the forces from the dynamic model but keep the airplane pose based on a simplified model (not dynamic).  I will move from here which is very good for control (and automation).
 * UserControl can be improved.  Sensitivity must be adjusted from within the game.
 
 Blender
@@ -187,3 +194,7 @@ References
 * https://github.com/avikola/fire-and-smoke
 * https://community.khronos.org/t/efficient-smoke/67120/6
 * http://www.inf.ufsc.br/~aldo.vw/grafica/apostilas/openGL/lesson19/lesson19.html
+* http://lua-users.org/wiki/CppObjectBinding
+* https://www-robotics.jpl.nasa.gov/how-we-do-it/facilities/the-darts-simulation-laboratory/
+* MuJoCo https://github.com/deepmind/mujoco
+* https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers

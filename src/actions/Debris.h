@@ -14,7 +14,7 @@ public:
     void init();
     void init(Vec3f dimensions);
     void drawModel(float yRot, float xRot, float x, float y, float z);
-
+    EntityTypeId virtual getTypeId();
     void setTexture(const GLuint &value);
 };
 

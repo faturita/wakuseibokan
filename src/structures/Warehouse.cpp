@@ -41,7 +41,7 @@ void Warehouse::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f,R);
 
         //_model->draw(Structure::texture);
-        drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        drawRectangularBox(Structure::width, Structure::height, Structure::length, Vec3f(0.0f, 0.2f, 0.0f),Vec3f(0.2, 0.2f, 0.0f),Vec3f(0.0f, 0.0f, 0.2f),Vec3f(0.2f, 0.0f, 0.1f));
 
         glPopMatrix();
     }
@@ -54,4 +54,9 @@ void Warehouse::drawModel(float yRot, float xRot, float x, float y, float z)
 int Warehouse::getSubType()
 {
     return WAREHOUSE;
+}
+
+EntityTypeId Warehouse::getTypeId()
+{
+    return EntityTypeId::TWarehouse;
 }

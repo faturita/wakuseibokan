@@ -26,6 +26,7 @@ public:
     void doControl();
 
     int getSubType();
+    EntityTypeId virtual getTypeId();
 
     Vehicle* fire(int weapon, dWorldID world, dSpaceID space);
     Vehicle* fire(int weapon, dWorldID world, dSpaceID space, int shellloadingtime);

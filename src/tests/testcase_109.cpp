@@ -59,7 +59,7 @@ void TestCase_109::init()
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
     dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
-    _bg->setPos(-5000.0,20.5f,-14000.0f);
+    _bg->setPos(-5000.0,20.5f,-7000.0f);
     _bg->stop();
 
     entities.push_back(_bg, _bg->getGeom());
@@ -118,35 +118,18 @@ void TestCase_109::init()
 
 
 
+
     //Vec3f pos(0.0,1.32, - 3500);
     Vec3f pos(-10,1.32,10);
     Camera.setPos(pos);
 
-    aiplayer = FREE_AI;
+    aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
 
 }
 
 int TestCase_109::check(unsigned long timertick)
 {
-    if (timertick == 400)
-    {
-        Vehicle* _b = entities[islands[0]->getStructures()[1]];
-
-        Vehicle *t = _b->spawn(world,space,WALRUS,1);
-
-        entities.push_back(t, t->getGeom());
-
-    }
-
-    if (timertick == 1000)
-    {
-        Vehicle* _b = entities[islands[0]->getStructures()[1]];
-
-        Vehicle *t = _b->spawn(world,space,WALRUS,2);
-
-        entities.push_back(t, t->getGeom());
-    }
 
     if (timertick > 8000)
     {
@@ -188,13 +171,13 @@ int TestCase_109::check(unsigned long timertick)
 
 int TestCase_109::number()
 {
-    return 108;
+    return 109;
 
 }
 
 std::string TestCase_109::title()
 {
-    return std::string("Check the new weapons of Beluga.");
+    return std::string("Check Docks spawning Walruses that attack immediately the incoming carrier.");
 }
 
 

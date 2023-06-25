@@ -356,18 +356,23 @@ void drawRedBox(float width, float height, float length)
 
 }
 
-
+void drawRectangularBox(float width, float height, float length)
+{
+    drawRectangularBox(width, height, length, Vec3f(0.0f,1.0f,0.0f),Vec3f(1.0f,1.0f,0.0f),Vec3f(0.0f, 0.0f, 1.0f),Vec3f(1.0f, 0.0f, 1.0f));
+}
 /**
  * When you draw the object, you move to height/2 to one side, and then height/2 to the other.
  *
  **/
-void drawRectangularBox(float width, float height, float length)
+void drawRectangularBox(float width, float height, float length, Vec3f green, Vec3f yellow, Vec3f blue, Vec3f magenta)
 {
     float x = width/2, y = height/2, z = length/2;
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
     glColor3f(0.0f, 1.0f, 0.0f);     // Green
+    glColor3f(0.0f, 0.2f, 0.0f);
+    glColor3f(green[0],green[1],green[2]);
     glVertex3f( x, y, -z);
     glVertex3f(-x, y, -z);
     glVertex3f(-x, y,  z);
@@ -389,13 +394,17 @@ void drawRectangularBox(float width, float height, float length)
     
     // Back face (z = -1.0f)
     glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
+    glColor3f(0.2, 0.2f, 0.0f);
+    glColor3f(yellow[0],yellow[1],yellow[2]);
     glVertex3f( x, -y, -z);
     glVertex3f(-x, -y, -z);
     glVertex3f(-x,  y, -z);
     glVertex3f( x,  y, -z);
-    
+
     // Left face (x = -1.0f)
     glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+    glColor3f(0.0f, 0.0f, 0.2f);
+    glColor3f(blue[0],blue[1],blue[2]);
     glVertex3f(-x,  y,  z);
     glVertex3f(-x,  y, -z);
     glVertex3f(-x, -y, -z);
@@ -403,6 +412,8 @@ void drawRectangularBox(float width, float height, float length)
     
     // Right face (x = 1.0f)
     glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
+    glColor3f(0.2f, 0.0f, 0.1f);
+    glColor3f(magenta[0],magenta[1],magenta[2]);
     glVertex3f(x,  y, -z);
     glVertex3f(x,  y,  z);
     glVertex3f(x, -y,  z);
@@ -720,6 +731,11 @@ void initTextures()
     textures["solar"] = _texture;
     delete image;
 
+    image = loadBMP("terrain/boat.bmp");
+    _texture = loadTexture(image);
+    textures["boat"] = _texture;
+    delete image;
+
     image = loadBMP("terrain/smoke.bmp");
     _texture = loadTexture(image);
     textures["solar"] = _texture;
@@ -749,6 +765,9 @@ void drawFloor(float x, float y, float z)
     glBindTexture(GL_TEXTURE_2D, textures["sea"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //glEnable(GL_BLEND);
+    //glColor4f (0.0, 0.0, 0.6, 0.2);
     
     glBegin(GL_QUADS);
     
@@ -936,8 +955,8 @@ void drawSky (float posX, float posY, float posZ)
 void drawLightning()
 {
     // Lighting, ambient light...
-    //GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat ambientLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    //GLfloat ambientLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
     
 	GLfloat diffuseLight[] = { 0.7f  , 0.7f, 0.7f,   1.0f};

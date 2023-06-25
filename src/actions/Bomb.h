@@ -18,6 +18,7 @@ public:
     void drawModel(float yRot, float xRot, float x, float y, float z);
     void doMaterial();
     int getType();
+    EntityTypeId virtual getTypeId();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward);
 

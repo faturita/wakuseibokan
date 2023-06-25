@@ -25,6 +25,7 @@ public:
     BoxVehicle(int faction );
 	void  init();
     int   getType();
+    EntityTypeId getTypeId();
 	void  drawModel(float yRot, float xRot, float x, float y, float z);
     
 	void drawModel();

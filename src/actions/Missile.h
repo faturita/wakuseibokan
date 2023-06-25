@@ -39,6 +39,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 
     void doControlControl2(Vec3f target, float thrust);
     void doControl();

@@ -21,6 +21,8 @@ public:
 
     void doDynamics();
     void doDynamics(dBodyID body);
+
+    EntityTypeId virtual getTypeId();
 };
 
 

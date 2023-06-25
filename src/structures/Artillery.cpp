@@ -194,3 +194,8 @@ int Artillery::getSubType()
 {
     return ARTILLERY;
 }
+
+EntityTypeId Artillery::getTypeId()
+{
+    return EntityTypeId::TArtillery;
+}

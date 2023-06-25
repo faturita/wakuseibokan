@@ -13,6 +13,7 @@ protected:
     Vec3f ap;
     std::vector<size_t> weapons;
 
+
 public:
 
     static const int OFFSHORING = 1;
@@ -52,6 +53,8 @@ public:
 
     std::vector<size_t> getWeapons();
     void addWeapon(size_t w);
+
+    virtual EntityTypeId getTypeId();
 };
 
 #endif // BALAENIDAE_H

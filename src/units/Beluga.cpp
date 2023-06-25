@@ -21,7 +21,7 @@ Beluga::Beluga(int faction) : Balaenidae(faction)
 void Beluga::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,textures["road"]);
+    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,textures["boat"]);
 
     setForward(0,0,1);
 
@@ -168,6 +168,11 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
 int Beluga::getSubType()
 {
     return BELUGA;
+}
+
+EntityTypeId Beluga::getTypeId()
+{
+    return EntityTypeId::TBeluga;
 }
 
 //draw3DSModel("units/beluga.3ds",1200.0+100,15.0,700.0+300.0,1,_textureBox);

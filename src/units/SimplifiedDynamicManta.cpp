@@ -1513,7 +1513,7 @@ Vehicle* SimplifiedDynamicManta::fireMissile(dWorldID world, dSpaceID space)
 
 
     position = orig;
-    position[1] += 40;
+    //position[1] += 40;
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
 
@@ -1534,6 +1534,7 @@ Vehicle* SimplifiedDynamicManta::fireMissile(dWorldID world, dSpaceID space)
 
 
     Vec3f Ft=fw + Vec3f(0,20,0);
+    Ft = fw;
     Ft=Ft*250;
 
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
@@ -1620,3 +1621,7 @@ Vehicle* SimplifiedDynamicManta::fireAmmo(dWorldID world, dSpaceID space)
     return (Vehicle*)action;
 }
 
+EntityTypeId SimplifiedDynamicManta::getTypeId()
+{
+    return EntityTypeId::TSimplifiedDynamicManta;
+}

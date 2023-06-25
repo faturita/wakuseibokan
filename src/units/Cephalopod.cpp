@@ -159,6 +159,11 @@ int Cephalopod::getSubType()
     return CEPHALOPOD;
 }
 
+EntityTypeId Cephalopod::getTypeId()
+{
+    return EntityTypeId::TCephalopod;
+}
+
 void Cephalopod::doDynamics()
 {
     doDynamics(getBodyID());

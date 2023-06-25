@@ -56,3 +56,8 @@ int Hangar::getSubType()
 {
     return HANGAR;
 }
+
+EntityTypeId Hangar::getTypeId()
+{
+    return EntityTypeId::THangar;
+}

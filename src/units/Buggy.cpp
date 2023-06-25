@@ -32,7 +32,10 @@ int Buggy::getType()
 }
 
 
-
+EntityTypeId Buggy::getTypeId()
+{
+    return EntityTypeId::TBuggy;
+}
 
 void Buggy::drawModel(float yRot, float xRot, float x, float y, float z)
 {

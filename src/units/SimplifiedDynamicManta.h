@@ -61,6 +61,8 @@ public:
     void dogfight(Vec3f target);
 
     void hold();
+
+    virtual EntityTypeId getTypeId();
 };
 
 #endif // SIMPLIFIEDMANTA_H

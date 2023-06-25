@@ -68,6 +68,8 @@ public:
 
     void setNameByNumber(int number);
 
+    virtual EntityTypeId getTypeId();
+
 };
 
 #endif /* MANTA_H_ */

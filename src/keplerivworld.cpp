@@ -83,6 +83,10 @@ std::vector<Message> messages;
 
 int gamemode;
 
+int tracemode;
+
+int peermode;
+
 int aiplayer;
 
 
@@ -544,7 +548,7 @@ void initWorldPopulation()
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
         _b->init();
         dSpaceID carrier_space = _b->embody_in_space(world, space);
-        _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
+        //b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
         _b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
@@ -574,6 +578,7 @@ void initWorldPopulation()
         _bg->init();
         dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
         _bg->embody(world,space);
+        // @NOTE Let the carriers fight against each other.
         _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
         //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
         _bg->stop();
@@ -772,16 +777,20 @@ void initWorldModelling()
 {
     initIslands();
 
-    initWorldPopulation();
+   if (tracemode != REPLAY && peermode != CLIENT) initWorldPopulation();
 }
 
 
 void update(int value);
+void replayupdate(int value);
 
 void worldStep(int value)
 {
     timer++;
-    update(value);
+    if (tracemode==REPLAY || peermode==CLIENT)
+        replayupdate(value);
+    else
+        update(value);
 }
 
 void endWorldModelling()

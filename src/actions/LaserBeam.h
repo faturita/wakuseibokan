@@ -25,6 +25,7 @@ public:
     void embody(dBodyID myBodySelf);
 
     int getType();
+    EntityTypeId virtual getTypeId();
 };
 
 #endif // LASERBEAM_H

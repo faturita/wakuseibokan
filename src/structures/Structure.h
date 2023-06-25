@@ -41,6 +41,7 @@ public:
 
     int getType();
     int virtual getSubType();
+    EntityTypeId virtual getTypeId();
 
     void onIsland(Island* island);
 
@@ -54,6 +55,8 @@ public:
     void setTexture(GLuint texture);
 
     bool virtual checkHeightOffset(int heightOffset);
+
+    TickRecord serialize();
 };
 
 #endif // STRUCTURE_H

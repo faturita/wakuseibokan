@@ -63,6 +63,11 @@ int Manta::getSubType()
     return SIMPLEMANTA;
 }
 
+EntityTypeId Manta::getTypeId()
+{
+    return EntityTypeId::TManta;
+}
+
 void Manta::doHold(Vec3f target, float thrust)
 {
     assert(!"Method not implemented in Manta.");

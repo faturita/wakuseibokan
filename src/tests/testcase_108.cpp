@@ -56,14 +56,21 @@ void TestCase_108::init()
 
     islands.push_back(nemesis);
 
+    BoxVehicle * _bo= new BoxVehicle();
+    _bo->init();
+    _bo->embody(world, space);
+    _bo->setPos(-5000.0,50.0f,-13000.0f);
+    _bo->stop();
+
+    entities.push_back(_bo, _bo->getGeom());
+
     Beluga *_bg = new Beluga(BLUE_FACTION);
     _bg->init();
     dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
     _bg->setPos(-5000.0,20.5f,-14000.0f);
     _bg->stop();
 
-    _bg->addWeapon(entities.push_back(_bg, _bg->getGeom()));
-
+    entities.push_back(_bg, _bg->getGeom());
 
     CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
     _bl->init();
@@ -107,6 +114,8 @@ void TestCase_108::init()
     _bg->addWeapon(entities.push_back(_cf, _cf->getGeom()));
 
 
+
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Launcher(GREEN_FACTION)           ,         0.0f,    -1700.0f,0,world);
     Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
@@ -131,7 +140,7 @@ void TestCase_108::init()
     Vec3f pos(-10,1.32,10);
     Camera.setPos(pos);
 
-    aiplayer = BLUE_AI;
+    aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
 
 }
@@ -152,7 +161,8 @@ int TestCase_108::check(unsigned long timertick)
 
     }
 
-    if (timertick > 1000)
+
+    if (timertick > 100)
     {
         Vehicle* _b = findCarrier(BLUE_FACTION);
 
@@ -162,7 +172,9 @@ int TestCase_108::check(unsigned long timertick)
         {
             Beluga *bb = (Beluga*) _b;
 
-            CarrierTurret* cb = (CarrierTurret*)entities[bb->getWeapons()[0]];
+            std::vector<size_t> weap = bb->getWeapons();
+
+            CarrierTurret* cb = (CarrierTurret*)entities[weap[0]];
             Vehicle *action = cb->aimAndFire(world, space, _w->getPos());
 
             if (action != NULL)
@@ -170,8 +182,19 @@ int TestCase_108::check(unsigned long timertick)
                 entities.push_back(action, action->getGeom());
                 gunshot();
             }
+
+            CarrierTurret* cbb = (CarrierTurret*)entities[weap[1]];
+            action = cbb->aimAndFire(world, space, _w->getPos());
+
+            if (action != NULL)
+            {
+                entities.push_back(action, action->getGeom());
+                gunshot();
+            }
+
         }
     }
+
 
     if (timertick > 8000)
     {
