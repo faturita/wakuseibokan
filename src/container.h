@@ -15,16 +15,21 @@
 
 #include "ode/common.h"
 
-//#define synchronized(m) \
-//    for(std::unique_lock<std::recursive_mutex> lk(m); lk; lk.unlock())
-
+#ifndef _WIN32
+#define synchronized(m) \
+    for(std::unique_lock<std::recursive_mutex> lk(m); lk; lk.unlock())
+#else
 #define synchronized(m) printf("");
+#endif
+
 
 template <class T> class container
 {
 protected:
     //std::vector<T> elements;
-    //std::mutex mlock;
+#ifndef _WIN32
+    std::mutex mlock;
+#endif
 
     std::unordered_map<dGeomID, size_t> geomidmap;
 
@@ -43,7 +48,9 @@ public:
      * Use with the synchronized macro to restrict access to a block.
      * @brief m_mutex
      */
-    //std::recursive_mutex m_mutex;
+#ifndef _WIN32
+    std::recursive_mutex m_mutex;
+#endif
     container();
 
     /**
