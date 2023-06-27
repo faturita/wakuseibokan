@@ -1,17 +1,33 @@
-/**
-  ai.cpp
-  wakuseibokan
+/* ============================================================================
+**
+** AI - Wakuseiboukan - Around 2020
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** This is a general state machine, on top of all the others that drive any
+** individual unit. It is raw.  I've found that it is much more difficult to
+** do something generic, nice, that actually works.
+** When you need something workable you have to cook up a lot of details.
+** Player represent an AI that tries to behave like a human player.  This has
+** been a mantra on this project. Hence each class is a state in the sequence
+** of steps that you need to perform to win the game, and each transition
+** represent some action.  The idea was to model like state-action diagram,
+** able for use in a RL model.
+** ========================================================================= */
 
-  Created around 2020.
-
-  This is a general state machine, on top of all the others that drive any individual unit.
-  It is raw.  I've found that it is much more difficult to do something generic, nice, that actually works.
-  When you need something workable you have to cook up a lot of details.
-  Player represent an AI that tries to behave like a human player.  This has been a mantra on this project.
-  Hence each class is a state in the sequence of steps that you need to perform to win the game, and each transition
-  represent some action.  The idea was to model like state-action diagram, able for use in a RL model.
-
-**/
 
 #include <assert.h>
 
@@ -33,6 +49,7 @@ extern  Controller controller;
 extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 extern std::vector<Message> messages;
+extern std::vector<TrackRecord>   track;
 
 extern dWorldID world;
 extern dSpaceID space;
@@ -47,7 +64,221 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
     if (!b) return state;
 
-    Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
+    // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
+    std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
+
+    Vehicle *v = NULL;
+    if (enemies.size()>0)
+    {
+        v = entities[enemies[0]];
+    }
+
+    if (v)
+    {
+        Vec3f Po = b->getPos();
+        Vec3f Pf = v->getPos();
+        Vec3f T = Pf-Po;
+
+        for (size_t i: enemies)
+        {
+            if (entities[i]->getType() == CARRIER)
+            {
+                b->disableAuto();
+                b->setThrottle(0.0);
+            }
+        }
+
+        if (b->getHealth()<500.0)
+        {
+            // @NOTE: The idea is to perfom an evasive action and move the carrier away tangential to the island encircle.
+            BoxIsland *is = findNearestIsland(b->getPos());
+            Vec3f target = is->getPos() - Po;
+            target = target.normalize();
+            target = target.cross(Vec3f(0.0,1.0,0.0));
+            b->setDestination( Po + target * 10000.0);
+            b->enableAuto();
+
+        }
+
+        float distance = T.magnitude();
+
+        Vec3f F = b->getForward();
+        F = F.normalize();
+        T = T.normalize();
+        float e = _acos( T.dot(F) );
+        float signn = T.cross(F)[1];
+
+        if(Beluga* lb = dynamic_cast<Beluga*>(b))
+        {
+
+            if (distance>500 && entities[lb->getWeapons()[0]] != NULL)
+            {
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
+                {
+
+                    CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+
+                    if (t) {
+                        Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+
+                if (Pf[1]<50.0 && signn<0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[3]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]>50.0 || (Pf[1]<50.0 && signn>0))
+                {
+                    CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
+
+                    if (t2)
+                    {
+                        Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                if (Pf[1]<50.0 && signn>0 && e>PI/6.0)
+                {
+
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[2]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+
+                CarrierLauncher* ct = (CarrierLauncher*)entities[lb->getWeapons()[4]];
+
+                if (ct) {
+
+                    Vec3f firingloc = ct->getPos();
+                    float elevation = -5;
+                    float azimuth = getAzimuth(v->getPos()-firingloc);
+                    ct->setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+                    Vehicle *action = NULL;
+
+                    if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
+                    {
+                        ct->water();
+                        action = ct->fire(0,world, space);
+                    } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
+                        ct->ground();
+                        action = ct->fire(0,world, space);
+                    } else {
+                        ct->air();
+                        action = ct->fire(0,world, space);
+                    }
+
+                    if (action)
+                    {
+                        entities.push_back(action, action->getGeom());
+                        action->goTo(v->getPos());
+                        action->enableAuto();
+
+                        // @FIXME: This is to avoid the carrier being damaged by missiles.
+                        ((Gunshot*)action)->setOrigin(lb->getBodyID());
+
+
+                        auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                            Vehicle *snd = entities.find(sender);
+                            Vehicle *rec = entities.find(recv);
+
+                            if (snd != NULL && rec != NULL)
+                            {
+                                //printf ("Updating....\n");
+                                rec->setDestination(snd->getPos());
+                                return true;
+                            }
+                            else
+                            {
+                                //printf ("End");
+                                return false;
+                            }
+
+
+                        };
+
+                        TrackRecord val;
+                        std::get<0>(val) = v->getGeom();
+                        std::get<1>(val) = action->getGeom();
+                        std::get<2>(val) = lambda;
+                        track.push_back(val);
+                    }
+                }
+
+
+
+
+            }
+        }
+        else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
+        {
+
+            if (distance>500 && lb->getWeapons().size()>0 && entities[lb->getWeapons()[0]] != NULL)
+            {
+
+
+                CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+                if (t)
+                {
+                    Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                    if (action)
+                    {
+                        entities.push_back(action, action->getGeom());
+                    }
+                }
+
+                if (Pf[1]<50.0 && e<PI/6.0)
+                {
+                    CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[1]];
+
+                    if (at) {
+                        Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            ((Gunshot*)action)->setOrigin(b->getBodyID());
+                            entities.push_back(action, action->getGeom());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     if (v && (v->getType() == CARRIER || v->getType() == WALRUS) && state != 20 && state != 21)
     {
@@ -144,6 +375,7 @@ int NavalDefense::apply(int state, int faction, unsigned long &timeevent, unsign
 
     dout << "read" << v->getPos() << std::endl;
 
+    // @FIXME Check why this is actually working with the faulty function findWalrusByOrder
     Walrus *w1 = findWalrusByOrder(faction,1);
 
     if (!w1)
@@ -185,6 +417,7 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
 
     if (!b) return state;
 
+    // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
     Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
 
 
@@ -211,55 +444,8 @@ int NavalDefending::apply(int state, int faction, unsigned long &timeevent, unsi
         timeevent= timer;return 3;
     }
 
-    /**
-    if (v)
-    {
-        if(Beluga* lb = dynamic_cast<Beluga*>(b))
-        {
-            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
-
-            if (t) {
-                Vehicle *action = t->aimAndFire(world, space, v->getPos());
-
-                if (action)
-                {
-                    entities.push_back(action, action->getGeom());
-                }
-            }
-
-            CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
-
-            if (t2)
-            {
-                Vehicle *action = t2->aimAndFire(world, space, v->getPos());
-
-                if (action)
-                {
-                    entities.push_back(action, action->getGeom());
-                }
-            }
-        }
-        else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
-        {
-            CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
-            if (t)
-            {
-                Vehicle *action = t->aimAndFire(world, space, v->getPos());
-
-                if (action)
-                {
-                    entities.push_back(action, action->getGeom());
-                }
-            }
-        }
-    }
-    **/
-
-
     return state;
 }
-
-
 
 // Find a closer enemy island and attack it.
 int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
@@ -280,7 +466,9 @@ int ApproachEnemyIsland::apply(int state, int faction, unsigned long &timeevent,
 
         vector = vector.normalize();
 
-        b->goTo(is->getPos()+Vec3f(12500.0f * vector));
+        Vec3f approachaddress = getRandomCircularSpot(is->getPos()+Vec3f(12500.0f * vector),400.0);
+
+        b->goTo(approachaddress);
         b->enableAuto();
         timeevent=timer;return 10;
     }
@@ -514,7 +702,9 @@ int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, 
 
             vector = vector.normalize();
 
-            b->goTo(is->getPos()+Vec3f(3500.0f * vector));
+            Vec3f finaldestiny = getRandomCircularSpot(is->getPos()+Vec3f(3500.0f * vector),150.0);
+
+            b->goTo(finaldestiny);
             b->enableAuto();
             timeevent = timer; return 1;
         } else {
@@ -653,7 +843,7 @@ int InvadeIsland::apply(int state, int faction, unsigned long &timeevent, unsign
             {
                 w = spawnWalrus(space,world,b);
             }
-            w->goTo(is->getPos());
+            w->goTo(getRandomCircularSpot(is->getPos(),200.0));
             w->enableAuto();
 
             timeevent = timer;return 2;

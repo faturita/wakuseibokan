@@ -144,6 +144,8 @@ FILE *ledger;
 
 std::vector<Controller*> controllers;
 
+std::vector<TrackRecord>   track;
+
 void disclaimer()
 {
     printf ("惑星母艦\n");
@@ -1007,7 +1009,7 @@ void inline processCommandOrders()
                                 action->enableAuto();
 
                                 // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
-                                //switchControl(actionid);
+                                switchControl(actionid);
                         }
 
                     }
@@ -1096,6 +1098,8 @@ void update(int value)
 
         // Build island structures, international water structures and repair carriers.
         buildAndRepair(space,world);
+
+        trackTargets();
 
         defendIsland(timer,space,world);
 

@@ -133,6 +133,7 @@ public:
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
+
 class Player
 {
 private:

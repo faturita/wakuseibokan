@@ -31,6 +31,8 @@ void CommandCenter::init()
     Structure::length=30;
     Structure::width=40;
 
+    setName("CommandCenter");
+
     setForward(0,0,1);
 }
 

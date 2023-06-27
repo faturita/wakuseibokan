@@ -35,6 +35,8 @@ void Structure::init()
     Structure::length=8;
     Structure::width=8;
 
+    setName("Tower");
+
     setForward(0,0,1);
 }
 

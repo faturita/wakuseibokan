@@ -23,6 +23,8 @@ void Runway::init()
     Structure::length=1000;
     Structure::width=20;
 
+    setName("Runway");
+
     setForward(0,0,1);
 }
 

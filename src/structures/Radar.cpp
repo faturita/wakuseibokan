@@ -22,6 +22,8 @@ void Radar::init()
     Structure::length=70;
     Structure::width=40;
 
+    setName("Radar");
+
     setForward(0,0,1);
 }
 

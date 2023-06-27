@@ -23,6 +23,8 @@ void Dock::init()
     Structure::height=5;
     Structure::length=500;
 
+    setName("Dock");
+
     setForward(0,0,1);
 }
 

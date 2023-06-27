@@ -156,7 +156,7 @@ void Walrus::doControlAttack()
 
     Vec3f T = Pf - Po;
 
-    if (T.magnitude()>1000)
+    if (T.magnitude()>300)
     {
         float distance = T.magnitude();
 
@@ -211,7 +211,7 @@ void Walrus::doControlAttack()
 
 
     } else
-    if (T.magnitude()<1000)
+    if (T.magnitude()<300)
     {
         float distance = T.magnitude();
 
@@ -266,7 +266,7 @@ void Walrus::doControlDestination()
 
     Vec3f T = Pf - Po;
 
-    float roundederror = 500;
+    float roundederror = 400;
 
     if (getStatus() == SailingStatus::ROLLING)
         roundederror = 5;

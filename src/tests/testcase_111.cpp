@@ -46,7 +46,7 @@ extern int  aiplayer;
 
 typedef struct sockaddr SA;
 
-struct ControlStructure {
+struct ControlWalrus {
     int id;
     float roll;
     float thrust;
@@ -112,7 +112,7 @@ void TestCase_111::init()
         _otter->setPos(400.0f,70.0f,-4400.0f);
         _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-120,120),30.0f,getRandomInteger(-60,60)));
+        _otter->setPos(Vec3f(getRandomInteger(-1200,1200),30.0f,getRandomInteger(-600,600)));
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(1);
@@ -167,7 +167,7 @@ void TestCase_111::init()
         dMatrix3 Re2;
         dRSetIdentity(Re2);
         //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/4*10+PI,(int)PI/4*10)/10.0+PI);
+        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/2.0+PI,(int)PI/2.0)/10.0+PI);
         dBodySetRotation(_otter->getBodyID(),Re2);
 
         //_otter->goTo(Vec3f(0,0,340));
@@ -184,7 +184,7 @@ void TestCase_111::init()
         _otter->setPos(400.0f,70.0f,-4400.0f);
         _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-120,120),30.0f,getRandomInteger(-60,60)));
+        _otter->setPos(Vec3f(getRandomInteger(-1200,1200),30.0f,getRandomInteger(-600,600)));
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(2);
@@ -273,7 +273,7 @@ int TestCase_111::check(unsigned long timertick)
     {
 
         socklen_t len;
-        ControlStructure mesg;
+        ControlWalrus mesg;
 
         SA pcliaddr;
 
