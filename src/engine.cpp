@@ -134,13 +134,15 @@ bool departed(Vehicle *walrus)
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
+        return true;
     }
-    return true;
+    return false;
 }
 
 // SYNC
 bool arrived(dSpaceID s, Island *island)
 {
+    bool arv = false;
     for(int gids=0;gids<dSpaceGetNumGeoms(s);gids++)
     {
 
@@ -148,8 +150,9 @@ bool arrived(dSpaceID s, Island *island)
         Vehicle *v = gVehicle(g);
 
         if (v->getType() == WALRUS)
-            arrived(v,island);
+            if (arrived(v,island)) arv=true;
     }
+    return arv;
 }
 
 bool arrived(Vehicle *invadingunit, Island *island)
@@ -166,6 +169,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
+        return true;
     }
 
     if (island && invadingunit && invadingunit->getSubType() == CEPHALOPOD)
@@ -182,11 +186,12 @@ bool arrived(Vehicle *invadingunit, Island *island)
             mg.msg = std::string(str);
             mg.faction = c->getFaction();
             messages.insert(messages.begin(), mg);
+            return true;
         }
     }
 
 
-    return true;
+    return false;
 }
 
 // SYNC
@@ -213,9 +218,10 @@ bool landed(Vehicle *manta, Island *island)
             sprintf(str, "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);
             messages.insert(messages.begin(), mg);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 // SYNC
@@ -287,7 +293,9 @@ bool hit(Structure* structure, Gunshot *g)
         //bullethit();
         g->setVisible(false);
         structure->damage(g->getDamage());
+        return true;
     }
+    return false;
 }
 
 // SYNC

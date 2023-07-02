@@ -1074,6 +1074,7 @@ void test10()
     _walrus->embody(world, space);
     _walrus->setPos(200.0f,1.32f,-6000.0f);
     _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setName("Intrepid");
     _walrus->stop();
 
     entities.push_back(_walrus, _walrus->getGeom());
@@ -7672,10 +7673,10 @@ void initWorldModelling(int testcase)
     case 35:test35();break;                         // Test Missiles fired from Carrier
     case 36:test36();break;                         // Test Missile Launcher
     case 37:test37();break;                         // Test Missile Launcher against Manta flying.
-    case 38:test38();break;                         // Carrier attacks an island and try to conquer it.
+    case 38:test38();break;                         // Carrier attacks an island and tries to conquer it.
     case 39:test39();break;                         // Walrus attack enemy carrier trying to destroy it.
     case 40:test40();break;                         // Different walrus attack enemy carrier trying to destroy it.
-    case 41:test41();break;                         // Carrier detect enemy automatically, stops what it is doing and attack it.
+    case 41:test41();break;                         // Carrier detects enemy automatically, stops what it is doing and attacks it.
     case 42:test42();break;                         // Carrier is attacked by Manta and activates defenses.
     case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
     case 44:test44();break;                         // Manta attacks incoming walruses.

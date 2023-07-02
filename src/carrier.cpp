@@ -1111,6 +1111,9 @@ void update(int value)
         // As the sync problem only arises when you delete something, there's no problem here.
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
+            if (!entities.isValid(i))
+                continue;
+
             // Autocontrol (AI)
             if (entities[i]->isAuto())
             {
