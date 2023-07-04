@@ -19,6 +19,8 @@ void LaserBeam::init()
     Gunshot::length=range;
     Gunshot::width=0.1f;
 
+    setName("LaserBeam");
+
     setForward(0,0,1);
 }
 

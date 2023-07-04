@@ -40,6 +40,7 @@ void Missile::init()
     Missile::mass = 1.0f;
 
     setDamage(10000);
+    setName("Missile");
 
     setForward(0,0,1);
 }

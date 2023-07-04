@@ -36,6 +36,8 @@ void Bomb::init()
 
     setDamage(10000);
 
+    setName("Bomb");
+
     setForward(0,0,1);
 
     visible = true;

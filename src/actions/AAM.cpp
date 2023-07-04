@@ -47,6 +47,8 @@ void AAM::init()
 
     setDamage(10000);
 
+    setName("AAM");
+
     setForward(0,0,1);
 }
 

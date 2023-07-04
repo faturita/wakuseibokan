@@ -47,6 +47,7 @@ void Torpedo::init()
     Torpedo::mass = 1.0f;
 
     setDamage(10000);
+    setName("Torpedo");
 
     setForward(0,0,1);
 

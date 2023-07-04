@@ -33,6 +33,8 @@ void Gunshot::init()
 
     setDamage(2);
 
+    setName("Gunshot");
+
     setForward(0,0,1);
 }
 

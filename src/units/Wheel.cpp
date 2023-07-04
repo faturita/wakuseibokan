@@ -30,6 +30,8 @@ void Wheel::init()
     Wheel::height = 1.0;
     Wheel::length = 1.0;
 
+    setName("Wheel");
+
     setForward(0,0,1);
 
 }

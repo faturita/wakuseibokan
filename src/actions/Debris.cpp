@@ -15,6 +15,7 @@ void Debris::init(Vec3f dimensions)
     Debris::mass = 0.01f;
 
     setDamage(5);
+    setName("Debris");
 
     setForward(0,0,1);
 }

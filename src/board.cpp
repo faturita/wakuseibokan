@@ -58,10 +58,16 @@ extern container<Vehicle*> entities;
 
 extern  Controller controller;
 
-//int cx=1200/2,cy=800/2;
 
-extern int cx, cy;
+extern int width;
+extern int height;
+extern int mapzoom;
+extern int cx,cy;
 
+
+float X(float x);
+
+float Y(float y);
 
 void drawBoard()
 {
@@ -71,10 +77,14 @@ void drawBoard()
     glPushMatrix();
     glLoadIdentity();
 
-    int xsize = 1200;
-    int ysize = 800;
+    int xsize = width/mapzoom;
+    int ysize = height/mapzoom;
 
-
+    if (mapzoom==1)
+    {
+        cx = width/2;
+        cy = height/2;
+    }
 
     glOrtho(cx-xsize/2, cx+xsize/2, cy+ysize/2, cy-ysize/2, -1, 1);
     glMatrixMode(GL_MODELVIEW);
@@ -91,9 +101,6 @@ void drawBoard()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     char str[256];
-    sprintf (str, "Kepler IV Sea");
-    // width, height, 0 0 upper left
-    drawString(0,-30,1,str,0.2f,1.0f,1.0f,1.0f);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix(); {
@@ -103,8 +110,8 @@ void drawBoard()
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             CLog::Write(CLog::Debug,"[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
-            sprintf(str, "[%3d]\tType: %d", entities.indexOf(i), entities[i]->getType());
-            drawString(10,300-counter*40,0,str,0.2f,1.0f,1.0f,1.0f);
+            sprintf(str, "[%3d]\t%s", i, entities[i]->getName().c_str());
+            drawString(X(+550000.0-((int)(counter/78))*150000.0)-10,Y(+400000.0-(counter%78)*10000.0)-20,0,str,0.1f,1.0f,1.0f,1.0f);
             counter++;
         }
 

@@ -136,7 +136,7 @@ void processMouse(int button, int state, int x, int y) {
         if (button == GLUT_LEFT_BUTTON) {
 			//buttonState = 1;
             CLog::Write(CLog::Debug,"Mouse down %d,%d\n",x,y);
-            if (controller.view == 2)
+            if (controller.view == 2 || controller.view == 3)
             {
                 if (specialKey == GLUT_ACTIVE_SHIFT && commandmode == ATTACK_MODE)
                 {

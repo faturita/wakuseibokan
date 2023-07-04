@@ -33,6 +33,7 @@ void Shell::init()
     }
 
     setDamage(20);
+    setName("Shell");
 
     setForward(0,0,1);
 }

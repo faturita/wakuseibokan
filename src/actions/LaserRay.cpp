@@ -17,6 +17,8 @@ LaserRay::~LaserRay()
 void LaserRay::init()
 {
     setForward(0,0,1);
+
+    setName("LaserRay");
 }
 
 void LaserRay::drawModel()
