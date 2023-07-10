@@ -33,6 +33,10 @@ protected:
 
     size_t push_back(T value);
 
+    size_t push_back(size_t initialregion, T value);
+
+    size_t push_back(size_t initialregion, T value, dGeomID geom);
+
 public:
     /**
      * Use with the synchronized macro to restrict access to a block.
@@ -49,6 +53,7 @@ public:
      * @return
      */
     size_t push_back(T value,dGeomID);
+    size_t push_at_the_back(T value, dGeomID geom);
 
     /**
      * Verify whether is lock is released.

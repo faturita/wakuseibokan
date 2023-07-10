@@ -239,7 +239,7 @@ void Walrus::doControlAttack()
 
         if (action != NULL)
         {
-            entities.push_back(action, action->getGeom());
+            entities.push_at_the_back(action, action->getGeom());
             gunshot();
             setTtl(5);
         }

@@ -43,19 +43,32 @@ template<class T> void container<T>::unlockme()
     usleep(1);
 }
 
-
 template<class T> size_t container<T>::push_back(T value, dGeomID geom)
 {
-    size_t i = push_back(value);
+    return push_back(0,value,geom);
+}
+
+template<class T> size_t container<T>::push_at_the_back(T value, dGeomID geom)
+{
+    return push_back(e_size, value, geom);
+}
+
+template<class T> size_t container<T>::push_back(size_t initialregion, T value, dGeomID geom)
+{
+    size_t i = push_back(initialregion, value);
     geomidmap[geom] = i;
     return i;
 }
 
 template<class T> size_t container<T>::push_back(T value)
 {
-    size_t i=0;
-    size_t count=0;
-    for(i=0;i<MAX;i++)
+    return push_back(0, value);
+}
+
+template<class T> size_t container<T>::push_back(size_t initialregion, T value)
+{
+    size_t i;
+    for(i=initialregion;i<MAX;i++)
     {
         if (elem[i] == NULL)
             break;
@@ -65,6 +78,7 @@ template<class T> size_t container<T>::push_back(T value)
 
     elem[i] = value;
 
+    e_size++;
 
     return i;
 }
