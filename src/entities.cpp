@@ -211,7 +211,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             action->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
             action->setVisible(true);
 
-            entities.push_back(action, action->getGeom());
+            entities.push_at_the_back(action, action->getGeom());
         }
     }
 

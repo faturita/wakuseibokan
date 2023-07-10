@@ -58,6 +58,7 @@ extern dSpaceID space;
 // @FIXME: We should do the same for every unit on existence.
 // @FIXME: We could extend that, including the buildings from each island.
 // @FIXME: Finally, we need a system to read information from sensors to sense the world.
+// @NOTE: We need to be aware that there could be a moment when the carrier has no weapons.
 int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
     Vehicle *b = findCarrier(faction);
@@ -110,8 +111,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
         if(Beluga* lb = dynamic_cast<Beluga*>(b))
         {
-
-            if (distance>500 && entities[lb->getWeapons()[0]] != NULL)
+            if (distance>500 && lb->getWeapons().size()>0 && entities[lb->getWeapons()[0]] != NULL)
             {
 
                 if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
@@ -124,7 +124,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                         if (action)
                         {
-                            entities.push_back(action, action->getGeom());
+                            entities.push_at_the_back(action, action->getGeom());
                         }
                     }
                 }
@@ -141,7 +141,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
                         if (action)
                         {
                             ((Gunshot*)action)->setOrigin(b->getBodyID());
-                            entities.push_back(action, action->getGeom());
+                            entities.push_at_the_back(action, action->getGeom());
                         }
                     }
                 }
@@ -156,7 +156,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                         if (action)
                         {
-                            entities.push_back(action, action->getGeom());
+                            entities.push_at_the_back(action, action->getGeom());
                         }
                     }
                 }
@@ -172,7 +172,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
                         if (action)
                         {
                             ((Gunshot*)action)->setOrigin(b->getBodyID());
-                            entities.push_back(action, action->getGeom());
+                            entities.push_at_the_back(action, action->getGeom());
                         }
                     }
                 }
@@ -202,7 +202,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                     if (action)
                     {
-                        entities.push_back(action, action->getGeom());
+                        entities.push_at_the_back(action, action->getGeom());
                         action->goTo(v->getPos());
                         action->enableAuto();
 
@@ -257,7 +257,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
 
                     if (action)
                     {
-                        entities.push_back(action, action->getGeom());
+                        entities.push_at_the_back(action, action->getGeom());
                     }
                 }
 
@@ -271,7 +271,7 @@ int DefCon::apply(int state, int faction, unsigned long &timeevent, unsigned lon
                         if (action)
                         {
                             ((Gunshot*)action)->setOrigin(b->getBodyID());
-                            entities.push_back(action, action->getGeom());
+                            entities.push_at_the_back(action, action->getGeom());
                         }
                     }
                 }
