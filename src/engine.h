@@ -6,6 +6,11 @@
 #include <mutex>
 #include <unordered_map>
 
+#ifdef __linux
+#include <functional>
+#elif __APPLE__
+#endif
+
 #include "container.h"
 
 #include "odeutils.h"
@@ -52,7 +57,7 @@
 
 #include "weapons/CarrierArtillery.h"
 #include "weapons/CarrierLauncher.h"
-#include "weapons/CarrierTurret.h"
+#include "weapons/CarrierTurret.h" 
 
 using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeomID)>>;
 
