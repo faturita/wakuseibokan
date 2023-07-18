@@ -24,7 +24,7 @@ ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT $(ODEFL)
 else ifeq ($(shell uname),MINGW32_NT-6.2)
 	CFLAGS = -std=c++17 -w -g -Wall -O2 -I/c/freeglut/include -I/usr/local/include/ -msse2 -mmmx -mstackrealign -MP -MD -lglu32 -lopengl32 -lpthread -lstdc++  -fpermissive  -fPIC -static -static-libgcc -static-libstdc++
-	LIBS = -L/usr/local/lib/ -lode -L/c/freeglut/lib/ -lglu32 -lopengl32 -lfreeglut -lpthread -lstdc++ 
+	LIBS = -L/usr/local/lib/ -lode -L/c/freeglut/lib/ -lglu32 -lopengl32 -lfreeglut -lpthread -lstdc++ -lws2_32
 else
 	LIBS = -L/usr/local/lib -I/usr/local/include   -L/usr/lib/x86_64-linux-gnu/ -lGL -lGLU -lglut  $(ODEFL) -pthread -lbsd
 endif

@@ -30,12 +30,12 @@ LobbyConnection newplayer(char ip[], int port)
     LobbyConnection con;
 
     /* Clean up */
-    bzero(&con.modelserveraddr, sizeof(con.modelserveraddr));
+    //bzero(&con.modelserveraddr, sizeof(con.modelserveraddr));
 
     /* Initialize the client to connect to the server on local port 4500 */
     con.modelserveraddr.sin_family = AF_INET;
     con.modelserveraddr.sin_port = htons(port);
-    inet_pton(AF_INET, ip, &con.modelserveraddr.sin_addr);
+    //inet_pton(AF_INET, ip, &con.modelserveraddr.sin_addr);
 
     /* Bring up the client socket */
     con.modelsockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -61,7 +61,7 @@ void join_lobby()
     modelsockasserverfd = socket(AF_INET, SOCK_DGRAM, 0);
     //fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
-    bzero(&modelserverasserveraddr, sizeof(modelserverasserveraddr));
+    //bzero(&modelserverasserveraddr, sizeof(modelserverasserveraddr));
     modelserverasserveraddr.sin_family = AF_INET;
     modelserverasserveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     modelserverasserveraddr.sin_port = htons(4500);
@@ -83,21 +83,21 @@ void notify(unsigned long timerparam, size_t id, Vehicle *v)
 
     for (size_t i=0; i<lobby.size(); i++) {
         // @NOTE: The socket must be already connected at this point.
-        sendto(lobby[i].modelsockfd, &tickrecord, sizeof(tickrecord), 0, (SA *)&lobby[i].modelserveraddr, sizeof(lobby[i].modelserveraddr));
+        sendto(lobby[i].modelsockfd, (const char *)&tickrecord, sizeof(tickrecord), 0, (SA *)&lobby[i].modelserveraddr, sizeof(lobby[i].modelserveraddr));
     }
 }
 
 // This is called by the GAME CLIENT to receive constantly the model information.
 int receive(TickRecord *record)
 {
-    socklen_t len;
+    //socklen_t len;
     SA pcliaddr;
 
-    socklen_t clilen=sizeof(cliaddr);
+    //socklen_t clilen=sizeof(cliaddr);
     int n;
 
-    len = clilen;
-    n = recvfrom(modelsockasserverfd, record, sizeof(TickRecord), 0, &pcliaddr, &len);
+    //len = clilen;
+    //n = recvfrom(modelsockasserverfd, record, sizeof(TickRecord), 0, &pcliaddr, &len);
 
     if (n == -1) n = 0;
 
@@ -114,9 +114,9 @@ void disconnect()
 void setupControllerServer()
 {
     controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    fcntl(controllersockfd, F_SETFL, O_NONBLOCK);
+    //fcntl(controllersockfd, F_SETFL, O_NONBLOCK);
 
-    bzero(&controllerserveraddr, sizeof(controllerserveraddr));
+    //bzero(&controllerserveraddr, sizeof(controllerserveraddr));
     controllerserveraddr.sin_family = AF_INET;
     controllerserveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     controllerserveraddr.sin_port = htons(5000);
@@ -132,12 +132,12 @@ void setupControllerClient()
     int port = 5000;
 
     /* Clean up */
-    bzero(&controllerserveraddr, sizeof(controllerserveraddr));
+    //bzero(&controllerserveraddr, sizeof(controllerserveraddr));
 
     /* Initialize the client to connect to the server on local port 4500 */
     controllerserveraddr.sin_family = AF_INET;
     controllerserveraddr.sin_port = htons(port);
-    inet_pton(AF_INET, ip, &controllerserveraddr.sin_addr);
+    //inet_pton(AF_INET, ip, &controllerserveraddr.sin_addr);
 
     /* Bring up the client socket */
     controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -145,20 +145,20 @@ void setupControllerClient()
 
 void sendCommand(ControlStructure mesg)
 {
-    sendto(controllersockfd, &mesg, sizeof(mesg), 0, (SA *)&controllerserveraddr, sizeof(controllerserveraddr));
+    sendto(controllersockfd, (const char *) &mesg, sizeof(mesg), 0, (SA *)&controllerserveraddr, sizeof(controllerserveraddr));
 }
 
 int receiveCommand(ControlStructure *mesg)
 {
-    socklen_t len;
-    SA pcliaddr;
+    //socklen_t len;
+    //SA pcliaddr;
     struct sockaddr_in cliaddr;
 
-    socklen_t clilen=sizeof(cliaddr);
-    len = clilen;
+    //socklen_t clilen=sizeof(cliaddr);
+    //len = clilen;
     int n;
 
-    n = recvfrom(controllersockfd, mesg, sizeof(ControlStructure), 0, &pcliaddr, &len);
+    //n = recvfrom(controllersockfd, mesg, sizeof(ControlStructure), 0, &pcliaddr, &len);
 
     return n;
 }

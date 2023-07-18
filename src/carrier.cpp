@@ -1391,19 +1391,22 @@ int main(int argc, char** argv) {
 
     }
 
+    for (int i = 0; i < 10000000; i++) ;
 
-    controllers.push_back(&controller);
+
+    //controllers.push_back(&controller);
+    controllers.push_back(new Controller());
 
     if (peermode==SERVER)
     {
         controllers.push_back(new Controller());
-        setupControllerServer();
+        //setupControllerServer();
 
     }
 
     if (peermode == CLIENT)
     {
-        setupControllerClient();
+        //setupControllerClient();
     }
 
 

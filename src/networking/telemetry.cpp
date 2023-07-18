@@ -44,12 +44,12 @@ Connection addNewTelemetryListener(char ip[], int port)
     Connection connection;
 
     /* Clean up */
-    bzero(&connection.servaddr, sizeof(connection.servaddr));
+    //bzero(&connection.servaddr, sizeof(connection.servaddr));
 
     /* Initialize the client to connect to the server on local port 4500 */
     connection.servaddr.sin_family = AF_INET;
     connection.servaddr.sin_port = htons(port);
-    inet_pton(AF_INET, ip, &connection.servaddr.sin_addr);
+    //inet_pton(AF_INET, ip, &connection.servaddr.sin_addr);
 
     /* Bring up the client socket */
     connection.sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -93,7 +93,7 @@ void telemetryme(int number, int health, int power, float bearing, float *dBodyP
 
     for (size_t i=0; i<connections.size(); i++) {
         // @NOTE: The socket must be already connected at this point.
-        sendto(connections[i].sockfd, &logstructure, sizeof(logstructure), 0, (SA *)&connections[i].servaddr, sizeof(connections[i].servaddr));
+        sendto(connections[i].sockfd, (const char *)&logstructure, sizeof(logstructure), 0, (SA *)&connections[i].servaddr, sizeof(connections[i].servaddr));
     }
 
 }
