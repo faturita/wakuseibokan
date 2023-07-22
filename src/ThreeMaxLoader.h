@@ -35,7 +35,7 @@ typedef struct{
 }polygon_type;
 
 // The object type
-typedef struct {
+struct obj_type {
 	char name[20];
     
 	int vertices_qty=0;
@@ -44,14 +44,14 @@ typedef struct {
     vertex_type vertex[MAX_VERTICES]; 
     polygon_type polygon[MAX_POLYGONS];
 
-} obj_type, *obj_type_ptr;
+};
 
 
  int get_file_size(std::string filename) ;
 
  void draw3DSModel(obj_type object, float x, float y, float z, float scale);
 
- char Load3DS (obj_type_ptr p_object, char *p_filename);
+ char Load3DS (obj_type *p_object, char *p_filename);
 
  int draw3DSModel(char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal);
 

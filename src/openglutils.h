@@ -15,9 +15,9 @@
 #elif __APPLE__
 #define GL_SILENCE_DEPRECATION
 #include <GLUT/glut.h>
-#endif
-
+#elif _WIN32
 #include <GL/glut.h>
+#endif
 
 #include <vector>
 #include "math/vec3f.h"

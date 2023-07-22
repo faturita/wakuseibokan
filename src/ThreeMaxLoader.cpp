@@ -65,7 +65,7 @@ void draw3DSModel(obj_type object, float x, float y, float z, float scale)
     glPopMatrix();
 }
 
-char Load3DS (obj_type_ptr p_object, char *p_filename)
+char Load3DS (obj_type *p_object, char *p_filename)
 {
     int i; //Index variable
 
