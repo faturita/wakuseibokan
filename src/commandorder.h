@@ -16,6 +16,12 @@ enum class Command {
     FireOrder,
     LandOrder};
 
+
+enum TargetType {
+    Air_To_Air = 1,
+    Air_To_Ground = 2
+};
+
 struct commandparameters
 {
     int spawnid;
@@ -23,6 +29,7 @@ struct commandparameters
     float x;
     float y;
     float z;
+    TargetType target_type;
     bool bit;
     int weapon;
 };

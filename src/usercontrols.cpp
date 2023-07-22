@@ -744,6 +744,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 {
                     CommandOrder co;
                     co.command = Command::FireOrder;
+                    if (controller.weapon==1)
+                    {
+                        Vec3f target = Vec3f(controller.targetX, controller.targetY, controller.targetZ);
+
+                        if (target.magnitude()>0)
+                        {
+                            co.parameters.target_type = controller.target_type;
+                            co.parameters.x = target[0];
+                            co.parameters.y = target[1];
+                            co.parameters.z = target[2];
+                        }
+                    }
                     controller.push(co);
                 } else {
                     controller.controllingid = CONTROLLING_NONE;

@@ -9,7 +9,6 @@
 
 #define CONTROLLING_NONE (size_t)-1
 
-
 class Controller
 {
 private:
@@ -39,6 +38,9 @@ public:
     bool teletype=false;
 
     std::string str;
+
+    float targetX, targetY, targetZ;
+    TargetType target_type;
 
 
     void push(CommandOrder co)

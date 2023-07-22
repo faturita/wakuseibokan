@@ -403,6 +403,9 @@ void drawHUD()
             float closest = 10000.0f;
             float proj = 40.0f;
 
+            float closerOnTarget = closest;
+            int whichIsCloserOnTarget = -1;
+
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 Vehicle *v=entities[i];
@@ -433,7 +436,7 @@ void drawHUD()
                 }
                 if (v &&
                         ( (v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY))
-                        && v->getFaction()!=friendlyfaction)   // Fix this.
+                        && v->getFaction()!=friendlyfaction)   // @FIXME: Fix this.
                 {
                     Vec3f enemy = v->getPos() - meLoc;
                     if ((enemy).magnitude()<closest) {
@@ -458,7 +461,15 @@ void drawHUD()
                         if ((sc[1]<1 && sc[0]>0 && sc[0]<screen_width) &&
                             (sc[1]<1 && sc[2]>0 && sc[2]<screen_height) )
                         {
+                            float distance = (Vec3f(sc[0],0.0,sc[2]) - Vec3f(600.0,0,400.0)).magnitude();
 
+                            if (distance<closerOnTarget)
+                            {
+                                closerOnTarget = distance;
+                                whichIsCloserOnTarget = i;
+                            }
+
+                            // @FIXME: The screen size should not be fixed.
                             float x = 1200.0/screen_width * sc[0];
                             float y = 800.0/screen_height * sc[2] - 400.0;
                             //drawOverlyMark(x,y, 10,10);
@@ -467,6 +478,23 @@ void drawHUD()
                     }
                 }
             }
+
+            if (whichIsCloserOnTarget>=0)
+            {
+                if (entities[whichIsCloserOnTarget]->getType()==VehicleTypes::MANTA)
+                    controller.target_type = TargetType::Air_To_Air;
+                else
+                    controller.target_type = TargetType::Air_To_Ground;
+                controller.targetX = entities[whichIsCloserOnTarget]->getPos()[0];
+                controller.targetY = entities[whichIsCloserOnTarget]->getPos()[1];
+                controller.targetZ = entities[whichIsCloserOnTarget]->getPos()[2];
+            } else {
+                controller.targetX = 0;
+                controller.targetY = 0;
+                controller.targetZ = 0;
+            }
+
+
         }
 
         
@@ -991,25 +1019,24 @@ void inline processCommandOrders()
                     if (action != NULL)
                     {
                         actionid = entities.push_at_the_back(action, action->getGeom());
-
                     }
 
                     // @FIXME: At this point I need to notify the controller that the fire action was executed,
                     //   which can be used to switch to control a missile or to make a sound.
                     if (controllerindex == 0 && action != NULL && action->getType() == VehicleTypes::CONTROLABLEACTION)
                     {
+                        Vec3f target(co.parameters.x,co.parameters.y,co.parameters.z);
+                        //Vehicle *_b = findNearestEnemyVehicle(entities[ctroler->controllingid]->getFaction(),entities[ctroler->controllingid]->getPos(),10000.0);
+                        //Island *island = findNearestEnemyIsland(entities[ctroler->controllingid]->getPos(),false);
+                        //_b = findCommandCenter(island);
 
-                        Vehicle *_b = findNearestEnemyVehicle(entities[ctroler->controllingid]->getFaction(),entities[ctroler->controllingid]->getPos(),10000.0);
-                        Island *island = findNearestEnemyIsland(entities[ctroler->controllingid]->getPos(),false);
-                        _b = findCommandCenter(island);
-
-                        if (_b)
+                        //if (_b)
                         {
-                                action->goTo(_b->getPos());
+                                action->goTo(target);
                                 action->enableAuto();
 
                                 // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
-                                switchControl(actionid);
+                                //switchControl(actionid);
                         }
 
                     }
