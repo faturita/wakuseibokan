@@ -841,6 +841,7 @@ void inline processCommandOrders()
     for (size_t controllerindex = 0; controllerindex < controllers.size(); controllerindex++)
     {
         Controller *ctroler = controllers[controllerindex];
+        if (ctroler->controllingid < -1 || ctroler->controllingid > 800) ctroler->controllingid = 0;
         if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
         {
             CommandOrder co = ctroler->pop();
@@ -1391,11 +1392,8 @@ int main(int argc, char** argv) {
 
     }
 
-    for (int i = 0; i < 10000000; i++) ;
-
-
-    //controllers.push_back(&controller);
-    controllers.push_back(new Controller());
+    controllers.push_back(&controller);
+    //controllers.push_back(new Controller());
 
     if (peermode==SERVER)
     {

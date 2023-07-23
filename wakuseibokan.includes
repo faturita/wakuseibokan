@@ -9,6 +9,7 @@ src/units
 src/water
 .
 /usr/local/include
+/c/freeglut/include
 src/weapons
 src/tests
 src/networking
