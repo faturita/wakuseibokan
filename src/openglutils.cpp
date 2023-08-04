@@ -972,10 +972,10 @@ void drawLightning()
     
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientLight);
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseLight);
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, lightPos);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientLight);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseLight);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, lightPos);
     
     
 	//glTranslatef(0.0f+posx, 0.0f+posy, -20.0f+posz);

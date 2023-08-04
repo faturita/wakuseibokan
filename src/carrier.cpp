@@ -326,27 +326,6 @@ void drawHUD()
         // Center cross
         int cc = crossc;
 
-        /**
-        glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle-10, cc + Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle-2, cc + Camera.yAngle, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle+2, cc + Camera.yAngle, 0.0);
-        glVertex3f(uc+50+Camera.xAngle+10, cc + Camera.yAngle, 0);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle-2, 0);
-        glEnd();        
-
-        glBegin(GL_LINES);
-        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+10, 0.0);
-        glVertex3f(uc+50+Camera.xAngle, cc + Camera.yAngle+2, 0);
-        glEnd();**/
-
         drawCross(uc + Camera.xAngle,lc + Camera.yAngle);
 
         // Bearing arrow
@@ -404,7 +383,7 @@ void drawHUD()
             float proj = 40.0f;
 
             float closerOnTarget = closest;
-            int whichIsCloserOnTarget = -1;
+            int whichIsCloserOnTarget = -1; float whichX=0, whichY=0;
 
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
@@ -461,19 +440,23 @@ void drawHUD()
                         if ((sc[1]<1 && sc[0]>0 && sc[0]<screen_width) &&
                             (sc[1]<1 && sc[2]>0 && sc[2]<screen_height) )
                         {
-                            float distance = (Vec3f(sc[0],0.0,sc[2]) - Vec3f(600.0,0,400.0)).magnitude();
-
-                            if (distance<closerOnTarget)
-                            {
-                                closerOnTarget = distance;
-                                whichIsCloserOnTarget = i;
-                            }
 
                             // @FIXME: The screen size should not be fixed.
                             float x = 1200.0/screen_width * sc[0];
                             float y = 800.0/screen_height * sc[2] - 400.0;
                             //drawOverlyMark(x,y, 10,10);
                             drawCross(x,y);
+
+                            float distance = (Vec3f(x,0.0,y) - Vec3f(uc + Camera.xAngle,0,lc + Camera.yAngle)).magnitude();
+
+
+                            if (distance<closerOnTarget)
+                            {
+                                closerOnTarget = distance;
+                                whichIsCloserOnTarget = i;
+                                whichX = x;
+                                whichY = y;
+                            }
                         }
                     }
                 }
@@ -488,6 +471,7 @@ void drawHUD()
                 controller.targetX = entities[whichIsCloserOnTarget]->getPos()[0];
                 controller.targetY = entities[whichIsCloserOnTarget]->getPos()[1];
                 controller.targetZ = entities[whichIsCloserOnTarget]->getPos()[2];
+                drawOverlyMark(whichX,whichY, 10,10);
             } else {
                 controller.targetX = 0;
                 controller.targetY = 0;
@@ -866,6 +850,8 @@ void replayupdate(int value)
     glutTimerFunc(20, worldStep, 0);
 }
 
+// Go through all the controllers and check if there are pending orders that have not been processed
+// and executes them on the entity model.  This runs only on the SERVER.
 void inline processCommandOrders()
 {
     for (size_t controllerindex = 0; controllerindex < controllers.size(); controllerindex++)
@@ -1090,7 +1076,7 @@ void update(int value)
 
         if (n!=-1)
         {
-            // @FIXME: I need to go through all the registered users and get the informaiton from their controllers.
+            // @FIXME: I need to go through all the registered users and get the information from their controllers.
             controllers[1]->controllingid = mesg.controllingid;
             controllers[1]->faction = mesg.faction;
             controllers[1]->registers = mesg.registers;
@@ -1135,7 +1121,7 @@ void update(int value)
 
 
         //CLog::Write(CLog::Debug,"Elements alive now: %d\n", vehicles.size());
-        // As the sync problem only arises when you delete something, there's no problem here.
+        // As the race condition problem only arises when you delete something, there's no problem here.
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
             if (!entities.isValid(i))
@@ -1344,11 +1330,11 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-aiplayerboth"))
         aiplayer = BOTH_AI;
 
-    controller.controllingid = 0;
+    controller.controllingid = 1;
 
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 3;}
+        {controller.faction = BLUE_FACTION;controller.controllingid = 2;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
         controller.faction = GREEN_FACTION;
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))

@@ -158,6 +158,14 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
     const int N = 10;
     dContact contact[N];
+
+    // @NOTE Uncomment me if you have OUT OF MEMORY problems with ODE's heightmaps.
+    //Vehicle *k = gVehicle(o1);
+    //Vehicle *l = gVehicle(o2);
+
+    //if (k) dout << "Vehicle1:" << k->getName() << std::endl;
+    //if (l) dout << "Vehicle2:" << l->getName() << std::endl;
+
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
     if (n > 0) {
         for (i=0; i<n; i++) {

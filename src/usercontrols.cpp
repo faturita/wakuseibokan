@@ -1,9 +1,23 @@
-/*
- * usercontrols.cpp
- *
- *  Created on: Dec 12, 2011
- *      Author: faturita
- */
+/* ============================================================================
+**
+** User Controls - Wakuseiboukan - 22/12/2011
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -72,7 +86,7 @@ enum COMMAND_MODES {ATTACK_MODE, DESTINATION_MODE};
 int commandmode=DESTINATION_MODE;
 
 
-static int controlmap[] = {0,1,2,3,4,5,6,7,8};
+static int controlmap[] = {1,2,3,4,5,6,7,8,9};
 
 
 void processMouseEntry(int state) {
@@ -671,7 +685,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '1':case '2':case '3': case '4': case '5':case '6':case '7':case '8':case '9':
         {
             size_t index = CONTROLLING_NONE;
-            index = controlmap[(int)(key-48)-1];
+            index = (size_t)controlmap[(int)(key-48)-1];        // @NOTE: Verify if the conversion works.
 
             switchControl(index);
         }

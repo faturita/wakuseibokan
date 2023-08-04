@@ -7,7 +7,7 @@
 
 #include "commandorder.h"
 
-#define CONTROLLING_NONE (size_t)-1
+#define CONTROLLING_NONE (size_t)0
 
 class Controller
 {
