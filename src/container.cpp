@@ -9,7 +9,7 @@ template<class T> container<T>::container()
 {
     e_size = 0;
 
-    for(int i=0;i<MAX;i++)
+    for(int i=MIN;i<MAX;i++)
         elem[i]= NULL;
 
 }
@@ -23,12 +23,16 @@ template<class T> bool container<T>::isSafe()
 template<class T> void container<T>::lock()
 {
     printf("<<");
+#ifndef _WIN32
     mlock.lock();
+#endif
 }
 
 template<class T> void container<T>::unlock()
 {
+#ifndef _WIN32
     mlock.unlock();
+#endif
     printf(">>");
 }
 
@@ -45,7 +49,7 @@ template<class T> void container<T>::unlockme()
 
 template<class T> size_t container<T>::push_back(T value, dGeomID geom)
 {
-    return push_back(0,value,geom);
+    return push_back(MIN,value,geom);
 }
 
 template<class T> size_t container<T>::push_at_the_back(T value, dGeomID geom)
@@ -62,7 +66,7 @@ template<class T> size_t container<T>::push_back(size_t initialregion, T value, 
 
 template<class T> size_t container<T>::push_back(T value)
 {
-    return push_back(0, value);
+    return push_back(MIN, value);
 }
 
 template<class T> size_t container<T>::push_back(size_t initialregion, T value)
@@ -87,7 +91,7 @@ template<class T> size_t container<T>::push_back(size_t initialregion, T value)
 template<class T> T container<T>::operator[](size_t index)
 {
     T t;
-    if (index>MAX)
+    if (index<MIN || index>MAX)
         assert(!"This should not happen");
     if (elem[index] == NULL)
         assert(!"Pointer is null");
@@ -122,9 +126,9 @@ template<class T> T container<T>::find(dGeomID geom)
 
 template <class T> size_t container<T>::indexAt(int position)
 {
-    size_t i=0;
+    size_t i=MIN;
     int count=0;
-    for(i=0;i<MAX;i++)
+    for(i=MIN;i<MAX;i++)
     {
         if (elem[i] != NULL)
             count++;
@@ -138,9 +142,9 @@ template <class T> size_t container<T>::indexAt(int position)
 
 template <class T> int container<T>::indexOf(size_t element)
 {
-    size_t i=0;
+    size_t i=MIN;
     int count=0;
-    for(i=0;i<MAX;i++)
+    for(i=MIN;i<MAX;i++)
     {
         if (elem[i] != NULL)
             count++;
@@ -154,9 +158,9 @@ template <class T> int container<T>::indexOf(size_t element)
 
 template<class T> size_t container<T>::size()
 {
-    size_t i=0;
+    size_t i=MIN;
     size_t count=0;
-    for(i=0;i<MAX;i++)
+    for(i=MIN;i<MAX;i++)
     {
         if (elem[i] != NULL)
             count++;
@@ -168,12 +172,15 @@ template<class T> void container<T>::prune()
 {
     assert(!"Deprecated!");
 
-    for(int i=0;i<prunning.size();i++)
+    for(int i=MIN;i<prunning.size();i++)
         delete prunning[i];
 }
 
 template<class T> bool container<T>::isValid(size_t index)
 {
+    // @NOTE: Allow zero because I want to return FALSE for it.
+    assert( index>=0 && index <MAX || !"Accessing an entity which is out of the valid range.");
+
     return (elem[index] != NULL);
 }
 
@@ -181,7 +188,7 @@ template<class T> bool container<T>::isValid(size_t index)
 template<class T> bool container<T>::hasMore(size_t index)
 {
     size_t i=index;
-    while ( (i>=0 && i<MAX) && elem[i] == NULL)
+    while ( (i>=MIN && i<MAX) && elem[i] == NULL)
     {
         i++;
     }
@@ -198,15 +205,15 @@ template<class T> bool container<T>::hasMore(size_t index)
 
 template<class T> size_t container<T>::first()
 {
-    size_t i=0;
-    while ( (i>=0 && i<MAX) && elem[i] == NULL) i++;
+    size_t i=MIN;
+    while ( (i>=MIN && i<MAX) && elem[i] == NULL) i++;
     return i;
 }
 
 template<class T> size_t container<T>::next(size_t index)
 {
     size_t i=index+1;
-    while ( (i>=0 && i<MAX) && elem[i] == NULL) i++;
+    while ( (i>=MIN && i<MAX) && elem[i] == NULL) i++;
 
     return i;
 

@@ -4,6 +4,9 @@
 
 // In Mac Sierra, if you change this 10000 value to something different, the mutex from bellow does not work and generates a core dump :O
 #define MAX 10000
+#define MIN 1
+
+// 0 is out of range value.
 
 #include <cassert>
 #include <vector>
@@ -12,14 +15,20 @@
 
 #include "ode/common.h"
 
+#ifndef _WIN32
 #define synchronized(m) \
     for(std::unique_lock<std::recursive_mutex> lk(m); lk; lk.unlock())
+#else
+#define synchronized(m) printf("");
+#endif
 
 template <class T> class container
 {
 protected:
     //std::vector<T> elements;
+#ifndef _WIN32
     std::mutex mlock;
+#endif
 
     std::unordered_map<dGeomID, size_t> geomidmap;
 
@@ -42,7 +51,9 @@ public:
      * Use with the synchronized macro to restrict access to a block.
      * @brief m_mutex
      */
+#ifndef _WIN32
     std::recursive_mutex m_mutex;
+#endif
     container();
 
     /**
@@ -53,6 +64,16 @@ public:
      * @return
      */
     size_t push_back(T value,dGeomID);
+
+    /**
+     * Add a new entity to the list, but closer to the end of the vector (avoid going through all the values to see
+     * which one is empty).
+     *
+     * @brief push_at_the_back
+     * @param value
+     * @param geom
+     * @return
+     */
     size_t push_at_the_back(T value, dGeomID geom);
 
     /**

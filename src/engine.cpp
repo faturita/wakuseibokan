@@ -568,6 +568,7 @@ void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
         b1->expand(10,10,10,2,world, space);
 
         Gunshot *g = (Gunshot*)v;
+        v->damage(10000);
         g->setVisible(false);
 
         dBodyDisable(v->getBodyID());
@@ -594,6 +595,7 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
         b1->expand(10,10,10,2,world, space);
 
         Gunshot *g = (Gunshot*)v;
+        v->damage(10000);
         g->setVisible(false);
 
         dBodyDisable(v->getBodyID());
@@ -1465,7 +1467,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                         Vec3f firingloc = lb->getPos();
 
-                        dout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
+                        //dout << lb <<  ":Loc: " << firingloc << " Target: " << b->getPos() << std::endl;
 
                         lb->elevation = -5; // A little bit up.
                         lb->azimuth = getAzimuth((b->getPos())-(firingloc));
@@ -1476,7 +1478,9 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         //lb->setControlRegisters(c);
                         lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
 
-                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        //dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+
+                        //dout << "Target type:" << target->getType() << " vs " << MANTA << std::endl;
 
                         if (target->getType() == MANTA || target->getType() == WALRUS)
                         {
@@ -1484,7 +1488,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         } else if (target->getType() == COMMANDCENTER)   {
                             // @FIXME:  There should be a list of matching targets.
                             lb->ground();
-                        } else {
+                        } else if (target->getType() == WALRUS || target->getType() == CARRIER) {
                             lb->water();
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(0,world,space);
