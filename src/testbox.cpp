@@ -39,6 +39,7 @@
 #include "math/yamathutil.h"
 
 #include "container.h"
+#include "profiling.h"
 
 #include "usercontrols.h"
 #include "camera.h"
@@ -501,7 +502,7 @@ void checktest2(unsigned long timer)
 {
     if (timer==320)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 0.0f/(10.0);
@@ -512,7 +513,7 @@ void checktest2(unsigned long timer)
     }
     if (timer==1600)
     {
-        Vehicle *_b = entities[1];
+        Vehicle *_b = entities[2];
         Vec3f val = _b->getPos();
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
@@ -547,7 +548,7 @@ void test6()
     Vec3f pos(0.0f,10.0f,-4400.0f);
     Camera.setPos(pos);
 
-    Balaenidae *b = (Balaenidae*)entities[0];
+    Balaenidae *b = (Balaenidae*)entities[1];
 
     b->setPos(0.0f,20.5f,-3000.0f);
 
@@ -584,7 +585,7 @@ void checktest8(unsigned long  timer)      // Check Walrus entering and leaving 
 
     if (timer>100)
     {
-        Walrus *_walrus = (Walrus*)entities[1];
+        Walrus *_walrus = (Walrus*)entities[2];
 
         if (_walrus->getIsland() != NULL)
         {
@@ -605,7 +606,7 @@ void checktest8(unsigned long  timer)      // Check Walrus entering and leaving 
 
     if (timer>=4000)
     {
-        Walrus *_walrus = (Walrus*)entities[1];
+        Walrus *_walrus = (Walrus*)entities[2];
 
         if (!isWalrusInIsland)
         {
@@ -653,13 +654,13 @@ void checktest15(unsigned long timer)
     if (timer == 100)
     {
         size_t idx = 0;
-        spawnManta(space,world,entities[0],idx);
+        spawnManta(space,world,entities[1],idx);
     }
 
     if (timer == 320)
     {
         // launch
-        launchManta(entities[0]);
+        launchManta(entities[1]);
     }
 
 
@@ -750,7 +751,7 @@ void checktest1(unsigned long timer)
 {
     if (timer>500)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
         Vec3f val = _b->getPos()-Vec3f(0.0f,20.5f,-4000.0f);
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
@@ -799,7 +800,7 @@ void checktest3(unsigned long timer)
 
     if (timer==90)  // Slow down Manta so that it can hit the structure.
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
@@ -809,7 +810,7 @@ void checktest3(unsigned long timer)
     }
     if (timer==1000)   // In case it hit the structure, their health will be lower.
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
 
         if (_manta1->getHealth()==1000)
         {
@@ -835,7 +836,7 @@ void checktest4(unsigned long  timer)
 {
     if (timer==100)   // Slow down Manta so that it can land on the runway
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
@@ -846,7 +847,7 @@ void checktest4(unsigned long  timer)
     }
     if (timer==1000)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
 
         if (_manta1->getStatus()!=FlyingStatus::LANDED)
         {
@@ -866,7 +867,7 @@ void checktest5(unsigned long  timer)   // Manta lands on carrier.
 {
     if (timer==70)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
@@ -877,7 +878,7 @@ void checktest5(unsigned long  timer)   // Manta lands on carrier.
     }
     if (timer==240)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 0.0f/(10.0);
@@ -889,7 +890,7 @@ void checktest5(unsigned long  timer)   // Manta lands on carrier.
     }
     if (timer==1000)
     {
-        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[1];
+        SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
 
         if (_manta1->getStatus()!=FlyingStatus::ON_DECK)
         {
@@ -911,7 +912,7 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
 
     if (timer==100)  // This is not autopilot.  If you control de carrier, you will override the controlregister parameters.
     {
-        Balaenidae *b = (Balaenidae*)entities[0];
+        Balaenidae *b = (Balaenidae*)entities[1];
         struct controlregister c;
         memset(&c,0,sizeof(struct controlregister));
         c.thrust = 10000.0f;
@@ -923,7 +924,7 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
     }
     if (timer >100 )
     {
-        Balaenidae *b = (Balaenidae*)entities[0];
+        Balaenidae *b = (Balaenidae*)entities[1];
 
         if (b->getStatus()==Balaenidae::OFFSHORING)
         {
@@ -932,9 +933,9 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
     }
     if (timer==3800)
     {
-        Balaenidae *b = (Balaenidae*)entities[0];
+        Balaenidae *b = (Balaenidae*)entities[1];
 
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
         Vec3f val = _b->getPos();
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
@@ -1031,7 +1032,7 @@ void checktest9(unsigned long timer)     // Check walrus stability.
 {
     if (timer>500)
     {
-        Vehicle *_b = entities[1];
+        Vehicle *_b = entities[2];
         Vec3f posVector = _b->getPos()-Vec3f(200.0f,1.32f,-6000.0f);
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
@@ -1083,7 +1084,7 @@ void test10()
 void checktest10(unsigned long timer)     // Check Walrus arriving to an island and creating the command center.
 {
     static unsigned long timerstep = 0;
-    Walrus *_walrus = (Walrus*)entities[1];
+    Walrus *_walrus = (Walrus*)entities[2];
 
     static int stateMachine = 0;
 
@@ -1186,7 +1187,7 @@ void checktest11(unsigned long timer)     // Check Carrier stability.
 {
     if (timer>1500)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
         Vec3f val = _b->getPos()-Vec3f(-400 kmf,20.5f,-400 kmf);
 
         dReal *v = (dReal *)dBodyGetLinearVel(_b->getBodyID());
@@ -1241,7 +1242,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
 {
     if (timer==100)
     {
-        LaserTurret *l=(LaserTurret*)entities[1];
+        LaserTurret *l=(LaserTurret*)entities[2];
         l->enableAuto();
         l->elevation = 0.3f; // Pushing down the turret.
         struct controlregister c;
@@ -1256,7 +1257,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
         //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
         //dGeomSetRotation (ray,R);
 
-        LaserTurret *l=(LaserTurret*)entities[1];
+        LaserTurret *l=(LaserTurret*)entities[2];
         Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
@@ -1271,7 +1272,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
 
     if (timer == 700)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1308,7 +1309,7 @@ void checktest12(unsigned long timer)
 {
     if (timer==100)
     {
-        Turret *l=(Turret*)entities[1];
+        Turret *l=(Turret*)entities[2];
         l->enableAuto();
         l->elevation = 0.12f; // Pushing down the turret.
         l->azimuth = 159.0f;   // Moving around the turret.
@@ -1327,7 +1328,7 @@ void checktest12(unsigned long timer)
         //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
         //dGeomSetRotation (ray,R);
 
-        LaserTurret *l=(LaserTurret*)entities[1];
+        LaserTurret *l=(LaserTurret*)entities[2];
         Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
@@ -1342,7 +1343,7 @@ void checktest12(unsigned long timer)
 
     if (timer == 700)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1382,20 +1383,20 @@ void checktest14(unsigned long timer)
     if (timer == 100)
     {
         size_t idx = 0;
-        Manta *m = spawnManta(space,world,entities[0],idx);
+        Manta *m = spawnManta(space,world,entities[1],idx);
         m->setSignal(4);
     }
 
     if (timer == 320)
     {
         // launch
-        launchManta(entities[0]);
+        launchManta(entities[1]);
     }
 
 
     if (timer == 420)
     {
-        Vehicle *_b = entities[3];
+        Vehicle *_b = entities[4];
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
         _manta1->inert = false;
         _manta1->setStatus(FlyingStatus::FLYING);
@@ -1411,7 +1412,7 @@ void checktest14(unsigned long timer)
     if (timer > 501)
     {
         // Auto control
-        Vehicle *_b = entities[3];
+        Vehicle *_b = entities[4];
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)_b;
 
         Vec3f Po = _manta1->getPos();
@@ -1484,7 +1485,7 @@ void checktest14(unsigned long timer)
         } else
         {
             printf("Manta arrived to destination...\n");
-            SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[3];
+            SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[4];
             _manta1->elevator = 35;
             struct controlregister c;
             c.thrust = 300.0f/(10.0);
@@ -1550,7 +1551,7 @@ void checktest16(unsigned long timer)
 {
     if (timer==100)
     {
-        Turret *l=(Turret*)entities[1];
+        Turret *l=(Turret*)entities[2];
         l->enableAuto();
         l->elevation = 0.23f; // Pushing down the turret.
         l->azimuth = 90.0f;   // Moving around the turret.
@@ -1569,7 +1570,7 @@ void checktest16(unsigned long timer)
         //dRFromAxisAndAngle (R,0.0f,1.0f,0.0f,-90.0f);
         //dGeomSetRotation (ray,R);
 
-        LaserTurret *l=(LaserTurret*)entities[1];
+        LaserTurret *l=(LaserTurret*)entities[2];
         Vehicle *action = (l)->fire(0,world,space);
         //int *idx = new int();
         //*idx = vehicles.push_back(action);
@@ -1584,7 +1585,7 @@ void checktest16(unsigned long timer)
 
     if (timer == 700)
     {
-        LaserTurret *_b = (LaserTurret*)entities[2];
+        LaserTurret *_b = (LaserTurret*)entities[3];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1603,9 +1604,9 @@ void checktest16(unsigned long timer)
 
 void checktest17(unsigned long timer)
 {
-    Turret *l=(Turret*)entities[1];
+    Turret *l=(Turret*)entities[2];
 
-    Vehicle *_b = entities[0];
+    Vehicle *_b = entities[1];
 
 
     // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
@@ -1667,7 +1668,7 @@ void checktest17(unsigned long timer)
 
     if (timer == 900)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1688,9 +1689,9 @@ void checktest17(unsigned long timer)
 
 void checktest18(unsigned long timer)
 {
-    Turret *l=(Turret*)entities[2];
+    Turret *l=(Turret*)entities[3];
 
-    Vehicle *_b = entities[0];
+    Vehicle *_b = entities[1];
 
 
     // Find the vector between them, and the parameters for the turret to hit the carrier, regardless of its random position.
@@ -1721,7 +1722,7 @@ void checktest18(unsigned long timer)
         // @NOTE The real test should be performed controlling the parameters to control the turret instead of the internal parameters of the turret.
         // I mean, this is not a real turret that should have mass and inertia.  This is straightforward aiming.
         l->enableAuto();
-        l->elevation = incl;
+        l->elevation = incl+10*PI/180.0;
         l->azimuth = azimuth;
         struct controlregister c;
         c.pitch = 0.0;
@@ -1752,7 +1753,7 @@ void checktest18(unsigned long timer)
 
     if (timer == 900)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1772,12 +1773,12 @@ void checktest18(unsigned long timer)
 
 void checktest19(unsigned long timer)
 {
-    Turret *l1=(Turret*)entities[1];
-    Turret *l2=(Turret*)entities[2];
+    Turret *l1=(Turret*)entities[2];
+    Turret *l2=(Turret*)entities[3];
 
     Vehicle *b=NULL;
-    if (entities.hasMore(0))
-        b = entities[0];
+    if (entities.isValid(1))
+        b = entities[1];
     else
     {
         printf("Test passed OK!\n");
@@ -1840,7 +1841,7 @@ void checktest19(unsigned long timer)
 
     if (timer == 3000)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1882,12 +1883,12 @@ void test20()
 
 void checktest20(unsigned long timer)
 {
-    Turret *l1=(Turret*)entities[1];
-    Turret *l2=(Turret*)entities[2];
+    Turret *l1=(Turret*)entities[2];
+    Turret *l2=(Turret*)entities[3];
 
     Vehicle *b=NULL;
-    if (entities.isValid(0))
-        b = entities[0];
+    if (entities.isValid(1))
+        b = entities[1];
     else
     {
         printf("Test passed OK!\n");
@@ -1950,7 +1951,7 @@ void checktest20(unsigned long timer)
 
     if (timer == 3000)
     {
-        Vehicle *_b = entities[0];
+        Vehicle *_b = entities[1];
 
         if (_b->getHealth() == 1000.0f)
         {
@@ -1970,9 +1971,9 @@ void checktest20(unsigned long timer)
 void test21()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
-    nemesis->setName("Nemesis");
+    nemesis->setName("Thermopilae");
     nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
-    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
 
@@ -1984,7 +1985,7 @@ void test21()
 
     entities.push_back(_b, _b->getGeom());
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,0,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    -1600.0f,0,world);
 
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -2075,16 +2076,13 @@ void checktest22(unsigned long timer)
     azimuth2 = getAzimuth((b->getPos())-(l2->getPos()));
     inclination2 = getDeclination((b->getPos())-(l2->getPos()));
 
+
     printf ("Incl:%10.5f    Bg: %10.5f\n", inclination2, azimuth2);
 
     if (timer>600 && (timer % 54 == 0))
     {
-        l2->enableAuto();
-        l2->elevation = inclination2;
-        l2->azimuth = azimuth2;
-        struct controlregister c;
-        c.pitch = 0.0;
-        l2->setControlRegisters(c);
+        Vec3f firingloc = l2->getFiringPort();
+        l2->setForward((b->getPos())-(firingloc));
 
 
         Vehicle *action = (l2)->fire(0,world,space);
@@ -2136,7 +2134,7 @@ void checktest23(unsigned long timer)
 {
     Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
     Walrus *b = findWalrus(GREEN_FACTION);
-    //BoxVehicle *b = (BoxVehicle*)entities[2];
+    //BoxVehicle *b = (BoxVehicle*)entities[3];
 
     if (!b)
     {
@@ -2218,7 +2216,7 @@ void test24()
 void checktest24(unsigned long timer)
 {
     Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
-    BoxVehicle *b = (BoxVehicle*)entities[2];
+    BoxVehicle *b = (BoxVehicle*)entities[3];
 
     static Vec3f *p = NULL;
 
@@ -2236,15 +2234,7 @@ void checktest24(unsigned long timer)
 
     elevation = getDeclination((b->getPos())-(firingloc));
     azimuth = getAzimuth((b->getPos())-(firingloc));
-    //l2->setForward((b->getPos())-(firingloc));
-
-    l2->elevation = elevation;
-    l2->azimuth = azimuth;
-
-    struct controlregister c;
-    c.pitch = 0.0;
-    c.roll = 0.0;
-    l2->setControlRegisters(c);
+    l2->setForward((b->getPos())-(firingloc));
 
     std::cout << "Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
 
@@ -2303,7 +2293,7 @@ void test25()
 
 void checktest25(unsigned long timer)
 {
-    Balaenidae *b = (Balaenidae*)entities[0];
+    Balaenidae *b = (Balaenidae*)entities[1];
 
     std::cout << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
 
@@ -2317,7 +2307,7 @@ void checktest25(unsigned long timer)
         b->stop();
         b->setControlRegisters(c);
         b->setThrottle(1000.0f);
-        //b->enableAuto();
+        b->enableAuto();
     }
     if (timer % 300 == 0)
     {
@@ -2325,7 +2315,8 @@ void checktest25(unsigned long timer)
         w->setSignal(4);
     }
 
-    if (timer > 200 && entities.size()>30)
+    // @NOTE: Remember that Walruses now have wheels, so you need more entities.
+    if (timer > 200 && entities.size()>19*5)
     {
         if (fps>20.0)
         {
@@ -2539,11 +2530,13 @@ void test27()
 
     Vec3f pos(0.0f,10.0f,-4400.0f);
     Camera.setPos(pos);
+
+    controller.controllingid = CONTROLLING_NONE;
 }
 
 void checktest27(unsigned long timer)
 {
-    Balaenidae *b = (Balaenidae*)entities[0];
+    Balaenidae *b = (Balaenidae*)entities[1];
 
     if (timer==100)  // This is not autopilot.  If you control the carrier, you will override the controlregister parameters (it wont move).
     {
@@ -2635,6 +2628,8 @@ void test28()
     Camera.xAngle = 90;
     Camera.yAngle = 0;
 
+    controller.controllingid = CONTROLLING_NONE;
+
 
 }
 
@@ -2666,10 +2661,10 @@ void checktest28(unsigned long timer)
         }
     }
 
-    if (timer == 5000)
+    if (timer == 1200)
     {
-        Balaenidae *b = (Balaenidae*)entities[0];
-        if (b->getHealth()<1000)
+
+        if (!entities.isValid(1) || entities[1]->getHealth()<1000)
         {
             printf("Test passed OK!\n");
             endWorldModelling();
@@ -2679,6 +2674,7 @@ void checktest28(unsigned long timer)
             endWorldModelling();
             exit(0);
         }
+
     }
 
 }
@@ -2873,7 +2869,7 @@ void test30()
 void checktest30(unsigned long timer)
 {
     LaserTurret *l2=(LaserTurret*)entities[islands[0]->getStructures()[0]]; // Risky
-    BoxVehicle *b = (BoxVehicle*)entities[2];
+    BoxVehicle *b = (BoxVehicle*)entities[3];
 
     static Vec3f *p = NULL;
 
@@ -4289,13 +4285,13 @@ void checktest45(unsigned long timer)
     if (timer == starttime + 100)
     {
         size_t idx=0;
-        spawnManta(space,world,entities[0],idx);
+        spawnManta(space,world,entities[1],idx);
     }
 
     if (timer == starttime + 320)
     {
         // launch
-        m = launchManta(entities[0]);
+        m = launchManta(entities[1]);
     }
 
     if (timer == starttime + 600)
@@ -4633,13 +4629,13 @@ void checktest46(unsigned long timer)
     if (timer == starttime + 100)
     {
         size_t idx=0;
-        spawnManta(space,world,entities[0],idx);
+        spawnManta(space,world,entities[1],idx);
     }
 
     if (timer == starttime + 320)
     {
         // launch
-        launchManta(entities[0]);
+        launchManta(entities[1]);
     }
 
 
@@ -5468,13 +5464,13 @@ void checktest56(unsigned long timer)
     if (timer == 100)
     {
         size_t idx = 0;
-        spawnManta(space,world,entities[0],idx);
+        spawnManta(space,world,entities[1],idx);
     }
 
     if (timer == 320)
     {
         // launch
-        launchManta(entities[0]);
+        launchManta(entities[1]);
     }
 
 
@@ -6855,13 +6851,13 @@ void checktest71(unsigned long timer)
     if (step == 0 && timer == starttime + 100)
     {
         size_t idx = 0;
-        spawnManta(space,world,entities[0],idx);
+        spawnManta(space,world,entities[1],idx);
     }
 
     if (step==0 && timer == starttime + 320)
     {
         // launch
-        launchManta(entities[0]);
+        launchManta(entities[1]);
     }
 
 
@@ -7038,7 +7034,7 @@ void checktest73(unsigned long timer)
     if (timer == 100)
     {
         Vehicle *b = findCarrier(GREEN_FACTION);
-        Torpedo *t = (Torpedo*) entities[0];
+        Torpedo *t = (Torpedo*) entities[1];
 
         t->goTo(b->getPos());
         t->enableAuto();
@@ -7122,7 +7118,7 @@ void checktest74(unsigned long timer)
 
         if (entities.isValid(0))
         {
-            Torpedo *t = (Torpedo*) entities[0];
+            Torpedo *t = (Torpedo*) entities[1];
 
             t->goTo(b->getPos());
             t->enableAuto();
@@ -7136,7 +7132,7 @@ void checktest74(unsigned long timer)
         if (b)
             if (entities.isValid(0))
             {
-                Torpedo *t = (Torpedo*) entities[0];
+                Torpedo *t = (Torpedo*) entities[1];
 
                 t->goTo(b->getPos());
                 t->enableAuto();

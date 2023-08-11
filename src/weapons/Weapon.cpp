@@ -256,5 +256,9 @@ void  Weapon::drawModel(float yRot, float xRot, float x, float y, float z)
       //  boxangle = 0.0f;
 }
 
+Vec3f Weapon::getForward()
+{
+    return forward;
+}
 
 

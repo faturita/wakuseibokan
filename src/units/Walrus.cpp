@@ -291,12 +291,16 @@ void Walrus::doControlDestination()
             c.registers.thrust = 20.0f;
         }
 
+        float closest=0;
         BoxIsland *b = findNearestIsland(Po);
-        float closest = (b->getPos() - Po).magnitude();
-        if (closest > 1600 && closest < 2200)
+        if (b)
         {
-            c.registers.thrust = 15.0f;
+            closest = (b->getPos() - Po).magnitude();
+            if (closest > 1600 && closest < 2200)
+            {
+                c.registers.thrust = 15.0f;
 
+            }
         }
 
         if (island != NULL)

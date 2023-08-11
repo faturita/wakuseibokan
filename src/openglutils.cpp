@@ -525,7 +525,7 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glBegin(GL_QUADS);
 
     //Top face
-    glColor3f(1.0f, 1.0f, 0.0f);
+    //glColor3f(1.0f, 1.0f, 0.0f);
     glNormal3f(0.0, 0.0f, 1.0f);
     glVertex3f(-x, -y, z);
     glVertex3f(x, -y,  z);
@@ -533,7 +533,7 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glVertex3f(-x, y, z);
 
     //Bottom face
-    glColor3f(1.0f, 0.0f, 1.0f);
+    //glColor3f(1.0f, 0.0f, 1.0f);
     glNormal3f(0.0, -1.0f, 0.0f);
     glVertex3f(-x, -y, -z);
     glVertex3f(x, -y, - z);
@@ -541,20 +541,20 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glVertex3f(-x, -y, z);
 
     //Left face
-    glNormal3f(-1.0, 0.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 1.0f);
+    //glNormal3f(-1.0, 0.0f, 0.0f);
+    //glColor3f(0.0f, 1.0f, 1.0f);
     glVertex3f(-x, -y, -z);
     glVertex3f(- x, - y, z);
-    glColor3f(0.0f, 0.0f, 1.0f);
+    //glColor3f(0.0f, 0.0f, 1.0f);
     glVertex3f(-x, y, z);
     glVertex3f(-x, y, -z);
 
     //Right face
     glNormal3f(1.0, 0.0f, 0.0f);
-    glColor3f(1.0f, 0.0f, 0.0f);
+    //glColor3f(1.0f, 0.0f, 0.0f);
     glVertex3f(x, -y, -z);
     glVertex3f(x, y, -z);
-    glColor3f(0.0f, 1.0f, 0.0f);
+    //glColor3f(0.0f, 1.0f, 0.0f);
     glVertex3f(x, y, z);
     glVertex3f(x, -y, z);
 
@@ -564,11 +564,11 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glBindTexture(GL_TEXTURE_2D, _textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    //glColor3f(1.0f, 1.0f, 1.0f);
 
     glBegin(GL_QUADS);
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    //glColor3f(1.0f, 1.0f, 1.0f);
     glNormal3f(0.0, 1.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, y, -z);
@@ -741,6 +741,33 @@ void initTextures()
     textures["solar"] = _texture;
     delete image;
 
+    image = loadBMP("terrain/sun.bmp");
+    _texture = loadTexture(image);
+    textures["sun"] = _texture;
+    delete image;
+
+
+    image = loadBMP("terrain/moon.bmp");
+    _texture = loadTexture(image);
+    textures["moon"] = _texture;
+    delete image;
+
+
+    image = loadBMP("terrain/venus.bmp");
+    _texture = loadTexture(image);
+    textures["venus"] = _texture;
+    delete image;
+
+    image = loadBMP("terrain/stars.bmp");
+    _texture = loadTexture(image);
+    textures["stars"] = _texture;
+    delete image;
+
+    image = loadBMP("terrain/theclouds.bmp");
+    _texture = loadTexture(image);
+    textures["clouds"] = _texture;
+    delete image;
+
 }
 
 
@@ -853,6 +880,7 @@ void drawSky (float posX, float posY, float posZ)
     glTexCoord2f (x+offset_h,-x+offset_v);
     glVertex3f (ssize+view_xyz[0],-ssize+view_xyz[1],z);
     glEnd();
+
 
 
 //    const float BOX_SIZE = 0.3f; //The length of each side of the cube

@@ -222,7 +222,7 @@ public:
     void setVelocity(float vx,float vy, float vz);
 	void setForward(float x, float y, float z);
     void setForward(Vec3f);
-	Vec3f getForward();
+    Vec3f virtual getForward();
 
     dSpaceID myspace();
 

@@ -252,7 +252,7 @@ void drawHUD()
     if (messages.size()>0)
     {
         int msgonboard=0;
-        for(int i=0;i<messages.size();i++)
+        for(size_t i=0;i<messages.size();i++)
         {
             if (messages[i].faction == controller.faction || messages[i].faction == BOTH_FACTION || controller.faction == BOTH_FACTION)
             {
@@ -279,8 +279,7 @@ void drawHUD()
 
     f = (Camera.fw.normalize())*30;
 
-
-    sprintf (str, "%5.2f", Camera.getBearing());
+    snprintf(str,7,  "%5.2f",Camera.getBearing());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
 
     // Add typical noisy signal when the aircraft has lost their signal.
@@ -558,19 +557,31 @@ void drawScene() {
     
     // Sets the camera and that changes the floor position.
     Camera.setPos(pos);
+
+    // Put up there a sun like in minecraft.  @TODO: Configure it a light source and adjust its trajectory
+    //   from east to west crossing the zenith.
+    float daylight_frequency = 1.0/CYCLES_IN_SOL;
+
+    glPushAttrib(GL_CURRENT_BIT);
+    glPushMatrix();
+    glTranslatef(pos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),pos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),pos[2]);
+    drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
+    glPopMatrix();
+    glPopAttrib();
     
     // Draw CENTER OF coordinates RGB=(x,y,b)
     glPushAttrib(GL_CURRENT_BIT);
     drawArrow(3);
     glPopAttrib();
     
+    // Go with the floor (the sea)
     glPushAttrib(GL_CURRENT_BIT);
     drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
     glPopAttrib();
 
 
     // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
-    for (int i=0; i<islands.size(); i++) {
+    for (size_t i=0; i<islands.size(); i++) {
         (islands[i]->draw());
     }
 
@@ -581,12 +592,14 @@ void drawScene() {
     // Put all of them in a list.
     // And activate all the structures that are inside a 10k radius of that.
     // Deactivate all the others.
-    // If a tree is in the middle of the forest and nobody is around it to see it, then, does the tree actually fall ?
+    // If a tree falls in the middle of the forest and nobody is around to see it, then, does the tree actually fall ?
 
     // @NOTE: I am only considering two carriers here.
     Vec3f carrierloc1(0,0,0);
     Vec3f carrierloc2(0,0,0);
     Vec3f cameraloc = Camera.getPos();
+
+    float RENDER_RANGE = 10000.0;
 
 
     // Draw vehicles and objects
@@ -600,7 +613,7 @@ void drawScene() {
                 carrierloc1 = entities[i]->getPos();
             if (entities[i]->getType() == CARRIER && entities[i]->getFaction() == GREEN_FACTION)
                 carrierloc2 = entities[i]->getPos();
-            if ((entities[i]->getPos() - cameraloc).magnitude()<10000)
+            if ((entities[i]->getPos() - cameraloc).magnitude()<RENDER_RANGE)
             {
                 //(entities[i]->setTexture(textures["metal"]));
                 glPushAttrib(GL_CURRENT_BIT);
@@ -614,8 +627,8 @@ void drawScene() {
                 else
                     dGeomEnable(entities[i]->getGeom());
             }
-            else if ( ((entities[i]->getPos() - carrierloc1).magnitude()<10000) ||
-                      ((entities[i]->getPos() - carrierloc2).magnitude()<10000) )
+            else if ( ((entities[i]->getPos() - carrierloc1).magnitude()<RENDER_RANGE) ||
+                      ((entities[i]->getPos() - carrierloc2).magnitude()<RENDER_RANGE) )
             {
                 if (!(entities[i]->getBodyID()))
                     dGeomEnable(entities[i]->getGeom());
@@ -628,13 +641,12 @@ void drawScene() {
     }
 
     // Daylight frequency.  The "sol" in this world lasts for 10000 cicles.  At 60 fps, 2.7 minutes.
-    float daylight_frequency = 1.0/CYCLES_IN_SOL;
     float daylight =   sin(daylight_frequency * 2 * PI * timer)*0.4 + 0.6;   // From 0.2 -- 1.0
 
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
-    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developer: I want submarines !)
+    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developers: I want submarines !)
         glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD

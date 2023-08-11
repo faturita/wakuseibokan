@@ -971,9 +971,9 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold)
 
 BoxIsland* findNearestIsland(Vec3f Po)
 {
-    int nearesti = 0;
+    int nearesti = -1;
     float closest = 0;
-    for(int i=0;i<islands.size();i++)
+    for(size_t i=0;i<islands.size();i++)
     {
         BoxIsland *b = islands[i];
         Vec3f l(b->getX(),0.0f,b->getZ());
@@ -984,6 +984,9 @@ BoxIsland* findNearestIsland(Vec3f Po)
         }
     }
 
+    if (nearesti<0)
+        return NULL;
+
     return islands[nearesti];
 }
 
@@ -992,7 +995,7 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
 {
     int nearesti = -1;
     float closest = 0;
-    for(int i=0;i<islands.size();i++)
+    for(size_t i=0;i<islands.size();i++)
     {
         BoxIsland *b = islands[i];
         Vec3f l(b->getX(),0.0f,b->getZ());

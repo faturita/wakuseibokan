@@ -44,7 +44,7 @@ public:
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 
-    Vec3f getForward();
+    Vec3f virtual getForward();
 
     dBodyID  getBodyID();
     void  stop();
