@@ -1275,6 +1275,15 @@ void update(int value)
 }
 
 
+/*
+ * GLUT callbacks:
+ */
+static void update_fade_factor(void)
+{
+    int milliseconds = glutGet(GLUT_ELAPSED_TIME);
+    sinf((float)milliseconds * 0.001f) * 0.5f + 0.5f;
+    glutPostRedisplay();
+}
 
 
 int main(int argc, char** argv) {
@@ -1451,6 +1460,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(drawScene);
 	glutKeyboardFunc(handleKeypress);
 	glutSpecialFunc(handleSpecKeypress);
+    //glutIdleFunc(&update_fade_factor);
     
 	// Resize callback function.
 	glutReshapeFunc(handleResize);

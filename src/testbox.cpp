@@ -3119,6 +3119,7 @@ void test33()
     Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
     Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    1230.0f,0,world);
 
 
     Vec3f pos(0.0f,60.0f,-71.0f);
@@ -3169,10 +3170,10 @@ void checktest33(unsigned long timer)
 
         if (m)
         {
-            Vec3f pos = m->getPos();
-            Vec3f center = i->getPos();
+            Vec3f pos = m->getPos();pos[1]=0;
+            Vec3f center = i->getPos();center[1]=0;
 
-            pos[1] = 0.0;
+            dout << (pos-center).magnitude() << std::endl;
 
             if ( (pos-center).magnitude() < 500 )
             {
@@ -3185,7 +3186,7 @@ void checktest33(unsigned long timer)
 
     if (timer == 9000)
     {
-        printf("Test failed.\n");
+        printf("Test failed. Manta should travel from the carrier to the center of the enemy island.\n");
         endWorldModelling();
         exit(0);
     }
