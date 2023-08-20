@@ -1,10 +1,10 @@
 ODEF:=$(shell ode-config --cflags)
 ODEFL:=$(shell ode-config --libs)
 CC = g++
-CFLAGS = -std=c++17 -w -g -Wall $(ODEF) -I/usr/include -I/usr/include/GL -I/System/Library/Frameworks/OpenGL.framework/Headers -fpermissive
+CFLAGS = -std=c++17 -w -g -Wall $(ODEF) -I/usr/include -I/usr/include/GL -I/System/Library/Frameworks/OpenGL.framework/Headers -I../stk/include -fpermissive
 PROG = waku
 
-SCS = src/usercontrols.cpp src/savegame.cpp src/camera.cpp src/odeutils.cpp src/map.cpp src/board.cpp src/hud.cpp src/terrain/imageloader.cpp src/ThreeMaxLoader.cpp src/md2model.cpp src/math/vec3f.cpp src/math/yamathutil.cpp src/openglutils.cpp src/FractalNoise.cpp src/math/uuid.cpp src/terrain/Terrain.cpp src/font/DrawFonts.cpp $(shell ls src/units/*.cpp) $(shell ls src/structures/*.cpp) $(shell ls src/actions/*.cpp) $(shell ls src/weapons/*.cpp) src/sounds/sounds.cpp src/engine.cpp src/entities.cpp src/commandline.cpp src/control.cpp src/ai.cpp src/profiling.cpp src/networking/telemetry.cpp src/networking/ledger.cpp src/networking/lobby.cpp
+SCS = src/usercontrols.cpp src/savegame.cpp src/camera.cpp src/odeutils.cpp src/map.cpp src/board.cpp src/hud.cpp src/terrain/imageloader.cpp src/ThreeMaxLoader.cpp src/md2model.cpp src/math/vec3f.cpp src/math/yamathutil.cpp src/openglutils.cpp src/FractalNoise.cpp src/math/uuid.cpp src/terrain/Terrain.cpp src/font/DrawFonts.cpp $(shell ls src/units/*.cpp) $(shell ls src/structures/*.cpp) $(shell ls src/actions/*.cpp) $(shell ls src/weapons/*.cpp) src/sounds/sounds.cpp src/sounds/soundtexture.cpp src/engine.cpp src/entities.cpp src/commandline.cpp src/control.cpp src/ai.cpp src/profiling.cpp src/networking/telemetry.cpp src/networking/ledger.cpp src/networking/lobby.cpp
 SRCS = $(SCS) src/keplerivworld.cpp src/testbox.cpp src/carrier.cpp
 
 TSRCS = $(SCS) src/testbox.cpp src/carrier.cpp
@@ -22,7 +22,7 @@ TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
 ifeq ($(shell uname),Darwin)
-	LIBS = -framework OpenGL -framework GLUT $(ODEFL)
+	LIBS = -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation 
 else
 	LIBS = -L/usr/local/lib -I/usr/local/include   -L/usr/lib/x86_64-linux-gnu/ -lGL -lGLU -lglut  $(ODEFL) -pthread -lbsd
 endif

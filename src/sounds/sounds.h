@@ -10,6 +10,8 @@
 #endif
 
 
+void initSound();
+void clearSound();
 
 void firesound(int times);
 void enginestart();

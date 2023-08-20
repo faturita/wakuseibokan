@@ -91,7 +91,7 @@ void TestCase_116::init()
         _otter->setPos(40.0f,30.0f,-0.0f);
 
         _otter->setPos(Vec3f(2000.0,20.0f,-4000.0+getRandomInteger(-600,600)));
-        _otter->setPos(getRandomCircularSpot(Vec3f(0.0,10,-4000.0),2000.0f));
+        _otter->setPos(getRandomCircularSpot(Vec3f(0.0,10,-6000.0),2000.0f));
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(1);

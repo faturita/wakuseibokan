@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 /******************************************/
 /*
   Example program to play an N channel
@@ -11,14 +13,15 @@
 */
 /******************************************/
 
-#include "FileWvIn.h"
-#include "RtAudio.h"
+#include <FileWvIn.h>
+#include <RtAudio.h>
 
 #include <signal.h>
 #include <iostream>
 #include <cstdlib>
 
 using namespace stk;
+
 
 // Eewww ... global variables! :-)
 bool done = false;
@@ -51,13 +54,64 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
     *samples++ = frames[i];
     if ( input->channelsOut() == 1 ) *samples++ = frames[i]; // play mono files in stereo
   }
-  
+
   if ( input->isFinished() ) {
     done = true;
     return 1;
   }
   else
     return 0;
+}
+
+void init(RtAudio &dac, char filename[256] )
+{
+    static FileWvIn input;
+
+    // Try to load the soundfile.
+    try {
+      input.openFile( filename );
+    }
+    catch ( StkError & ) {
+      exit( 1 );
+    }
+
+    // Set input read rate based on the default STK sample rate.
+    double rate = 1.0;
+    rate = input.getFileRate() / Stk::sampleRate();
+    rate *= atof( "1.0" );
+    input.setRate( rate );
+
+    input.ignoreSampleRateChange();
+
+    // Find out how many channels we have.
+    int channels = input.channelsOut();
+
+    // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
+    RtAudio::StreamParameters parameters;
+    parameters.deviceId = dac.getDefaultOutputDevice();
+    parameters.nChannels = ( channels == 1 ) ? 2 : channels; //  Play mono files as stereo.
+    RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+    unsigned int bufferFrames = RT_BUFFER_SIZE;
+    try {
+      dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&input );
+    }
+    catch ( RtAudioError &error ) {
+      error.printMessage();
+    }
+
+    // Resize the StkFrames object appropriately.
+    frames.resize( bufferFrames, channels );
+}
+
+
+void play(RtAudio &dac)
+{
+    try {
+      dac.startStream();
+    }
+    catch ( RtAudioError &error ) {
+      error.printMessage();
+    }
 }
 
 int main(int argc, char *argv[])
@@ -70,59 +124,18 @@ int main(int argc, char *argv[])
 
   // Initialize our WvIn and RtAudio pointers.
   RtAudio dac;
-  FileWvIn input;
 
-  // Try to load the soundfile.
-  try {
-    input.openFile( argv[1] );
-  }
-  catch ( StkError & ) {
-    exit( 1 );
-  }
-
-  // Set input read rate based on the default STK sample rate.
-  double rate = 1.0;
-  rate = input.getFileRate() / Stk::sampleRate();
-  if ( argc == 4 ) rate *= atof( argv[3] );
-  input.setRate( rate );
-
-  input.ignoreSampleRateChange();
-
-  // Find out how many channels we have.
-  int channels = input.channelsOut();
-
-  // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-  RtAudio::StreamParameters parameters;
-  parameters.deviceId = dac.getDefaultOutputDevice();
-  parameters.nChannels = ( channels == 1 ) ? 2 : channels; //  Play mono files as stereo.
-  RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-  unsigned int bufferFrames = RT_BUFFER_SIZE;
-  try {
-    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&input );
-  }
-  catch ( RtAudioError &error ) {
-    error.printMessage();
-    goto cleanup;
-  }
+  init(dac, argv[1]);
 
   // Install an interrupt handler function.
-	(void) signal(SIGINT, finish);
+    (void) signal(SIGINT, finish);
 
-  // Resize the StkFrames object appropriately.
-  frames.resize( bufferFrames, channels );
-
-  try {
-    dac.startStream();
-  }
-  catch ( RtAudioError &error ) {
-    error.printMessage();
-    goto cleanup;
-  }
+  play(dac);
 
   // Block waiting until callback signals done.
   while ( !done )
     Stk::sleep( 100 );
-  
+
   // By returning a non-zero value in the callback above, the stream
   // is automatically stopped.  But we should still close it.
   try {
@@ -132,6 +145,5 @@ int main(int argc, char *argv[])
     error.printMessage();
   }
 
- cleanup:
   return 0;
 }

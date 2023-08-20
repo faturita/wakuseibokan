@@ -729,6 +729,7 @@ void replayupdate(int value)
     if (controller.isInterrupted())
     {
         endWorldModelling();
+        clearSound();
         // Do extra wrap up
         msgboardfile.close();
         if (tracemode == RECORD || tracemode == REPLAY)
@@ -1035,6 +1036,7 @@ void inline processCommandOrders()
 
                                 // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
                                 //switchControl(actionid);
+                                //gunshot();
                         }
 
                     }
@@ -1389,6 +1391,7 @@ int main(int argc, char** argv) {
 
     setupWorldModelling();
     initRendering();
+    initSound();
 
     // Initialize ODE, create islands, structures and populate the world.
     if (isPresentCommandLineParameter(argc,argv,"-testcase"))
@@ -1452,7 +1455,7 @@ int main(int argc, char** argv) {
     //Initialize all the models and structures.
     //initRendering();
 
-    //intro();
+    intro();
 
     msgboardfile.open ("messageboard.dat");
     

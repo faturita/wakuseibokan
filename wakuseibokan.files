@@ -99,6 +99,8 @@ src/sounds/sineosc
 src/sounds/sineosc.cpp
 src/sounds/sounds.cpp
 src/sounds/sounds.h
+src/sounds/soundtexture.cpp
+src/sounds/soundtexture.h
 src/structures/Antenna.cpp
 src/structures/Antenna.h
 src/structures/Artillery.cpp
