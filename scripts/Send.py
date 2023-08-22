@@ -20,7 +20,7 @@ import socket
 # This is the port where the simulator is waiting for commands.
 ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 ip = '127.0.0.1'
-port = 5400
+port = 4501
 
 if (len(sys.argv)>=2):
     ip = sys.argv[1]

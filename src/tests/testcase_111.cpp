@@ -1,3 +1,14 @@
+/* ============================================================================
+**
+** Scenario 111
+**
+** This is 3D port of Java RoboCode platform.
+**
+** There are two (it could be more) walrus tanks.  They are configured
+** to transmit telemetry information to whoever is subscribed to receive them
+**
+** ========================================================================= */
+
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -46,15 +57,6 @@ extern int  aiplayer;
 
 typedef struct sockaddr SA;
 
-struct ControlWalrus {
-    int id;
-    float roll;
-    float thrust;
-    float pitch;
-    float precesion;
-    int openfire;
-};
-
 TestCase_111::TestCase_111()
 {
 
@@ -69,7 +71,7 @@ void TestCase_111::init()
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(4500);
+    servaddr.sin_port = htons(4501);
 
     bind(sockfd, (SA *) &servaddr, sizeof(servaddr));
 
@@ -247,6 +249,14 @@ void TestCase_111::init()
         _otter->enableTelemetry();
     }
 
+//    BoxVehicle * _bo= new BoxVehicle();
+//    _bo->init();
+//    _bo->embody(world, space);
+//    _bo->setPos(0.0,320.0f,-1900.0f);
+//    _bo->stop();
+
+//    entities.push_back(_bo, _bo->getGeom());
+
 
     //Vec3f pos(0.0,1.32, - 3500);
     Vec3f pos(-10,1.32,10);
@@ -265,15 +275,17 @@ int TestCase_111::check(unsigned long timertick)
     {
         Vehicle* _b1 = findWalrus(GREEN_FACTION);
         _b1->enableAuto();
+        _b1->setStatus(ROLLING);
         Vehicle* _b2 = findWalrus(BLUE_FACTION);
         _b2->enableAuto();
+        _b2->setStatus(ROLLING);
     }
 
     if (timertick > 20)
     {
 
         socklen_t len;
-        ControlWalrus mesg;
+        ControlStructure mesg;
 
         SA pcliaddr;
 
@@ -287,26 +299,27 @@ int TestCase_111::check(unsigned long timertick)
         {
             //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
 
-            printf("%d:roll %10.2f thrust %10.2f\n", mesg.id, mesg.roll, mesg.thrust);
+            printf("Delay %lu %d:roll %10.2f thrust %10.2f\n", (timer-mesg.sourcetimer),mesg.controllingid, mesg.registers.roll, mesg.registers.thrust);
 
             Vehicle *_b=NULL;
 
-            if (mesg.id == 1)
+            if (mesg.controllingid == 1)
                 _b = findWalrus(GREEN_FACTION);
-            else if (mesg.id == 2)
+            else if (mesg.controllingid == 2)
                 _b = findWalrus(BLUE_FACTION);
 
             if (_b)
             {
                 Controller co;
-                co.registers.thrust = mesg.thrust;
-                co.registers.roll = mesg.roll;
-                co.registers.pitch = mesg.pitch;
-                co.registers.precesion = mesg.precesion;
+                co.controllingid = mesg.controllingid;
+                co.faction = mesg.faction;
+                co.registers = mesg.registers;
+                //co.push(mesg.order);
 
                 _b->doControl(co);
 
-                if (mesg.openfire == 1 && _b->getPower()>0)
+
+                if (mesg.order.command == Command::FireOrder && _b->getPower()>0)
                 {
                     Vehicle *action = _b->fire(0,world, space);
 

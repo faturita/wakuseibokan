@@ -90,6 +90,8 @@ src/openglutils.cpp
 src/openglutils.h
 src/profiling.cpp
 src/profiling.h
+src/propertystore.cpp
+src/propertystore.h
 src/reinforcement.cpp
 src/savegame.cpp
 src/savegame.h

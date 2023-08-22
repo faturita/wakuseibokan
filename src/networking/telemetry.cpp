@@ -6,8 +6,13 @@
 #include <string.h>
 #include <vector>
 
+#include "../propertystore.h"
+#include "../profiling.h"
+
+extern unsigned long timer;
 
 struct ModelRecord {
+    unsigned long recordtimer;
     int number;
     int health;
     int power;
@@ -59,9 +64,37 @@ Connection addNewTelemetryListener(char ip[], int port)
 
 void inittelemetry()
 {
-    // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
+    // @NOTE: The info is being read from a configuration file.
     // (who has joined the game)
     //connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
+
+    char filename[256];
+    sprintf(filename,"%s%s%s","conf",DIRSEPARATOR,"telemetry.endpoints.ini");
+    PropertyStore ps(filename);
+
+    //ps.Set("client","127.0.0.1");
+
+    //ps.Save();
+
+    ps.Load();
+
+    char *endpoints = ps.Get("endpoints");
+
+    int iendpoints = atoi(endpoints);
+
+    for(int i=0;i<iendpoints;i++)
+    {
+        char telkey[256];
+        sprintf(telkey,"endpoint#%d",i+1);
+        char *telemetryendpoint = ps.Get(telkey);
+
+        if (strcmp(telemetryendpoint,EMPTYVALUE)!=0)
+        {
+
+            dout << "Hooking up to telemetry endpoint at " << telemetryendpoint << std::endl;
+            connections.push_back(addNewTelemetryListener(telemetryendpoint,4500));
+        }
+    }
 }
 
 
@@ -69,6 +102,7 @@ void telemetryme(int number, int health, int power, float bearing, float *dBodyP
 {
     ModelRecord logstructure;
 
+    logstructure.recordtimer = timer;
     logstructure.number = number;
     logstructure.health = health;
     logstructure.power = power;

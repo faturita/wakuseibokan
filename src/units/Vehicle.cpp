@@ -604,18 +604,18 @@ void Vehicle::wrapDynamics(dBodyID body)
         float *fPos = (float *)dBodyPosition;
         float *R = (float *)dBodyRotation;
 
-        for (int i=0;i<4;i++)
-        {
-            printf("|");
-            for (int j=0; j<3;j++)
-            {
-                printf ("%10.5f", R[i*4+j]);
-            }
-            printf("|\n");
-        }
+//        for (int i=0;i<4;i++)
+//        {
+//            printf("|");
+//            for (int j=0; j<3;j++)
+//            {
+//                printf ("%10.5f", R[i*4+j]);
+//            }
+//            printf("|\n");
+//        }
 
-        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
-        dout << s << std::endl;
+//        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
+//        dout << s << std::endl;
 
         telemetryme(number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
     }

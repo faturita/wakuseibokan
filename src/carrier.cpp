@@ -511,7 +511,7 @@ void drawScene() {
     int ctrling = 0;
     
     // @NOTE Safe code.  Destroy something and see what happens here.
-    if (!entities.isValid(controller.controllingid))
+    if (controller.controllingid != CONTROLLING_NONE && !entities.isValid(controller.controllingid))
     {
         controller.controllingid = CONTROLLING_NONE;
         controller.reset();
@@ -538,11 +538,12 @@ void drawScene() {
 
         Camera.fw = forward;
 
+        Vec3f f = forward.normalize();
+        f = f * controller.registers.thrust;
+
+        pos = pos + f;
+
         if (Camera.dx!=0) {
-            //pos[0]+=(forward[0]);
-            //pos[1]+=(forward[1]);
-            //pos[2]+=(forward[2]);
-            
             pos[2]+=controller.registers.pitch;
             pos[1]+=controller.registers.precesion;
             pos[0]+=controller.registers.roll;
@@ -585,6 +586,7 @@ void drawScene() {
         (islands[i]->draw());
     }
 
+    // @NOTE: You can test quickly any 3ds model, by openning it up here and drawing it.
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
 
     // Movable units, and the camera, carry the living energy.
@@ -646,7 +648,7 @@ void drawScene() {
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
-    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developers: I want submarines !)
+    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developers: submarines could be nice)
         glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD

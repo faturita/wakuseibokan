@@ -15,26 +15,58 @@ import sys, select
 
 import socket
 
-from TelemetryDictionary import telemetrydirs
+from TelemetryDictionary import telemetrydirs as td
 
-# This is the port where the simulator is waiting for commands.
+# This is the port where the simulator is waiting for commands
+# The structure is given in ../commandorder.h/CommandOrder
 ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 ip = '127.0.0.1'
-controlport = 5400
+controlport = 4501
 
 
 ctrl_server_address = (ip, controlport)
 
 
-def send_command(id, roll, thrust,pitch,precesion,openfire):
-    #id = 1
-    #roll = 1.0
-    #thrust = 10.0
-    #pitch = 0
-    #precesion = 0
-    #openfire = 1
+def send_command(timer):
 
-    data=pack("iffffi",id,roll,thrust,pitch, precesion, openfire)
+    controllingid=1
+    thrust=10.0
+    roll=1.0
+    pitch=0.0
+    yaw=0.0
+    precesion=0.0
+    bank=0.0
+    faction=1
+    #timer=1
+
+    command = 11
+    spawnid=0
+    typeofisland=0
+    x=0.0
+    y=0.0
+    z=0.0
+    target=0
+    bit=0
+    weapon=0
+
+    # This is the structure fron CommandOrder
+    data=pack("iffffffiLiiifffi?i",
+        controllingid,
+        thrust,
+        roll,
+        pitch,
+        yaw,
+        precesion,
+        bank,
+        faction,
+        timer,
+        command,
+        spawnid,
+        typeofisland,
+        x,y,z,
+        target,
+        bit,
+        weapon)
 
     sent = ctrlsock.sendto(data, ctrl_server_address)
 
@@ -48,8 +80,8 @@ min = -400
 max = 400
 
 # Telemetry length and package form.
-length = 76
-unpackcode = 'iiiffffffffffffffff'
+length = 84
+unpackcode = 'Liiiffffffffffffffff'
 
 if (len(sys.argv)>=2):
     print ("Reading which data to shown")
@@ -127,18 +159,18 @@ while True:
 
     data, address = sock.recvfrom(length)
 
-
+    # If you plot, latency will be bigger !!!
     if len(data)>0 and len(data) == length:
         # is  a valid message struct
         new_values = unpack(unpackcode,data)
 
-        if int(new_values[telemetrydirs['number']]) == tank:
+        if int(new_values[td['number']]) == tank:
 
             f.write( str(new_values[0]) + ',' + str(new_values[1]) + ',' + str(new_values[2]) +  ',' + str(new_values[3]) + ',' + str(new_values[4]) + ',' + str(new_values[6]) + '\n')
 
-            x.append( float(new_values[telemetrydirs['bearing']]))
-            y.append( float(new_values[telemetrydirs['x']]))
-            z.append( float(new_values[telemetrydirs['z']]))
+            x.append( float(new_values[td['bearing']]))
+            y.append( float(new_values[td['x']]))
+            z.append( float(new_values[td['z']]))
 
             plotx.append( plcounter )
 
@@ -164,7 +196,7 @@ while True:
 
             # Analyze the data to determine what to do.
             # Do something
-            #send_command(1,1.0,10.0,0,0,1)
+            send_command(new_values[td["timer"]])
 
 
 f.close()
