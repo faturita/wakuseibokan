@@ -43,3 +43,4 @@ Missiles: http://openrocket.info/documentation.html
 https://github.com/doyubkim/fluid-engine-dev/blob/main/INSTALL.md
 https://stackoverflow.com/questions/12328896/thrift-is-it-possible-to-do-only-serialization-with-c-thrift-library
 https://github.com/Symphonym/Saurobyte
+https://www.quora.com/How-is-it-possible-to-create-a-game-engine-OS-in-C-with-normal-coding-when-it-does-not-support-graphics
