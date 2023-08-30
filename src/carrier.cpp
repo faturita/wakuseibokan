@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <queue>
+#include <pthread.h>
 #include <stdarg.h>
 #include <math.h>
 
@@ -719,6 +721,23 @@ void handleResize(int w, int h) {
 
 static bool didODEInit=false;
 
+std::queue<TickRecord> buffer;
+pthread_t thread1;
+
+void *up(void *ptr)
+{
+    int ret = 1;
+    TickRecord record;
+
+    while(ret>0)
+    {
+        ret = receive(&record);
+
+        if (ret>0)
+            buffer.push(record);
+    }
+}
+
 
 // Go through all the elements that appear each time on the trackrecord.
 // Those who are new, create them.
@@ -753,13 +772,21 @@ void replayupdate(int value)
         TickRecord record;
 
         int ret = 1;
-        while (ret>0)
+        while (true)
         {
 
             // Read from the remote connection.
 
             if (peermode == CLIENT)
-                ret = receive(&record);
+            {
+                ret = buffer.size();
+                if (ret>0)
+                {
+                    record = buffer.front();
+                    buffer.pop();
+                }
+                printf("Len %d\n", ret);
+            }
             else if (tracemode == REPLAY)
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
@@ -799,6 +826,7 @@ void replayupdate(int value)
                 // @FIXME Check what happen with timer if they are synchronized between server and clients.
                 if (record.timerparam != timer)
                     break;
+
             }
 
         }
@@ -1441,6 +1469,7 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
     {
+        pthread_create(&thread1, NULL, *up, (void *) NULL);
         setupControllerClient();
     }
 

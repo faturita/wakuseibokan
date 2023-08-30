@@ -59,7 +59,7 @@ void init_lobby()
 void join_lobby()
 {
     modelsockasserverfd = socket(AF_INET, SOCK_DGRAM, 0);
-    //fcntl(sockfd, F_SETFL, O_NONBLOCK);
+    //fcntl(modelsockasserverfd, F_SETFL, O_NONBLOCK);
 
     bzero(&modelserverasserveraddr, sizeof(modelserverasserveraddr));
     modelserverasserveraddr.sin_family = AF_INET;
