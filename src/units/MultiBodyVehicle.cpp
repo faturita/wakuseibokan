@@ -11,7 +11,7 @@
 
 void MultiBodyVehicle::init()
 {
-    Image* image = loadBMP("vtr.bmp");
+    Image* image = loadBMP("terrain/vtr.bmp");
     _textureBox = loadTexture(image);
     delete image;
     

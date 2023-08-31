@@ -1,3 +1,15 @@
+/* ============================================================================
+**
+** Telemetry
+**
+** This code sends telemetry information to any client that is UDP listening.
+** The information that is being sent is unique per unit (comes from Vehicle)
+** when the telemetry flag is enabled on each unit.
+**
+** This allow to monitor the behaviour of each one of the vehicles.  Any entity
+** can send telemetry information at each simulation step.
+**
+** ========================================================================= */
 #include "telemetry.h"
 
 #include <iostream>
