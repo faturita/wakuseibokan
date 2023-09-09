@@ -60,6 +60,11 @@ export LD_LIBRARY_PATH=/usr/local/lib/
  make
  ./waku
 
+ # Running
+
+ make testcase TC=111
+ ./testcase -mute
+
 That's all folks.
 
 
