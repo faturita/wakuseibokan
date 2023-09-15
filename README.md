@@ -24,14 +24,46 @@ make
 make install
 ```
 
+# STK
+
+First you need to copy the stk file from dependencies into the 
+parent directory where you cloned wakuseiboukan.  Then you need
+to compile this sound library.
+
+```bash
+cp dependencies/stk.tgz ../../
+cd ../../
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+
+```
+
+The STK libraries are going to be copied into /usr/local/lib/.  So you need
+to run the following command before executing the simulator or configure it intorc_bash or similar.
+
+```bash
+export LD_LIBRARY_PATH=/usr/local/lib/
+``` 
+
+
 # Ubuntu Packages
 
  libbsd-dev  freeglut3-dev
+ libasound2  libasound2-dev
 
 # Compiling
 
  make
  ./waku
+
+ # Running
+
+ make testcase TC=111
+ ./testcase -mute
 
 That's all folks.
 
@@ -40,6 +72,14 @@ ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
 ----------------------------------------------------------
 
 * Run the following script to install automake tools for Mac
+
+On newer OSX systems with brew installed, you can do
+
+```bash
+brew install premake
+```
+
+Otherwise, for older versions, you can run:
 
 ```bash
 #!/bin/sh
@@ -97,6 +137,10 @@ echo "Installation complete."
 * Now download the ode-0.14.tar tarball.
 * Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
+
+
+Once these steps are completed you can compile ODE first and then follow the guidelines to install STK.
+
 * ./bootstrap
 * ./configure --disable-asserts
 * make clean && make && sudo make install
