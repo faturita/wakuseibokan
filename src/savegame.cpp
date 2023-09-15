@@ -66,9 +66,9 @@ extern dWorldID world;
 extern dSpaceID space;
 
 
-void savegame()
+void savegame(std::string filename)
 {
-    std::ofstream ss("savegame.w", std::ios_base::binary);
+    std::ofstream ss(filename, std::ios_base::binary);
 
     // @FIXME: Include a .h that is generated on compile time that calculates the hash of this .cpp, that is the version.
     // Version
@@ -219,7 +219,7 @@ void savegame()
 }
 
 
-void loadgame()
+void loadgame(std::string filename)
 {
     /**std::ifstream ss("savegame.w", std::ios_base::binary);
 
@@ -230,7 +230,7 @@ void loadgame()
 
     ss.close();**/
 
-    std::ifstream ss("savegame.w", std::ios_base::binary);
+    std::ifstream ss(filename, std::ios_base::binary);
 
     // @FIXME: Verify the version when loading.
     int version;

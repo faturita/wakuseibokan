@@ -45,6 +45,8 @@
 
 #include "engine.h"
 
+#include "savegame.h"
+
 #include "usercontrols.h"
 #include "map.h"
 #include "units/Vehicle.h"
@@ -603,7 +605,13 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("save") != std::string::npos)
             {
-                savegame();
+                std::string savegamefilename;
+                if (controller.str.length()<=4)
+                    savegamefilename = std::string("savegames/savegame.w");
+                else
+                    savegamefilename = std::string("savegames/") + controller.str.substr(5);
+
+                savegame(savegamefilename);
             } else
             if (controller.str.find("list") != std::string::npos)
             {

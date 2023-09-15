@@ -72,6 +72,8 @@
 #include "engine.h"
 #include "entities.h"
 
+#include "savegame.h"
+
 #include "structures/Structure.h"
 #include "structures/Warehouse.h"
 #include "structures/Hangar.h"
@@ -1401,7 +1403,7 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-test"))
         initWorldModelling(atoi(getCommandLineParameter(argc,argv,"-test")));
     else if (isPresentCommandLineParameter(argc,argv,"-load"))
-        loadgame();
+        loadgame(std::string(getCommandLineParameter(argc,argv,"-load")));
     else if (tracemode == REPLAY)
     {
         initWorldModelling();
