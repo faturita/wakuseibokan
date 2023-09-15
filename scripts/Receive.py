@@ -1,6 +1,12 @@
 '''
+Wakuseibokan - Telemetry UDP Server
 
-UDP Server
+This is a simple UDP server that receives a telemetry package, in the format
+specified by TelemetryDictionary.py (which is the same as the one in
+networking/telemetry.cpp@ModelRecord (it should be the same).
+
+The teletry information is sent by the server to the IPs specified in
+conf/telemetry.endpoints.ini
 
 '''
 
@@ -17,7 +23,7 @@ import socket
 
 
 ip = '0.0.0.0'
-port = 5400
+port = 4500
 
 if (len(sys.argv)>=2):
     ip = sys.argv[1]
@@ -30,8 +36,10 @@ print ('Starting up on %s port %s' % server_address)
 
 sock.bind(server_address)
 
-length = 76
-unpackcode = 'iiiffffffffffffffff'
+# This is the length and format of the struct ModelRecord that is sent by the server.
+# Check https://docs.python.org/3/library/struct.html
+length = 80
+unpackcode = 'Iiiiffffffffffffffff'
 
 address = ''
 while True:

@@ -80,7 +80,7 @@ min = -400
 max = 400
 
 # Telemetry length and package form.
-length = 84
+length = 80
 unpackcode = 'Liiiffffffffffffffff'
 
 if (len(sys.argv)>=2):

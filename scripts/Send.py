@@ -1,6 +1,8 @@
 '''
+Wakuseibokan - Command UDP Client
 
-UDP Send Test
+The command data type is commandorder.h@ControlStructure.  This is what
+the scenario is expecting to be used to control the tank.
 
 '''
 
@@ -26,10 +28,54 @@ if (len(sys.argv)>=2):
     ip = sys.argv[1]
     port = int(sys.argv[2])
 
-server_address = (ip, port)
+ctrl_server_address = (ip, port)
 
+def send_command(timer):
 
-sent = ctrlsock.sendto(b'1', server_address)
+    controllingid=1
+    thrust=10.0
+    roll=1.0
+    pitch=10.0
+    yaw=0.0
+    precesion=0.0
+    bank=0.0
+    faction=1
+    #timer=1
+
+    command = 11
+    spawnid=0
+    typeofisland=0
+    x=0.0
+    y=0.0
+    z=0.0
+    target=0
+    bit=0
+    weapon=0
+
+    # This is the structure fron CommandOrder
+    data=pack("iffffffiLiiifffi?i",
+        controllingid,
+        thrust,
+        roll,
+        pitch,
+        yaw,
+        precesion,
+        bank,
+        faction,
+        timer,
+        command,
+        spawnid,
+        typeofisland,
+        x,y,z,
+        target,
+        bit,
+        weapon)
+
+    sent = ctrlsock.sendto(data, ctrl_server_address)
+
+    return
+
+send_command(100)
 
 print('Package sent...')
 

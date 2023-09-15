@@ -308,7 +308,11 @@ int TestCase_111::check(unsigned long timertick)
             else if (mesg.controllingid == 2)
                 _b = findWalrus(BLUE_FACTION);
 
-            if (_b)
+            if ((timer-mesg.sourcetimer)>30000)
+            {
+                printf("Message IGNORED !!!");
+            }
+            else if (_b)
             {
                 Controller co;
                 co.controllingid = mesg.controllingid;
