@@ -119,6 +119,7 @@ void TestCase_111::init()
         _otter->setSignal(4);
         _otter->setNameByNumber(1);
         _otter->setStatus(SailingStatus::SAILING);
+        _otter->setIsland(nemesis);
 
         Vec3f dimensions(5.0f,4.0f,10.0f);
 
@@ -191,6 +192,7 @@ void TestCase_111::init()
         _otter->setSignal(4);
         _otter->setNameByNumber(2);
         _otter->setStatus(SailingStatus::SAILING);
+        _otter->setIsland(nemesis);
 
         Vec3f dimensions(5.0f,4.0f,10.0f);
 

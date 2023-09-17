@@ -81,7 +81,7 @@ max = 400
 
 # Telemetry length and package form.
 length = 80
-unpackcode = 'Liiiffffffffffffffff'
+unpackcode = 'Iiiiffffffffffffffff'
 
 if (len(sys.argv)>=2):
     print ("Reading which data to shown")

@@ -38,8 +38,8 @@ sock.bind(server_address)
 
 # This is the length and format of the struct ModelRecord that is sent by the server.
 # Check https://docs.python.org/3/library/struct.html
-length = 80
-unpackcode = 'Iiiiffffffffffffffff'
+length = 84
+unpackcode = 'Liiiffffffffffffffff'
 
 address = ''
 while True:

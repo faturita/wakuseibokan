@@ -15,9 +15,9 @@ ArtilleryAmmo::~ArtilleryAmmo()
 
 void ArtilleryAmmo::init()
 {
-    ArtilleryAmmo::height=0.5f;
-    ArtilleryAmmo::length=0.5f;
-    ArtilleryAmmo::width=0.5f;
+    ArtilleryAmmo::height=5.5f;
+    ArtilleryAmmo::length=5.5f;
+    ArtilleryAmmo::width=5.5f;
 
     ArtilleryAmmo::mass = 10.01f;
 

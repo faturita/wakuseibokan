@@ -456,7 +456,7 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
     dRFromAxisAndAngle(Re,f2[0],f2[1],f2[2],-alpha);
 
     // Shift origin up towards where the turret is located.
-    position = orig;
+    //position = orig;
     position[1] += firingpos[1];
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
