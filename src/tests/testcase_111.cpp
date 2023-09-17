@@ -384,8 +384,12 @@ int TestCase_111::check(unsigned long timertick)
         printf("Walrus %d WON.\n", whowon);
     }
 
+    float fps = getFPS();
+
+    if (fps == 0)  fps=60.0;
+
     // Only 5 mimutes duration
-    if (timertick > getFPS() * 60 * 5)
+    if (timertick > (unsigned long)fps * 60 * 5)
     {
         isdone = true;
         haspassed = false;
