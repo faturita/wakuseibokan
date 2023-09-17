@@ -8,6 +8,9 @@ networking/telemetry.cpp@ModelRecord (it should be the same).
 The teletry information is sent by the server to the IPs specified in
 conf/telemetry.endpoints.ini
 
+The Simulator sends per tick one RECORD per tank.  So this script receives
+first the record for tank number 1 and then the record for tank number 2.
+
 '''
 
 import matplotlib.pyplot as plt
