@@ -204,9 +204,10 @@ Vec3f getRandomCircularSpot(Vec3f origin, float radius)
     return origin+Vec3f(x,0,z);
 }
 
+
 int getRandomInteger(int min, int max)
 {
-    int val = (rand() % (max+1) + min);
+    int val = (rand() % ((max-min)+1) + min);
     return val;
 }
 

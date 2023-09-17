@@ -114,7 +114,7 @@ void TestCase_111::init()
         _otter->setPos(400.0f,70.0f,-4400.0f);
         _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-1200,1200),30.0f,getRandomInteger(-600,600)));
+        _otter->setPos(Vec3f(getRandomInteger(-1400,1400),30.0f,getRandomInteger(-1400,1400)));
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(1);
@@ -170,7 +170,9 @@ void TestCase_111::init()
         dMatrix3 Re2;
         dRSetIdentity(Re2);
         //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/2.0+PI,(int)PI/2.0)/10.0+PI);
+
+        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
+
         dBodySetRotation(_otter->getBodyID(),Re2);
 
         //_otter->goTo(Vec3f(0,0,340));
@@ -187,7 +189,7 @@ void TestCase_111::init()
         _otter->setPos(400.0f,70.0f,-4400.0f);
         _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-1200,1200),30.0f,getRandomInteger(-600,600)));
+        _otter->setPos(Vec3f(getRandomInteger(-1400,1400),30.0f,getRandomInteger(-1400,1400)));
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(2);
@@ -243,7 +245,7 @@ void TestCase_111::init()
         dMatrix3 Re2;
         dRSetIdentity(Re2);
         //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,getRandomInteger((int)-PI/4*10,(int)PI/4*10)/10.0);
+        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0 )*100 , ( (int)PI/2.0)/10.0 )/100.0    );
         dBodySetRotation(_otter->getBodyID(),Re2);
 
         //_otter->goTo(Vec3f(0,0,340));
@@ -251,16 +253,7 @@ void TestCase_111::init()
         _otter->enableTelemetry();
     }
 
-//    BoxVehicle * _bo= new BoxVehicle();
-//    _bo->init();
-//    _bo->embody(world, space);
-//    _bo->setPos(0.0,320.0f,-1900.0f);
-//    _bo->stop();
 
-//    entities.push_back(_bo, _bo->getGeom());
-
-
-    //Vec3f pos(0.0,1.32, - 3500);
     Vec3f pos(-10,1.32,10);
     Camera.setPos(pos);
 
@@ -270,6 +263,8 @@ void TestCase_111::init()
     endtimer = 0;
 
 }
+
+float distancegreen, distanceblue;
 
 int TestCase_111::check(unsigned long timertick)
 {
@@ -344,6 +339,18 @@ int TestCase_111::check(unsigned long timertick)
 
         Vehicle *_b2 = findWalrus(BLUE_FACTION);
 
+        if (_b1)
+        {
+            distancegreen += _b1->getSpeed();
+        }
+
+        if (_b2)
+        {
+            distanceblue += _b2->getSpeed();
+        }
+
+
+
         if (_b1 && (_b1->getStatus() == SailingStatus::SAILING || _b1->getStatus() == SailingStatus::OFFSHORING))
         {
             _b1->damage(1);
@@ -374,10 +381,11 @@ int TestCase_111::check(unsigned long timertick)
     {
         isdone = true;
         haspassed = true;
-        printf("Walrus %d won.", whowon);
+        printf("Walrus %d WON.\n", whowon);
     }
 
-    if (timertick > 6000)
+    // Only 5 mimutes duration
+    if (timertick > getFPS() * 60 * 5)
     {
         isdone = true;
         haspassed = false;
@@ -389,12 +397,12 @@ int TestCase_111::check(unsigned long timertick)
 
         if (_b1)
         {
-            printf("GREEN 1 : Health:%d\n", _b1->getHealth());
+            printf("GREEN 1 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b1->getHealth(), ((float)_b1->getPower()/(float)_b2->getHealth()), distancegreen/timertick);
         }
 
         if (_b2)
         {
-            printf("BLUE 2 : Health:%d\n", _b2->getHealth());
+            printf("BLUE 2 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b2->getHealth(), ((float)_b2->getPower()/(float)_b1->getHealth()), distanceblue/timertick);
         }
 
     }
