@@ -1259,12 +1259,14 @@ void update(int value)
                 }
             }
         }
+        // Ok, done with the dynamics
 
-        
-		// Ok, done with the dynamics
+        // @NOTE: At 00.5 the speed that you get from ODE represents in meters/ticks speed/20.
+        // So if you want speed in m/s you need to do (speed * FPS)/20
+        // The value that you get is independent of the computer performance and fps.
         clock_t inicio = clock();
         dSpaceCollide (space,0,&nearCallback);
-        dWorldStep (world,0.05);
+        dWorldStep (world,0.05);        // 0.05
         elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
         
 

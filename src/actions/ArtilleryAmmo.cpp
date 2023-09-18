@@ -1,4 +1,8 @@
+#include <unordered_map>
+#include "../ThreeMaxLoader.h"
 #include "ArtilleryAmmo.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 ArtilleryAmmo::ArtilleryAmmo()
 {
@@ -20,6 +24,12 @@ void ArtilleryAmmo::init()
     ArtilleryAmmo::width=5.5f;
 
     ArtilleryAmmo::mass = 10.01f;
+
+    //Load the model
+    _model = (Model*)T3DSModel::loadModel("units/shell.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
+    if (_model != NULL)
+    {
+    }
 
     setDamage(80);
     setName("Ammo");
@@ -45,10 +55,12 @@ void ArtilleryAmmo::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        //doTransform(f, R);
-
         //drawArrow(v[0],v[1],v[2],1.0,0.0,0.0);
-        drawRedBox(Gunshot::width, Gunshot::height, Gunshot::length);
+        //drawRedBox(Gunshot::width, Gunshot::height, Gunshot::length);
+
+        doTransform(f, R);
+        _model->setTexture(textures["metal"]);
+        _model->draw();
 
         glPopMatrix();
     }

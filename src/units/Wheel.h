@@ -26,6 +26,9 @@ protected:
     float cfm = 0.8;
     float maxtorque = 5.5;
 
+    float odometry = 0;
+
+
 public:
     Wheel(int faction);
     Wheel(int faction, float cfm, float maxtorque);
@@ -61,6 +64,9 @@ public:
     void setSteering(bool steer);
 
     void setAzimuth(float value);
+
+    void resetOdometry();
+    float getOdometry();
 };
 
 
