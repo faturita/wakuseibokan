@@ -4,7 +4,7 @@ Excited warfare on the seas of a Kepler IV.
 
 The time has come to conquer Kepler IV.  Humanity is now able to travel further away from our solar system, and it has now reached exoplanets.  Two companies sent surveying parties in the form of two AI carriers that aim to control the vast archipielago of Kepler IV. These AIs can be controlled remotely in real-time by space folding uplinks.
 
-[VIDEOS](https://www.youtube.com/playlist?list=PLJHMIS4ekxNSLS422Nw7D2JlJW3En1Vul)
+Check [Videos](https://www.youtube.com/playlist?list=PLJHMIS4ekxNSLS422Nw7D2JlJW3En1Vul)
 
 ![Manta taking off](images/screenshot1.png)
 
