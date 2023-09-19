@@ -9,15 +9,15 @@ Check [video](https://www.youtube.com/watch?v=_LJj1x4orbU).
 
 ![Manta taking off](images/screenshot1.png)
 
-Compiling and Installation
---------------------------
+# Compiling and Installation
 
 'Requirements'
 * ODE: Open Dynamics Engine, version 0.14: https://bitbucket.org/odedevs/ode
 * STK: The Synthesis Toolkit in C++ (Audio Library)
 * OpenGL Version 2.1 (supported natively in Linux, Mac and Windows).
 
-# ODE
+ODE
+---
 
 You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
 Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
@@ -39,8 +39,6 @@ On newer OSX systems with brew installed, you can do
 ```bash
 brew install premake
 ```
-
-
 
 <details>
 <summary>For older versions, you can run the following script</summary>
@@ -111,7 +109,8 @@ Once these steps are completed you can compile ODE:
  make clean && make && sudo make install
 ```
 
-# STK
+STK
+---
 
 First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
 to compile this sound library.
@@ -134,7 +133,8 @@ to run the following command before executing the simulator or configure it into
 export LD_LIBRARY_PATH=/usr/local/lib/
 ``` 
 
-# Ubuntu Packages
+Ubuntu Packages
+---------------
 
  libbsd-dev  freeglut3-dev
  libasound2  libasound2-dev
@@ -199,6 +199,7 @@ The scenario 111 is the tank battleground:
  ./testcase -mute -random
 ```
 
+# Description
 
 Objective and design guidelines
 -------------------------------
@@ -251,8 +252,8 @@ Sounds
 * ./playaudio hellosine.wav 44100 1.0
 * https://github.com/thestk/stk/blob/master/INSTALL.md
 
-References
-----------
+More info
+---------
 * OpenGL Tutorial: http://www.opengl-tutorial.org/
 * Normalize error: https://github.com/resibots/robdyn/issues/3
 * ODE http://ode.org/wiki/index.php?title=Main_Page
