@@ -81,7 +81,8 @@ void Wheel::doDynamics()
 
     Vec3f vav = dBodyGetAngularVelInBody(me);
 
-    odometry += vav.magnitude();
+    //@NOTE: For some unknown reason, the following line generates a segfault when the ODE world is terminated.
+    //odometry += vav.magnitude();
 
     if (steeringwheel)
     {
