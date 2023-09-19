@@ -160,10 +160,9 @@ export LD_LIBRARY_PATH=/usr/local/lib/
 
 ``` 
 
- make testcase TC=111
- ./testcase -mute
-
 That's all folks.
+
+# Playing
 
 <details>
  <summary>How to play?</summary>
@@ -187,6 +186,18 @@ Capital letters increase the values of the sensitivity.
 The map can be activated by pressing "@".  And the main view can be restored by pressing "!".  The map can be zoomed in and out by pressing left and right mouse clicks.  While clicking and pressing shift will set a waypoint for the autopilot.  The waypoint mode can be modified from "destination" or "attack" by writing these commands in the console.
  
 </details>
+
+
+# Scenarios
+
+There are several scenarios in the engine that are used for research and as test cases.
+
+The scenario 111 is the tank battleground:
+
+```bash
+ make testcase TC=111
+ ./testcase -mute -random
+```
 
 
 Objective and design guidelines
