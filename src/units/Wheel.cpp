@@ -79,6 +79,11 @@ void Wheel::doDynamics()
     dJointSetHinge2Param (joint,dParamVel2,-getThrottle());
     dJointSetHinge2Param (joint,dParamFMax2,maxtorque);
 
+    Vec3f vav = dBodyGetAngularVelInBody(me);
+
+    //@NOTE: For some unknown reason, the following line generates a segfault when the ODE world is terminated.
+    //odometry += vav.magnitude();
+
     if (steeringwheel)
     {
 
@@ -86,8 +91,6 @@ void Wheel::doDynamics()
         if (v > 0.1) v = 0.1;
         if (v < -0.1) v = -0.1;
         v *= -5.0;
-
-        //printf("Azimuth: %10.5f, value %10.5f\n", azimuth, dJointGetHinge2Angle1 (joint));
 
 
         dJointSetHinge2Param (joint,dParamVel,v);
@@ -115,9 +118,13 @@ void Wheel::embody(dWorldID world, dSpaceID space)
     me = dBodyCreate(world);
     dQuaternion q;
     dQFromAxisAndAngle (q,0,0,1,M_PI*0.5);
+    // dQFromAxisAndAngle (q,0,0,1,M_PI*0.5);  // Use me for cylinders
     dBodySetQuaternion (me,q);
     embody(me);
+
+    // @NOTE: Sphere are better because they are submerged in the sea floor when the walrus becomes a boat.
     geom = dCreateSphere(space, length);
+    //geom = dCreateCylinder(space,length,width);
     dGeomSetBody(geom, me);
 }
 
@@ -184,6 +191,7 @@ void Wheel::doControl(Controller controller)
 
     setThrottle(controller.registers.thrust);
 
+
 }
 
 void Wheel::doControl()
@@ -224,8 +232,6 @@ void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
     glPushMatrix();
     glTranslatef(x,y,z);
 
-
-
     // This will Rotate according to the R quaternion (which is a variable in Vehicle).
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
@@ -234,14 +240,11 @@ void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
 
     //glRotatef(0, 0.0f, 0.0f, 1.0f);
 
+    // @FIXME: Create a nice wheel.
     drawRectangularBox(width, height, length);
 
     glPopMatrix();
 
-    //boxangle += 0.5f;
-
-    //if (boxangle >= 360.f)
-      //  boxangle = 0.0f;
 }
 
 void Wheel::setSteering(bool option)
@@ -252,4 +255,15 @@ void Wheel::setSteering(bool option)
 void Wheel::setAzimuth(float value)
 {
     Wheel::azimuth = value;
+}
+
+void Wheel::resetOdometry()
+{
+    odometry = 0.0;
+}
+
+
+float Wheel::getOdometry()
+{
+    return odometry;
 }

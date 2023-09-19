@@ -278,6 +278,8 @@ int TestCase_111::check(unsigned long timertick)
         _b2->setStatus(ROLLING);
     }
 
+    //usleep(1000000.0);
+
     if (timertick > 20)
     {
 
@@ -296,7 +298,7 @@ int TestCase_111::check(unsigned long timertick)
         {
             //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
 
-            printf("Delay %lu %d:roll %10.2f thrust %10.2f\n", (timer-mesg.sourcetimer),mesg.controllingid, mesg.registers.roll, mesg.registers.thrust);
+            printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg.controllingid, (timer-mesg.sourcetimer), mesg.registers.roll, mesg.registers.thrust);
 
             Vehicle *_b=NULL;
 

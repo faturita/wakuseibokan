@@ -20,6 +20,8 @@ import socket
 
 from TelemetryDictionary import telemetrydirs as td
 
+import math
+
 # This is the port where the simulator is waiting for commands
 # The structure is given in ../commandorder.h/CommandOrder
 ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,17 +32,17 @@ controlport = 4501
 ctrl_server_address = (ip, controlport)
 
 
-def send_command(timer):
+def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank, faction):
 
-    controllingid=1
-    thrust=10.0
-    roll=1.0
-    pitch=0.0
-    yaw=0.0
-    precesion=0.0
-    bank=0.0
-    faction=1
-    #timer=1
+#    controllingid=1
+#    thrust=10.0
+#    roll=1.0
+#    pitch=0.0
+#    yaw=0.0
+#    precesion=0.0
+#    bank=0.0
+#    faction=1
+#    #timer=1
 
     command = 0
     spawnid=0
@@ -145,6 +147,7 @@ while True:
         # is  a valid message struct
         new_values = unpack(unpackcode,data)
 
+        # The
         if int(new_values[td['number']]) == tank:
 
             f.write( str(new_values[0]) + ',' + str(new_values[1]) + ',' + str(new_values[2]) +  ',' + str(new_values[3]) + ',' + str(new_values[4]) + ',' + str(new_values[6]) + '\n')
@@ -154,9 +157,24 @@ while True:
             y.append( float(new_values[td['x']]))
             z.append( float(new_values[td['z']]))
 
+            vec2d = (float(new_values[td['x']]), float(new_values[td['z']]))
+
+            polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
+
+            if polardistance < 1700:
+                thrust = 10.0
+            else:
+                thrust = 0.0
+
+            roll = 0.0
+            pitch = 0.0
+            yaw = 0.0
+            precesion = 0.0
+            bank = 0.0
+
             # Analyze the data to determine what to do.
             # Do something
-            send_command(new_values[td["timer"]])
+            send_command(new_values[td["timer"]], 1, thrust, roll, pitch, yaw, precesion, bank, 1)
 
 
 f.close()
