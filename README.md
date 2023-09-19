@@ -14,59 +14,20 @@ Compiling and Installation
 
 'Requirements'
 * ODE: Open Dynamics Engine, version 0.14: https://bitbucket.org/odedevs/ode
-* Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+* STK: The Synthesis Toolkit in C++ (Audio Library)
+* OpenGL Version 2.1 (supported natively in Linux, Mac and Windows).
 
 # ODE
+
+You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
+Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+
 ```bash
 ./bootstrap
 ./configure --disable-asserts
 make
-make install
-```
-
-# STK
-
-First you need to copy the stk file from dependencies into the 
-parent directory where you cloned wakuseiboukan.  Then you need
-to compile this sound library.
-
-```bash
-cp dependencies/stk.tgz ../../
-cd ../../
-tar xvzf stk.tgz
-cd stk
-make clean
-./configure
-make 
 sudo make install
-
 ```
-
-The STK libraries are going to be copied into /usr/local/lib/.  So you need
-to run the following command before executing the simulator or configure it intorc_bash or similar.
-
-```bash
-export LD_LIBRARY_PATH=/usr/local/lib/
-``` 
-
-
-# Ubuntu Packages
-
- libbsd-dev  freeglut3-dev
- libasound2  libasound2-dev
-
-# Compiling
-
- make
- ./waku
-
- # Running
-
- make testcase TC=111
- ./testcase -mute
-
-That's all folks.
-
 
 ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
 ----------------------------------------------------------
@@ -144,6 +105,61 @@ Once these steps are completed you can compile ODE first and then follow the gui
 * ./bootstrap
 * ./configure --disable-asserts
 * make clean && make && sudo make install
+
+# STK
+
+First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
+to compile this sound library.
+
+```bash
+cp dependencies/stk.tgz ../../
+cd ../../
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+```
+
+The STK libraries are going to be copied into /usr/local/lib/.  So you need
+to run the following command before executing the simulator or configure it intorc_bash or similar.
+
+```bash
+export LD_LIBRARY_PATH=/usr/local/lib/
+``` 
+
+# Ubuntu Packages
+
+ libbsd-dev  freeglut3-dev
+ libasound2  libasound2-dev
+
+# Compiling the game
+
+ make
+
+ # Running
+
+```bash
+ ./waku [-d] [-random] [-client] [-server] [-greenmode|-bluemode] [-aiplayergreen|-aiplayerblue|-aiboth] [-action|-strategy] [-loadgame savegames/file.w]
+
+ -d: open is a window
+ -random: initialize the random number generator with a seed from timestamp.
+ -server: runs as a server, ready for receiving incoming connections.
+ -client: runs as a client, trying to connect to a server and receiving UDP Telemetry.
+ -greenmode|-bluemode: plays as green faction or blue faction.
+ -aiplayergreen|aiplayerblue|aiboth: choose which side gets the AI.
+ -action: action mode with a lot of islands already established.
+ -strategy: starts from an initial island and conquering all the rest.
+ -loadgame: load a savegame.
+
+``` 
+
+ make testcase TC=111
+ ./testcase -mute
+
+That's all folks.
+
 
 Objective and design guidelines
 -------------------------------
