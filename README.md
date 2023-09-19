@@ -40,8 +40,11 @@ On newer OSX systems with brew installed, you can do
 brew install premake
 ```
 
-Otherwise, for older versions, you can run:
 
+
+<details>
+<summary>For older versions, you can run the following script</summary>
+ 
 ```bash
 #!/bin/sh
 
@@ -98,13 +101,15 @@ echo "Installation complete."
 * Now download the ode-0.14.tar tarball.
 * Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
+</details>
 
+Once these steps are completed you can compile ODE:
 
-Once these steps are completed you can compile ODE first and then follow the guidelines to install STK.
-
-* ./bootstrap
-* ./configure --disable-asserts
-* make clean && make && sudo make install
+```bash
+ ./bootstrap
+ ./configure --disable-asserts
+ make clean && make && sudo make install
+```
 
 # STK
 
@@ -159,6 +164,29 @@ export LD_LIBRARY_PATH=/usr/local/lib/
  ./testcase -mute
 
 That's all folks.
+
+<details>
+ <summary>How to play?</summary>
+
+First the console can be activated with 't', like Minecraft.
+
+Everything can be controlled.  Each vehicle has a vehicle number.  Keyboard 1-9 allows to control 9 vehicles directly from the keyboard.  Otherwise you need to activate the console  write 'control NN' and the number of the vehicle.   The list of all the entities can be accessed with '#'.  It is only possible to control vehicles from the same faction.
+The keyboard entries can be configured by writing in the console 'set KEYNUMBER#NN'.
+
+There are five degrees of freedom that can be controlled from each vehicle
+* a-d: ROLL a clockwise on Z
+* w-s: PITCH w noise down.
+* v-b: YAW   b clockwise on Y
+* z-c: PRECESION  c clockwise on Z
+* r-f: THRUST    r inclease it
+* h: Fire active weapon.
+* j/J: Engage/Disengage autopilot.
+
+Capital letters increase the values of the sensitivity.
+
+The map can be activated by pressing "@".  And the main view can be restored by pressing "!".  The map can be zoomed in and out by pressing left and right mouse clicks.  While clicking and pressing shift will set a waypoint for the autopilot.  The waypoint mode can be modified from "destination" or "attack" by writing these commands in the console.
+ 
+</details>
 
 
 Objective and design guidelines
@@ -248,3 +276,4 @@ References
 * https://www-robotics.jpl.nasa.gov/how-we-do-it/facilities/the-darts-simulation-laboratory/
 * MuJoCo https://github.com/deepmind/mujoco
 * https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers
+* ARMA 3 https://en.wikipedia.org/wiki/Arma_3
