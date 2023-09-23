@@ -22,6 +22,8 @@ from TelemetryDictionary import telemetrydirs as td
 
 import math
 
+from Fps import Fps
+
 # This is the port where the simulator is waiting for commands
 # The structure is given in ../commandorder.h/CommandOrder
 ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -112,7 +114,7 @@ if (len(sys.argv)>=7):
 
 # UDP Telemetry port on port 4500
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('0.0.0.0', 4500)
+server_address = ('0.0.0.0', 4600)
 print ('Starting up on %s port %s' % server_address)
 
 sock.bind(server_address)
@@ -134,13 +136,18 @@ x = []
 y = []
 z = []
 
+fps = Fps()
+fps.tic()
+
 # Which tank I AM.
 tank=1
 
 while True:
     # read
-
+    fps.steptoc()
     data, address = sock.recvfrom(length)
+
+    print(f"Fps: {fps.fps}")
 
     # Take care of the latency
     if len(data)>0 and len(data) == length:
@@ -161,6 +168,8 @@ while True:
 
             polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
 
+            print(polardistance);
+
             if polardistance < 1700:
                 thrust = 10.0
             else:
@@ -174,7 +183,7 @@ while True:
 
             # Analyze the data to determine what to do.
             # Do something
-            send_command(new_values[td["timer"]], 1, thrust, roll, pitch, yaw, precesion, bank, 1)
+            send_command(new_values[td["timer"]], tank, thrust, roll, pitch, yaw, precesion, bank, 1)
 
 
 f.close()
