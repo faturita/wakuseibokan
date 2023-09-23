@@ -4,7 +4,7 @@
 **
 ** This is 3D port of Java RoboCode platform.
 **
-** There are two (it could be more) walrus tanks.  They are configured
+** There are two (there could be more) walrus tanks.  They are configured
 ** to transmit telemetry information to whoever is subscribed to receive them
 **
 ** ========================================================================= */
@@ -65,15 +65,26 @@ TestCase_111::TestCase_111()
 void TestCase_111::init()
 {
 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    fcntl(sockfd, F_SETFL, O_NONBLOCK);
+    sockfd1 = socket(AF_INET, SOCK_DGRAM, 0);
+    fcntl(sockfd1, F_SETFL, O_NONBLOCK);
 
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(4501);
+    bzero(&servaddr1, sizeof(servaddr1));
+    servaddr1.sin_family = AF_INET;
+    servaddr1.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr1.sin_port = htons(4501);
 
-    bind(sockfd, (SA *) &servaddr, sizeof(servaddr));
+    bind(sockfd1, (SA *) &servaddr1, sizeof(servaddr1));
+
+
+    sockfd2 = socket(AF_INET, SOCK_DGRAM, 0);
+    fcntl(sockfd2, F_SETFL, O_NONBLOCK);
+
+    bzero(&servaddr2, sizeof(servaddr2));
+    servaddr2.sin_family = AF_INET;
+    servaddr2.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr2.sin_port = htons(4502);
+
+    bind(sockfd2, (SA *) &servaddr2, sizeof(servaddr2));
 
     /**
     socklen_t len;
@@ -268,7 +279,7 @@ float distancegreen, distanceblue;
 
 int TestCase_111::check(unsigned long timertick)
 {
-    if (timertick ==5)
+    if (timertick ==1)
     {
         Vehicle* _b1 = findWalrus(GREEN_FACTION);
         _b1->enableAuto();
@@ -280,49 +291,95 @@ int TestCase_111::check(unsigned long timertick)
 
     //usleep(1000000.0);
 
-    if (timertick > 20)
+    if (timertick >= 1)
     {
 
         socklen_t len;
-        ControlStructure mesg;
+        ControlStructure mesg1, mesg2;
+        SA pcliaddr1, pcliaddr2;
 
-        SA pcliaddr;
+        socklen_t clilen1=sizeof(cliaddr1);
+        int n1, n2;
 
-        socklen_t clilen=sizeof(cliaddr);
-        int n;
+        len = clilen1;
+        n1 = recvfrom(sockfd1, &mesg1, sizeof(mesg1), 0, &pcliaddr1, &len);
 
-        len = clilen;
-        n = recvfrom(sockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
 
-        if (n!=-1)
+        socklen_t clilen2=sizeof(cliaddr2);
+
+        len = clilen2;
+        n2 = recvfrom(sockfd2, &mesg2, sizeof(mesg2), 0, &pcliaddr2, &len);
+
+        if (n1!=-1)
         {
-            //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
-
-            printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg.controllingid, (timer-mesg.sourcetimer), mesg.registers.roll, mesg.registers.thrust);
+            //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg1.controllingid, (timer-mesg1.sourcetimer), mesg1.registers.roll, mesg1.registers.thrust);
 
             Vehicle *_b=NULL;
 
-            if (mesg.controllingid == 1)
+            if (mesg1.controllingid == 1)
                 _b = findWalrus(GREEN_FACTION);
-            else if (mesg.controllingid == 2)
+            else if (mesg1.controllingid == 2)
                 _b = findWalrus(BLUE_FACTION);
 
-            if ((timer-mesg.sourcetimer)>30000)
+            if ((timer-mesg1.sourcetimer)>30000)
             {
                 printf("Message IGNORED !!!");
             }
             else if (_b)
             {
                 Controller co;
-                co.controllingid = mesg.controllingid;
-                co.faction = mesg.faction;
-                co.registers = mesg.registers;
+                co.controllingid = mesg1.controllingid;
+                co.faction = mesg1.faction;
+                co.registers = mesg1.registers;
                 //co.push(mesg.order);
 
                 _b->doControl(co);
 
 
-                if (mesg.order.command == Command::FireOrder && _b->getPower()>0)
+                if (mesg1.order.command == Command::FireOrder && _b->getPower()>0)
+                {
+                    Vehicle *action = _b->fire(0,world, space);
+
+                    if (action != NULL)
+                    {
+                        entities.push_back(action, action->getGeom());
+                        gunshot();
+                    }
+                    _b->setPower(_b->getPower()-1);
+                }
+
+            }
+        }
+
+        if (n2!=-1)
+        {
+            //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
+
+            //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg2.controllingid, (timer-mesg2.sourcetimer), mesg2.registers.roll, mesg2.registers.thrust);
+
+            Vehicle *_b=NULL;
+
+            if (mesg2.controllingid == 1)
+                _b = findWalrus(GREEN_FACTION);
+            else if (mesg2.controllingid == 2)
+                _b = findWalrus(BLUE_FACTION);
+
+            if ((timer-mesg2.sourcetimer)>30000)
+            {
+                printf("Message IGNORED !!!");
+            }
+            else if (_b)
+            {
+                Controller co;
+                co.controllingid = mesg2.controllingid;
+                co.faction = mesg2.faction;
+                co.registers = mesg2.registers;
+                //co.push(mesg.order);
+
+                _b->doControl(co);
+
+
+                if (mesg2.order.command == Command::FireOrder && _b->getPower()>0)
                 {
                     Vehicle *action = _b->fire(0,world, space);
 
@@ -391,7 +448,7 @@ int TestCase_111::check(unsigned long timertick)
     if (fps == 0)  fps=60.0;
 
     // Only 5 mimutes duration
-    if (timertick > (unsigned long)fps * 60 * 5)
+    if (timertick > 10000)
     {
         isdone = true;
         haspassed = false;

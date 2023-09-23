@@ -27,8 +27,12 @@
 class TestCase_111 : public TestCase
 {
 private:
-    struct sockaddr_in servaddr, cliaddr;
-    int sockfd;
+    struct sockaddr_in servaddr1, cliaddr1;
+    int sockfd1;
+
+    struct sockaddr_in servaddr2, cliaddr2;
+    int sockfd2;
+
     unsigned long endtimer;
     int whowon;
 public:

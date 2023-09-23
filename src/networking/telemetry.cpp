@@ -94,17 +94,25 @@ void inittelemetry()
 
     int iendpoints = atoi(endpoints);
 
+    dout << iendpoints << std::endl;
+
     for(int i=0;i<iendpoints;i++)
     {
         char telkey[256];
+        char ipkey[256];
         sprintf(telkey,"endpoint#%d",i+1);
+        sprintf(ipkey,"port#%d", i+1);
         char *telemetryendpoint = ps.Get(telkey);
+        char *portendpoint = ps.Get(ipkey);
+        int portnumber = atoi(portendpoint);
 
-        if (strcmp(telemetryendpoint,EMPTYVALUE)!=0)
+        if (strcmp(telemetryendpoint,EMPTYVALUE)!=0 && strcmp(portendpoint,EMPTYVALUE)!=0)
         {
+            if (portnumber <=0 || portnumber > 65500)
+                portnumber = 4500;
 
-            dout << "Hooking up to telemetry endpoint at " << telemetryendpoint << std::endl;
-            connections.push_back(addNewTelemetryListener(telemetryendpoint,4500));
+            dout << "Hooking up to telemetry endpoint at " << telemetryendpoint << ":" << portendpoint << std::endl;
+            connections.push_back(addNewTelemetryListener(telemetryendpoint,portnumber));
         }
     }
 }
