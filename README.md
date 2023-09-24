@@ -183,6 +183,14 @@ There are five degrees of freedom that can be controlled from each vehicle
 Capital letters increase the values of the sensitivity.
 
 The map can be activated by pressing "@".  And the main view can be restored by pressing "!".  The map can be zoomed in and out by pressing left and right mouse clicks.  While clicking and pressing shift will set a waypoint for the autopilot.  The waypoint mode can be modified from "destination" or "attack" by writing these commands in the console.
+
+* o/O: Spawns a UGV either from any of the Carriers or from Ports or Armories.  Capital O despawns them when they are nearby.
+* m/M: Spawns a UAV either from any of the Carriers or from Roadways.  Capital M despawns them when they are landed.
+* c:   Spawns a UGV drone only from the Beluga Carrier.
+* 'launch': Console command to launch any aircraft landed on the runways or carriers.
+* 'taxi': Moves the aircraft to launching position when necessary.
+* 'land': Order any nearby aircraft to land.
+
  
 </details>
 
@@ -288,3 +296,4 @@ More info
 * MuJoCo https://github.com/deepmind/mujoco
 * https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers
 * ARMA 3 https://en.wikipedia.org/wiki/Arma_3
+* Game Networking https://pvigier.github.io/2019/09/08/beginner-guide-game-networking.html
