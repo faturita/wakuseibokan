@@ -181,6 +181,8 @@ src/tests/testcase_115.cpp
 src/tests/testcase_115.h
 src/tests/testcase_116.cpp
 src/tests/testcase_116.h
+src/tests/testcase_117.cpp
+src/tests/testcase_117.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h
