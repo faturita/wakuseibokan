@@ -130,7 +130,10 @@ bool departed(Vehicle *walrus)
         w->setIsland(NULL);
         char str[256];
         Message mg;
-        sprintf(str, "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
+        if (island)
+            sprintf(str, "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
+        else
+            sprintf(str, "%s has departed.", w->getName().c_str());
         mg.msg = std::string(str);
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);

@@ -67,7 +67,7 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
         bank,
         faction,
         timer,
-        command,
+        command,    # 0 or 11
         spawnid,
         typeofisland,
         x,y,z,
@@ -114,7 +114,7 @@ if (len(sys.argv)>=7):
 
 # UDP Telemetry port on port 4500
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('0.0.0.0', 4600)
+server_address = ('0.0.0.0', 4601)
 print ('Starting up on %s port %s' % server_address)
 
 sock.bind(server_address)
