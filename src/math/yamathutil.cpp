@@ -211,6 +211,17 @@ int getRandomInteger(int min, int max)
     return val;
 }
 
+float getRandom(float min, float max, int resolution)
+{
+    float Res = pow(10.0,resolution);
+    int Max = (int) (max*Res);
+    int Min = (int) (min*Res);
+
+    int Val = getRandomInteger(Min,Max);
+
+    return ( (float)Val/100.0);
+}
+
 float _acos(float val)
 {
     float out = acos(val);

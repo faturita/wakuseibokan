@@ -398,7 +398,10 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         v = (Vehicle*)_walrus;
 
         p = getForward().normalize()*(1000);
-        _walrus->goTo(Vec3f(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]));
+        p = p.rotateOnY(getRandom(-PI/2.0+PI/4.0, PI/2.0 - PI/4));
+        p = getPos()-p;
+
+        _walrus->goTo(p);
         _walrus->enableAuto();
 
         Vec3f dimensions(5.0f,4.0f,10.0f);
@@ -430,11 +433,6 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
         entities.push_back(_br, _br->getGeom());
 
-
-
-
-
-
         Wheel * _bl= new Wheel(getFaction(), 0.001, 30.0);
         _bl->init();
         _bl->embody(world, car_space);
@@ -448,12 +446,16 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _fl->setSteering(true);
         _fr->setSteering(true);
 
-        alignToMyBody(_walrus->getBodyID());
-
-        dMatrix3 Re2;
-        dRSetIdentity(Re2);
+        // Get the alignment of the carrier and invert it for the walrus.
+        dMatrix3 Re1,Re2,Re3;
+        dQuaternion q1,q2,q3;
+        dBodyCopyRotation(me,Re1);
         dRFromAxisAndAngle(Re2,0.0,1.0,0.0,PI);
-        dBodySetRotation(_walrus->getBodyID(),Re2);
+        dQfromR(q1,Re1);
+        dQfromR(q2,Re2);
+        dQMultiply0(q3,q1,q2);
+        dRfromQ(Re3,q3);
+        dBodySetRotation(_walrus->getBodyID(),Re3);
 
     }
 

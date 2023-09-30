@@ -5002,7 +5002,7 @@ void checktest51(unsigned long timer)
 
     if (timer == starttime + 500)
     {
-        savegame();
+        savegame("savegames/test.w");
         message("Game saved.");
     }
 
@@ -5020,7 +5020,7 @@ void checktest51(unsigned long timer)
 
     if (timer == starttime + 1200)
     {
-        loadgame();
+        loadgame("savegames/test.w");
     }
 
 

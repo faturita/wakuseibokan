@@ -41,6 +41,7 @@ float min(float val1, float val2);
 
 Vec3f getRandomCircularSpot(Vec3f origin, float radius);
 int getRandomInteger(int min, int max);
+float getRandom(float min, float max, int resolution=2);
 
 typedef uint8_t crc;
 
