@@ -13,7 +13,8 @@ using namespace stk;
 class SoundTexture
 {
 public:
-    bool done;
+    bool done=true;
+    bool interrupt=false;
     StkFrames frames;
     FileWvIn input;
     RtAudio dac;

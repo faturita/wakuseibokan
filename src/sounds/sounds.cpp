@@ -41,11 +41,16 @@ void playsound(char *filename)
 
 void bullethit()
 {
-    if (!mute) {
-        //static SoundTexture s;
-        s.init("sounds/bullethit.wav");
-        s.play();
+    try {
+        if (!mute && s.done) {
+            //static SoundTexture s;
+            s.init("sounds/bullethit.wav");
+            s.play();
+        }
+    }  catch (StkError) {
+
     }
+
 }
 
 void firesound(int times)
@@ -57,118 +62,170 @@ void firesound(int times)
 
 void smallenginestart()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/boozing.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void enginestart()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/cruise.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void takeoff()
 {
-    if (!mute)
+        try {
+    if (!mute && s.done)
     {
         //static SoundTexture s;
         s.init("sounds/takeoff.wav");
         s.play();
     }
+    }  catch (StkError) {
+
+    }
 }
 
 void explosion()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done) {
         //static SoundTexture s;
         s.init("sounds/explosion.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void radarbeep()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/radarbeep.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void splash()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/splash.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void coast()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/coast.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void honk()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/boathonk.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void soaring()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/soaring.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void gunshot()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/gunshot.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void artilleryshot()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/artillery.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void droneflying()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/cephalopod.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }
 
 void intro()
 {
-    if (!mute) {
+        try {
+    if (!mute && s.done)  {
         //static SoundTexture s;
         s.init("sounds/intro.wav");
         s.play();
+    }
+    }  catch (StkError) {
+
     }
 }

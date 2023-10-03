@@ -19,7 +19,7 @@ int tick_callback( void *outputBuffer, void *inputBuffer, unsigned int nBufferFr
     if ( input->channelsOut() == 1 ) *samples++ = so->frames[i]; // play mono files in stereo
   }
 
-  if ( input->isFinished() ) {
+  if ( input->isFinished() || so->interrupt) {
     so->done = true;
     so->dac.closeStream();
     return 1;
@@ -48,7 +48,7 @@ void SoundTexture::init(char fl[256])
       exit( 1 );
     }
 
-    done = false;
+    done = false;interrupt = false;
 
     // Set input read rate based on the default STK sample rate.
     double rate = 1.0;
@@ -102,8 +102,8 @@ SoundTexture::~SoundTexture()
 void SoundTexture::close()
 {
     // Block waiting until callback signals done.
-    //while ( !done )
-      //Stk::sleep( 100 );
+    while ( !done )
+      Stk::sleep( 100 );
 
     // By returning a non-zero value in the callback above, the stream
     // is automatically stopped.  But we should still close it.
