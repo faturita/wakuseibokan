@@ -260,6 +260,8 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
     int rounded = round(adjusted);
     adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
 
+    int minradius = 2500;
+    float mindistance = 60;
 
     for(int radius = 2500;radius>0;radius--)
     {
@@ -279,11 +281,40 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
         // @FIXME Put this line in a different function and use it from there.  Repeated code here.
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
 
+        //dout << heightOffset << std::endl;
+
         if (  abs(heightOffset-desiredHeight)<0.5 )
         {
             return addStructure(structure,x,z,-t+3*(PI/2), world);
         }
+
+        if ( abs(heightOffset-desiredHeight)<mindistance )
+        {
+            minradius = radius;
+            mindistance = abs(heightOffset-desiredHeight);
+        }
+
     }
+
+    if (mindistance < 60)
+    {
+        x = cos(t);
+        z = sin(t);
+
+        x = x * minradius;
+        z = z * minradius;
+
+        if (x>1799) x = 1799;
+        if (x<-1799) x = -1799;
+        if (z>1799) z = 1799;
+        if (z<-1799) z = -1799;
+
+        return addStructure(structure,x,z,-t+3*(PI/2), world);
+    }
+
+#ifdef DEBUG
+    assert( false || !"I did my best but couldn't find a place where to put what you want me to put at the desired place.");
+#endif
 
     // @NOTE Give up.
     return addStructure(structure,x,z,-t+3*(PI/2), world);

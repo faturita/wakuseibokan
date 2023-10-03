@@ -565,6 +565,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (entities.isValid(controller.controllingid) && entities[controller.controllingid]->getType()==WALRUS)
                 {
+                    // @FIXME:  This is not working
                     Walrus *w = (Walrus*) entities[controller.controllingid];
                     Vehicle *b = findCarrier(w->getFaction());
                     Vec3f t = b->getPos() - w->getPos();

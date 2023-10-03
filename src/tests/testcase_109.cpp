@@ -52,7 +52,7 @@ void TestCase_109::init()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/fulcrum.bmp");
+    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
 
     islands.push_back(nemesis);
 
@@ -108,7 +108,7 @@ void TestCase_109::init()
 
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION), world, 0);
+    Structure *t2 = islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION), world, 2);
     Structure *t3 = islands[0]->addStructure(new Antenna(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       290.0f,    80.0f,0,world);
