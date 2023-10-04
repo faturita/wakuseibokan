@@ -15,6 +15,7 @@ class SoundTexture
 public:
     bool done=true;
     bool interrupt=false;
+    StkFloat amplitude = 1.0;
     StkFrames frames;
     FileWvIn input;
     RtAudio dac;

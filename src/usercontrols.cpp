@@ -765,7 +765,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                 {
-                    gunshot();
+                    gunshot(Camera.pos);
                     CommandOrder co;
                     co.command = Command::FireOrder;
                     if (controller.weapon==1)

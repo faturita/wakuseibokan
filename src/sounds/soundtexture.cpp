@@ -15,7 +15,7 @@ int tick_callback( void *outputBuffer, void *inputBuffer, unsigned int nBufferFr
   input->tick( so->frames );
 
   for ( unsigned int i=0; i<so->frames.size(); i++ ) {
-    *samples++ = so->frames[i];
+    *samples++ = so->frames[i] * so->amplitude;
     if ( input->channelsOut() == 1 ) *samples++ = so->frames[i]; // play mono files in stereo
   }
 

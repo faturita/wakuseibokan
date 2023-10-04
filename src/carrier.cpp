@@ -402,7 +402,7 @@ void drawHUD()
                         static int coun=0;
                         if (int((enemy).magnitude()) <= coun++ )
                         {
-                            radarbeep();
+                            radarbeep(v->getPos());
                             coun=0;
                         }
 
@@ -1238,8 +1238,8 @@ void update(int value)
 
                     if (entities[i]->getType() != VehicleTypes::WEAPON)
                     {
-                        explosion();
                         Vec3f loc = entities[i]->getPos();
+                        explosion(loc);
 
                         Explosion* b1 = new Explosion();
                         b1->init();

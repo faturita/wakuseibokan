@@ -240,7 +240,7 @@ void Walrus::doControlAttack()
         if (action != NULL)
         {
             entities.push_at_the_back(action, action->getGeom());
-            gunshot();
+            gunshot(getPos());
             setTtl(5);
         }
 
@@ -396,7 +396,7 @@ void Walrus::doControl(struct controlregister conts)
     if (getThrottle()>=10 && getThrottle()<=20 and !didit)
     {
         didit = true;
-        smallenginestart();
+        smallenginestart(pos);
     } else if (getThrottle()==0)
         didit = false;
     

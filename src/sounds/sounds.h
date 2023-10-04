@@ -9,24 +9,26 @@
 #include <GLUT/glut.h>
 #endif
 
+#include "../math/yamathutil.h"
+
 
 void initSound();
 void clearSound();
 
 void firesound(int times);
-void enginestart();
-void takeoff();
-void explosion();
-void splash();
-void honk();
-void gunshot();
-void artilleryshot();
-void smallenginestart();
-void soaring();
-void bullethit();
-void droneflying();
+void enginestart(Vec3f source);
+void takeoff(Vec3f source);
+void explosion(Vec3f source);
+void splash(Vec3f source);
+void honk(Vec3f source);
+void gunshot(Vec3f source);
+void artilleryshot(Vec3f source);
+void smallenginestart(Vec3f source);
+void soaring(Vec3f source);
+void bullethit(Vec3f source);
+void droneflying(Vec3f source);
 
-void radarbeep();
+void radarbeep(Vec3f source);
 
 void intro();
 

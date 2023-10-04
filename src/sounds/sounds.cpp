@@ -1,5 +1,3 @@
-#include "sounds.h"
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,6 +7,12 @@
 
 #include "soundtexture.h"
 
+#include "sounds.h"
+
+#include "../camera.h"
+
+
+extern  Camera Camera;
 extern bool mute;
 
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
@@ -39,12 +43,19 @@ void playsound(char *filename)
     system(temp);
 }
 
-void bullethit()
+
+void playthissound(char fl[256])
 {
     try {
-        if (!mute && s.done) {
+        if (!mute) {
+            while (!s.done)
+            {
+                s.interrupt = true;
+                Stk::sleep( 1 );
+            }
             //static SoundTexture s;
-            s.init("sounds/bullethit.wav");
+            s.init(fl);
+            s.amplitude = 1.0;
             s.play();
         }
     }  catch (StkError) {
@@ -53,6 +64,35 @@ void bullethit()
 
 }
 
+void playthissound(Vec3f source, char fl[256])
+{
+    try {
+        if (!mute) {
+            Vec3f dist = source - Camera.pos;
+            if (dist.magnitude()<1000.0)
+            {
+                StkFloat amplitude = 1000.0-dist.magnitude() / 1000.0;
+                amplitude = 1.0;
+                while (!s.done)
+                {
+                    s.interrupt = true;
+                    Stk::sleep( 1 );
+                }
+                //static SoundTexture s;
+                s.init(fl);
+                s.amplitude = amplitude;
+                s.play();
+            }
+        }
+    }  catch (StkError) {
+
+    }
+
+}
+
+
+
+
 void firesound(int times)
 {
     for(int i=0;i<times;i++)
@@ -60,172 +100,72 @@ void firesound(int times)
 
 }
 
-void smallenginestart()
+void bullethit(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/boozing.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/bullethit.wav");
 }
 
-void enginestart()
+void smallenginestart(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/cruise.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/boozing.wav");
 }
 
-void takeoff()
+void enginestart(Vec3f source)
 {
-        try {
-    if (!mute && s.done)
-    {
-        //static SoundTexture s;
-        s.init("sounds/takeoff.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/cruise.wav");
 }
 
-void explosion()
+void takeoff(Vec3f source)
 {
-        try {
-    if (!mute && s.done) {
-        //static SoundTexture s;
-        s.init("sounds/explosion.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/takeoff.wav");
 }
 
-void radarbeep()
+void explosion(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/radarbeep.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/explosion.wav");
 }
 
-void splash()
+void radarbeep(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/splash.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/radarbeep.wav");
 }
 
-void coast()
+void splash(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/coast.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/splash.wav");
 }
 
-void honk()
+void coast(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/boathonk.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/coast.wav");
 }
 
-void soaring()
+void honk(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/soaring.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/boathonk.wav");
 }
 
-void gunshot()
+void soaring(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/gunshot.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/soaring.wav");
 }
 
-void artilleryshot()
+void gunshot(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/artillery.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound(source,"sounds/gunshot.wav");
 }
 
-void droneflying()
+void artilleryshot(Vec3f source)
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/cephalopod.wav");
-        s.play();
-    }
-    }  catch (StkError) {
+    playthissound(source,"sounds/artillery.wav");
+}
 
-    }
+void droneflying(Vec3f source)
+{
+    playthissound(source,"sounds/cephalopod.wav");
 }
 
 void intro()
 {
-        try {
-    if (!mute && s.done)  {
-        //static SoundTexture s;
-        s.init("sounds/intro.wav");
-        s.play();
-    }
-    }  catch (StkError) {
-
-    }
+    playthissound( "sounds/intro.wav");
 }

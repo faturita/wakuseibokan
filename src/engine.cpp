@@ -556,8 +556,8 @@ void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 {
     if (dGeomIsEnabled(v->getGeom()))
     {
-        splash();
         Vec3f loc = v->getPos();
+        splash(loc);
 
         Explosion* b1 = new Explosion();
         b1->init();
@@ -583,8 +583,8 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 {
     if (dGeomIsEnabled(v->getGeom()))
     {
-        explosion();
         Vec3f loc = v->getPos();
+        explosion(loc);
 
         Explosion* b1 = new Explosion();
         b1->init();
@@ -1504,7 +1504,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (action != NULL)
                         {
                             size_t l = entities.push_at_the_back(action,action->getGeom());
-                            gunshot();
+                            gunshot(lb->getPos());
 
                             action->goTo(target->getPos());
                             action->enableAuto();
@@ -1950,7 +1950,7 @@ Manta* launchManta(Vehicle *v)
             sprintf(msg, "%s has been launched.", m->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
-            takeoff();
+            takeoff(m->getPos());
         }
         return m;
     } else if (v->getType() == LANDINGABLE)
@@ -1972,7 +1972,7 @@ Manta* launchManta(Vehicle *v)
             sprintf(msg, "%s is departing from %s.", m->getName().c_str(), is->getName().c_str());
             mg.msg = std::string(msg);
             messages.insert(messages.begin(), mg);
-            takeoff();
+            takeoff(m->getPos());
         }
         return m;
     }
