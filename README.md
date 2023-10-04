@@ -211,15 +211,15 @@ The scenario 111 is the tank battleground:
 Objective and design guidelines
 -------------------------------
 
-The purpose was to create an multiplatform simple game engine based on physics dynamic engine and a fluid simulation solver, and a testbed platform to simulate manipulators and mobile robots.
+The purpose was to create a multiplatform simple game engine based on physics dynamic engine and a fluid simulation solver, and a testbed platform to simulate manipulators and mobile robots.
 
-The game is a remake of an old and amazing game, which uses the engine as platform.  The desgin guideline for the game was to create a networked game where it is possible to control indepentendly all of the entities that are available.
+The game is a remake of an old and amazing game, which uses the engine as platform.  The design guideline for the game was to create a networked game where it is possible to control indepentendly all of the entities that are available.  You can be anyone anywhere.
 
 Characteristics
 ---------------
 * Floor
-    * The floor is a square flat box that extends to the horizon.  Horizon works according the fulcrum representation.
-    * Sea is good.  Works as a texture that is shifted based on the camera position.
+    * The floor is a flat square that extends to the horizon, located based on camera position.  Horizon works according the fulcrum representation.
+    * Sea works as a texture that is shifted based on the camera position.
     * Reflections and alpha are missing.
     * Waves and boat wakes are missing.  
 * Sky
