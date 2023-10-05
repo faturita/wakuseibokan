@@ -475,7 +475,7 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
     Ft = Ft.normalize();  Ft=Ft * 0.2;
 
     //dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
-    artilleryshot();
+    artilleryshot(getPos());
     //setTtl(200);
 
     // I can set power or something here.

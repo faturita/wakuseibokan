@@ -100,7 +100,7 @@ int TestCase_113::check(unsigned long timertick)
         if (action != NULL)
         {
             size_t index = entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(_b->getPos());
             switchControl(index);
 
             missile = index;

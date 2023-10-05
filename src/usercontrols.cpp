@@ -309,7 +309,6 @@ void switchControl(size_t id)
     // Check if it is from users faction
     if (!(entities[id]->getFaction() == controller.faction || controller.faction == BOTH_FACTION))
     {
-        controller.controllingid = CONTROLLING_NONE;
         return;
     }
 
@@ -765,7 +764,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                 {
-                    gunshot();
+                    gunshot(Camera.pos);
                     CommandOrder co;
                     co.command = Command::FireOrder;
                     if (controller.weapon==1)

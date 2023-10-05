@@ -227,7 +227,7 @@ int TestCase_117::check(unsigned long timertick)
                     if (action != NULL)
                     {
                         entities.push_back(action, action->getGeom());
-                        gunshot();
+                        gunshot(_b->getPos());
                     }
                     _b->setPower(_b->getPower()-1);
                 }

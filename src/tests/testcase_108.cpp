@@ -180,7 +180,7 @@ int TestCase_108::check(unsigned long timertick)
             if (action != NULL)
             {
                 entities.push_back(action, action->getGeom());
-                gunshot();
+                gunshot(_b->getPos());
             }
 
             CarrierTurret* cbb = (CarrierTurret*)entities[weap[1]];
@@ -189,7 +189,7 @@ int TestCase_108::check(unsigned long timertick)
             if (action != NULL)
             {
                 entities.push_back(action, action->getGeom());
-                gunshot();
+                gunshot(_b->getPos());
             }
 
         }

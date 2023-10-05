@@ -264,7 +264,7 @@ void Balaenidae::doControl(Controller controller)
 void Balaenidae::doControl(struct controlregister regs)
 {
     if (getThrottle()==0 and regs.thrust != 0)
-        honk();
+        honk(getPos());
     setThrottle(regs.thrust*2*5);
 
     Balaenidae::rudder = -regs.roll;

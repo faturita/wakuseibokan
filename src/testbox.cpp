@@ -1279,7 +1279,7 @@ void checktest13(unsigned long timer)    // Laser firing and hitting Carrier.
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l->getPos());
         }
 
     }
@@ -1350,7 +1350,7 @@ void checktest12(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l->getPos());
         }
 
     }
@@ -1592,7 +1592,7 @@ void checktest16(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l->getPos());
         }
 
     }
@@ -1675,7 +1675,7 @@ void checktest17(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l->getPos());
         }
 
     }
@@ -1760,7 +1760,7 @@ void checktest18(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l->getPos());
         }
 
     }
@@ -1827,7 +1827,7 @@ void checktest19(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l1->getPos());
         }
 
     }
@@ -1848,7 +1848,7 @@ void checktest19(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 
@@ -1937,7 +1937,7 @@ void checktest20(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l1->getPos());
         }
 
     }
@@ -1958,7 +1958,7 @@ void checktest20(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 
@@ -2104,7 +2104,7 @@ void checktest22(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 }
@@ -2190,7 +2190,7 @@ void checktest23(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 }
@@ -2274,7 +2274,7 @@ void checktest24(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 
@@ -2927,7 +2927,7 @@ void checktest30(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 
@@ -2939,7 +2939,7 @@ void checktest30(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            gunshot();
+            gunshot(l2->getPos());
         }
     }
 
@@ -6522,7 +6522,7 @@ void checktest66(unsigned long timer)
                             if (action != NULL)
                             {
                                 entities.push_back(action, action->getGeom());
-                                gunshot();
+                                gunshot(w->getPos());
                                 //cm->setTtl(100);
                             }
 
@@ -7408,7 +7408,7 @@ void checktest78(unsigned long timer)
         if (action != NULL)
         {
             entities.push_back(action, action->getGeom());
-            soaring();
+            soaring(manta->getPos());
         }
         bombed = true;
     }

@@ -159,7 +159,7 @@ Vehicle* Artillery::fire(int weapon, dWorldID world, dSpaceID space)
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
-    artilleryshot();
+    artilleryshot(getPos());
     setTtl(200);
 
     // I can set power or something here.

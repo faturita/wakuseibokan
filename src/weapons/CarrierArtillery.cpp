@@ -218,7 +218,7 @@ Vehicle* CarrierArtillery::fire(int weapon, dWorldID world, dSpaceID space, int 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
 
-    artilleryshot();
+    artilleryshot(getPos());
     setTtl(shellloadingtime);
 
     // I can set power or something here.
