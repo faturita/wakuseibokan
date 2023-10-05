@@ -309,7 +309,6 @@ void switchControl(size_t id)
     // Check if it is from users faction
     if (!(entities[id]->getFaction() == controller.faction || controller.faction == BOTH_FACTION))
     {
-        controller.controllingid = CONTROLLING_NONE;
         return;
     }
 

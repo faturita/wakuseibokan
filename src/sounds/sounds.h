@@ -11,6 +11,8 @@
 
 #include "../math/yamathutil.h"
 
+#define SOUND_DISTANCE_LIMIT 1000.0
+
 
 void initSound();
 void clearSound();

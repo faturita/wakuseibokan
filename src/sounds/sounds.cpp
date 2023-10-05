@@ -66,12 +66,14 @@ void playthissound(char fl[256])
 
 void playthissound(Vec3f source, char fl[256])
 {
+    // @NOTE: Use the camera location to determine if the sound should be reproduced or not
+    //   and with which intensity.
     try {
         if (!mute) {
             Vec3f dist = source - Camera.pos;
-            if (dist.magnitude()<1000.0)
+            if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
             {
-                StkFloat amplitude = 1000.0-dist.magnitude() / 1000.0;
+                StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
                 amplitude = 1.0;
                 while (!s.done)
                 {
