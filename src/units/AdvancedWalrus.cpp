@@ -442,8 +442,8 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
     position = position + 40*forward;
     forward = -orig+position;
 
-    // Bullet energy
-    Vec3f Ft = forward*15;
+    // Bullet initial speed towards the turret direction.
+    Vec3f Ft = forward.normalize()*firepower;
 
     // Bullet rotation (alignment with forward direction)
     Vec3f f1(0.0,0.0,1.0);
@@ -465,11 +465,15 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
 
     //dout << d << std::endl;
 
-    dout << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+    dout << "Firing height:" << position[1] << "-" << Ft << "Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
     dBodyAddRelTorque(action->getBodyID(),5.0, 4.0, 2.0);
+
+    // @NOTE: Is the artillery affected by wind or not ?
+    if (no_damping_on_bullets)
+        dBodySetLinearDamping(action->getBodyID(),0);
 
     // Recoil (excellent for the simulation, cumbersome for playing...)
     Ft = Ft.normalize();  Ft=Ft * 0.2;

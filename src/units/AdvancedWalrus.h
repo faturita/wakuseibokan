@@ -13,7 +13,8 @@ protected:
     Vec3f aim;
     float viewport_height = 20.0;
 public:
-
+    bool no_damping_on_bullets = false;
+    float firepower = 600;
     float azimuth = 0;
     float elevation = 0;
 

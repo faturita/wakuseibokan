@@ -183,6 +183,10 @@ src/tests/testcase_116.cpp
 src/tests/testcase_116.h
 src/tests/testcase_117.cpp
 src/tests/testcase_117.h
+src/tests/testcase_118.cpp
+src/tests/testcase_118.h
+src/tests/testcase_119.cpp
+src/tests/testcase_119.h
 src/tests/tester.cpp
 src/units/AdvancedManta.cpp
 src/units/AdvancedManta.h

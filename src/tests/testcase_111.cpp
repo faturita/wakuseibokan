@@ -443,6 +443,7 @@ int TestCase_111::check(unsigned long timertick)
         printf("Walrus %d WON.\n", whowon);
     }
 
+    // @FIXME: This is wrong because the function cannot be called twice per cycle.
     float fps = getFPS();
 
     if (fps == 0)  fps=60.0;
@@ -458,13 +459,19 @@ int TestCase_111::check(unsigned long timertick)
 
         Vehicle *_b2 = findWalrus(BLUE_FACTION);
 
-        if (_b1)
+        if (!_b1)
         {
-            printf("GREEN 1 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b1->getHealth(), ((float)_b1->getPower()/(float)_b2->getHealth()), distancegreen/timertick);
+            printf("Walrus 2 WON.\n");
         }
 
-        if (_b2)
+        if (!_b2)
         {
+            printf("Walrus 1 WON.\n");
+        }
+
+        if (_b1 && _b2)
+        {
+            printf("GREEN 1 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b1->getHealth(), ((float)_b1->getPower()/(float)_b2->getHealth()), distancegreen/timertick);
             printf("BLUE 2 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b2->getHealth(), ((float)_b2->getPower()/(float)_b1->getHealth()), distanceblue/timertick);
         }
 

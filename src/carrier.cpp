@@ -184,7 +184,8 @@ void drawHUD()
 
     assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There are numerical error somewhere.");
     
-    fps = getFPS();
+    fps = getTimedFPS(fps, timer);
+
     
     sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
@@ -1261,7 +1262,7 @@ void update(int value)
         }
         // Ok, done with the dynamics
 
-        // @NOTE: At 00.5 the speed that you get from ODE represents in meters/ticks speed/20.
+        // @NOTE: At 0.05 the speed that you get from ODE represents in meters/ticks speed/20.
         // So if you want speed in m/s you need to do (speed * FPS)/20
         // The value that you get is independent of the computer performance and fps.
         clock_t inicio = clock();
@@ -1278,7 +1279,7 @@ void update(int value)
     
 	glutPostRedisplay();
     // @NOTE: update time should be adapted to real FPS (lower is faster).
-    glutTimerFunc(20, worldStep, 0);
+    glutTimerFunc(20, worldStep, 0);        // 20
 
 }
 

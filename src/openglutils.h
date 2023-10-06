@@ -53,6 +53,7 @@ void drawSky (float x,float y, float z);
 void initTextures();
 
 float getFPS();
+float getTimedFPS(float fps, unsigned long timer);
 
 void getScreenLocation(float &winX, float &winY, float &winZ, float xx, float zz, float yy);
 

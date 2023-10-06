@@ -116,6 +116,14 @@ void Otter::addWheels(Wheel *left, Wheel *right, Wheel *backleft, Wheel *backrig
     Otter::backright = backright;
 }
 
+void Otter::getWheels(Wheel *&left, Wheel *&right, Wheel *&backleft, Wheel *&backright)
+{
+    left = Otter::left;
+    right = Otter::right;
+    backleft = Otter::backleft;
+    backright = Otter::backright;
+}
+
 
 void Otter::doControl(Controller controller)
 {

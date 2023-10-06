@@ -1033,13 +1033,26 @@ void drawLightning()
 
 
 void drawBox(float xx, float yy, float zz)
-{
-    int x=0, y=0, z=0;
-    
-    const float BOX_SIZE = 7.0f; //The length of each side of the cube
-    static float boxangle = 0;            //The rotation of the box
-    
+{    
     drawBox(textures["metal"],xx,yy,zz);
+}
+
+float getTimedFPS(float fps, unsigned long timer)
+{
+    int time=0;
+
+    static int timebase=0;
+    //static float fps=0;
+
+    static unsigned long frame = 0;
+    time=glutGet(GLUT_ELAPSED_TIME);
+    if (time - timebase > 1000) {
+        fps=((float)(timer-frame)*1000.0/(time-timebase));
+        timebase = time;
+        frame = timer;
+    }
+
+    return fps;
 }
 
 float getFPS()

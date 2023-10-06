@@ -75,6 +75,8 @@ void ArtilleryAmmo::doDynamics(dBodyID body)
 {
     //dBodyAddForce(body,0,9.81f,0);
 
+    //std::cout << getSpeed() << std::endl;
+
     // @NOTE: Bullets are really unstable.
     if (VERIFY(pos, body))
         wrapDynamics(body);
