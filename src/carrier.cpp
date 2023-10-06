@@ -1364,7 +1364,7 @@ int main(int argc, char** argv) {
 
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 2;}
+        {controller.faction = BLUE_FACTION;controller.controllingid = 4;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
         controller.faction = GREEN_FACTION;
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
