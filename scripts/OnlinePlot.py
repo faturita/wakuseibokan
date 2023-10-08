@@ -53,7 +53,7 @@ if (len(sys.argv)>=7):
 
 # UDP Telemetry port on port 4500
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('0.0.0.0', 4500)
+server_address = ('0.0.0.0', 4601)
 print ('Starting up on %s port %s' % server_address)
 
 sock.bind(server_address)

@@ -54,6 +54,6 @@ while True:
 
     new_values = unpack(unpackcode,data)
 
-    print(new_values[0])
+    print(new_values[5])
 
 print ('Everything successfully closed.')

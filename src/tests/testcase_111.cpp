@@ -289,7 +289,7 @@ int TestCase_111::check(unsigned long timertick)
         _b2->setStatus(ROLLING);
     }
 
-    //usleep(1000000.0);
+//    //usleep(1000000.0);
 
     if (timertick >= 1)
     {

@@ -62,4 +62,6 @@ clean:
 	rm -f testall
 	rm -f test
 	rm -f testcase
+	rm -f testcase.o
+
 
