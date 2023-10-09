@@ -1,5 +1,11 @@
 # Escenario 111
 
+Este escenario consiste en dos tanques que arrancan en una isla plana.  Los dos tanques tienen como objetivo identificar la posición del otro y dispararle hasta destruirlo.  El valor de "health" inicial es 1000 así como el de "power".  Si se van al agua o quedan dados de vuelta se reduce la salud.  Cada vez que disparan se consume un punto de energía.
+
+Tener en cuenta que las localizaciones al inicio son siempre aleatorias, así como las orientaciones.
+
+Tener presente que el cliente puntualmente puede correr en cualquier computadora, sólo necesita tener la capacidad para enviar y recibir UDP (conectividad) y poder hacer los cálculos que son necesarios para determinar la acción correspondiente.  Es decir, el simulador es más restrictivo con el tipo de sistema operativo, pero el cliente no.
+
 La bala sale con una velocidad inicial de 600 m/s.  El ángulo de tiro es directamente el valor en grados en “pitch” con 90 grados positivo apuntando al zenith.
 
 Sin embargo la bala sale de la boca de la torreta que son 2 metros arriba del centro de masa del tanque y unos 40 metros por delante es cuando se dibuja por primera vez (esto se hace para que no toque al tanque de donde sale).
