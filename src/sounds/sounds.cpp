@@ -32,7 +32,8 @@ void initSound()
 
 void clearSound()
 {
-
+    s.interrupt = true;
+    s.close();
 }
 
 void playsound(char *filename)
@@ -110,6 +111,7 @@ void bullethit(Vec3f source)
 {
     playthissound(source,"sounds/bullethit.wav");
 }
+
 
 void smallenginestart(Vec3f source)
 {

@@ -1066,6 +1066,7 @@ void update(int value)
     if (controller.isInterrupted())
     {
         endWorldModelling();
+        clearSound();
         // Do extra wrap up
         msgboardfile.close();
         fclose(ledger);
