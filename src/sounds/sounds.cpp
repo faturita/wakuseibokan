@@ -51,7 +51,7 @@ void playthissound(char fl[256])
             while (!s.done)
             {
                 s.interrupt = true;
-                Stk::sleep( 1 );
+                Stk::sleep( 0 );
             }
             //static SoundTexture s;
             s.init(fl);
@@ -78,7 +78,7 @@ void playthissound(Vec3f source, char fl[256])
                 while (!s.done)
                 {
                     s.interrupt = true;
-                    Stk::sleep( 1 );
+                    Stk::sleep( 0 );
                 }
                 //static SoundTexture s;
                 s.init(fl);
@@ -100,6 +100,10 @@ void firesound(int times)
     for(int i=0;i<times;i++)
         printf ("%c", 7);
 
+extern bool mute;
+
+//std::unordered_map<std::string, SoundTexture*> soundtextures;
+SoundTexture s;
 }
 
 void bullethit(Vec3f source)
