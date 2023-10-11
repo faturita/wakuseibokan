@@ -1069,7 +1069,10 @@ void update(int value)
         clearSound();
         // Do extra wrap up
         msgboardfile.close();
-        fclose(ledger);
+        if (tracemode == RECORD || tracemode == REPLAY)
+        {
+            fclose(ledger);
+        }
         exit(0);
     }
     if (!controller.pause)

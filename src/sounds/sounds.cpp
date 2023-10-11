@@ -32,8 +32,11 @@ void initSound()
 
 void clearSound()
 {
-    s.interrupt = true;
-    s.close();
+    if (!mute)
+    {
+        s.interrupt = true;
+        s.close();
+    }
 }
 
 void playsound(char *filename)
