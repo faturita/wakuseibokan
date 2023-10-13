@@ -26,7 +26,6 @@
 
 #include "../units/Balaenidae.h"
 #include "../units/Beluga.h"
-
 #include "../units/Otter.h"
 
 #include "../units/Wheel.h"
@@ -276,6 +275,16 @@ void TestCase_111::init()
 }
 
 float distancegreen, distanceblue;
+float powergreen, powerblue;
+float healthgreen, healthblue;
+
+void TestCase_111::checkBeforeDone(unsigned long timertick)
+{
+    float efficiencygreen = (powergreen/healthblue);
+    float efficiencyblue = (powerblue/healthgreen);
+    printf("GREEN 1 : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", healthgreen, powergreen, efficiencygreen, distancegreen/timertick);
+    printf("BLUE  2 : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", healthblue, powerblue, efficiencyblue, distanceblue/timertick);
+}
 
 int TestCase_111::check(unsigned long timertick)
 {
@@ -313,6 +322,7 @@ int TestCase_111::check(unsigned long timertick)
         if (n1!=-1)
         {
             //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg1.controllingid, (timer-mesg1.sourcetimer), mesg1.registers.roll, mesg1.registers.thrust);
+            greenttl--;
 
             Vehicle *_b=NULL;
 
@@ -356,7 +366,6 @@ int TestCase_111::check(unsigned long timertick)
             //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
 
             //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg2.controllingid, (timer-mesg2.sourcetimer), mesg2.registers.roll, mesg2.registers.thrust);
-
             Vehicle *_b=NULL;
 
             if (mesg2.controllingid == 1)
@@ -387,6 +396,7 @@ int TestCase_111::check(unsigned long timertick)
                     {
                         entities.push_back(action, action->getGeom());
                         gunshot(_b->getPos());
+
                     }
                     _b->setPower(_b->getPower()-1);
                 }
@@ -398,14 +408,18 @@ int TestCase_111::check(unsigned long timertick)
 
         Vehicle *_b2 = findWalrus(BLUE_FACTION);
 
-        if (_b1)
+        if (_b1 && _b2)
         {
             distancegreen += _b1->getSpeed();
+            healthgreen = clipped(_b1->getHealth(),1,1000);
+            powergreen = _b1->getPower();
         }
 
-        if (_b2)
+        if (_b1 && _b2)
         {
             distanceblue += _b2->getSpeed();
+            healthblue = clipped(_b2->getHealth(),1,1000);
+            powerblue = _b2->getPower();
         }
 
 
@@ -441,15 +455,12 @@ int TestCase_111::check(unsigned long timertick)
         isdone = true;
         haspassed = true;
         printf("Walrus %d WON.\n", whowon);
+        checkBeforeDone(timertick);
     }
 
-    // @FIXME: This is wrong because the function cannot be called twice per cycle.
-    float fps = getFPS();
-
-    if (fps == 0)  fps=60.0;
 
     // Only 5 mimutes duration
-    if (timertick > 10000)
+    if (timertick > 5000)
     {
         isdone = true;
         haspassed = false;
@@ -469,11 +480,7 @@ int TestCase_111::check(unsigned long timertick)
             printf("Walrus 1 WON.\n");
         }
 
-        if (_b1 && _b2)
-        {
-            printf("GREEN 1 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b1->getHealth(), ((float)_b1->getPower()/(float)_b2->getHealth()), distancegreen/timertick);
-            printf("BLUE 2 : Health:%d, Efficiency: %f, Travelled Distance: %f\n", _b2->getHealth(), ((float)_b2->getPower()/(float)_b1->getHealth()), distanceblue/timertick);
-        }
+        checkBeforeDone(timertick);
 
     }
 
