@@ -258,6 +258,7 @@ Sounds
 * ffmpeg -i input.m4a output.wav
 * ./playaudio hellosine.wav 44100 1.0
 * https://github.com/thestk/stk/blob/master/INSTALL.md
+* https://ccrma.stanford.edu/software/stk/multichannel.html
 
 More info
 ---------
