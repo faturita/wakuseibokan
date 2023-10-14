@@ -373,7 +373,7 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
         Message mg;
         sprintf(msg, "%s has arrived to destination.", getName().c_str());
         mg.faction = getFaction();
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = 0;
         messages.insert(messages.begin(), mg);
         dst_status = DestinationStatus::REACHED;
         setStatus(FlyingStatus::HOLDING);
@@ -758,7 +758,7 @@ void SimplifiedDynamicManta::doControlLanding()
                 //Message mg;
                 //sprintf(msg, "Manta %d has arrived to destination.", getNumber()+1);
                 //mg.faction = getFaction();
-                //mg.msg = std::string(msg);
+                //mg.msg = std::string(msg); mg.timer = timer;
                 //messages.insert(messages.begin(), mg);
                 dst_status = DestinationStatus::REACHED;
                 setStatus(FlyingStatus::HOLDING);
@@ -872,7 +872,7 @@ void SimplifiedDynamicManta::doControlDestination()
             Message mg;
             sprintf(msg, "%s has arrived to destination.", getName().c_str());
             mg.faction = getFaction();
-            mg.msg = std::string(msg);
+            mg.msg = std::string(msg); mg.timer = 0;
             messages.insert(messages.begin(), mg);
             dst_status = DestinationStatus::REACHED;
             setStatus(FlyingStatus::HOLDING);

@@ -88,7 +88,7 @@ enum COMMAND_MODES {ATTACK_MODE, DESTINATION_MODE};
 int commandmode=DESTINATION_MODE;
 
 
-static int controlmap[] = {1,2,3,4,5,6,7,8,9};
+int controlmap[] = {1,2,3,4,5,6,7,8,9};
 
 
 void processMouseEntry(int state) {
@@ -707,6 +707,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         break;
         case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;
         case '@':controller.view = 3;break;
+        case '#':controller.view = 4;break;
         case '~':Camera.control = 0;break;
         case '?':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;

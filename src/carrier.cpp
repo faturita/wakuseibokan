@@ -129,6 +129,8 @@ extern int gamemode;
 extern int tracemode;
 extern int peermode;
 
+extern int controlmap[];
+
 extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
@@ -270,10 +272,19 @@ void drawHUD()
 
         if (mbrefresher--<=0)
         {
-            msgboardfile << timer << ":" << messages.back().msg <<  std::endl ;
-            msgboardfile.flush();
-            messages.pop_back();
-            mbrefresher = 1000;
+            while (messages.size()>5)
+            {
+                Message ms = messages.back();
+                if (ms.timer==0)
+                {
+                    ms.timer = timer;
+                }
+                msgboardfile << ms.timer << ":" << ms.msg <<  std::endl ;
+                msgboardfile.flush();
+
+                messages.pop_back();
+                mbrefresher = 1000;
+            }
         }
 
     }
@@ -660,6 +671,8 @@ void drawScene() {
     case 1: drawHUD();break;
     case 2: drawMap();break;
     case 3: drawBoard();break;
+    case 4: drawEntities();break;
+    case 5: drawIntro();break;
     }
 
 	glDisable(GL_TEXTURE_2D);
@@ -951,7 +964,7 @@ void inline processCommandOrders()
                             Message mg;
                             mg.faction = entities[i]->getFaction();
                             sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
-                            mg.msg = std::string(msg);
+                            mg.msg = std::string(msg); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
 
                             entities[i]->damage(1000);
@@ -974,7 +987,7 @@ void inline processCommandOrders()
                             Message mg;
                             mg.faction = entities[i]->getFaction();
                             sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
-                            mg.msg = std::string(str);
+                            mg.msg = std::string(str);mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                             //CLog::Write(CLog::Debug,"Eliminating....\n");
 
@@ -1233,7 +1246,7 @@ void update(int value)
                         Message mg;
                         mg.faction = BOTH_FACTION;
                         sprintf(str, "%s has been destroyed.", v->getName().c_str());
-                        mg.msg = std::string(str);
+                        mg.msg = std::string(str);mg.timer = timer;
                         messages.insert(messages.begin(), mg);
                     }
 
@@ -1361,16 +1374,17 @@ int main(int argc, char** argv) {
         aiplayer = BOTH_AI;
 
     controller.controllingid = 1;
+    Camera.pos = Vec3f(0,0,0);
 
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 4;}
+        {controller.faction = BLUE_FACTION;controller.controllingid = 2;controlmap[0]=2;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        controller.faction = GREEN_FACTION;
+        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=3;controlmap[2]=4;}
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
         controller.faction = BOTH_FACTION;
     else
-        controller.faction = GREEN_FACTION;
+        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=3;controlmap[2]=4;}
 
 
 
@@ -1439,7 +1453,6 @@ int main(int argc, char** argv) {
 
     }
 
-
     controllers.push_back(&controller);
 
     if (peermode==SERVER)
@@ -1458,11 +1471,9 @@ int main(int argc, char** argv) {
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
     //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
-    
-    //Initialize all the models and structures.
-    //initRendering();
 
-    intro();
+    if (!isPresentCommandLineParameter(argc,argv,"-nointro"))
+        {intro();controller.view = 5;}
 
     msgboardfile.open ("messageboard.dat");
     

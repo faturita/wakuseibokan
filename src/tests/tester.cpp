@@ -510,7 +510,7 @@ void worldStep(int value)
         Message mg;
         sprintf(msg, "TC%03d: %s", t->number(), t->title().c_str());
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
