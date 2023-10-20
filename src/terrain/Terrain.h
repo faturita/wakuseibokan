@@ -173,6 +173,7 @@ class Terrain {
 		}
 };
 
+Terrain* loadTerrain(float height);
 Terrain* loadTerrain(const char* filename, float height);
 
 void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
@@ -207,6 +208,7 @@ public:
 
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
+    dGeomID buildTerrainModel(dSpaceID space );
     
     //void draw(float x, float y, float z, float side, float height);
     void draw();

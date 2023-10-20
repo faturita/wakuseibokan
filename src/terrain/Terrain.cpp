@@ -30,6 +30,7 @@
 #include <GL/glut.h>
 #endif
 
+#include "../FractalNoise.h"
 #include "../profiling.h"
 #include "../imageloader.h"
 #include "../math/vec3f.h"
@@ -47,6 +48,120 @@ extern std::unordered_map<std::string, GLuint> textures;
 
 
 using namespace std;
+
+Terrain* loadFractalTerrain(float height)
+{
+    Terrain* t = new Terrain(60, 60);
+
+    int sideLength = 65;	// Accepts 2^n+1, for (4 <= n <= 10).
+    TFracVal* buff = new TFracVal[65*65];
+    CFractalNoise myNoise(buff, sideLength);
+
+    //
+    for (int i=0 ; i<sideLength*sideLength ; i++)
+        buff[i] = FRACVAL_UNINIT;
+
+
+    myNoise.SetVal(0,0,0);
+    myNoise.SetVal(sideLength-1,0,0);
+    myNoise.SetVal(0, sideLength-1,0);
+    myNoise.SetVal(sideLength-1,sideLength-1,0);
+
+
+    //
+    //  3. Make some noise with the Generate() interface:
+    //
+    int seed = getRandomInteger(1,1000);
+    float adjust = 32000.0f;
+    float frequency = 2.5f;
+    myNoise.Generate(seed, adjust, frequency);
+
+
+
+    for(int y = 0; y < 60; y++) {
+        for(int x = 0; x < 60; x++) {
+            unsigned char color = 0;
+            float h = height * ((color / 255.0f) - 0.5f);
+            t->setHeight(x, y, h+height/2.0);
+        }
+    }
+
+    int r = getRandomInteger(1,4);
+
+    for(int y = 1; y < 59; y++) {
+        for(int x = 1; x < 59; x++) {
+            float h = myNoise.GetVal(x,y) /100.0;
+
+            // @NOTE:  Heightmap color 0 is FIXME
+            //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
+            //if (color == 0) h =  -70.0f;
+
+            if (r==1) t->setHeight(y, x, h+height/2.0);
+            else if (r==2) t->setHeight(59-x, y, h+height/2.0);
+            else if (r==3) t->setHeight(x, 59-y, h+height/2.0);
+            else t->setHeight(x, y, h+height/2.0);
+            //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+        }
+    }
+
+
+    delete [] buff;
+    buff = 0;
+    //
+    //	Note: To create an island approximation, pre-seed the buffer 'edges' with zero and
+    //	the centre point with some positive value.
+
+    t->computeNormals();
+    return t;
+}
+
+Terrain* loadTerrain(float height)
+{
+    Terrain* t = new Terrain(60, 60);
+
+    for(int y = 0; y < 60; y++) {
+        for(int x = 0; x < 60; x++) {
+            unsigned char color = 0;
+            float h = height * ((color / 255.0f) - 0.5f);
+
+            // @NOTE:  Heightmap color 0 is FIXME
+            //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
+            //if (color == 0) h =  -70.0f;
+            t->setHeight(x, y, h+height/2.0);
+            //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+        }
+    }
+
+    for(int y = 10; y < 50; y++) {
+        for(int x = 10; x < 50; x++) {
+            unsigned char color = 10;
+            float h = height * ((color / 255.0f) - 0.5f);
+
+            // @NOTE:  Heightmap color 0 is FIXME
+            //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
+            //if (color == 0) h =  -70.0f;
+            t->setHeight(x, y, h+height/2.0);
+            //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+        }
+    }
+
+
+    for(int y = 25; y < 35; y++) {
+        for(int x = 25; x < 35; x++) {
+            unsigned char color = 255;
+            float h = height * ((color / 255.0f) - 0.5f);
+
+            // @NOTE:  Heightmap color 0 is FIXME
+            //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
+            //if (color == 0) h =  -70.0f;
+            t->setHeight(x, y, h+height/2.0);
+            //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
+        }
+    }
+
+    t->computeNormals();
+    return t;
+}
 
 //
 // Loads a terrain from a heightmap.  The heights of the terrain range from
@@ -98,6 +213,43 @@ dReal hedightfield_callback( void* pUserData, int x, int z )
 BoxIsland::BoxIsland(container<Vehicle*> *enti)
 {
     entities = enti;
+}
+
+dGeomID BoxIsland::buildTerrainModel(dSpaceID space )
+{
+    _landmass = loadFractalTerrain(TERRAIN_MAX_HEIGHT);
+
+    // There must be a model name for the texture that is used in the map.
+    modelname = "terrain/thermopilae.bmp";
+
+    islandspace = dHashSpaceCreate(space);
+    //islandspace = space;
+
+    CLog::Write(CLog::Debug,"Island: %s\n", "Fractal");
+    CLog::Write(CLog::Debug,"Landmass width: %d\n", _landmass->width());
+    CLog::Write(CLog::Debug,"Landmass heigth: %d\n",_landmass->length());
+
+    dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
+
+    float realside = TERRAIN_SIDE_LENGTH * TERRAIN_SCALE * REAL( 1.0 );
+
+    // Create a finite heightfield.
+    dGeomHeightfieldDataBuildCallback( heightid, _landmass, hedightfield_callback,
+                                      realside , realside, HFIELD_WSTEP, HFIELD_DSTEP,
+                                      REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
+
+    // These boundaries are used to limit how the heightfield affects objects.
+    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), TERRAIN_MAX_HEIGHT ); // +6000 decia
+
+    dGeomID gheight = dCreateHeightfield( islandspace, heightid, 1 );
+
+    dGeomSetPosition( gheight, X, Y, Z );
+
+    islandGeom = gheight;
+
+
+    return gheight;
+
 }
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
