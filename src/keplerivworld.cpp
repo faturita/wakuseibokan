@@ -1,11 +1,25 @@
-//
-//  keplerivworld.cpp
-//  wakuseiboukan
-//
-//  Dynamic World Model
-//
-//  Created by Rodrigo Ramele on 24/05/14.
-//
+/* ============================================================================
+**
+** KeplerIVWorld - Wakuseiboukan - 24/05/2014
+**
+** Dynamic World Model.  This creates ODE world structures
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #define dSINGLE
 
@@ -496,42 +510,42 @@ void inline initIslands()
     BoxIsland *oshima = new BoxIsland(&entities);
     oshima->setName("Oshima");
     oshima->setLocation(-310 kmf, -1.0, 210 kmf);
-    oshima->buildTerrainModel(space);
+    oshima->buildFractalTerrainModel(space);
 
     BoxIsland *iriomote = new BoxIsland(&entities);
     iriomote->setName("Iriomote");
     iriomote->setLocation(-390 kmf, -1.0, 110 kmf);
-    iriomote->buildTerrainModel(space);
+    iriomote->buildFractalTerrainModel(space);
 
     BoxIsland *amami = new BoxIsland(&entities);
     amami->setName("Amami");
     amami->setLocation(390 kmf, -1.0, -190 kmf);
-    amami->buildTerrainModel(space);
+    amami->buildFractalTerrainModel(space);
 
     BoxIsland *miyake = new BoxIsland(&entities);
     miyake->setName("Miyake");
     miyake->setLocation(420 kmf, -1.0, -110 kmf);
-    miyake->buildTerrainModel(space);
+    miyake->buildFractalTerrainModel(space);
 
     BoxIsland *tokunoshima = new BoxIsland(&entities);
     tokunoshima->setName("Tokunoshima");
     tokunoshima->setLocation(420 kmf, -1.0, 210 kmf);
-    tokunoshima->buildTerrainModel(space);
+    tokunoshima->buildFractalTerrainModel(space);
 
     BoxIsland *dogojima = new BoxIsland(&entities);
     dogojima->setName("Dogojima");
     dogojima->setLocation(380 kmf, -1.0, 110 kmf);
-    dogojima->buildTerrainModel(space);
+    dogojima->buildFractalTerrainModel(space);
 
     BoxIsland *kikajima = new BoxIsland(&entities);
     kikajima->setName("Kikajima");
     kikajima->setLocation(205 kmf, -1.0, 80 kmf);
-    kikajima->buildTerrainModel(space);
+    kikajima->buildFractalTerrainModel(space);
 
     BoxIsland *kamehouse = new BoxIsland(&entities);
     kamehouse->setName("KameHouse");
     kamehouse->setLocation(128 kmf, -1.0, 230 kmf);
-    kamehouse->buildTerrainModel(space);
+    kamehouse->buildFractalTerrainModel(space);
 
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
@@ -571,6 +585,15 @@ void inline initIslands()
 
 }
 
+/**
+ * This is an alternative callback function for the ODE collision detector.  You can use this function to debug easily when something is not working on this module.
+ * It is very easy to replace the callback to use this function, check init method.
+ *
+ * @brief _nearCallback
+ * @param data
+ * @param o1
+ * @param o2
+ */
 void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;

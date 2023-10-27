@@ -16,6 +16,7 @@
 #include "../units/Beluga.h"
 
 #include "../units/Otter.h"
+#include "../units/Turtle.h"
 
 #include "../units/Wheel.h"
 #include "../units/BoxVehicle.h"
@@ -46,7 +47,7 @@ TestCase_120::TestCase_120()
 }
 
 
-Otter*  addOtter(Vec3f pos, float angle, int faction)
+Otter*  addOtter(Vec3f pos, float angle, int faction, int number)
 {
     // 6,3,12
     Otter *_otter = new Otter(faction);
@@ -56,13 +57,11 @@ Otter*  addOtter(Vec3f pos, float angle, int faction)
     _otter->setPos(pos);
     _otter->stop();
     _otter->setSignal(4);
-    _otter->setNameByNumber(1);
+    _otter->setNameByNumber(number);
     _otter->setStatus(SailingStatus::ROLLING);
     _otter->setIsland(islands[0]);
 
-    Vec3f dimensions(5.0f,4.0f,10.0f);
-
-    entities.push_back(_otter, _otter->getGeom());
+    // The multibody entity is not added first here, is added by the spawner
 
 
     Wheel * _fr= new Wheel(faction, 0.001, 30.0);
@@ -117,31 +116,68 @@ Otter*  addOtter(Vec3f pos, float angle, int faction)
 
 }
 
+
 void TestCase_120::init()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space);
+    nemesis->buildRegularTerrainModel(space);
 
     islands.push_back(nemesis);
 
+    Turtle *_turtle = spawnTurtle(Vec3f(0,100.0,0), PI, GREEN_FACTION,1,4,space,world);
+    _turtle->setIsland(nemesis);
 
-    BoxIsland *atom = new BoxIsland(&entities);
-    atom->setName("Atom");
-    atom->setLocation(0.0f,-1.0,6 kmf);
-    atom->buildTerrainModel(space);
+    entities.push_back(_turtle, _turtle->getGeom());
 
-    islands.push_back(atom);
+    Otter *_otter1 = addOtter(Vec3f(0,5,-3000.0), 0,BLUE_FACTION,1);
+    entities.push_back(_otter1, _otter1->getGeom());
 
-    Otter *_otter1 = addOtter(Vec3f(0,5,-3000.0), 0,GREEN_FACTION);
+    Wheel *l,*r,*bl,*br;
+    _turtle->setPos(Vec3f(0,100.0,0));
+    _turtle->getWheels(l,r,bl,br);
+    l->setPos(Vec3f(0,100.0,0));
+    r->setPos(Vec3f(0,100.0,0));
+    bl->setPos(Vec3f(0,100.0,0));
+    br->setPos(Vec3f(0,100.0,0));
 
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Armory(GREEN_FACTION)           ,         0.0f,    -650.0f,0,world);
+    Structure *t3 = islands[0]->addStructure(new Antenna(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Launcher(GREEN_FACTION)      ,       -650.0f,    0.0f,0,world);
+
+
+
+    Vec3f pos(0,10,-4000);
+    Camera.setPos(pos);
+    Camera.dy = 0;
+    Camera.dz = 0;
+    Camera.xAngle = 0;
+    Camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
 
 }
 
 int TestCase_120::check(unsigned long timertick)
 {
 
+    if (timertick == 1)
+    {
+        BoxIsland *nemesis = (BoxIsland*) islands[0];
+        Turtle *_turtle = (Turtle*) entities[1];
+
+        Walrus *_otter = findWalrus(BLUE_FACTION);
+
+        if (_otter && _turtle)
+        {
+            _otter->attack(_turtle->getPos());
+        }
+
+    }
     if (timertick > 18000)
     {
         Vehicle* _b = findCarrier(GREEN_FACTION);
@@ -177,7 +213,7 @@ int TestCase_120::number()
 
 std::string TestCase_120::title()
 {
-    return std::string("Write the test/scenario description here");
+    return std::string("Check the terrain island and the tank.");
 }
 
 

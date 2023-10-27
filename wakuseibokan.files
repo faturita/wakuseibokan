@@ -105,6 +105,8 @@ src/sounds/soundtexture.cpp
 src/sounds/soundtexture.h
 src/structures/Antenna.cpp
 src/structures/Antenna.h
+src/structures/Armory.cpp
+src/structures/Armory.h
 src/structures/Artillery.cpp
 src/structures/Artillery.h
 src/structures/CommandCenter.cpp
@@ -218,6 +220,8 @@ src/units/SimplifiedManta.cpp
 src/units/SimplifiedManta.h
 src/units/Stingray.cpp
 src/units/Stingray.h
+src/units/Turtle.cpp
+src/units/Turtle.h
 src/units/Vehicle.cpp
 src/units/Vehicle.h
 src/units/Walrus.cpp

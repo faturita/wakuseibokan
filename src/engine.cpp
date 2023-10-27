@@ -447,7 +447,7 @@ bool isRay(dGeomID o)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getGeom() == o && v->getType()==RAY)
+        if (o && v && v->getGeom() == o && v->getType() == RAY)
         {
             return true;
         }
@@ -1331,6 +1331,14 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                 }
 
+                Walrus *o = findWalrusByOrder2(sc->getFaction(), 66);
+
+                // If there are any existing walrus, it should stop attacking the enemies and go back closer to where the Command Center is located.
+                if (o)
+                {
+                    o->goTo(sc->getPos()+Vec3f(50,0,50)); // @FIXME  Let's define "Close to".
+                }
+
 
                 continue;
             }
@@ -1370,6 +1378,18 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             w->enableAuto();
 
                         w->attack(b->getPos());
+
+                    }
+
+                    // @FIXME Using a different function because here the other was not working
+                    Walrus *o = findWalrusByOrder2(sc->getFaction(), 66);
+
+                    if (o)
+                    {
+                        if (!o->isAuto())
+                            o->enableAuto();
+
+                        o->attack(b->getPos());
 
                     }
                 }
@@ -1565,7 +1585,27 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                                 walrus->setOrder(DEFEND_ISLAND);
                             }
                         }
-                    }
+                    } else
+                    if(Armory *d = dynamic_cast<Armory*>(entities[str[i]]))
+                    {
+                        unsigned long timeevent = sc->getTimer();
+
+                        if (timer>=(timeevent + 200))
+                        {
+                            // Spawn 1 Turtle @FIXME: Recode all this.
+                            Walrus *w = findWalrusByOrder2(d->getFaction(), 66);
+
+                            if (!w && (b->getType() == CARRIER || b->getType() == WALRUS))
+                            {
+                                int walrusNumber = findNextNumber(d->getFaction(), WALRUS, TURTLE);
+                                Vehicle *walrus = (d)->spawn(world, space, WALRUS, walrusNumber);
+
+                                size_t l = entities.push_back(walrus, walrus->getGeom());
+
+                                walrus->setOrder(66);
+                            }
+                        }
+                    } else
                     if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
                     {
                         // Launch airplanes to attack incoming mantas.
@@ -1599,7 +1639,6 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (timer==(timeevent + 300))
                         {
                             Manta *m = launchManta(lb);
-                            printf ("Medusa: %p\n", m);
                         }
 
                     }
@@ -1651,6 +1690,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.6;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
@@ -1664,6 +1704,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
@@ -1675,6 +1716,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.85;islandstructs.push_back(tp);}
 
                     }
 
@@ -1698,10 +1740,14 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                             Structure *s = NULL;
                             switch (islandstructs[which].subType) {
+                            case VehicleSubTypes::ARMORY:
+                                s = new Armory(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::HANGAR:
-                                    s = new Hangar(c->getFaction());
-                                    island->addStructure(s,world);
-                                    break;
+                                s = new Hangar(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::WAREHOUSE:
                                 s = new Warehouse(c->getFaction());
                                 island->addStructure(s,world);
@@ -1744,6 +1790,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 s = new Structure(c->getFaction());
                                 island->addStructure(s,world);
                                 break;
+
 
                             }
 
@@ -2038,5 +2085,67 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
     }
 }
 
+// @NOTE: Spawn functions should NOT add the vehicles into the final entity because this is done in the caller.
+Turtle* spawnTurtle(Vec3f pos, float angle, int faction, int number, int signal, dSpaceID space, dWorldID world)
+{
+    // 6,3,12
+    Turtle *_turtle = new Turtle(faction);
+    _turtle->init();
+    dSpaceID car_space = _turtle->embody_in_space(world, space);
+
+    _turtle->setPos(pos);
+    _turtle->stop();
+    _turtle->setSignal(signal);
+    _turtle->setNameByNumber(number);
+    _turtle->setStatus(SailingStatus::ROLLING);
+
+
+    Wheel * _fr= new Wheel(faction, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_turtle,3.9f, -3.0, 4.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(faction, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_turtle, -3.9f, -3.0, 4.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(faction, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_turtle, 3.9f, -3.0, -4.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(faction, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_turtle, -3.9f,-3.0, -4.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _turtle->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+    dMatrix3 Re2;
+    dRSetIdentity(Re2);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,angle);
+    dBodySetRotation(_turtle->getBodyID(),Re2);
+
+    return _turtle;
+}
 
 

@@ -33,6 +33,7 @@
 #include "units/Medusa.h"
 #include "units/Stingray.h"
 #include "units/Otter.h"
+#include "units/Turtle.h"
 
 #include "terrain/Terrain.h"
 
@@ -49,6 +50,7 @@
 #include "structures/Antenna.h"
 #include "structures/Factory.h"
 #include "structures/Radar.h"
+#include "structures/Armory.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -198,6 +200,8 @@ Manta* launchManta(Vehicle *v);
 void landManta(Vehicle *v);
 void landManta(Vehicle *landplace, Manta *m);
 Manta* taxiManta(Vehicle *v);
+
+Turtle* spawnTurtle(Vec3f pos, float angle, int faction, int number, int signal, dSpaceID space, dWorldID world);
 
 BoxIsland* findNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po);

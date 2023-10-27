@@ -1,27 +1,28 @@
-/* Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above notice and this permission notice shall be included in all copies
- * or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+/* ============================================================================
+**
+** Terrain - Wakuseiboukan - 22/05/2014
+**
+** Handle island generation and ODE heightmap.
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
-/* 
- * Terrain Class - Handle island generation and heightmaps.
- *
- */
 #include <stdlib.h>
+#include <fstream>
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
@@ -34,6 +35,7 @@
 #include "../profiling.h"
 #include "../imageloader.h"
 #include "../math/vec3f.h"
+#include "../openglutils.h"
 #include "Terrain.h"
 
 // Islands of 3600x3600 (based on heightmaps of 60x60). Max height is 100m.
@@ -115,7 +117,7 @@ Terrain* loadFractalTerrain(float height)
     return t;
 }
 
-Terrain* loadTerrain(float height)
+Terrain* loadRegularTerrain(float height)
 {
     Terrain* t = new Terrain(60, 60);
 
@@ -134,7 +136,7 @@ Terrain* loadTerrain(float height)
 
     for(int y = 10; y < 50; y++) {
         for(int x = 10; x < 50; x++) {
-            unsigned char color = 10;
+            unsigned char color = 15;
             float h = height * ((color / 255.0f) - 0.5f);
 
             // @NOTE:  Heightmap color 0 is FIXME
@@ -148,7 +150,7 @@ Terrain* loadTerrain(float height)
 
     for(int y = 25; y < 35; y++) {
         for(int x = 25; x < 35; x++) {
-            unsigned char color = 255;
+            unsigned char color = 20;
             float h = height * ((color / 255.0f) - 0.5f);
 
             // @NOTE:  Heightmap color 0 is FIXME
@@ -215,52 +217,71 @@ BoxIsland::BoxIsland(container<Vehicle*> *enti)
     entities = enti;
 }
 
-dGeomID BoxIsland::buildTerrainModel(dSpaceID space )
+extern std::unordered_map<std::string, GLuint> maptextures;
+
+dGeomID BoxIsland::buildTerrainModel(dSpaceID space, Terrain *p_landmass, const char *model )
 {
-    _landmass = loadFractalTerrain(TERRAIN_MAX_HEIGHT);
+    _landmass = p_landmass;
 
-    // There must be a model name for the texture that is used in the map.
-    modelname = "terrain/thermopilae.bmp";
+    char *pixels2 = new char[TERRAIN_SIDE_LENGTH * TERRAIN_SIDE_LENGTH * 3];
 
+    for(int x=0;x<60;x++)
+        for(int y=0;y<60;y++)
+        {
+            pixels2[x*60*3 + y*3 + 0] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
+            pixels2[x*60*3 + y*3 + 1] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
+            pixels2[x*60*3 + y*3 + 2] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
+        }
+
+    Image image(pixels2,TERRAIN_SIDE_LENGTH,TERRAIN_SIDE_LENGTH);
+
+    GLuint _texture;
+
+    if (maptextures.find(std::string(modelname)) == maptextures.end())
+    {
+        _texture = loadTexture(&image);
+
+        maptextures[std::string(modelname)]=_texture;
+
+    }
+
+
+    // This is the ODE space for the island.
     islandspace = dHashSpaceCreate(space);
-    //islandspace = space;
-
-    CLog::Write(CLog::Debug,"Island: %s\n", "Fractal");
-    CLog::Write(CLog::Debug,"Landmass width: %d\n", _landmass->width());
-    CLog::Write(CLog::Debug,"Landmass heigth: %d\n",_landmass->length());
-
-    dHeightfieldDataID heightid = dGeomHeightfieldDataCreate();
-
-    float realside = TERRAIN_SIDE_LENGTH * TERRAIN_SCALE * REAL( 1.0 );
-
-    // Create a finite heightfield.
-    dGeomHeightfieldDataBuildCallback( heightid, _landmass, hedightfield_callback,
-                                      realside , realside, HFIELD_WSTEP, HFIELD_DSTEP,
-                                      REAL( 1.0 ), REAL( 0.0 ), REAL( 0.0 ), 0 );
-
-    // These boundaries are used to limit how the heightfield affects objects.
-    dGeomHeightfieldDataSetBounds( heightid, REAL( -4.0 ), TERRAIN_MAX_HEIGHT ); // +6000 decia
-
-    dGeomID gheight = dCreateHeightfield( islandspace, heightid, 1 );
-
-    dGeomSetPosition( gheight, X, Y, Z );
-
-    islandGeom = gheight;
 
 
-    return gheight;
-
+    // @NOTE: Image destructor eliminates the pixels2 buffer.
+    return buildModel();
 }
+
+dGeomID BoxIsland::buildFractalTerrainModel(dSpaceID space )
+{
+    return buildTerrainModel(space, loadFractalTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
+}
+
+
+dGeomID BoxIsland::buildRegularTerrainModel(dSpaceID space )
+{
+    return buildTerrainModel(space, loadRegularTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
+}
+
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, const char *model )
 {
-    _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
+        _landmass = loadTerrain(model, TERRAIN_MAX_HEIGHT);
 
-    modelname = model;
+        modelname = model;
+        islandspace = dHashSpaceCreate(space);
+        //islandspace = space;
 
-    islandspace = dHashSpaceCreate(space);
-    //islandspace = space;
+        return buildModel();
+}
 
-    CLog::Write(CLog::Debug,"Island: %s\n", model);
+
+
+dGeomID BoxIsland::buildModel()
+{
+
+    CLog::Write(CLog::Debug,"Island: %s\n", modelname.c_str());
     CLog::Write(CLog::Debug,"Landmass width: %d\n", _landmass->width());
     CLog::Write(CLog::Debug,"Landmass heigth: %d\n",_landmass->length());
     
@@ -308,6 +329,11 @@ float BoxIsland::getZ()
 Vec3f BoxIsland::getPos()
 {
     return Vec3f(getX(), 0.0, getZ());
+}
+
+float BoxIsland::getHeight(float x, float z)
+{
+    return _landmass->getHeight(x-getPos()[0],z-getPos()[2]);
 }
 
 std::string BoxIsland::getName()
@@ -612,14 +638,11 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
     //glColor3f(r,g,b);
     
     
-    
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textures["land"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);
-    
-    
     
     
     for(int z = 0; z < _landmass->length() - 1; z++) {

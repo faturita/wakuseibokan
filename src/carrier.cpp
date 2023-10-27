@@ -732,7 +732,11 @@ void handleResize(int w, int h) {
     
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+
+    // @NOTE: Changing zNear helps to avoid as much as possible island z-fighting.
+    //    However putting a value greater than 3.0 wrec havoc the sky which is bounded by this.
+    //    https://stackoverflow.com/questions/3410096/setting-near-plane-in-opengl
+    gluPerspective(45.0, (float)w / (float)h, 3.0, Camera.pos[2]+ horizon /**+ yyy**/);
 }
 
 static bool didODEInit=false;
