@@ -333,7 +333,21 @@ Vec3f BoxIsland::getPos()
 
 float BoxIsland::getHeight(float x, float z)
 {
-    return _landmass->getHeight(x-getPos()[0],z-getPos()[2]);
+    if (x>1799) return 0;
+    if (x<-1799) return 0;
+    if (z>1799) return 0;
+    if (z<-1799) return 0;
+
+    x = x-getPos()[0];
+    z = z-getPos()[2];
+
+    x = x / TERRAIN_SCALE;
+    z = z / TERRAIN_SCALE;
+
+    x += TERRAIN_SCALE/2;
+    z += TERRAIN_SCALE/2;
+
+    return _landmass->getHeight((int)x, (int)z);
 }
 
 std::string BoxIsland::getName()

@@ -2,6 +2,12 @@
 #include "../ThreeMaxLoader.h"
 #include "Turtle.h"
 #include "../profiling.h"
+#include "../engine.h"
+#include "../container.h"
+#include "../sounds/sounds.h"
+
+extern dWorldID world;
+extern dSpaceID space;
 
 extern std::unordered_map<std::string, GLuint> textures;
 extern container<Vehicle*> entities;
@@ -209,4 +215,196 @@ void Turtle::doDynamics(dBodyID body)
         AdvancedWalrus::doDynamics(body);
     }
 
+}
+
+void Turtle::doControlAttack()
+{
+    Controller c;
+
+    c.registers = registers;
+
+    Vec3f Po = getPos();
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    if (T.magnitude()>1000)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 400.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 200.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 100.0f;
+        }
+
+        BoxIsland *b = findNearestIsland(Po);
+        float closest = (b->getPos() - Po).magnitude();
+        if (closest > 1800 && closest < 1900)
+        {
+            //c.registers.thrust = 35.0f;                 // This is the thrust at which the walrus enter the island (more or less).
+
+        }
+
+
+        float e = _acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else
+    if (T.magnitude()<1000)
+    {
+        Vec3f target = destination - getPos();
+        Vec3f aim = toBody(me,target);
+
+        dout << "Target:" << aim <<  ":Loc: " << getPos() << " Target: " << destination<< std::endl;
+
+
+        float azimuth=getAzimuth(aim);
+        float declination=getDeclination(aim);
+
+        struct controlregister c;
+        c = getControlRegisters();
+        c.precesion = azimuth;
+        c.pitch = declination;
+        setControlRegisters(c);
+
+        Vehicle *action = fire(0,world,space);
+
+        if (action != NULL)
+        {
+            entities.push_at_the_back(action, action->getGeom());
+            //gunshot();
+            setTtl(100);
+        }
+
+
+    }
+
+    BoxIsland *is = findNearestIsland(Po);
+
+    Vec3f fw = getForward().normalize();
+
+    Vec3f l = Po + 30*fw;
+
+    float x,y;
+    x = l[0];
+    y = l[2];
+
+    if (is->getHeight(x,y) < 5)
+        // Go back and forth towards the target but moving back from the seashore.
+        c.registers.thrust = -10;
+
+    doControl(c);
+
+}
+
+
+void Turtle::doControlDestination()
+{
+    Controller c;
+
+    c.registers = registers;
+
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float roundederror;
+
+    roundederror = 5;
+
+
+    if (dst_status != DestinationStatus::REACHED && T.magnitude()>roundederror)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 600.0f;
+
+        if (distance<600.0f)
+        {
+            c.registers.thrust = 20.0f;
+        }
+
+
+        float e = _acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
+
+
+    } else {
+        if (dst_status != DestinationStatus::REACHED)
+        {
+            dst_status = DestinationStatus::REACHED;
+            autostatus = AutoStatus::FREE;
+            c.registers.thrust = 0.0f;
+            setThrottle(0.0);
+            c.registers.roll = 0.0f;
+        }
+    }
+
+    BoxIsland *is = findNearestIsland(Po);
+
+    Vec3f fw = getForward().normalize();
+
+    Vec3f l = Po + 30*fw;
+
+    float x,y;
+    x = l[0];
+    y = l[2];
+
+    if (is->getHeight(x,y) < 5)
+        // Go back and forth towards the target but moving back from the seashore.
+        c.registers.thrust = -10;
+
+    doControl(c);
 }

@@ -128,7 +128,6 @@ void TestCase_120::init()
 
     Turtle *_turtle = spawnTurtle(Vec3f(0,100.0,0), PI, GREEN_FACTION,1,4,space,world);
     _turtle->setIsland(nemesis);
-
     entities.push_back(_turtle, _turtle->getGeom());
 
     Otter *_otter1 = addOtter(Vec3f(0,5,-3000.0), 0,BLUE_FACTION,1);
@@ -145,7 +144,15 @@ void TestCase_120::init()
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Armory(GREEN_FACTION)           ,         0.0f,    -650.0f,0,world);
     Structure *t3 = islands[0]->addStructure(new Antenna(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
-    Structure *t4 = islands[0]->addStructure(new Launcher(GREEN_FACTION)      ,       -650.0f,    0.0f,0,world);
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    {Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,world);}
+    //Structure *t4 = islands[0]->addStructure(new Launcher(GREEN_FACTION)      ,       -1050.0f,    0.0f,0,world);
 
 
 
@@ -178,6 +185,8 @@ int TestCase_120::check(unsigned long timertick)
         }
 
     }
+
+
     if (timertick > 18000)
     {
         Vehicle* _b = findCarrier(GREEN_FACTION);
@@ -213,6 +222,9 @@ int TestCase_120::number()
 
 std::string TestCase_120::title()
 {
+    // The island should be ok without strong zfighting
+    // Walrus should land into the island without breaking.
+    // Tank should defend the island without moving into the water.
     return std::string("Check the terrain island and the tank.");
 }
 

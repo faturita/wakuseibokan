@@ -36,6 +36,9 @@ public:
 
     int  virtual getSubType();
     EntityTypeId virtual getTypeId();
+
+    void virtual doControlAttack();
+    void virtual doControlDestination();
 };
 
 #endif // TURTLE_H

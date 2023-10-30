@@ -1415,9 +1415,6 @@ int main(int argc, char** argv) {
 
     initSound();
 
-    if (!isPresentCommandLineParameter(argc,argv,"-nointro"))
-        {intro();controller.view = 5;}
-
 
     setupWorldModelling();
     initRendering();
@@ -1444,6 +1441,9 @@ int main(int argc, char** argv) {
         join_lobby();
     else if (peermode == SERVER)
         init_lobby();
+
+    if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
+        {intro();controller.view = 5;}
 
 
     const char *conf = dGetConfiguration ();

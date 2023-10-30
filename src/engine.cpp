@@ -1485,12 +1485,12 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                     if(Launcher* lb = dynamic_cast<Launcher*>(entities[str[i]]))
                     {
                         // Increase the range a little bit.
-                        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+                        //Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
 
-                        if (!target)
-                            return;
+                        //if (!target)
+                        //    return;
 
-                        Vehicle *b = target;
+                        //Vehicle *b = target;
 
                         Vec3f firingloc = lb->getPos();
 
@@ -1515,7 +1515,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         } else if (target->getType() == COMMANDCENTER)   {
                             // @FIXME:  There should be a list of matching targets.
                             lb->ground();
-                        } else if (target->getType() == WALRUS || target->getType() == CARRIER) {
+                        } else if (target->getType() == CARRIER) {
                             lb->water();
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(0,world,space);
