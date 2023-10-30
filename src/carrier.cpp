@@ -732,7 +732,11 @@ void handleResize(int w, int h) {
     
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    gluPerspective(45.0, (float)w / (float)h, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+
+    // @NOTE: Changing zNear helps to avoid as much as possible island z-fighting.
+    //    However putting a value greater than 3.0 wrec havoc the sky which is bounded by this.
+    //    https://stackoverflow.com/questions/3410096/setting-near-plane-in-opengl
+    gluPerspective(45.0, (float)w / (float)h, 3.0, Camera.pos[2]+ horizon /**+ yyy**/);
 }
 
 static bool didODEInit=false;
@@ -1378,13 +1382,13 @@ int main(int argc, char** argv) {
 
 
     if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 2;controlmap[0]=2;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
+        {controller.faction = BLUE_FACTION;controller.controllingid = 4;controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=3;controlmap[2]=4;}
+        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
     else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
         controller.faction = BOTH_FACTION;
     else
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=3;controlmap[2]=4;}
+        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
 
 
 
@@ -1409,10 +1413,11 @@ int main(int argc, char** argv) {
     else
         peermode = SERVER;
 
+    initSound();
+
 
     setupWorldModelling();
     initRendering();
-    initSound();
 
     // Initialize ODE, create islands, structures and populate the world.
     if (isPresentCommandLineParameter(argc,argv,"-testcase"))
@@ -1436,6 +1441,9 @@ int main(int argc, char** argv) {
         join_lobby();
     else if (peermode == SERVER)
         init_lobby();
+
+    if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
+        {intro();controller.view = 5;}
 
 
     const char *conf = dGetConfiguration ();
@@ -1471,9 +1479,6 @@ int main(int argc, char** argv) {
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 
     //CLog::Write(CLog::Debug,"Manta is located in %lu\n",*a);
-
-    if (!isPresentCommandLineParameter(argc,argv,"-nointro"))
-        {intro();controller.view = 5;}
 
     msgboardfile.open ("messageboard.dat");
     

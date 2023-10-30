@@ -494,6 +494,7 @@ void initWorldModelling(int testcase)
     t->init();
 
     controller.faction = BOTH_FACTION;
+    controller.view = 1;
 
 }
 

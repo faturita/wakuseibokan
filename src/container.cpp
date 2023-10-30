@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <unordered_map>
 
+#include "profiling.h"
+
 template<class T> container<T>::container()
 {
     e_size = 0;
@@ -76,6 +78,11 @@ template<class T> size_t container<T>::push_back(size_t initialregion, T value)
     {
         if (elem[i] == NULL)
             break;
+
+#ifdef DEBUG
+        // @NOTE: Check if by mistake we are adding twice the same element to the container
+        assert( elem[i] != value || !"Adding the same element twice to the container!");
+#endif
     }
 
     assert( i < MAX || !"The container is full and cannot hold more values.");

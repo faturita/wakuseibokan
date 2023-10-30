@@ -23,6 +23,7 @@
 std::string Vehicle::subTypeText(int code)
 {
     switch (code) {
+    case VehicleSubTypes::ARMORY:return std::string("Armory");break;
     case VehicleSubTypes::DOCK:return std::string("Dock");break;
     case VehicleSubTypes::RADAR:return std::string("Radar");break;
     case VehicleSubTypes::BELUGA:return std::string("Beluga Carrier");break;

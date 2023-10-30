@@ -121,10 +121,9 @@ void TestCase_111::init()
         Otter *_otter = new Otter(GREEN_FACTION);
         _otter->init();
         dSpaceID car_space = _otter->embody_in_space(world, space);
-        _otter->setPos(400.0f,70.0f,-4400.0f);
-        _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-1400,1400),30.0f,getRandomInteger(-1400,1400)));
+        Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
+        _otter->setPos(p);
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(1);
@@ -188,6 +187,14 @@ void TestCase_111::init()
         //_otter->goTo(Vec3f(0,0,340));
         _otter->enableAuto();
         _otter->enableTelemetry();
+
+        Wheel *l,*r,*bl,*br;
+        _otter->setPos(p);
+        _otter->getWheels(l,r,bl,br);
+        l->setPos(p);
+        r->setPos(p);
+        bl->setPos(p);
+        br->setPos(p);
     }
 
 
@@ -196,10 +203,9 @@ void TestCase_111::init()
         Otter *_otter = new Otter(BLUE_FACTION);
         _otter->init();
         dSpaceID car_space = _otter->embody_in_space(world, space);
-        _otter->setPos(400.0f,70.0f,-4400.0f);
-        _otter->setPos(40.0f,30.0f,-0.0f);
 
-        _otter->setPos(Vec3f(getRandomInteger(-1400,1400),30.0f,getRandomInteger(-1400,1400)));
+        Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
+        _otter->setPos(p);
         _otter->stop();
         _otter->setSignal(4);
         _otter->setNameByNumber(2);
@@ -261,6 +267,14 @@ void TestCase_111::init()
         //_otter->goTo(Vec3f(0,0,340));
         _otter->enableAuto();
         _otter->enableTelemetry();
+
+        Wheel *l,*r,*bl,*br;
+        _otter->setPos(p);
+        _otter->getWheels(l,r,bl,br);
+        l->setPos(p);
+        r->setPos(p);
+        bl->setPos(p);
+        br->setPos(p);
     }
 
 
@@ -322,7 +336,6 @@ int TestCase_111::check(unsigned long timertick)
         if (n1!=-1)
         {
             //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg1.controllingid, (timer-mesg1.sourcetimer), mesg1.registers.roll, mesg1.registers.thrust);
-            greenttl--;
 
             Vehicle *_b=NULL;
 

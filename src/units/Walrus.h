@@ -52,7 +52,7 @@ public:
 
     void attack(Vec3f target);
 
-    void setNameByNumber(int number);
+    void virtual setNameByNumber(int number);
 
     void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 };

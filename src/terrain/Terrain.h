@@ -173,6 +173,7 @@ class Terrain {
 		}
 };
 
+Terrain* loadTerrain(float height);
 Terrain* loadTerrain(const char* filename, float height);
 
 void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
@@ -207,6 +208,10 @@ public:
 
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
+    dGeomID buildFractalTerrainModel(dSpaceID space );
+    dGeomID buildRegularTerrainModel(dSpaceID space );
+    dGeomID buildTerrainModel(dSpaceID space, Terrain *_landmass, const char *model );
+    dGeomID buildModel();
     
     //void draw(float x, float y, float z, float side, float height);
     void draw();
@@ -222,6 +227,7 @@ public:
     float getZ();
     Vec3f getPos();
     Vec3f getPosAtDesiredHeight(float desiredHeight);
+    float getHeight(float x,float z);
 
     std::string getName();
     void setName(std::string name);

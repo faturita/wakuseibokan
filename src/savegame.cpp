@@ -30,6 +30,7 @@
 #include "units/AdvancedManta.h"
 #include "units/Stingray.h"
 #include "units/Otter.h"
+#include "units/Turtle.h"
 
 #include "structures/Structure.h"
 #include "structures/Runway.h"
@@ -39,6 +40,7 @@
 #include "structures/Laserturret.h"
 #include "structures/CommandCenter.h"
 #include "structures/Launcher.h"
+#include "structures/Armory.h"
 
 #include "weapons/CarrierArtillery.h"
 #include "weapons/CarrierTurret.h"
@@ -122,6 +124,8 @@ void savegame(std::string filename)
                 subtype = VehicleSubTypes::BALAENIDAE;
             else if(Cephalopod* cp = dynamic_cast<Cephalopod*>(entities[i]))
                 subtype = VehicleSubTypes::CEPHALOPOD;
+            else if(Turtle* tu = dynamic_cast<Turtle*>(entities[i]))
+                subtype = VehicleSubTypes::TURTLE;
 
             ss << subtype << std::endl;
 
@@ -484,6 +488,66 @@ void loadgame(std::string filename)
                     _bl->setRotation(R);
                     _br->setRotation(R);
                 }
+                else if (subtype == VehicleSubTypes::TURTLE)
+                {
+                    Turtle* _tu = new Turtle(faction);
+                    v = _tu;
+                    _tu->init();
+                    dSpaceID car_space = _tu->embody_in_space(world, space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+
+                    _walrus = _tu;
+                    entities.push_back(_walrus, _walrus->getGeom());
+
+                    Wheel * _fr= new Wheel(faction, 0.001, 30.0);
+                    _fr->init();
+                    _fr->embody(world, car_space);
+                    _fr->attachTo(world,_walrus,4.9f, -3.0, 5.8);
+                    _fr->stop();
+
+                    entities.push_back(_fr, _fr->getGeom());
+
+
+                    Wheel * _fl= new Wheel(faction, 0.001, 30.0);
+                    _fl->init();
+                    _fl->embody(world, car_space);
+                    _fl->attachTo(world,_walrus, -4.9f, -3.0, 5.8);
+                    _fl->stop();
+
+                    entities.push_back(_fl, _fl->getGeom());
+
+
+                    Wheel * _br= new Wheel(faction, 0.001, 30.0);
+                    _br->init();
+                    _br->embody(world, car_space);
+                    _br->attachTo(world,_walrus, 4.9f, -3.0, -5.8);
+                    _br->stop();
+
+                    entities.push_back(_br, _br->getGeom());
+
+
+                    Wheel * _bl= new Wheel(faction, 0.001, 30.0);
+                    _bl->init();
+                    _bl->embody(world, car_space);
+                    _bl->attachTo(world,_walrus, -4.9f, -3.0, -5.8);
+                    _bl->stop();
+
+                    entities.push_back(_bl, _bl->getGeom());
+
+                    _tu->addWheels(_fl, _fr, _bl, _br);
+                    _fl->setSteering(true);
+                    _fr->setSteering(true);
+
+                    v->setRotation(R);
+                    _fl->setRotation(R);
+                    _fr->setRotation(R);
+                    _bl->setRotation(R);
+                    _br->setRotation(R);
+                }
 
                 //_walrus->inert = true;
                 v = _walrus;
@@ -584,43 +648,45 @@ void loadgame(std::string filename)
                 ss >> typeofisland;
 
                 switch (subtype) {
-                case 10:
+                case VehicleSubTypes::ARMORY:
+                    v = new Armory(faction);
+                case VehicleSubTypes::ARTILLERY:
                     v = new Artillery(faction);
                     break;
-                case 11:
+                case VehicleSubTypes::COMMANDCENTER:
                     v = new CommandCenter(faction,typeofisland);
                     break;
-                case 12:
+                case VehicleSubTypes::HANGAR:
                     v = new Hangar(faction);
                     break;
-                case 13:
+                case VehicleSubTypes::WAREHOUSE:
                     v = new Warehouse(faction);
                     break;
-                case 14:
+                case VehicleSubTypes::RUNWAY:
                     v = new Runway(faction);
                     break;
-                case 15:
+                case VehicleSubTypes::LASERTURRET:
                     v = new LaserTurret(faction);
                     break;
-                case 16:
+                case VehicleSubTypes::TURRET:
                     v = new Turret(faction);
                     break;
-                case 17:
+                case VehicleSubTypes::LAUNCHER:
                     v = new Launcher(faction);
                     break;
-                case 18:
+                case VehicleSubTypes::FACTORY:
                     v = new Factory(faction);
                     break;
-                case 19:
+                case VehicleSubTypes::DOCK:
                     v = new Dock(faction);
                     break;
-                case 20:
+                case VehicleSubTypes::ANTENNA:
                     v = new Antenna(faction);
                     break;
-                case 21:
+                case VehicleSubTypes::RADAR:
                     v = new Radar(faction);
                     break;
-                case 22:default:
+                case VehicleSubTypes::STRUCTURE:default:
                     v = new Structure(faction);
                     break;
                 }

@@ -1,5 +1,10 @@
 #include "Wheel.h"
 #include "../profiling.h"
+#include "../engine.h"
+#include "../container.h"
+#include "../sounds/sounds.h"
+
+extern std::unordered_map<std::string, GLuint> textures;
 
 Wheel::Wheel(int faction)
 {
@@ -25,6 +30,8 @@ Wheel::~Wheel()
 
 void Wheel::init()
 {
+
+    _model = (Model*)T3DSModel::loadModel("units/wheel.3ds",0,0,0,1,1,1,0);
 
     Wheel::width = 0.2;
     Wheel::height = 1.0;
@@ -241,7 +248,13 @@ void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
     //glRotatef(0, 0.0f, 0.0f, 1.0f);
 
     // @FIXME: Create a nice wheel.
-    drawRectangularBox(width, height, length);
+    //drawRectangularBox(width, height, length);
+
+    if (_model != NULL)
+    {
+        _model->setTexture(textures["metal"]);
+        _model->draw();
+    }
 
     glPopMatrix();
 

@@ -16,6 +16,7 @@
 #include "units/Medusa.h"
 #include "units/Stingray.h"
 #include "units/Otter.h"
+#include "units/Turtle.h"
 
 #include "terrain/Terrain.h"
 
@@ -32,6 +33,7 @@
 #include "structures/Antenna.h"
 #include "structures/Factory.h"
 #include "structures/Radar.h"
+#include "structures/Armory.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -172,6 +174,16 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
             entities.push_back(_walrus, _walrus->getGeom());
         }
+        else if (record.typeId == EntityTypeId::TTurtle)
+        {
+            Turtle *_walrus = new Turtle(record.faction);
+            _walrus->init();
+            dSpaceID car_space = _walrus->embody_in_space(world, space);
+            _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+            _walrus->setStatus(SailingStatus::SAILING);
+
+            entities.push_back(_walrus, _walrus->getGeom());
+        }
     }
 
     {
@@ -224,6 +236,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         int typeofisland=0;
 
         switch (record.typeId) {
+        case EntityTypeId::TArmory:
+            v = new Armory(record.faction);
+            break;
         case EntityTypeId::TArtillery:
             v = new Artillery(record.faction);
             break;
