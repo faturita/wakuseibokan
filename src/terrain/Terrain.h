@@ -186,7 +186,7 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b);
 class BoxIsland : public Island
 {
 private:
-    Terrain *_landmass;
+
     
     dReal heightfield_callback( void* pUserData, int x, int z );
     
@@ -205,6 +205,8 @@ private:
     std::string modelname;
     
 public:
+    Terrain *_landmass;
+    bool dynamic_island = false;
 
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);

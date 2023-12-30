@@ -133,7 +133,25 @@ namespace {
 }
 
 
+void Image::save()
+{
+    FILE *pf = fopen("filename","wb+");
 
+    fwrite(pixels, sizeof(char),height*width*3,pf);
+
+    fclose(pf);
+}
+
+void Image::load()
+{
+    auto_array<char> pixels2(new char[width * height * 3]);
+
+    FILE *pf = fopen("filename","rb+");
+
+    fread(pixels2.release(), sizeof(char),height*width*3,pf);
+
+    fclose(pf);
+}
 
 
 
@@ -205,6 +223,7 @@ Image* loadBMP(const char* filename) {
 	input.close();
 	return new Image(pixels2.release(), width, height);
 }
+
 
 /**
 GLuint LoadImage(char* file)

@@ -51,6 +51,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 
 using namespace std;
 
+
 Terrain* loadFractalTerrain(float height)
 {
     Terrain* t = new Terrain(60, 60);
@@ -222,15 +223,23 @@ extern std::unordered_map<std::string, GLuint> maptextures;
 dGeomID BoxIsland::buildTerrainModel(dSpaceID space, Terrain *p_landmass, const char *model )
 {
     _landmass = p_landmass;
+    modelname = model;
 
     char *pixels2 = new char[TERRAIN_SIDE_LENGTH * TERRAIN_SIDE_LENGTH * 3];
 
     for(int x=0;x<60;x++)
         for(int y=0;y<60;y++)
         {
-            pixels2[x*60*3 + y*3 + 0] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
-            pixels2[x*60*3 + y*3 + 1] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
-            pixels2[x*60*3 + y*3 + 2] = (char)(_landmass->getHeight(x,y)/TERRAIN_MAX_HEIGHT)*255;
+
+            float height = _landmass->getHeight(x,y);
+
+            height = (height - 0) / (255 - 0);
+            height = height * (255-80) + 80;
+
+
+            pixels2[x*60*3 + y*3 + 0] = (char)(height/TERRAIN_MAX_HEIGHT)*255;
+            pixels2[x*60*3 + y*3 + 1] = (char)(height/TERRAIN_MAX_HEIGHT)*255;
+            pixels2[x*60*3 + y*3 + 2] = (char)(height/TERRAIN_MAX_HEIGHT)*255;
         }
 
     Image image(pixels2,TERRAIN_SIDE_LENGTH,TERRAIN_SIDE_LENGTH);
@@ -254,14 +263,17 @@ dGeomID BoxIsland::buildTerrainModel(dSpaceID space, Terrain *p_landmass, const 
     return buildModel();
 }
 
+
 dGeomID BoxIsland::buildFractalTerrainModel(dSpaceID space )
 {
+    dynamic_island = true;
     return buildTerrainModel(space, loadFractalTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
 }
 
 
 dGeomID BoxIsland::buildRegularTerrainModel(dSpaceID space )
 {
+    dynamic_island = true;
     return buildTerrainModel(space, loadRegularTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
 }
 

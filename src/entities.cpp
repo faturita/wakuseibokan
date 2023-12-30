@@ -2,7 +2,7 @@
 #include "profiling.h"
 #include "container.h"
 
-// Add a new interface to an enbodied object.
+// Add a new interface to an embodied object.
 #include "units/BoxVehicle.h"
 #include "units/Walrus.h"
 #include "units/Manta.h"

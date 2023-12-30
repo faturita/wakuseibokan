@@ -25,7 +25,7 @@
 #include <fstream>
 #include <string.h>
 
-#include "terrain/imageloader.h"
+#include "imageloader.h"
 #include "md2model.h"
 
 using namespace std;

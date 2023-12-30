@@ -141,7 +141,6 @@ src/structures/turrettop.blend
 src/structures/turrettop.blend1
 src/terrain/Terrain.cpp
 src/terrain/Terrain.h
-src/terrain/imageloader.cpp
 src/terrain/imageloader.h
 src/terrain/island.h
 src/terrain/main.cpp

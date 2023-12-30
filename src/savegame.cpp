@@ -181,6 +181,16 @@ void savegame(std::string filename)
         ss << islands[j]->getModelName() << std::endl;
         dout << "Name:" << islands[j]->getName() << std::endl;
 
+        ss << islands[j]->dynamic_island << std::endl;
+
+        if (islands[j]->dynamic_island)
+            for(int x=0;x<60;x++)
+                for(int z=0;z<60;z++)
+                {
+                    ss << islands[j]->_landmass->getHeight(x,z) << std::endl;
+                }
+
+
         Structure *c =  islands[j]->getCommandCenter();
 
         if (c)
@@ -623,7 +633,27 @@ void loadgame(std::string filename)
         is->setLocation(loc[0],-1,loc[2]);
         ss >> modelname;
         dout << "Reading Island:" << name << "\t" << modelname << std::endl;
-        is->buildTerrainModel(space,modelname.c_str());
+
+        ss >> is->dynamic_island;
+
+        if (is->dynamic_island)
+        {
+            Terrain* t = new Terrain(60, 60);
+
+            for(int y = 0; y < 60; y++) {
+                for(int x = 0; x < 60; x++) {
+                    float height;
+                    ss >> height;
+                    t->setHeight(x, y, height);
+                }
+            }
+
+            t->computeNormals();
+            is->buildTerrainModel(space,t,modelname.c_str());
+        } else {
+
+            is->buildTerrainModel(space,modelname.c_str());
+        }
 
         islands.push_back(is);
 
@@ -650,6 +680,7 @@ void loadgame(std::string filename)
                 switch (subtype) {
                 case VehicleSubTypes::ARMORY:
                     v = new Armory(faction);
+                    break;
                 case VehicleSubTypes::ARTILLERY:
                     v = new Artillery(faction);
                     break;
