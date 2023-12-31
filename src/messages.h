@@ -5,6 +5,7 @@
 
 struct Message
 {
+    unsigned long timer;
     std::string msg;
     int faction;
 };

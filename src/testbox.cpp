@@ -1529,7 +1529,7 @@ void checktest14(unsigned long timer)
                 Message mg;
                 mg.faction = _manta1->getFaction();
                 sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
-                mg.msg = std::string(str);
+                mg.msg = std::string(str);mg.timer = timer;
                 messages.insert(messages.begin(), mg);
                 reached = true;
             }
@@ -4571,7 +4571,7 @@ void checktest46(unsigned long timer)
         Message mg;
         sprintf(msg, "Schedule attack at %ld", starttime);
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -4615,7 +4615,7 @@ void checktest46(unsigned long timer)
         Message mg;
         sprintf(msg, "Air and amphibious attack started.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -4914,7 +4914,7 @@ void checktest50(unsigned long timer)
         Message mg;
         sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -4967,7 +4967,7 @@ void message(char* mms)
     Message mg;
     sprintf(msg, "%s",mms);
     mg.faction = BOTH_FACTION;
-    mg.msg = std::string(msg);
+    mg.msg = std::string(msg); mg.timer = timer;
     messages.insert(messages.begin(), mg);
 }
 
@@ -4982,7 +4982,7 @@ void checktest51(unsigned long timer)
         Message mg;
         sprintf(msg, "Initiating islands configuration");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5082,7 +5082,7 @@ void checktest52(unsigned long timer)
         Message mg;
         sprintf(msg, "TC52: Cephalopod basic dynamics, hoovering, stability and basic auto destination.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5175,7 +5175,7 @@ void checktest53(unsigned long timer)
         Message mg;
         sprintf(msg, "TC53: Cephalopod positioning and aiming to target.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5313,7 +5313,7 @@ void checktest54(unsigned long timer)
         Message mg;
         sprintf(msg, "TC54: Stop aircraft from departing if the island is already free.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5394,7 +5394,7 @@ void checktest55(unsigned long timer)
         Message mg;
         sprintf(msg, "TC55: Checking comm link interruption.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5423,7 +5423,7 @@ void checktest55(unsigned long timer)
         Message mg;
         sprintf(msg, "TC55: Manta will be flying far away.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
 
     }
@@ -5621,7 +5621,7 @@ void checktest57(unsigned long timer)
         Message mg;
         sprintf(msg, "TC57: Check landing after the command center is destroyed.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -5832,7 +5832,7 @@ void checktest59(unsigned long timer)
         Message mg;
         sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6237,7 +6237,7 @@ void checktest63(unsigned int timer)
         Message mg;
         sprintf(msg, "TC63: Order Manta to follow a path using waypoints.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6326,7 +6326,7 @@ void checktest64(unsigned long timer)
         Message mg;
         sprintf(msg, "TC64: Verifying launcher destroys Mantas by missiles.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6485,7 +6485,7 @@ void checktest66(unsigned long timer)
         Message mg;
         sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier shoots the CC.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6764,7 +6764,7 @@ void checktest69(unsigned long timer)
         Message mg;
         sprintf(msg, "TC69: Testing the controllers of a wheeled Walrus.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6824,7 +6824,7 @@ void checktest70(unsigned long timer)
         Message mg;
         sprintf(msg, "TC70: Testing manually manta landing on islands");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6859,7 +6859,7 @@ void checktest71(unsigned long timer)
         Message mg;
         sprintf(msg, "TC71: Landing Manta on a moving Carrier.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -6976,7 +6976,7 @@ void checktest72(unsigned long timer)
         Message mg;
         sprintf(msg, "TC72: Visually Checking explosions.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7042,7 +7042,7 @@ void checktest73(unsigned long timer)
         Message mg;
         sprintf(msg, "TC73: Testing torpedos chasing Carrier.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7115,7 +7115,7 @@ void checktest74(unsigned long timer)
         Message mg;
         sprintf(msg, "TC73: Testing torpedos chasing Walruses.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7210,7 +7210,7 @@ void checktest75(unsigned long timer)
         Message mg;
         sprintf(msg, "TC75: Testing bombs.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7256,7 +7256,7 @@ void checktest76(unsigned long timer)
         Message mg;
         sprintf(msg, "TC76: Playground on radar HUD. Move and check position.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7308,7 +7308,7 @@ void checktest77(unsigned long timer)
         Message mg;
         sprintf(msg, "TC75: Testing radar hud with enemy units.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7318,7 +7318,7 @@ void checktest77(unsigned long timer)
         Message mg;
         sprintf(msg, "TC75: Switch to the carrier or the turret and verify if there is a pink cross on the target");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7376,7 +7376,7 @@ void checktest78(unsigned long timer)
         Message mg;
         sprintf(msg, "TC75: Testing Mantas bombing an island.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7502,7 +7502,7 @@ void checktest79(unsigned long timer)
         Message mg;
         sprintf(msg, "TC79: Visually testing smoke.");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 
@@ -7512,7 +7512,7 @@ void checktest79(unsigned long timer)
         Message mg;
         sprintf(msg, "TC79: Check if the missile has a smoke tail");
         mg.faction = BOTH_FACTION;
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 

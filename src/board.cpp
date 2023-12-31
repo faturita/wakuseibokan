@@ -58,6 +58,7 @@ extern container<Vehicle*> entities;
 
 extern  Controller controller;
 
+extern unsigned long timer;
 
 extern int width;
 extern int height;
@@ -69,7 +70,154 @@ float X(float x);
 
 float Y(float y);
 
+void drawIntro()
+{
+    // This will make things dark.
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    int xsize = width/mapzoom;
+    int ysize = height/mapzoom;
+
+    if (mapzoom==1)
+    {
+        cx = width/2;
+        cy = height/2;
+    }
+
+    glOrtho(cx-xsize/2, cx+xsize/2, cy+ysize/2, cy-ysize/2, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glColor4f(1.0f, 1.0f, 1.0f, 1);
+    glDisable(GL_DEPTH_TEST);
+    glRotatef(180.0f,0,0,1);
+    glRotatef(180.0f,0,1,0);
+
+
+
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    char str[256], str2[256], str3[256], str4[256], str5[256];
+
+    static int letter=0, letter2=0, letter3=0, letter4=0, letter5=0;
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix(); {
+        glTranslatef(0, -400, 1);
+
+        memset(str,0,256);memset(str2,0,256);memset(str3,0,256);memset(str4,0,256);memset(str5,0,256);
+
+        sprintf(str, "Wakuseibokan");
+        if (getRandomInteger(1,2)==1)
+            drawString(400,300,0,str,0.5f,0.1f,1.0f,1.0f);
+        else
+            drawString(400,300,0,str,0.5f,0.1f,1.0f,0.0f);
+
+        strncpy(str, "Excited warfare on the seas of a Kepler IV.", letter);
+        drawString(0,0,0,str,0.2f,0.1f,1.0f,1.0f);
+
+        if (timer % 1 ==0 && letter <=43)
+            letter++;
+
+        strncpy(str2, "The time has come to conquer Kepler IV. Humanity is now able to travel further away ", letter2);
+        drawString(0,-50,0,str2,0.2f,0.1f,1.0f,1.0f);
+        strncpy(str3, "from our solar system, and it has now reached exoplanets. Two companies sent survey", letter3);
+        drawString(0,-90,0,str3,0.2f,0.1f,1.0f,1.0f);
+        strncpy(str4, "parties in the form of two AI carriers that aim to control the vast archipielago of ", letter4);
+        drawString(0,-130,0,str4,0.2f,0.1f,1.0f,1.0f);
+        strncpy(str5, "Kepler IV. These AIs can be controlled remotely in real-time by space folding uplinks.", letter5);
+        drawString(0,-170,0,str5,0.2f,0.1f,1.0f,1.0f);
+
+        if (letter >43 && timer % 10 ==0 && letter2 <=83)
+            letter2++;
+        if (letter2 >83 && timer % 8 ==0 && letter3 <=83)
+            letter3++;
+        if (letter3 >83 && timer % 6 ==0 && letter4 <=83)
+            letter4++;
+        if (letter4 >83 && timer % 4 ==0 && letter5 <=84)
+            letter5++;
+
+        if (letter5 >= 85)
+        {
+            strncpy(str, "Press ! to engage the uplink.", 30);
+            drawString(400,-300,0,str,0.2f,1.0f,1.0f,1.0f);
+        }
+
+    } glPopMatrix();
+
+    glEnable(GL_DEPTH_TEST);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+
 void drawBoard()
+{
+    // This will make things dark.
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    int xsize = width/mapzoom;
+    int ysize = height/mapzoom;
+
+    if (mapzoom==1)
+    {
+        cx = width/2;
+        cy = height/2;
+    }
+
+    glOrtho(cx-xsize/2, cx+xsize/2, cy+ysize/2, cy-ysize/2, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glColor4f(1.0f, 1.0f, 1.0f, 1);
+    glDisable(GL_DEPTH_TEST);
+    glRotatef(180.0f,0,0,1);
+    glRotatef(180.0f,0,1,0);
+
+
+
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    char str[256];
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix(); {
+        glTranslatef(0, -400, 1);
+
+        sprintf(str, "Message Board");
+        drawString(500,300,0,str,0.2f,0.1f,1.0f,1.0f);
+
+        std::ifstream messageboard("messageboard.dat");
+        std::string message;
+
+        // @FIXME: We need a slider because quickly we will run out of space.
+        int counter = 0;
+        while (messageboard.good())
+        {
+            std::getline (messageboard, message);
+            //std::cout << message << std::endl;
+            drawString(10,200-(counter++)*20,0,(char *)message.c_str(),0.2f,0.1f,1.0f,1.0f);
+        }
+
+        messageboard.close();
+
+    } glPopMatrix();
+
+    glEnable(GL_DEPTH_TEST);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+void drawEntities()
 {
     // This will make things dark.
 

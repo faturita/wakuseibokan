@@ -51,7 +51,6 @@ void Normalize(float v[3][3], float out[3])
 	UnitarizeNormal(out);
 }
 
-
 /**
  * @brief This function works very well.  It gets a vector in dx,dy,dz and rotate it around azimuth (0-360 clockwise) and
  * declination (0 horizon, -90 zenith).  It returns Vec3f object rotated accordingly.  This are World Coordinates.

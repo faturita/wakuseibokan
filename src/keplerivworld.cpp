@@ -1,11 +1,25 @@
-//
-//  keplerivworld.cpp
-//  wakuseiboukan
-//
-//  Dynamic World Model
-//
-//  Created by Rodrigo Ramele on 24/05/14.
-//
+/* ============================================================================
+**
+** KeplerIVWorld - Wakuseiboukan - 24/05/2014
+**
+** Dynamic World Model.  This creates ODE world structures
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #define dSINGLE
 
@@ -448,6 +462,11 @@ void inline initIslands()
     gaijin->setLocation(150 kmf, -1.0, -339 kmf);
     gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
 
+    BoxIsland *kerama = new BoxIsland(&entities);
+    kerama->setName("Kerama");
+    kerama->setLocation(138 kmf, -1.0, -212 kmf);
+    kerama->buildTerrainModel(space,"terrain/gaijin.bmp");
+
     BoxIsland *tristan = new BoxIsland(&entities);
     tristan->setName("Tristan da Cunha");
     tristan->setLocation(250 kmf, -1.0, 10 kmf);
@@ -468,6 +487,11 @@ void inline initIslands()
     enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
     enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
+    BoxIsland *yokatsu = new BoxIsland(&entities);
+    yokatsu->setName("Yokatsu");
+    yokatsu->setLocation(-350 kmf, -1.0, -120 kmf);
+    yokatsu->buildTerrainModel(space,"terrain/atom.bmp");
+
     BoxIsland *arachnid = new BoxIsland(&entities);
     arachnid->setName("Arachnid");
     arachnid->setLocation(-450 kmf, -1.0, -300 kmf);
@@ -482,6 +506,46 @@ void inline initIslands()
     taksaven->setName("Taksaven");
     taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
     taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *oshima = new BoxIsland(&entities);
+    oshima->setName("Oshima");
+    oshima->setLocation(-310 kmf, -1.0, 210 kmf);
+    oshima->buildFractalTerrainModel(space);
+
+    BoxIsland *iriomote = new BoxIsland(&entities);
+    iriomote->setName("Iriomote");
+    iriomote->setLocation(-390 kmf, -1.0, 110 kmf);
+    iriomote->buildFractalTerrainModel(space);
+
+    BoxIsland *amami = new BoxIsland(&entities);
+    amami->setName("Amami");
+    amami->setLocation(390 kmf, -1.0, -190 kmf);
+    amami->buildFractalTerrainModel(space);
+
+    BoxIsland *miyake = new BoxIsland(&entities);
+    miyake->setName("Miyake");
+    miyake->setLocation(420 kmf, -1.0, -110 kmf);
+    miyake->buildFractalTerrainModel(space);
+
+    BoxIsland *tokunoshima = new BoxIsland(&entities);
+    tokunoshima->setName("Tokunoshima");
+    tokunoshima->setLocation(420 kmf, -1.0, 210 kmf);
+    tokunoshima->buildFractalTerrainModel(space);
+
+    BoxIsland *dogojima = new BoxIsland(&entities);
+    dogojima->setName("Dogojima");
+    dogojima->setLocation(380 kmf, -1.0, 110 kmf);
+    dogojima->buildFractalTerrainModel(space);
+
+    BoxIsland *kikajima = new BoxIsland(&entities);
+    kikajima->setName("Kikajima");
+    kikajima->setLocation(205 kmf, -1.0, 80 kmf);
+    kikajima->buildFractalTerrainModel(space);
+
+    BoxIsland *kamehouse = new BoxIsland(&entities);
+    kamehouse->setName("KameHouse");
+    kamehouse->setLocation(128 kmf, -1.0, 230 kmf);
+    kamehouse->buildFractalTerrainModel(space);
 
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
@@ -500,17 +564,36 @@ void inline initIslands()
     islands.push_back(parentum);
     islands.push_back(goku);
     islands.push_back(gaijin);
+    islands.push_back(kerama);
     islands.push_back(tristan);
     islands.push_back(sentinel);
     islands.push_back(midway);
     islands.push_back(enewetak);
+    islands.push_back(yokatsu);
     islands.push_back(statera);
     islands.push_back(arachnid);
     islands.push_back(outcrop);
     islands.push_back(taksaven);
+    islands.push_back(oshima);
+    islands.push_back(iriomote);
+    islands.push_back(amami);
+    islands.push_back(miyake);
+    islands.push_back(tokunoshima);
+    islands.push_back(dogojima);
+    islands.push_back(kikajima);
+    islands.push_back(kamehouse);
 
 }
 
+/**
+ * This is an alternative callback function for the ODE collision detector.  You can use this function to debug easily when something is not working on this module.
+ * It is very easy to replace the callback to use this function, check init method.
+ *
+ * @brief _nearCallback
+ * @param data
+ * @param o1
+ * @param o2
+ */
 void _nearCallback (void *data, dGeomID o1, dGeomID o2)
 {
     int i,n;
@@ -642,23 +725,12 @@ void initWorldPopulation()
         Balaenidae *_b = new Balaenidae(GREEN_FACTION);
         _b->init();
         dSpaceID carrier_space = _b->embody_in_space(world, space);
-        _b->setPos(0.0f + 0.0 kmf,20.5f,-4000.0f + 0.0 kmf);
-        _b->setPos(0.0f + 0.0 kmf,20.5f,-16000.0f + 0.0 kmf);
+        _b->setPos(0.0f + 0.0    kmf,20.5f,-4000.0f + 0.0 kmf);
+        _b->setPos(0.0f + 10000.0    ,20.5f,+10000.0f + 0.0 kmf);
         //_b->setPos(580 kmf, 20.5f, -350 kmf - 4000.0f);
         _b->stop();
 
         entities.push_back(_b,_b->getGeom());
-
-
-        Beluga *_bg = new Beluga(BLUE_FACTION);
-        _bg->init();
-        dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
-        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
-        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
-        _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
-        _bg->stop();
-
-        entities.push_back(_bg, _bg->getGeom());
 
 
         CarrierTurret * _bo= new CarrierTurret(GREEN_FACTION);
@@ -677,6 +749,21 @@ void initWorldPopulation()
 
         _b->addWeapon(entities.push_back(_w1, _w1->getGeom()));
 
+        dMatrix3 Re2;
+        dRSetIdentity(Re2);
+        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/2.0 - PI/4.0);
+        dBodySetRotation(_b->getBodyID(),Re2);
+
+
+        Beluga *_bg = new Beluga(BLUE_FACTION);
+        _bg->init();
+        dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
+        _bg->setPos(-450 kmf, -1.0, 300 kmf - 6000.0f);
+        //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
+        _bg->setPos(150 kmf, -1.0, -340 kmf - 4000.0f);
+        _bg->stop();
+
+        entities.push_back(_bg, _bg->getGeom());
 
         CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
         _bl->init();

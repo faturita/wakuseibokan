@@ -12,7 +12,6 @@ extern  Controller controller;
 
 /* dynamics and collision objects */
 
-
 extern container<Vehicle*> entities;
 
 extern std::vector<BoxIsland*> islands;
@@ -20,6 +19,8 @@ extern std::vector<BoxIsland*> islands;
 extern std::vector<Message> messages;
 
 extern std::unordered_map<std::string, GLuint> textures;
+
+extern unsigned long timer;
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom)
@@ -101,7 +102,7 @@ bool stranded(Vehicle *carrier, Island *island)
         Message mg;
         mg.faction = b->getFaction();
         sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
-        mg.msg = std::string(str);
+        mg.msg = std::string(str);mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
 }
@@ -134,7 +135,7 @@ bool departed(Vehicle *walrus)
             sprintf(str, "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
         else
             sprintf(str, "%s has departed.", w->getName().c_str());
-        mg.msg = std::string(str);
+        mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
         return true;
@@ -169,7 +170,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         char str[256];
         Message mg;
         sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
-        mg.msg = std::string(str);
+        mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
         return true;
@@ -186,7 +187,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
             char str[256];
             Message mg;
             sprintf(str, "%s has landed in %s.", c->getName().c_str(), island->getName().c_str());
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = timer;
             mg.faction = c->getFaction();
             messages.insert(messages.begin(), mg);
             return true;
@@ -219,7 +220,7 @@ bool landed(Vehicle *manta, Island *island)
             Message mg;
             mg.faction = manta->getFaction();
             sprintf(str, "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             return true;
         }
@@ -288,7 +289,7 @@ bool hit(Structure* structure, Gunshot *g)
             Message mg;
             mg.faction = BOTH_FACTION;
             sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             b = structure->island;
         }
@@ -323,7 +324,7 @@ bool releasecontrol(Vehicle* vehicle)
             mg.faction = s->getFaction();
             char str[256];
             sprintf(str, "%s has landed on Aircraft.", s->getName().c_str());
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
         }
     }
@@ -446,7 +447,7 @@ bool isRay(dGeomID o)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        if (v->getGeom() == o && v->getType()==RAY)
+        if (o && v && v->getGeom() == o && v->getType() == RAY)
         {
             return true;
         }
@@ -1186,7 +1187,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                             Message mg;
                             sprintf(msg, "%s is loosing connection.", entities[i]->getName().c_str());
                             mg.faction = entities[i]->getFaction();
-                            mg.msg = std::string(msg);
+                            mg.msg = std::string(msg); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                         }
                         entities[i]->setSignal(2);
@@ -1330,6 +1331,14 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
                 }
 
+                Walrus *o = findWalrusByOrder2(sc->getFaction(), 66);
+
+                // If there are any existing walrus, it should stop attacking the enemies and go back closer to where the Command Center is located.
+                if (o)
+                {
+                    o->goTo(sc->getPos()+Vec3f(50,0,50)); // @FIXME  Let's define "Close to".
+                }
+
 
                 continue;
             }
@@ -1369,6 +1378,18 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             w->enableAuto();
 
                         w->attack(b->getPos());
+
+                    }
+
+                    // @FIXME Using a different function because here the other was not working
+                    Walrus *o = findWalrusByOrder2(sc->getFaction(), 66);
+
+                    if (o)
+                    {
+                        if (!o->isAuto())
+                            o->enableAuto();
+
+                        o->attack(b->getPos());
 
                     }
                 }
@@ -1464,12 +1485,12 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                     if(Launcher* lb = dynamic_cast<Launcher*>(entities[str[i]]))
                     {
                         // Increase the range a little bit.
-                        Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
+                        //Vehicle *target = findNearestEnemyVehicle(BLUE_FACTION,island->getPos(), 9 * 3.6 kmf);
 
-                        if (!target)
-                            return;
+                        //if (!target)
+                        //    return;
 
-                        Vehicle *b = target;
+                        //Vehicle *b = target;
 
                         Vec3f firingloc = lb->getPos();
 
@@ -1494,7 +1515,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         } else if (target->getType() == COMMANDCENTER)   {
                             // @FIXME:  There should be a list of matching targets.
                             lb->ground();
-                        } else if (target->getType() == WALRUS || target->getType() == CARRIER) {
+                        } else if (target->getType() == CARRIER) {
                             lb->water();
                         }
                         Gunshot* action = (Gunshot*)(lb)->fire(0,world,space);
@@ -1564,7 +1585,27 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                                 walrus->setOrder(DEFEND_ISLAND);
                             }
                         }
-                    }
+                    } else
+                    if(Armory *d = dynamic_cast<Armory*>(entities[str[i]]))
+                    {
+                        unsigned long timeevent = sc->getTimer();
+
+                        if (timer>=(timeevent + 200))
+                        {
+                            // Spawn 1 Turtle @FIXME: Recode all this.
+                            Walrus *w = findWalrusByOrder2(d->getFaction(), 66);
+
+                            if (!w && (b->getType() == CARRIER || b->getType() == WALRUS))
+                            {
+                                int walrusNumber = findNextNumber(d->getFaction(), WALRUS, TURTLE);
+                                Vehicle *walrus = (d)->spawn(world, space, WALRUS, walrusNumber);
+
+                                size_t l = entities.push_back(walrus, walrus->getGeom());
+
+                                walrus->setOrder(66);
+                            }
+                        }
+                    } else
                     if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
                     {
                         // Launch airplanes to attack incoming mantas.
@@ -1598,7 +1639,6 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         if (timer==(timeevent + 300))
                         {
                             Manta *m = launchManta(lb);
-                            printf ("Medusa: %p\n", m);
                         }
 
                     }
@@ -1650,6 +1690,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.6;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
@@ -1663,6 +1704,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
@@ -1674,6 +1716,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.85;islandstructs.push_back(tp);}
 
                     }
 
@@ -1697,10 +1740,14 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                             Structure *s = NULL;
                             switch (islandstructs[which].subType) {
+                            case VehicleSubTypes::ARMORY:
+                                s = new Armory(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::HANGAR:
-                                    s = new Hangar(c->getFaction());
-                                    island->addStructure(s,world);
-                                    break;
+                                s = new Hangar(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::WAREHOUSE:
                                 s = new Warehouse(c->getFaction());
                                 island->addStructure(s,world);
@@ -1744,6 +1791,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 island->addStructure(s,world);
                                 break;
 
+
                             }
 
                         }
@@ -1778,7 +1826,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
         Message mg;
         sprintf(msg, "%s","There is another aircraft on deck.");
         mg.faction = spawner->getFaction();
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
         return NULL;
     }
@@ -1794,7 +1842,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
         Message mg;
         mg.faction = manta->getFaction();
         sprintf(msg, "%s is ready to takeoff.",manta->getName().c_str());
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
     return (Manta*)manta;
@@ -1811,7 +1859,7 @@ Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
         Message mg;
         mg.faction = m->getFaction();
         sprintf(msg, "%s has been deployed.",m->getName().c_str());
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
     return (Manta*)m;
@@ -1832,7 +1880,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
         Message mg;
         mg.faction = walrus->getFaction();
         sprintf(msg, "%s has been deployed.",walrus->getName().c_str());
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
     return (Walrus*)walrus;
@@ -1854,7 +1902,7 @@ void dockWalrus(Vehicle *dock)
             Message mg;
             mg.faction = entities[i]->getFaction();
             sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
-            mg.msg = std::string(msg);
+            mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
 
             deleteEntity(i);
@@ -1874,7 +1922,7 @@ void dockManta()
             Message mg;
             mg.faction = entities[i]->getFaction();
             sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             //CLog::Write(CLog::Debug,"Eliminating....\n");
 
@@ -1919,7 +1967,7 @@ Manta* taxiManta(Vehicle *v)
             Message mg;
             mg.faction = m->getFaction();
             sprintf(msg,"%s is ready for launch.",m->getName().c_str());
-            mg.msg = std::string(msg);
+            mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
         }
     } else if (v->getType()==LANDINGABLE )
@@ -1948,7 +1996,7 @@ Manta* launchManta(Vehicle *v)
             Message mg;
             mg.faction = b->getFaction();
             sprintf(msg, "%s has been launched.", m->getName().c_str());
-            mg.msg = std::string(msg);
+            mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
             takeoff(m->getPos());
         }
@@ -1970,7 +2018,7 @@ Manta* launchManta(Vehicle *v)
             Message mg;
             mg.faction = r->getFaction();
             sprintf(msg, "%s is departing from %s.", m->getName().c_str(), is->getName().c_str());
-            mg.msg = std::string(msg);
+            mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
             takeoff(m->getPos());
         }
@@ -2030,12 +2078,74 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
         Message mg;
         mg.faction = BOTH_FACTION;
         sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
-        mg.msg = std::string(msg);
+        mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(),  mg);
 
         wipeEnemyStructures(island,faction);
     }
 }
 
+// @NOTE: Spawn functions should NOT add the vehicles into the final entity because this is done in the caller.
+Turtle* spawnTurtle(Vec3f pos, float angle, int faction, int number, int signal, dSpaceID space, dWorldID world)
+{
+    // 6,3,12
+    Turtle *_turtle = new Turtle(faction);
+    _turtle->init();
+    dSpaceID car_space = _turtle->embody_in_space(world, space);
+
+    _turtle->setPos(pos);
+    _turtle->stop();
+    _turtle->setSignal(signal);
+    _turtle->setNameByNumber(number);
+    _turtle->setStatus(SailingStatus::ROLLING);
+
+
+    Wheel * _fr= new Wheel(faction, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_turtle,3.9f, -3.0, 4.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(faction, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_turtle, -3.9f, -3.0, 4.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(faction, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_turtle, 3.9f, -3.0, -4.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(faction, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_turtle, -3.9f,-3.0, -4.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _turtle->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+    dMatrix3 Re2;
+    dRSetIdentity(Re2);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,angle);
+    dBodySetRotation(_turtle->getBodyID(),Re2);
+
+    return _turtle;
+}
 
 

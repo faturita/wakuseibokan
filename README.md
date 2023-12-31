@@ -258,6 +258,7 @@ Sounds
 * ffmpeg -i input.m4a output.wav
 * ./playaudio hellosine.wav 44100 1.0
 * https://github.com/thestk/stk/blob/master/INSTALL.md
+* https://ccrma.stanford.edu/software/stk/multichannel.html
 
 More info
 ---------
@@ -297,3 +298,4 @@ More info
 * https://www.goodai.com/ai-in-games-open-source-spaceship-generator-released-for-space-engineers
 * ARMA 3 https://en.wikipedia.org/wiki/Arma_3
 * Game Networking https://pvigier.github.io/2019/09/08/beginner-guide-game-networking.html
+* https://github.com/medialab-ku/openGLESbook

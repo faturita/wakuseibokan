@@ -35,6 +35,9 @@ private:
 
     unsigned long endtimer;
     int whowon;
+
+    void checkBeforeDone(unsigned long timertick);
+
 public:
     TestCase_111();
     void init();

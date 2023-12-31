@@ -243,7 +243,7 @@ void Balaenidae::doControl()
             Message mg;
             mg.faction = getFaction();
             sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
-            mg.msg = std::string(str);
+            mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
             dst_status = DestinationStatus::REACHED;
             c.registers.thrust = 0.0f;
