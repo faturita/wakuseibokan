@@ -291,17 +291,19 @@ void drawMap()
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
-        glPushAttrib (GL_LINE_BIT);
+
         // Let's draw the typical grid of naval cartmaking.  It is 12x8. Each square is 100 kmf squared.
         // (+,0,0),(0,0,+) is upwards-right.  The screen is (+,0),(0,+) downward-right.
         for(int i=0;i<10;i++)
         {
+            glPushAttrib (GL_LINE_BIT);
             glLineWidth(2.5);
             glColor3f(0.0, 1.0, 0.0);
             glBegin(GL_LINES);
             glVertex3f(   1, -500+i*100, 0.0);
             glVertex3f(1200, -500+i*100, 0.0);
             glEnd();
+            glPopAttrib();
         }
 
         for(int i=0;i<12;i++)

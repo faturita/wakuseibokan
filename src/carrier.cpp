@@ -792,11 +792,9 @@ void replayupdate(int value)
             else if (tracemode == REPLAY)
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
-            // Sync timers
+            // Sync timers (The first value is 1 here)
             if (timer == 1)
             {
-                while (ret>0 && record.timerparam != 6000)
-                    ret = fread(&record, sizeof(TickRecord),1,ledger);
                 timer = record.timerparam;
             }
 
@@ -805,6 +803,8 @@ void replayupdate(int value)
                 //printf(" %ld vs %ld \n", record.timerparam, timer);
 
                 visited.push_back(record.id);
+
+                printf("Record id %ld\n", record.id);
 
                 if (!entities.isValid(record.id))
                 {
