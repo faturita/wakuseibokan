@@ -66,6 +66,23 @@ template<class T> size_t container<T>::push_back(size_t initialregion, T value, 
     return i;
 }
 
+template<class T> size_t container<T>::assign(size_t index, T value, dGeomID geom)
+{
+    assert( index < MAX || !"The container is full and cannot hold more values.");
+
+    if (elem[index] != NULL)
+    {
+        // If there is an element there, erase it.
+        erase(elem[index]->getGeom());
+    }
+
+    elem[index] = value;
+
+    e_size++;    
+
+    geomidmap[geom] = index;
+}
+
 template<class T> size_t container<T>::push_back(T value)
 {
     return push_back(MIN, value);

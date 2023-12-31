@@ -136,6 +136,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 float fps=0;
 float latency=0;
 extern unsigned long timer;
+extern unsigned long seektimer;
 clock_t elapsedtime;
 
 bool wincondition=false;
@@ -788,14 +789,27 @@ void replayupdate(int value)
             // Read from the remote connection.
 
             if (peermode == CLIENT)
+            {
                 ret = receive(&record);
+                if (timer == 1) timer = record.timerparam;
+            }
             else if (tracemode == REPLAY)
+            {
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
-            // Sync timers (The first value is 1 here)
-            if (timer == 1)
-            {
-                timer = record.timerparam;
+                // Sync timers (The first value is 1 here)
+                if (timer == 1 && seektimer != 1)
+                {
+                    fseek(ledger, 0, SEEK_SET);
+                    printf("%ld", ftell(ledger));
+                    printf("Seeking to %ld\n", seektimer);
+                    do {
+                        ret = fread(&record, sizeof(TickRecord),1,ledger);
+                    } while( ret > 0 && record.timerparam != seektimer);
+                        
+                    timer = record.timerparam;
+                    printf("New timer: %ld\n", timer);
+                }
             }
 
             if (ret>0)
@@ -803,8 +817,6 @@ void replayupdate(int value)
                 //printf(" %ld vs %ld \n", record.timerparam, timer);
 
                 visited.push_back(record.id);
-
-                printf("Record id %ld\n", record.id);
 
                 if (!entities.isValid(record.id))
                 {
@@ -1419,7 +1431,7 @@ int main(int argc, char** argv) {
     if (isPresentCommandLineParameter(argc,argv,"-record"))
         tracemode = RECORD;
     else if (isPresentCommandLineParameter(argc,argv,"-replay"))
-        tracemode = REPLAY;
+        {tracemode = REPLAY;seektimer=1;}
     else
         tracemode = NOTRACE;
 
