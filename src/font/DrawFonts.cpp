@@ -229,12 +229,14 @@ void drawString(GLfloat x, GLfloat y, GLfloat z, char *string, GLfloat stroke_sc
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); {
 		glTranslatef(x, y, z);
-
-        glColor3f(r,g,b);
+      glColor3f(r,g,b);
 		glScalef(stroke_scale, stroke_scale, stroke_scale);
+      glPushAttrib(GL_LINE_BIT);
+      glLineWidth(2.0);
 		print_stroke_string(
 		  stroke_fonts[0], string);
         glColor3f(1.0f,1.0f,1.0f);
+      glPopAttrib();
 	} glPopMatrix();
 
 }

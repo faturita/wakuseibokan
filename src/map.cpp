@@ -291,7 +291,7 @@ void drawMap()
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
-
+        glPushAttrib (GL_LINE_BIT);
         // Let's draw the typical grid of naval cartmaking.  It is 12x8. Each square is 100 kmf squared.
         // (+,0,0),(0,0,+) is upwards-right.  The screen is (+,0),(0,+) downward-right.
         for(int i=0;i<10;i++)
@@ -306,20 +306,23 @@ void drawMap()
 
         for(int i=0;i<12;i++)
         {
+            glPushAttrib (GL_LINE_BIT);
             glLineWidth(2.5);
             glColor3f(0.0, 1.0, 0.0);
             glBegin(GL_LINES);
             glVertex3f(   1+i*100,  500, 0.0);
             glVertex3f(   1+i*100, -500, 0.0);
             glEnd();
+            glPopAttrib();
         }
-
+        glPushAttrib (GL_LINE_BIT);
         glLineWidth(2.5);
         glColor3f(0.0, 1.0, 0.0);
         glBegin(GL_LINES);
         glVertex3f(   1200,  500, 0.0);
         glVertex3f(   1200, -500, 0.0);
         glEnd();
+        glPopAttrib();
 
 
         /**
@@ -347,6 +350,7 @@ void drawMap()
             int cx= X(b->getX());
             int cy=Y(b->getZ());
             float r =20;
+                glPushAttrib (GL_LINE_BIT);
                 glLineWidth(2.0f);
                 glColor3f(1.0f, 1.0f, 1.0f);
                 glBegin(GL_LINE_LOOP);
@@ -358,6 +362,7 @@ void drawMap()
                     glVertex3f(x + cx, y + cy, 0.0f);//output vertex
                 }
                 glEnd();
+                glPopAttrib();
             }
         }
 

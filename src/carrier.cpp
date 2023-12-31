@@ -302,7 +302,7 @@ void drawHUD()
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix(); {
             glTranslatef(0, -400, 1);
-
+            glPushAttrib (GL_LINE_BIT);
             glLineWidth(10.5);
 
             for(int i=0;i<1200;i++)
@@ -317,6 +317,7 @@ void drawHUD()
                         glEnd();
                     }
                 }
+            glPopAttrib();
 
         } glPopMatrix();
     }
@@ -326,7 +327,7 @@ void drawHUD()
     glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); {
 		glTranslatef(0, -400, 1);
-        
+        glPushAttrib (GL_LINE_BIT);
         glLineWidth(2.5);
 
         int uc=600;                     // Horizontal center, screen is 1100 pixels.
@@ -371,6 +372,8 @@ void drawHUD()
         glVertex3f(cx,           +cy, 0.0);
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
+
+        glPopAttrib();
 
         /**
         Vec3f enemy(5000.0, 0.0f, 5000.0f);
@@ -417,13 +420,14 @@ void drawHUD()
                             radarbeep(v->getPos());
                             coun=0;
                         }
-
+                        glPushAttrib(GL_PROGRAM_POINT_SIZE);
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,0.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+                        glPopAttrib();
                     }
                 }
                 if (v &&
@@ -437,12 +441,14 @@ void drawHUD()
 
                         Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
 
+                        glPushAttrib(GL_PROGRAM_POINT_SIZE);
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,1.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+                        glPopAttrib();
 
 
                         Vec3f sc = v->screenLocation();
@@ -787,8 +793,10 @@ void replayupdate(int value)
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
             // Sync timers
-            if (timer == 0)
+            if (timer == 1)
             {
+                while (ret>0 && record.timerparam != 6000)
+                    ret = fread(&record, sizeof(TickRecord),1,ledger);
                 timer = record.timerparam;
             }
 
@@ -826,6 +834,7 @@ void replayupdate(int value)
 
         }
 
+        if (tracemode != REPLAY)
         {
 
             // @FIXME: Add a CRC to the mesg to see if there are no changes DO NOT SEND IT.
