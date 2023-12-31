@@ -1385,15 +1385,20 @@ int main(int argc, char** argv) {
     Camera.pos = Vec3f(0,0,0);
 
 
-    if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 4;controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
+    if (isPresentCommandLineParameter(argc,argv,"-godmode"))
+        controller.faction = BOTH_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
+        {controller.faction = BLUE_FACTION;
+        #ifdef __linux
+        controller.controllingid = 5;
+        #else
+        controller.controllingid = 4;
+        #endif
+        controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
         {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
-    else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
-        controller.faction = BOTH_FACTION;
     else
         {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
-
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
