@@ -123,12 +123,16 @@ void processMouse(int button, int state, int x, int y) {
             if (buttonState != 1)
             {
                 buttonState = 1;
+#if __linux
                 glutSetCursor(GLUT_CURSOR_NONE);
+#endif
             }
             else
             {
                 buttonState = 0;
-                glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+#if __linux
+                glutSetCursor(GLUT_CURSOR_INHERIT);
+#endif
             }
 
             _xoffset = x;
@@ -323,7 +327,9 @@ void switchControl(size_t id)
     controller.registers = entities[controller.controllingid]->getControlRegisters();
 
     // Release mouse
-    glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+#if __linux
+    glutSetCursor(GLUT_CURSOR_CROSSHAIR);  // https://www.opengl.org/resources/libraries/glut/spec3/node28.html
+#endif
     buttonState = 0;
 }
 

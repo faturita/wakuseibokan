@@ -507,46 +507,6 @@ void inline initIslands()
     taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
     taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
 
-    BoxIsland *oshima = new BoxIsland(&entities);
-    oshima->setName("Oshima");
-    oshima->setLocation(-310 kmf, -1.0, 210 kmf);
-    oshima->buildFractalTerrainModel(space);
-
-    BoxIsland *iriomote = new BoxIsland(&entities);
-    iriomote->setName("Iriomote");
-    iriomote->setLocation(-390 kmf, -1.0, 110 kmf);
-    iriomote->buildFractalTerrainModel(space);
-
-    BoxIsland *amami = new BoxIsland(&entities);
-    amami->setName("Amami");
-    amami->setLocation(390 kmf, -1.0, -190 kmf);
-    amami->buildFractalTerrainModel(space);
-
-    BoxIsland *miyake = new BoxIsland(&entities);
-    miyake->setName("Miyake");
-    miyake->setLocation(420 kmf, -1.0, -110 kmf);
-    miyake->buildFractalTerrainModel(space);
-
-    BoxIsland *tokunoshima = new BoxIsland(&entities);
-    tokunoshima->setName("Tokunoshima");
-    tokunoshima->setLocation(420 kmf, -1.0, 210 kmf);
-    tokunoshima->buildFractalTerrainModel(space);
-
-    BoxIsland *dogojima = new BoxIsland(&entities);
-    dogojima->setName("Dogojima");
-    dogojima->setLocation(380 kmf, -1.0, 110 kmf);
-    dogojima->buildFractalTerrainModel(space);
-
-    BoxIsland *kikajima = new BoxIsland(&entities);
-    kikajima->setName("Kikajima");
-    kikajima->setLocation(205 kmf, -1.0, 80 kmf);
-    kikajima->buildFractalTerrainModel(space);
-
-    BoxIsland *kamehouse = new BoxIsland(&entities);
-    kamehouse->setName("KameHouse");
-    kamehouse->setLocation(128 kmf, -1.0, 230 kmf);
-    kamehouse->buildFractalTerrainModel(space);
-
     islands.push_back(thermopilae);
     islands.push_back(nonsquareisland);
     islands.push_back(vulcano);
@@ -574,6 +534,47 @@ void inline initIslands()
     islands.push_back(arachnid);
     islands.push_back(outcrop);
     islands.push_back(taksaven);
+
+    BoxIsland *oshima = new BoxIsland(&entities);
+    oshima->setName("Oshima");
+    oshima->setLocation(-310 kmf, -1.0, 210 kmf);
+    oshima->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *iriomote = new BoxIsland(&entities);
+    iriomote->setName("Iriomote");
+    iriomote->setLocation(-390 kmf, -1.0, 110 kmf);
+    iriomote->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *amami = new BoxIsland(&entities);
+    amami->setName("Amami");
+    amami->setLocation(390 kmf, -1.0, -190 kmf);
+    amami->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *miyake = new BoxIsland(&entities);
+    miyake->setName("Miyake");
+    miyake->setLocation(420 kmf, -1.0, -110 kmf);
+    miyake->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *tokunoshima = new BoxIsland(&entities);
+    tokunoshima->setName("Tokunoshima");
+    tokunoshima->setLocation(420 kmf, -1.0, 210 kmf);
+    tokunoshima->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *dogojima = new BoxIsland(&entities);
+    dogojima->setName("Dogojima");
+    dogojima->setLocation(380 kmf, -1.0, 110 kmf);
+    dogojima->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *kikajima = new BoxIsland(&entities);
+    kikajima->setName("Kikajima");
+    kikajima->setLocation(205 kmf, -1.0, 80 kmf);
+    kikajima->buildTerrainModel(space,"terrain/sentinel.bmp");
+
+    BoxIsland *kamehouse = new BoxIsland(&entities);
+    kamehouse->setName("KameHouse");
+    kamehouse->setLocation(128 kmf, -1.0, 230 kmf);
+    kamehouse->buildTerrainModel(space,"terrain/sentinel.bmp");
+
     islands.push_back(oshima);
     islands.push_back(iriomote);
     islands.push_back(amami);
