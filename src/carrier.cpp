@@ -1417,7 +1417,7 @@ int main(int argc, char** argv) {
         #endif
         controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
+        {controller.faction = GREEN_FACTION;controller.controllingid = 2;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
     else
         {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
 

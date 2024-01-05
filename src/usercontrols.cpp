@@ -74,6 +74,7 @@ extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
 extern int aiplayer;
+extern int tracemode;
 
 extern unsigned long timer;
 unsigned long seektimer;
@@ -350,7 +351,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 switchControl(content);
 
             } else
-            if (controller.str.find("timer") != std::string::npos)
+            if (controller.str.find("timer") != std::string::npos && tracemode == REPLAY)
             {
                 unsigned long content = atol( controller.str.substr(5).c_str() );
 

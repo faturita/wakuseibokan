@@ -48,8 +48,8 @@ void init_lobby()
 {
     // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
     // (who has joined the game)
-    //lobby.push_back(newplayer("127.0.0.1",4500));
-    lobby.push_back(newplayer("192.168.1.195",4500));
+    lobby.push_back(newplayer("127.0.0.1",4500));
+    //lobby.push_back(newplayer("192.168.1.107",4500));
 
     printf(" Setting up GAME SERVER to connect as client for the model...\n");
 }
@@ -127,8 +127,8 @@ void setupControllerServer()
 void setupControllerClient()
 {
     char ip[256];
-    strcpy(ip, "192.168.1.186");
-    //strcpy(ip, "127.0.0.1");
+    //strcpy(ip, "192.168.1.186");
+    strcpy(ip, "127.0.0.1");
     int port = 5000;
 
     /* Clean up */
