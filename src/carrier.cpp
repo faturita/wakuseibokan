@@ -421,14 +421,18 @@ void drawHUD()
                             radarbeep(v->getPos());
                             coun=0;
                         }
+#ifdef __linux
                         glPushAttrib(GL_PROGRAM_POINT_SIZE);
+#endif
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,0.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+#ifdef __linux
                         glPopAttrib();
+#endif
                     }
                 }
                 if (v &&
@@ -442,14 +446,18 @@ void drawHUD()
 
                         Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
 
+#ifdef __linux
                         glPushAttrib(GL_PROGRAM_POINT_SIZE);
+#endif
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,1.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+#ifdef __linux
                         glPopAttrib();
+#endif
 
 
                         Vec3f sc = v->screenLocation();
