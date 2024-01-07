@@ -136,6 +136,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 float fps=0;
 float latency=0;
 extern unsigned long timer;
+extern unsigned long seektimer;
 clock_t elapsedtime;
 
 bool wincondition=false;
@@ -302,7 +303,7 @@ void drawHUD()
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix(); {
             glTranslatef(0, -400, 1);
-
+            glPushAttrib (GL_LINE_BIT);
             glLineWidth(10.5);
 
             for(int i=0;i<1200;i++)
@@ -317,6 +318,7 @@ void drawHUD()
                         glEnd();
                     }
                 }
+            glPopAttrib();
 
         } glPopMatrix();
     }
@@ -326,7 +328,7 @@ void drawHUD()
     glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); {
 		glTranslatef(0, -400, 1);
-        
+        glPushAttrib (GL_LINE_BIT);
         glLineWidth(2.5);
 
         int uc=600;                     // Horizontal center, screen is 1100 pixels.
@@ -371,6 +373,8 @@ void drawHUD()
         glVertex3f(cx,           +cy, 0.0);
         glVertex3f(cx-f[0], +cy+f[2], 0.0);
         glEnd();
+
+        glPopAttrib();
 
         /**
         Vec3f enemy(5000.0, 0.0f, 5000.0f);
@@ -417,13 +421,18 @@ void drawHUD()
                             radarbeep(v->getPos());
                             coun=0;
                         }
-
+#ifdef __linux
+                        glPushAttrib(GL_PROGRAM_POINT_SIZE);
+#endif
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,0.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+#ifdef __linux
+                        glPopAttrib();
+#endif
                     }
                 }
                 if (v &&
@@ -437,12 +446,18 @@ void drawHUD()
 
                         Vec3f l = Vec3f(proj*(enemy[0]/closest),0.0,proj*(enemy[2]/closest) );
 
+#ifdef __linux
+                        glPushAttrib(GL_PROGRAM_POINT_SIZE);
+#endif
                         glPointSize(4.5);
                         glColor3f(1.0,0.0,1.0);
                         glBegin(GL_LINES);
                         glVertex3f(cx - l[0]+1, +cy+l[2]-1,  0.0);
                         glVertex3f(cx - l[0]-1, +cy+l[2]+1,  0.0);
                         glEnd();
+#ifdef __linux
+                        glPopAttrib();
+#endif
 
 
                         Vec3f sc = v->screenLocation();
@@ -782,14 +797,27 @@ void replayupdate(int value)
             // Read from the remote connection.
 
             if (peermode == CLIENT)
+            {
                 ret = receive(&record);
+                if (timer == 1) timer = record.timerparam;
+            }
             else if (tracemode == REPLAY)
+            {
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
-            // Sync timers
-            if (timer == 0)
-            {
-                timer = record.timerparam;
+                // Sync timers (The first value is 1 here)
+                if (timer == 1 && seektimer != 1)
+                {
+                    fseek(ledger, 0, SEEK_SET);
+                    printf("%ld", ftell(ledger));
+                    printf("Seeking to %ld\n", seektimer);
+                    do {
+                        ret = fread(&record, sizeof(TickRecord),1,ledger);
+                    } while( ret > 0 && record.timerparam != seektimer);
+                        
+                    timer = record.timerparam;
+                    printf("New timer: %ld\n", timer);
+                }
             }
 
             if (ret>0)
@@ -826,6 +854,7 @@ void replayupdate(int value)
 
         }
 
+        if (tracemode != REPLAY)
         {
 
             // @FIXME: Add a CRC to the mesg to see if there are no changes DO NOT SEND IT.
@@ -1083,9 +1112,13 @@ void update(int value)
     if (controller.isInterrupted())
     {
         endWorldModelling();
+        clearSound();
         // Do extra wrap up
         msgboardfile.close();
-        fclose(ledger);
+        if (tracemode == RECORD || tracemode == REPLAY)
+        {
+            fclose(ledger);
+        }
         exit(0);
     }
     if (!controller.pause)
@@ -1381,15 +1414,20 @@ int main(int argc, char** argv) {
     Camera.pos = Vec3f(0,0,0);
 
 
-    if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
-        {controller.faction = BLUE_FACTION;controller.controllingid = 4;controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
-    else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
-    else if (isPresentCommandLineParameter(argc,argv,"-godmode"))
+    if (isPresentCommandLineParameter(argc,argv,"-godmode"))
         controller.faction = BOTH_FACTION;
+    else if (isPresentCommandLineParameter(argc,argv,"-bluemode"))
+        {controller.faction = BLUE_FACTION;
+        #ifdef __linux
+        controller.controllingid = 5;
+        #else
+        controller.controllingid = 4;
+        #endif
+        controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
+    else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
+        {controller.faction = GREEN_FACTION;controller.controllingid = 2;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
     else
         {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
-
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
@@ -1401,7 +1439,7 @@ int main(int argc, char** argv) {
     if (isPresentCommandLineParameter(argc,argv,"-record"))
         tracemode = RECORD;
     else if (isPresentCommandLineParameter(argc,argv,"-replay"))
-        tracemode = REPLAY;
+        {tracemode = REPLAY;seektimer=1;}
     else
         tracemode = NOTRACE;
 

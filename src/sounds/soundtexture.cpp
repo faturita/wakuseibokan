@@ -21,7 +21,8 @@ int tick_callback( void *outputBuffer, void *inputBuffer, unsigned int nBufferFr
 
   if ( input->isFinished() || so->interrupt) {
     so->done = true;
-    so->dac.closeStream();
+    //if (so->dac.isStreamRunning() || so->dac.isStreamOpen())
+        //try {so->dac.closeStream();} catch (StkError &) {}
     return 1;
   }
   else
@@ -35,7 +36,6 @@ SoundTexture::SoundTexture()
 }
 
 
-
 void SoundTexture::init(char fl[256])
 {
     strcpy(filename, fl);
@@ -45,7 +45,8 @@ void SoundTexture::init(char fl[256])
       input.openFile( filename);
     }
     catch ( StkError & ) {
-      exit( 1 );
+      //exit( 1 );
+      printf("Error opening the file.");
     }
 
     done = false;interrupt = false;
@@ -67,8 +68,8 @@ void SoundTexture::play()
     // Find out how many channels we have.
     int channels = input.channelsOut();
 
-    //if (dac.isStreamRunning() || dac.isStreamOpen())
-    //    dac.closeStream();
+    if (dac.isStreamRunning() || dac.isStreamOpen())
+        dac.closeStream();
 
     // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
     RtAudio::StreamParameters parameters;
@@ -81,6 +82,9 @@ void SoundTexture::play()
     }
     catch ( RtAudioError &error ) {
       error.printMessage();
+      printf("Error opening the stream.  Now set to done.");
+      done = true;
+      return;
     }
 
     // Resize the StkFrames object appropriately.
@@ -91,6 +95,7 @@ void SoundTexture::play()
     }
     catch ( RtAudioError &error ) {
       error.printMessage();
+      printf("Error starting the stream.");
     }
 }
 
@@ -112,5 +117,6 @@ void SoundTexture::close()
     }
     catch ( RtAudioError &error ) {
       error.printMessage();
+      printf("Error closing the stream.");
     }
 }

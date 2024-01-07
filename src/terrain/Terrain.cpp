@@ -40,7 +40,7 @@
 
 // Islands of 3600x3600 (based on heightmaps of 60x60). Max height is 100m.
 // (remember that the zero value of the heightmap for the island is 5 m bellow sea level).
-#define TERRAIN_SIDE_LENGTH 60.0f
+#define TERRAIN_SIDE_LENGTH 60
 #define TERRAIN_MAX_HEIGHT  100.0f
 #define TERRAIN_SCALE       60.0f
 

@@ -75,7 +75,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         w->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
         w->stop();
 
-        entities.push_back(w, w->getGeom());
+        entities.assign(record.id,w, w->getGeom());
 
     }
 
@@ -88,7 +88,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         w->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
         w->stop();
 
-        entities.push_back(w, w->getGeom());
+        entities.assign(record.id, w, w->getGeom());
     }
 
     if (record.typeId == EntityTypeId::TBalaenidae)
@@ -99,7 +99,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         b->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
         b->stop();
 
-        entities.push_back(b, b->getGeom());
+        entities.assign(record.id, b, b->getGeom());
 
 
     }
@@ -111,7 +111,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         dSpaceID carrier_space_beluga = b->embody_in_space(world, space);
         b->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
 
-        entities.push_back(b, b->getGeom());
+        entities.assign(record.id, b, b->getGeom());
 
     }
     if (record.type == VehicleTypes::MANTA)
@@ -135,9 +135,10 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         _manta1->embody(world, space);
         _manta1->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
         _manta1->setStatus(FlyingStatus::FLYING);              // @FIXME, status should be stored.
+        _manta1->setNameByNumber(record.number);
         _manta1->inert = true;
 
-        entities.push_back(_manta1, _manta1->getGeom());
+        entities.assign(record.id, _manta1, _manta1->getGeom());
 
     }
 
@@ -150,8 +151,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             _walrus->init();
             _walrus->embody(world, space);
             _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+            _walrus->setNameByNumber(record.number);
 
-            entities.push_back(_walrus, _walrus->getGeom());
+            entities.assign(record.id, _walrus, _walrus->getGeom());
 
         }
         else if (record.typeId == EntityTypeId::TWalrus)
@@ -160,8 +162,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             _walrus->init();
             _walrus->embody(world, space);
             _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+            _walrus->setNameByNumber(record.number);
 
-            entities.push_back(_walrus, _walrus->getGeom());
+            entities.assign(record.id, _walrus, _walrus->getGeom());
 
         }
         else if (record.typeId == EntityTypeId::TOtter)
@@ -171,8 +174,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             dSpaceID car_space = _walrus->embody_in_space(world, space);
             _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
             _walrus->setStatus(SailingStatus::SAILING);
+            _walrus->setNameByNumber(record.number);
 
-            entities.push_back(_walrus, _walrus->getGeom());
+            entities.assign(record.id, _walrus, _walrus->getGeom());
         }
         else if (record.typeId == EntityTypeId::TTurtle)
         {
@@ -181,8 +185,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             dSpaceID car_space = _walrus->embody_in_space(world, space);
             _walrus->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
             _walrus->setStatus(SailingStatus::SAILING);
+            _walrus->setNameByNumber(record.number);
 
-            entities.push_back(_walrus, _walrus->getGeom());
+            entities.assign(record.id, _walrus, _walrus->getGeom());
         }
     }
 
@@ -223,7 +228,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             action->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
             action->setVisible(true);
 
-            entities.push_at_the_back(action, action->getGeom());
+            entities.assign(record.id, action, action->getGeom());
         }
     }
 
@@ -287,7 +292,7 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
         v->rotate(record.orientation);
         //v->onIsland(this);
-        entities.push_back(v, v->getGeom());
+        entities.assign(record.id, v, v->getGeom());
 
     }
 }

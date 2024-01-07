@@ -3,6 +3,7 @@
 
 void drawOverlyMark(int uc, int lc, int w, int h)
 {
+    glPushAttrib (GL_LINE_BIT);
     glLineWidth(2.5);
 
     glBegin(GL_LINES);
@@ -44,10 +45,15 @@ void drawOverlyMark(int uc, int lc, int w, int h)
     glVertex3f(uc+50, lc+50, 0);
     glVertex3f(uc+50-w, lc+50, 0);
     glEnd();
+    
+    glPopAttrib();
 }
 
 void drawCross(int uc, int cc)
 {
+    glPushAttrib (GL_LINE_BIT);
+    glLineWidth(2.5);
+
     glBegin(GL_LINES);
     glVertex3f(uc-10, cc + 0, 0.0);
     glVertex3f(uc-2, cc + 0, 0);
@@ -67,4 +73,6 @@ void drawCross(int uc, int cc)
     glVertex3f(uc+0, cc + 0+10, 0.0);
     glVertex3f(uc+0, cc + 0+2, 0);
     glEnd();
+
+    glPopAttrib();
 }

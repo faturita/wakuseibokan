@@ -108,6 +108,7 @@ void drawArrow(float x, float y, float z)
 void drawLine(float x, float y, float z,float red, float green, float blue, float linewidth)
 {
     glPushMatrix();
+    glPushAttrib (GL_LINE_BIT);
     glLineWidth(linewidth);
 
     // RED
@@ -120,11 +121,13 @@ void drawLine(float x, float y, float z,float red, float green, float blue, floa
 
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    glPopAttrib();
 }
 
 void drawArrow(float x, float y, float z,float red, float green, float blue, float linewidth)
 {
     glPushMatrix();
+    glPushAttrib (GL_LINE_BIT);
     glLineWidth(linewidth);
 
     // RED
@@ -141,6 +144,7 @@ void drawArrow(float x, float y, float z,float red, float green, float blue, flo
 
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+    glPopAttrib();
 }
 
 void drawArrow(float x, float y, float z, float red, float green, float blue)

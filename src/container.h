@@ -77,6 +77,17 @@ public:
     size_t push_at_the_back(T value, dGeomID geom);
 
     /**
+     * Assign the value to the index.
+     *
+     * @brief assign
+     * @param index
+     * @param value
+     * @param geom
+     * @return
+     */
+    size_t assign(size_t index, T value, dGeomID geom);
+
+    /**
      * Verify whether is lock is released.
      *
      * @brief isSafe

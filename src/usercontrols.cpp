@@ -74,6 +74,10 @@ extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
 extern int aiplayer;
+extern int tracemode;
+
+extern unsigned long timer;
+unsigned long seektimer;
 
 // Mouse offset for camera zoom in and out.
 int _xoffset = 0;
@@ -351,6 +355,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                 CLog::Write(CLog::Debug,"Controlling %d\n", content);
 
                 switchControl(content);
+
+            } else
+            if (controller.str.find("timer") != std::string::npos && tracemode == REPLAY)
+            {
+                unsigned long content = atol( controller.str.substr(5).c_str() );
+
+                CLog::Write(CLog::Debug,"Seek %d\n", content);
+
+                seektimer = content;
+                timer = 0;
 
             } else
             if (controller.str.find("set") != std::string::npos)
