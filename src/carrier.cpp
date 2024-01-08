@@ -582,9 +582,11 @@ void drawScene() {
     glPushAttrib(GL_CURRENT_BIT);
     drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
     glPopAttrib();
-    
-    Vec3f p = adjustViewLocation(pos);
 
+    BoxIsland *b = findNearestIsland(pos);
+    Vec3f offset = b->getPos();
+    
+    Vec3f p = adjustViewLocation(offset,pos);
     Camera.lookAtFrom(up, p, forward);
     
     // Sets the camera and that changes the floor position.
@@ -611,14 +613,10 @@ void drawScene() {
     drawFloor(p[0],p[1],p[2]);
     glPopAttrib();
 
-    BoxIsland *b = findNearestIsland(pos);
 
     // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
     for (size_t i=0; i<islands.size(); i++) {
-        if (islands[i] != b)
-            (islands[i]->draw(false));
-        else
-            (islands[i]->draw(true));
+        (islands[i]->draw(offset));
     }
 
     // @NOTE: You can test quickly any 3ds model, by openning it up here and drawing it.
@@ -654,7 +652,7 @@ void drawScene() {
             {
                 //(entities[i]->setTexture(textures["metal"]));
                 glPushAttrib(GL_CURRENT_BIT);
-                (entities[i]->drawModel());
+                (entities[i]->drawModel(offset));
                 glPopAttrib();
 
                 entities[i]->updateScreenLocation();

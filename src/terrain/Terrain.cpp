@@ -379,16 +379,13 @@ void BoxIsland::setLocation(float x, float y, float z)
     Z = z;
 }
 
-void BoxIsland::draw(bool adjusted)
+void BoxIsland::draw(Vec3f offset)
 {
     glPushMatrix();
     //glTranslatef(300.0, 0.0f,300.0);
 
-    Vec3f p;
-    if (adjusted)
-        p = adjustViewLocation(X,Y,Z);
-    else
-        p = Vec3f(X,Y,Z);
+    Vec3f p=Vec3f(X,Y,Z);
+    p = adjustViewLocation(offset, X,Y,Z);
 
     glTranslatef(p[0],p[1],p[2]);
     drawTerrain(_landmass,TERRAIN_SCALE);

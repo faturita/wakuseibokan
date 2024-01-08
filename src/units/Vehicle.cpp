@@ -344,9 +344,11 @@ void Vehicle::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void Vehicle::drawModel()
+void Vehicle::drawModel(Vec3f offset)
 {
-    Vec3f p = adjustViewLocation(pos);
+    Vec3f p = adjustViewLocation(offset, pos);
+
+    Vehicle::offset = offset;
 
     drawModel(0,0,p[0],p[1],p[2]);
 }
