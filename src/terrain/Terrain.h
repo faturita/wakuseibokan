@@ -216,7 +216,7 @@ public:
     dGeomID buildModel();
     
     //void draw(float x, float y, float z, float side, float height);
-    void draw();
+    void draw(bool adjusted);
     void setLocation(float x, float y, float z);
 
     dGeomID getGeom();

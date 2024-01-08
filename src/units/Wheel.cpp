@@ -227,10 +227,6 @@ void Wheel::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
     fwd = orig-position;
 }
 
-void Wheel::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void  Wheel::drawModel(float yRot, float xRot, float x, float y, float z)
 

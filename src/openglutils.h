@@ -52,6 +52,9 @@ void drawSky (float x,float y, float z);
 
 void initTextures();
 
+Vec3f adjustViewLocation(Vec3f pos);
+Vec3f adjustViewLocation(float X, float Y, float Z);
+
 float getFPS();
 float getTimedFPS(float fps, unsigned long timer);
 

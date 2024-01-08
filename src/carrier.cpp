@@ -550,7 +550,7 @@ void drawScene() {
     {
         ctrling = controller.controllingid;
         entities[ctrling]->getViewPort(up,pos,forward);
-        
+
         Vec3f up2,pos2;
         //Camera.getViewPort(up2,pos2,forward);
 
@@ -583,7 +583,9 @@ void drawScene() {
     drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
     glPopAttrib();
     
-    Camera.lookAtFrom(up, pos, forward);
+    Vec3f p = adjustViewLocation(pos);
+
+    Camera.lookAtFrom(up, p, forward);
     
     // Sets the camera and that changes the floor position.
     Camera.setPos(pos);
@@ -594,7 +596,7 @@ void drawScene() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glPushMatrix();
-    glTranslatef(pos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),pos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),pos[2]);
+    glTranslatef(p[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),p[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),p[2]);
     drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
     glPopMatrix();
     glPopAttrib();
@@ -606,13 +608,17 @@ void drawScene() {
     
     // Go with the floor (the sea)
     glPushAttrib(GL_CURRENT_BIT);
-    drawFloor(Camera.pos[0],Camera.pos[1],Camera.pos[2]);
+    drawFloor(p[0],p[1],p[2]);
     glPopAttrib();
 
+    BoxIsland *b = findNearestIsland(pos);
 
     // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
     for (size_t i=0; i<islands.size(); i++) {
-        (islands[i]->draw());
+        if (islands[i] != b)
+            (islands[i]->draw(false));
+        else
+            (islands[i]->draw(true));
     }
 
     // @NOTE: You can test quickly any 3ds model, by openning it up here and drawing it.

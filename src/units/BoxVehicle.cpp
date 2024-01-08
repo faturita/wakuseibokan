@@ -97,34 +97,27 @@ void BoxVehicle::doControl(Controller controller)
 
 void  BoxVehicle::drawModel(float yRot, float xRot, float x, float y, float z)
 {
-
-}
-
-void  BoxVehicle::drawModel()
-{
-    int x=0, y=0, z=0;
-    
     float xx = pos[0];
     float yy = pos[1];
     float zz = pos[2];
-    
+
     const float BOX_SIZE = 7.0f; //The length of each side of the cube
-    
+
     //glLoadIdentity();
     glPushMatrix();
     glTranslatef(xx,yy,zz);
-    
-    
-    
+
+
+
     // This will Rotate according to the R quaternion (which is a variable in Vehicle).
     float f[3];
     f[0] = 0; f[1] = 0; f[2] = 0;
-    
+
     doTransform(f, R);
-    
+
     glRotatef(boxRotatingAngle, 0.0f, 0.0f, 1.0f);
     glBegin(GL_QUADS);
-    
+
     //Top face
     glColor3f(1.0f, 1.0f, 0.0f);
     glNormal3f(0.0, 1.0f, 0.0f);
@@ -132,7 +125,7 @@ void  BoxVehicle::drawModel()
     glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
     glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
     glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
-    
+
     //Bottom face
     glColor3f(1.0f, 0.0f, 1.0f);
     glNormal3f(0.0, -1.0f, 0.0f);
@@ -140,7 +133,7 @@ void  BoxVehicle::drawModel()
     glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
     glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE /2 + z);
     glVertex3f(-BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
-    
+
     //Left face
     glNormal3f(-1.0, 0.0f, 0.0f);
     glColor3f(0.0f, 1.0f, 1.0f);
@@ -149,7 +142,7 @@ void  BoxVehicle::drawModel()
     glColor3f(0.0f, 0.0f, 1.0f);
     glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
     glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, -BOX_SIZE / 2 + z);
-    
+
     //Right face
     glNormal3f(1.0, 0.0f, 0.0f);
     glColor3f(1.0f, 0.0f, 0.0f);
@@ -158,17 +151,17 @@ void  BoxVehicle::drawModel()
     glColor3f(0.0f, 1.0f, 0.0f);
     glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
     glVertex3f(BOX_SIZE / 2 + x, -BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
-    
+
     glEnd();
-    
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, _textureBox);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor3f(1.0f, 1.0f, 1.0f);
-    
+
     glBegin(GL_QUADS);
-    
+
     //Front face
     glNormal3f(0.0, 0.0f, 1.0f);
     glTexCoord2f(0.0f, 0.0f);
@@ -179,7 +172,7 @@ void  BoxVehicle::drawModel()
     glVertex3f(BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(-BOX_SIZE / 2 + x, BOX_SIZE / 2 + y, BOX_SIZE / 2 + z);
-    
+
     //Back face
     glNormal3f(0.0, 0.0f, -1.0f);
     glTexCoord2f(0.0f, 0.0f);
@@ -190,16 +183,17 @@ void  BoxVehicle::drawModel()
     glVertex3f(BOX_SIZE / 2+ x, BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(BOX_SIZE / 2+ x, -BOX_SIZE / 2+ y, -BOX_SIZE / 2+ z);
-    
+
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
-    
+
     //boxangle += 0.5f;
-    
+
     //if (boxangle >= 360.f)
       //  boxangle = 0.0f;
 }
+
 
 void BoxVehicle::drawDirectModel()
 {

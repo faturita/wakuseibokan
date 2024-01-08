@@ -45,10 +45,6 @@ void Missile::init()
     setForward(0,0,1);
 }
 
-void Missile::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
 {
@@ -73,7 +69,7 @@ void Missile::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glPopMatrix();
 
-        smoke.drawModel(getPos(),getForward());
+        smoke.drawModel(adjustViewLocation(getPos()),getForward());
     }
     //else
     //{

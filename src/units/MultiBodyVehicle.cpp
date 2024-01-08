@@ -45,11 +45,6 @@ void MultiBodyVehicle::doMaterial()
 
 
 
-void MultiBodyVehicle::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
-
 void MultiBodyVehicle::doControl(Controller controller)
 {
     //engine[0] = -controller.roll;

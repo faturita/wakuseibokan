@@ -976,6 +976,38 @@ float getFPS()
     return fps;
 }
 
+
+Vec3f adjustViewLocation(float X, float Y, float Z)
+{
+    Vec3f pos = Vec3f(X,Y,Z);
+
+    return adjustViewLocation(pos);
+}
+
+Vec3f adjustViewLocation(Vec3f pos)
+{
+    Vec3f p = pos;
+
+    int val1 = (int) abs(p[0]);
+    int val2 = (int) abs(p[2]);
+
+    val1 = val1 * (-1)*(sgn(p[0]));
+    val2 = val2 * (-1)*(sgn(p[2]));
+
+    val1 = (val1 / 100000) * 100000;
+    val2 = (val2 / 100000) * 100000;
+
+    p[0] = p[0] + val1;
+    p[2] = p[2] + val2;
+
+    //p[0] = p[0] - 500 kmf;
+    //p[2] = p[2] + 300 kmf;
+
+    return p;
+}
+
+
+
 void getScreenLocation(float &screenX, float &screenY, float &screenZ, float xx, float yy, float zz)
 {
     GLint viewport[4];

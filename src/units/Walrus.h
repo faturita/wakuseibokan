@@ -27,7 +27,6 @@ public:
     int  virtual getSubType();
     EntityTypeId virtual getTypeId();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-	void virtual drawModel();
 	void virtual drawDirectModel();
 	void doMaterial();
 	void virtual doDynamics(dBodyID);

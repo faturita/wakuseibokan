@@ -127,11 +127,6 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
-void Walrus::drawModel()
-{
-	drawModel(0,0,pos[0],pos[1]+1.0,pos[2]);
-}
-
 void Walrus::doControl()
 {
     switch (autostatus) {

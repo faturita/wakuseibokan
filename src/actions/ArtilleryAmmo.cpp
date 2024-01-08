@@ -37,11 +37,6 @@ void ArtilleryAmmo::init()
     setForward(0,0,1);
 }
 
-void ArtilleryAmmo::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
-
 void ArtilleryAmmo::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];

@@ -41,7 +41,6 @@ public:
     int  virtual getSubType();
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-	void virtual drawModel();
 	void virtual drawDirectModel();
 	void virtual doDynamics(dBodyID);
     void virtual release(Vec3f orientation);

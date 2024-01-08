@@ -154,10 +154,6 @@ bool Structure::checkHeightOffset(int heightOffset)
     return (heightOffset >= 4);
 }
 
-void Structure::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
 {

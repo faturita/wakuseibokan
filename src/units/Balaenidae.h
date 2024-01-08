@@ -40,8 +40,6 @@ public:
 
     void doDynamics(dBodyID body);
 
-    void drawModel();
-
     void offshore();
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);

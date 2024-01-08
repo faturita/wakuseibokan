@@ -148,10 +148,6 @@ void Weapon::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
     fwd = orig-position;
 }
 
-void Weapon::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void  Weapon::drawModel(float yRot, float xRot, float x, float y, float z)
 

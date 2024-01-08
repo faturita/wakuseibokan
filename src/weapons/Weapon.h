@@ -24,7 +24,6 @@ public:
     ~Weapon();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
-	void drawModel();
 
     void virtual setPos(const Vec3f &newpos);
     void virtual setPos(float x, float y, float z);

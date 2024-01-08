@@ -21,10 +21,6 @@ void LaserRay::init()
     setName("LaserRay");
 }
 
-void LaserRay::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void LaserRay::drawModel(float yRot, float xRot, float x, float y, float z)
 {

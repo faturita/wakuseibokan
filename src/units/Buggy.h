@@ -32,7 +32,7 @@ public:
     void virtual init();
     int  virtual getType();
     void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-    void virtual drawModel();
+
     void virtual doDynamics(dBodyID);
     void doDynamics();
     void doControl(Controller controller);
