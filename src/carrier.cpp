@@ -583,11 +583,12 @@ void drawScene() {
     drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
     glPopAttrib();
 
+    // @KDTree or voronoi
     BoxIsland *b = findNearestIsland(pos);
     Vec3f offset = b->getPos();
     
-    Vec3f p = adjustViewLocation(offset,pos);
-    Camera.lookAtFrom(up, p, forward);
+    Vec3f relPos = adjustViewLocation(offset,pos);
+    Camera.lookAtFrom(up, relPos, forward);
     
     // Sets the camera and that changes the floor position.
     Camera.setPos(pos);
@@ -598,7 +599,7 @@ void drawScene() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glPushMatrix();
-    glTranslatef(p[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),p[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),p[2]);
+    glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
     drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
     glPopMatrix();
     glPopAttrib();
@@ -610,7 +611,7 @@ void drawScene() {
     
     // Go with the floor (the sea)
     glPushAttrib(GL_CURRENT_BIT);
-    drawFloor(p[0],p[1],p[2]);
+    drawFloor(relPos[0],relPos[1],relPos[2]);
     glPopAttrib();
 
 
