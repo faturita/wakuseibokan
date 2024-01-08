@@ -28,7 +28,6 @@ public:
     EntityTypeId getTypeId();
 	void  drawModel(float yRot, float xRot, float x, float y, float z);
     
-	void drawModel();
     
 	void  drawDirectModel();
 	void doMaterial();

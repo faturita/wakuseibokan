@@ -53,10 +53,6 @@ void Buggy::drawModel(float yRot, float xRot, float x, float y, float z)
 
 }
 
-void Buggy::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void Buggy::doControl(Controller controller)
 {

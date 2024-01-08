@@ -287,11 +287,6 @@ void Balaenidae::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 }
 
 
-void Balaenidae::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
-
 void Balaenidae::doDynamics()
 {
     doDynamics(getBodyID());

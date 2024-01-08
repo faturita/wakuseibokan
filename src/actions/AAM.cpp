@@ -52,10 +52,6 @@ void AAM::init()
     setForward(0,0,1);
 }
 
-void AAM::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void AAM::drawModel(float yRot, float xRot, float x, float y, float z)
 {

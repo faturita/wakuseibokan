@@ -24,10 +24,6 @@ void LaserBeam::init()
     setForward(0,0,1);
 }
 
-void LaserBeam::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void LaserBeam::drawModel(float yRot, float xRot, float x, float y, float z)
 {

@@ -39,11 +39,6 @@ void Shell::init()
 }
 
 
-void Shell::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
-
 void Shell::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];

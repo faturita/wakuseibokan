@@ -195,6 +195,8 @@ protected:
 
     // Location of the vehicle on the screen coordinates.
     Vec3f onScreen;
+
+    Vec3f offset;
     
 public:
     bool inert=false;
@@ -234,7 +236,7 @@ public:
     void setRotation(float newR[12]);
 
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
-    void virtual drawModel();
+    void virtual drawModel(Vec3f offset);
     
 	void virtual getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 	void setLocation(float fPos[3], float R[12]);

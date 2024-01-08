@@ -38,10 +38,6 @@ void Gunshot::init()
     setForward(0,0,1);
 }
 
-void Gunshot::drawModel()
-{
-    drawModel(0,0,pos[0],pos[1],pos[2]);
-}
 
 void Gunshot::setOrigin(dBodyID origin)
 {

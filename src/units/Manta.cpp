@@ -212,12 +212,6 @@ void Manta::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 }
 
 
-void Manta::drawModel()
-{
-	drawModel(0,0,pos[0],pos[1],pos[2]);
-}
-
-
 void Manta::drawDirectModel()
 {
     float modX=0.0f, modY=15.0f, modZ=0.0f;
