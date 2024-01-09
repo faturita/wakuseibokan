@@ -39,7 +39,7 @@ void loadgame();
 // **********************************************************************
 
 
-enum gamemodes { ACTIONGAME, STRATEGYGAME };
+enum gamemodes { ACTIONGAME, STRATEGYGAME, TOTALWAR };
 
 enum tracemodes { NOTRACE, RECORD, REPLAY };
 

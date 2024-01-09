@@ -1451,6 +1451,8 @@ int main(int argc, char** argv) {
         gamemode = STRATEGYGAME;
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
+    else if (isPresentCommandLineParameter(argc,argv,"totalwar"))
+        gamemode = TOTALWAR;
 
 
     if (isPresentCommandLineParameter(argc,argv,"-record"))
@@ -1520,6 +1522,7 @@ int main(int argc, char** argv) {
 
     if (peermode==SERVER)
     {
+        // Only one remote
         controllers.push_back(new Controller());
         setupControllerServer();
 
@@ -1527,7 +1530,7 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
     {
-        setupControllerClient("192.168.1.186");
+        setupControllerClient(getCommandLineParameter(argc,argv,"-ip"));
     }
 
 

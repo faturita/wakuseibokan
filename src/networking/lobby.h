@@ -39,5 +39,7 @@ void setupControllerClient(char ip[256]);
 void sendCommand(ControlStructure mesg);
 int receiveCommand(ControlStructure *mesg);
 
+int getlocalip(char ip[256]);
+
 
 #endif // LOBBY_H
