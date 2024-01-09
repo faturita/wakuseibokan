@@ -1451,7 +1451,7 @@ int main(int argc, char** argv) {
         gamemode = STRATEGYGAME;
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
-    else if (isPresentCommandLineParameter(argc,argv,"totalwar"))
+    else if (isPresentCommandLineParameter(argc,argv,"-totalwar"))
         gamemode = TOTALWAR;
 
 
