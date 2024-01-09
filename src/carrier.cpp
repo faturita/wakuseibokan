@@ -805,6 +805,15 @@ void replayupdate(int value)
             {
                 ret = receive(&record);
                 if (timer == 1) timer = record.timerparam;
+                if (ret == 0)
+                {
+                    char msg[256];
+                    Message mg;
+                    mg.faction = FACTIONS::BOTH_FACTION;
+                    sprintf(msg, "Connection with remote server interrupted.");
+                    mg.msg = std::string(msg); mg.timer = timer;
+                    messages.insert(messages.begin(), mg);                   
+                }
             }
             else if (tracemode == REPLAY)
             {

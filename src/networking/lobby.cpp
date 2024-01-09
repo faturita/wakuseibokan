@@ -71,6 +71,18 @@ void join_lobby()
     modelsockasserverfd = socket(AF_INET, SOCK_DGRAM, 0);
     //fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
+
+    struct timeval timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+
+    if (setsockopt(modelsockasserverfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout))<0)
+    {
+        printf("Cannot set socket timeout.\n");
+        exit(-1);
+    }
+
+
     bzero(&modelserverasserveraddr, sizeof(modelserverasserveraddr));
     modelserverasserveraddr.sin_family = AF_INET;
     modelserverasserveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
