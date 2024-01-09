@@ -933,10 +933,8 @@ void inline processCommandOrders()
             if (co.command == Command::JoinOrder)
             {
                 init_lobby(co.parameters.buf);
-            }
 
-
-            if (co.command == Command::StopOrder)
+            } else if (co.command == Command::StopOrder)
             {
                 Vehicle *v = entities[ctroler->controllingid];
                 v->stop();
@@ -1522,7 +1520,7 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
     {
-        //setupControllerClient();
+        setupControllerClient("192.168.1.186");
     }
 
 

@@ -51,6 +51,8 @@ void init_lobby(char ip[256])
     //lobby.push_back(newplayer("127.0.0.1",4500));
     lobby.push_back(newplayer(ip,4500));
 
+    printf("Connected from %s\n", ip);
+
     printf(" Setting up GAME SERVER to connect as client for the model...\n");
 }
 
@@ -147,7 +149,8 @@ void setupControllerClient(char ip[256])
     CommandOrder co;
     co.command = Command::JoinOrder;
     mesg.order = co;
-    sprintf(mesg.order.parameters.buf, "%s", "192.168.1.186");
+    mesg.controllingid = 4;
+    sprintf(mesg.order.parameters.buf, "%s", "192.168.1.197");
 
     printf("Command Order: %d\n", mesg.order.command);
     sendCommand(mesg);
