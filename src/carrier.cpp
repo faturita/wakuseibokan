@@ -881,7 +881,7 @@ void replayupdate(int value)
 
             if (val != arethereanychange)
             {
-                printf("Command Order: %d\n", mesg.order.command);
+                //printf("Command Order: %d\n", mesg.order.command);
                 sendCommand(mesg);
                 arethereanychange = val;
             }
@@ -933,6 +933,13 @@ void inline processCommandOrders()
             if (co.command == Command::JoinOrder)
             {
                 init_lobby(co.parameters.buf);
+
+                char msg[256];
+                Message mg;
+                mg.faction = FACTIONS::BOTH_FACTION;
+                sprintf(msg, "%s has joined the game.", co.parameters.buf);
+                mg.msg = std::string(msg); mg.timer = timer;
+                messages.insert(messages.begin(), mg);
 
             } else if (co.command == Command::StopOrder)
             {
