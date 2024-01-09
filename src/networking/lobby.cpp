@@ -44,12 +44,12 @@ LobbyConnection newplayer(char ip[], int port)
 }
 
 // Init lobby from the GAME SERVER side (running as client for the UDP connection to stream the model information).
-void init_lobby()
+void init_lobby(char ip[256])
 {
     // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
     // (who has joined the game)
-    lobby.push_back(newplayer("127.0.0.1",4500));
-    //lobby.push_back(newplayer("192.168.1.107",4500));
+    //lobby.push_back(newplayer("127.0.0.1",4500));
+    lobby.push_back(newplayer(ip,4500));
 
     printf(" Setting up GAME SERVER to connect as client for the model...\n");
 }
@@ -124,11 +124,11 @@ void setupControllerServer()
     bind(controllersockfd, (SA *) &controllerserveraddr, sizeof(controllerserveraddr));
 }
 
-void setupControllerClient()
+void setupControllerClient(char ip[256])
 {
-    char ip[256];
+    //char ip[256];
     //strcpy(ip, "192.168.1.186");
-    strcpy(ip, "127.0.0.1");
+    //strcpy(ip, "127.0.0.1");
     int port = 5000;
 
     /* Clean up */
@@ -141,6 +141,16 @@ void setupControllerClient()
 
     /* Bring up the client socket */
     controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    ControlStructure mesg;
+
+    CommandOrder co;
+    co.command = Command::JoinOrder;
+    mesg.order = co;
+    sprintf(mesg.order.parameters.buf, "%s", "192.168.1.186");
+
+    printf("Command Order: %d\n", mesg.order.command);
+    sendCommand(mesg);
 }
 
 void sendCommand(ControlStructure mesg)

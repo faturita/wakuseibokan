@@ -929,6 +929,13 @@ void inline processCommandOrders()
         if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
         {
             CommandOrder co = ctroler->pop();
+
+            if (co.command == Command::JoinOrder)
+            {
+                init_lobby(co.parameters.buf);
+            }
+
+
             if (co.command == Command::StopOrder)
             {
                 Vehicle *v = entities[ctroler->controllingid];
@@ -1482,8 +1489,8 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
         join_lobby();
-    else if (peermode == SERVER)
-        init_lobby();
+    else if (peermode == SERVER) peermode=SERVER;
+        //init_lobby();
 
     if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
         {intro();controller.view = 5;}
@@ -1515,7 +1522,7 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
     {
-        setupControllerClient();
+        //setupControllerClient();
     }
 
 
