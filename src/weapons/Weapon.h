@@ -47,6 +47,9 @@ public:
 
     dBodyID  getBodyID();
     void  stop();
+
+    virtual TickRecord  serialize();
+    virtual void        deserialize(TickRecord);
 };
 
 

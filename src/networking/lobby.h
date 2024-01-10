@@ -27,17 +27,19 @@ typedef struct sockaddr SA;
 #include "../units/Vehicle.h"
 
 void disconnect();
-void init_lobby();
+void init_lobby(char ip[256]);
 void join_lobby();
 
 void notify(unsigned long timerparam, size_t id, Vehicle *v);
 int receive(TickRecord *record);
 
 void setupControllerServer();
-void setupControllerClient();
+void setupControllerClient(char ip[256]);
 
 void sendCommand(ControlStructure mesg);
 int receiveCommand(ControlStructure *mesg);
+
+int getlocalip(char ip[256]);
 
 
 #endif // LOBBY_H

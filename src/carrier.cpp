@@ -799,15 +799,24 @@ void replayupdate(int value)
         while (ret>0)
         {
 
-            // Read from the remote connection.
-
             if (peermode == CLIENT)
             {
+                // Read from the remote connection
                 ret = receive(&record);
                 if (timer == 1) timer = record.timerparam;
+                if (ret == 0)
+                {
+                    char msg[256];
+                    Message mg;
+                    mg.faction = FACTIONS::BOTH_FACTION;
+                    sprintf(msg, "Connection with remote server interrupted.");
+                    mg.msg = std::string(msg); mg.timer = timer;
+                    messages.insert(messages.begin(), mg);                   
+                }
             }
             else if (tracemode == REPLAY)
             {
+                // Read from the stored ledger
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
                 // Sync timers (The first value is 1 here)
@@ -881,7 +890,7 @@ void replayupdate(int value)
 
             if (val != arethereanychange)
             {
-                printf("Command Order: %d\n", mesg.order.command);
+                //printf("Command Order: %d\n", mesg.order.command);
                 sendCommand(mesg);
                 arethereanychange = val;
             }
@@ -929,7 +938,19 @@ void inline processCommandOrders()
         if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))
         {
             CommandOrder co = ctroler->pop();
-            if (co.command == Command::StopOrder)
+
+            if (co.command == Command::JoinOrder)
+            {
+                init_lobby(co.parameters.buf);
+
+                char msg[256];
+                Message mg;
+                mg.faction = FACTIONS::BOTH_FACTION;
+                sprintf(msg, "%s has joined the game.", co.parameters.buf);
+                mg.msg = std::string(msg); mg.timer = timer;
+                messages.insert(messages.begin(), mg);
+
+            } else if (co.command == Command::StopOrder)
             {
                 Vehicle *v = entities[ctroler->controllingid];
                 v->stop();
@@ -1439,6 +1460,8 @@ int main(int argc, char** argv) {
         gamemode = STRATEGYGAME;
     else if (isPresentCommandLineParameter(argc,argv,"-action"))
         gamemode = ACTIONGAME;
+    else if (isPresentCommandLineParameter(argc,argv,"-totalwar"))
+        gamemode = TOTALWAR;
 
 
     if (isPresentCommandLineParameter(argc,argv,"-record"))
@@ -1482,8 +1505,6 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
         join_lobby();
-    else if (peermode == SERVER)
-        init_lobby();
 
     if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
         {intro();controller.view = 5;}
@@ -1508,6 +1529,7 @@ int main(int argc, char** argv) {
 
     if (peermode==SERVER)
     {
+        // Only one remote
         controllers.push_back(new Controller());
         setupControllerServer();
 
@@ -1515,7 +1537,7 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
     {
-        setupControllerClient();
+        setupControllerClient(getCommandLineParameter(argc,argv,"-ip"));
     }
 
 

@@ -5,6 +5,14 @@
 #include <string.h>
 #include <vector>
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include <cstring>
+#include <iostream>
+
 #include "lobby.h"
 
 // LobbyConnection contains the socket fd and addr of the game clients (acting as servers to receive the model information).
@@ -44,12 +52,14 @@ LobbyConnection newplayer(char ip[], int port)
 }
 
 // Init lobby from the GAME SERVER side (running as client for the UDP connection to stream the model information).
-void init_lobby()
+void init_lobby(char ip[256])
 {
     // @FIXME: Read the parameters from a configuration file or from some structure with the lobby information
     // (who has joined the game)
-    lobby.push_back(newplayer("127.0.0.1",4500));
-    //lobby.push_back(newplayer("192.168.1.107",4500));
+    //lobby.push_back(newplayer("127.0.0.1",4500));
+    lobby.push_back(newplayer(ip,4500));
+
+    printf("Connected from %s\n", ip);
 
     printf(" Setting up GAME SERVER to connect as client for the model...\n");
 }
@@ -60,6 +70,18 @@ void join_lobby()
 {
     modelsockasserverfd = socket(AF_INET, SOCK_DGRAM, 0);
     //fcntl(sockfd, F_SETFL, O_NONBLOCK);
+
+
+    struct timeval timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+
+    if (setsockopt(modelsockasserverfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout))<0)
+    {
+        printf("Cannot set socket timeout.\n");
+        exit(-1);
+    }
+
 
     bzero(&modelserverasserveraddr, sizeof(modelserverasserveraddr));
     modelserverasserveraddr.sin_family = AF_INET;
@@ -124,11 +146,11 @@ void setupControllerServer()
     bind(controllersockfd, (SA *) &controllerserveraddr, sizeof(controllerserveraddr));
 }
 
-void setupControllerClient()
+void setupControllerClient(char serverip[256])
 {
-    char ip[256];
+    //char ip[256];
     //strcpy(ip, "192.168.1.186");
-    strcpy(ip, "127.0.0.1");
+    //strcpy(ip, "127.0.0.1");
     int port = 5000;
 
     /* Clean up */
@@ -137,10 +159,23 @@ void setupControllerClient()
     /* Initialize the client to connect to the server on local port 4500 */
     controllerserveraddr.sin_family = AF_INET;
     controllerserveraddr.sin_port = htons(port);
-    inet_pton(AF_INET, ip, &controllerserveraddr.sin_addr);
+    inet_pton(AF_INET, serverip, &controllerserveraddr.sin_addr);
 
     /* Bring up the client socket */
     controllersockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    ControlStructure mesg;
+
+    CommandOrder co;
+    co.command = Command::JoinOrder;
+    mesg.order = co;
+    mesg.controllingid = 4;
+    char localip[256];
+    getlocalip(localip);
+    sprintf(mesg.order.parameters.buf, "%s", localip);
+
+    printf("Connecting to server %s from %s\n",serverip, localip);
+    sendCommand(mesg);
 }
 
 void sendCommand(ControlStructure mesg)
@@ -161,4 +196,47 @@ int receiveCommand(ControlStructure *mesg)
     n = recvfrom(controllersockfd, mesg, sizeof(ControlStructure), 0, &pcliaddr, &len);
 
     return n;
+}
+
+
+
+int getlocalip(char buf[256])
+{
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    sockaddr_in loopback;
+
+    if (sock == -1) {
+        std::cerr << "Could not socket\n";
+        return 0;
+    }
+
+    std::memset(&loopback, 0, sizeof(loopback));
+    loopback.sin_family = AF_INET;
+    loopback.sin_addr.s_addr = 1337;   // can be any IP address
+    loopback.sin_port = htons(9);      // using debug port
+
+    if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+        close(sock);
+        std::cerr << "Could not connect\n";
+        return 0;
+    }
+
+    socklen_t addrlen = sizeof(loopback);
+    if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+        close(sock);
+        std::cerr << "Could not getsockname\n";
+        return 0;
+    }
+
+    close(sock);
+
+
+    if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0) {
+        std::cerr << "Could not inet_ntop\n";
+        return 0;
+    } else {
+        std::cout << "Local ip address: " << buf << "\n";
+    }
+
+    return 1;
 }

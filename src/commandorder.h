@@ -14,7 +14,8 @@ enum class Command {
     SpawnOrder,
     DockOrder,
     FireOrder,
-    LandOrder};
+    LandOrder,
+    JoinOrder};
 
 
 enum TargetType {
@@ -32,6 +33,7 @@ struct commandparameters
     TargetType target_type;
     bool bit;
     int weapon;
+    char buf[20];
 };
 
 struct CommandOrder

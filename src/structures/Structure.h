@@ -12,8 +12,6 @@ protected:
     float width;
     float length;
 
-
-
 public:
     float azimuth;                      // x-y plane angle, starting from north clockwise towards east. in deg
     float elevation;                    // angle from x-y plane positive towards the cenith at z. in deg
@@ -55,7 +53,9 @@ public:
 
     bool virtual checkHeightOffset(int heightOffset);
 
-    TickRecord serialize();
+    virtual TickRecord  serialize();
+    virtual void        deserialize(TickRecord);
+
 };
 
 #endif // STRUCTURE_H
