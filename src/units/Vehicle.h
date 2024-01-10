@@ -54,6 +54,8 @@ struct TickRecord {
     int status;
     int ttl;
     int number;
+    float elevation;      // For structures and weapons
+    float azimuth;          // For structures and weapons
 
     ModelRecord location;
 

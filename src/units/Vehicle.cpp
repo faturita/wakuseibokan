@@ -977,9 +977,4 @@ void Vehicle::deserialize(TickRecord record)
 
     setTtl(record.ttl);
 
-    //if (record.type == MANTA)
-    //{
-    //    ((Manta*)this)->release(getForward());
-    //}
-
 }

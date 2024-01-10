@@ -182,15 +182,6 @@ void Structure::drawModel(float yRot, float xRot, float x, float y, float z)
 }
 
 
-TickRecord Structure::serialize()
-{
-    TickRecord t = Vehicle::serialize();
-
-    t.orientation = getAzimuthRadians(getForward());
-
-    return t;
-}
-
 int Structure::getType()
 {
     return COLLISIONABLE;
@@ -205,3 +196,27 @@ EntityTypeId Structure::getTypeId()
 {
     return EntityTypeId::TStructure;
 }
+
+
+TickRecord Structure::serialize()
+{
+    TickRecord t = Vehicle::serialize();
+
+    t.azimuth = azimuth;
+    t.elevation = elevation;
+    t.orientation = getAzimuthRadians(getForward());
+
+    return t;
+}
+
+
+void Structure::deserialize(TickRecord tick)
+{
+    Structure::azimuth = tick.azimuth;
+    Structure::elevation = tick.elevation;
+
+    rotate(tick.orientation);
+
+    Vehicle::deserialize(tick);
+}
+

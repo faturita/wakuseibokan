@@ -799,10 +799,9 @@ void replayupdate(int value)
         while (ret>0)
         {
 
-            // Read from the remote connection.
-
             if (peermode == CLIENT)
             {
+                // Read from the remote connection
                 ret = receive(&record);
                 if (timer == 1) timer = record.timerparam;
                 if (ret == 0)
@@ -817,6 +816,7 @@ void replayupdate(int value)
             }
             else if (tracemode == REPLAY)
             {
+                // Read from the stored ledger
                 ret = fread(&record, sizeof(TickRecord),1,ledger);
 
                 // Sync timers (The first value is 1 here)
@@ -1505,8 +1505,6 @@ int main(int argc, char** argv) {
 
     if (peermode == CLIENT)
         join_lobby();
-    else if (peermode == SERVER) peermode=SERVER;
-        //init_lobby();
 
     if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
         {intro();controller.view = 5;}

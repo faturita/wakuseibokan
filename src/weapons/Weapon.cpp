@@ -258,3 +258,20 @@ Vec3f Weapon::getForward()
 }
 
 
+TickRecord Weapon::serialize()
+{
+    TickRecord t = Vehicle::serialize();
+
+    t.azimuth = azimuth;
+    t.elevation = elevation;
+
+    return t;
+}
+void Weapon::deserialize(TickRecord tick)
+{
+    Weapon::azimuth = tick.azimuth;
+    Weapon::elevation = tick.elevation;
+
+    Vehicle::deserialize(tick);
+}
+
