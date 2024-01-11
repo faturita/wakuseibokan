@@ -586,6 +586,7 @@ void drawScene() {
     // @KDTree or voronoi
     BoxIsland *b = findNearestIsland(pos);
     Vec3f offset = b->getPos();
+    if (gamemode == TOTALWAR) offset = Vec3f(0,0,0);
     
     Vec3f relPos = adjustViewLocation(offset,pos);
     Camera.lookAtFrom(up, relPos, forward);

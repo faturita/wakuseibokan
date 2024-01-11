@@ -1761,7 +1761,8 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::TURRET:
-                                s = new Turret(c->getFaction());island->addStructure(s,world);
+                                s = new Turret(c->getFaction());
+                                island->addStructure(s,world);
 
                                 break;
                             case VehicleSubTypes::LAUNCHER:

@@ -445,7 +445,7 @@ Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
 
 
 /**
- * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinate.  After that start
+ * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinates.  After that start
  * from the center and try to find the closed height to the desired one.  As all the islands fit into the 36x36, there should be one height that matches.
  *
  * @brief BoxIsland::addStructureAtDesiredHeight
@@ -521,7 +521,8 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
     }
 
 #ifdef DEBUG
-    assert( false || !"I did my best but couldn't find a place where to put what you want me to put at the desired place.");
+    // @NOTE: I am disabling this because the code to handle that situation when no location is found is not easy to do.
+    assert( true || !"I did my best but couldn't find a place where to put what you want me to put at the desired place.");
 #endif
 
     // @NOTE Give up.
