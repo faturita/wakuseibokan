@@ -824,6 +824,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                     {
                         Vec3f target = Vec3f(controller.targetX, controller.targetY, controller.targetZ);
 
+                        //Island *island = findNearestEnemyIsland(entities[controller.controllingid]->getPos(),false);
+                        //Structure* _b = findCommandCenter(island);
+                        //target = _b->getPos();
+
                         if (target.magnitude()>0)
                         {
                             co.parameters.target_type = controller.target_type;
@@ -831,6 +835,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                             co.parameters.y = target[1];
                             co.parameters.z = target[2];
                         }
+
                     }
                     controller.push(co);
                 } else {
