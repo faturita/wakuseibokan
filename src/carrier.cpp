@@ -826,14 +826,14 @@ void replayupdate(int value)
                 if (timer == 1 && seektimer != 1)
                 {
                     fseek(ledger, 0, SEEK_SET);
-                    printf("%ld", ftell(ledger));
-                    printf("Seeking to %ld\n", seektimer);
+                    //printf("%ld", ftell(ledger));
+                    //printf("Seeking to %ld\n", seektimer);
                     do {
                         ret = fread(&record, sizeof(TickRecord),1,ledger);
                     } while( ret > 0 && record.timerparam != seektimer);
                         
                     timer = record.timerparam;
-                    printf("New timer: %ld\n", timer);
+                    //printf("New timer: %ld\n", timer);
                 }
             }
 
@@ -1091,9 +1091,7 @@ void inline processCommandOrders()
                 {
                     // @FIXME: Check if ctroler->weapon or co.parameters.weapon ??
                     Vehicle *action = (entities[ctroler->controllingid])->fire(ctroler->weapon, world,space);
-                    //int *idx = new int();
-                    //*idx = vehicles.push_back(action);
-                    //dBodySetData( action->getBodyID(), (void*)idx);
+
                     size_t actionid = CONTROLLING_NONE;
                     if (action != NULL)
                     {
@@ -1105,9 +1103,6 @@ void inline processCommandOrders()
                     if (controllerindex == 0 && action != NULL && action->getType() == VehicleTypes::CONTROLABLEACTION)
                     {
                         Vec3f target(co.parameters.x,co.parameters.y,co.parameters.z);
-                        //Vehicle *_b = findNearestEnemyVehicle(entities[ctroler->controllingid]->getFaction(),entities[ctroler->controllingid]->getPos(),10000.0);
-                        //Island *island = findNearestEnemyIsland(entities[ctroler->controllingid]->getPos(),false);
-                        //_b = findCommandCenter(island);
 
                         //if (_b)
                         {

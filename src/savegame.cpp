@@ -439,7 +439,7 @@ void loadgame(std::string filename)
                 }
                 else if (subtype == VehicleSubTypes::OTTER)
                 {
-                    printf("OTTER \n");
+                    //printf("OTTER \n");
                     Otter* _ot = new Otter(faction);
                     v = _ot;
                     _ot->init();
@@ -609,7 +609,7 @@ void loadgame(std::string filename)
 
             v->setName(name);
 
-            printf("Unit name: %s\n", name.c_str());
+            CLog::Write(CLog::Debug,"Unit name: %s\n", name.c_str());
 
             int number;
             ss >> number;

@@ -385,7 +385,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
                 int content = atoi(controller.str.substr(6).c_str());
 
-                printf ("Turtle %d\n", content);
+                CLog::Write(CLog::Debug,"Turtle %d\n", content);
 
                 size_t index = CONTROLLING_NONE;
                 findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::TURTLE, controller.faction, content);
@@ -397,7 +397,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
                 int content = atoi(controller.str.substr(6).c_str());
 
-                printf ("Walrus %d\n", content);
+                CLog::Write(CLog::Debug,"Walrus %d\n", content);
 
                 size_t index = CONTROLLING_NONE;
                 findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::OTTER, controller.faction, content);
@@ -409,7 +409,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
                 int content = atoi(controller.str.substr(4).c_str());
 
-                printf ("Seal %d\n", content);
+                CLog::Write(CLog::Debug,"Seal %d\n", content);
 
                 size_t index = CONTROLLING_NONE;
                 findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEWALRUS, controller.faction, content);
@@ -423,7 +423,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CEPHALOPOD,controller.faction, content);
 
-                printf ("Manta %ld\n", index);
+                CLog::Write(CLog::Debug,"Cephalopod %d\n", content);
 
                 switchControl(index);
             } else
@@ -434,7 +434,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, content);
 
-                printf ("Medusa %ld\n", index);
+                CLog::Write(CLog::Debug,"Medusa %d\n", content);
 
                 switchControl(index);
             } else
@@ -445,7 +445,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
-                printf ("Manta %ld\n", index);
+                CLog::Write(CLog::Debug,"Manta %d\n", index);
 
                 switchControl(index);
 
@@ -457,7 +457,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::STINGRAY, controller.faction, content);
 
-                printf ("Stingray %ld\n", index);
+                CLog::Write(CLog::Debug,"Stingray %d\n", content);
 
                 switchControl(index);
 
@@ -820,13 +820,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                     gunshot(Camera.pos);
                     CommandOrder co;
                     co.command = Command::FireOrder;
+                    Vec3f target;
                     if (controller.weapon==1)
                     {
-                        Vec3f target = Vec3f(controller.targetX, controller.targetY, controller.targetZ);
-
-                        //Island *island = findNearestEnemyIsland(entities[controller.controllingid]->getPos(),false);
-                        //Structure* _b = findCommandCenter(island);
-                        //target = _b->getPos();
+                        target = Vec3f(controller.targetX, controller.targetY, controller.targetZ);
 
                         if (target.magnitude()>0)
                         {
@@ -836,6 +833,20 @@ void handleKeypress(unsigned char key, int x, int y) {
                             co.parameters.z = target[2];
                         }
 
+                    }
+                    if (entities[controller.controllingid]->getType()==VehicleTypes::CARRIER)
+                    {
+                        Island *island = findNearestEnemyIsland(entities[controller.controllingid]->getPos(),false);
+                        Structure* _b = findCommandCenter(island);
+                        target = _b->getPos();
+
+                        if (target.magnitude()>0)
+                        {
+                            co.parameters.target_type = controller.target_type;
+                            co.parameters.x = target[0];
+                            co.parameters.y = target[1];
+                            co.parameters.z = target[2];
+                        }
                     }
                     controller.push(co);
                 } else {

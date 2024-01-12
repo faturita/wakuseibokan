@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include "../profiling.h"
 #include "Factory.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
@@ -50,7 +51,7 @@ void Factory::drawModel(float yRot, float xRot, float x, float y, float z)
     }
     else
     {
-        printf ("model is null\n");
+        CLog::Write(CLog::Debug,"Model is null.\n");
     }
 }
 

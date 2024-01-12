@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "profiling.h"
 #include <map>
+#include <sstream>
 
 #ifdef __linux
 #include <functional>
@@ -621,7 +622,6 @@ Walrus* findWalrusByFactionAndNumber(size_t &index, int faction, int number)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
-        printf("%3d\n", v->getNumber());
         if (v->getType() == WALRUS && v->getFaction() == faction)
         {
 
@@ -897,7 +897,7 @@ int findAvailableNumber(int bitmap)
     for(unsigned short a=0;a<20;a++)
     {
         int val = bitmap & 0x01;
-        printf("The number %d is %d\n", a, val);
+        //printf("The number %d is %d\n", a, val);
         bitmap = bitmap  >> 1;
 
         if (val == 0)
@@ -1202,9 +1202,10 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                         {
                             char msg[256];
                             Message mg;
-                            sprintf(msg, "%s is loosing connection.", entities[i]->getName().c_str());
+                            std::stringstream stream;
+                            stream << entities[i]->getName() << " is loosing connection.";
                             mg.faction = entities[i]->getFaction();
-                            mg.msg = std::string(msg); mg.timer = timer;
+                            mg.msg = stream.str(); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                         }
                         entities[i]->setSignal(2);

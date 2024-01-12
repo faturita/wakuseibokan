@@ -24,7 +24,7 @@ template<class T> bool container<T>::isSafe()
 
 template<class T> void container<T>::lock()
 {
-    printf("<<");
+    //printf("<<");
 #ifndef _WIN32
     mlock.lock();
 #endif
@@ -35,7 +35,7 @@ template<class T> void container<T>::unlock()
 #ifndef _WIN32
     mlock.unlock();
 #endif
-    printf(">>");
+    //printf(">>");
 }
 
 template<class T> void container<T>::lockme()
