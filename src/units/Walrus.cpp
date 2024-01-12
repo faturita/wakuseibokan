@@ -601,7 +601,7 @@ void Walrus::attack(Vec3f target)
 void Walrus::setNameByNumber(int number)
 {
     setNumber(number);
-    setName("Walrus", number);
+    setName("Seal", number);
 }
 
 void  Walrus::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)

@@ -42,6 +42,7 @@ public:
     float targetX, targetY, targetZ;
     TargetType target_type;
 
+    int slider=0;
 
     void push(CommandOrder co)
     {

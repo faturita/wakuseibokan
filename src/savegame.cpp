@@ -106,7 +106,9 @@ void savegame(std::string filename)
 
 
             // @NOTE, Remember that you need to put the more specific on top, becuase otherwise the dynamic casting works.
-            if (Otter* ot = dynamic_cast<Otter*>(entities[i]))
+            if(Turtle* tu = dynamic_cast<Turtle*>(entities[i]))
+                subtype = VehicleSubTypes::TURTLE;
+            else if (Otter* ot = dynamic_cast<Otter*>(entities[i]))
                 subtype = VehicleSubTypes::OTTER;
             else if(AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
                 subtype = VehicleSubTypes::ADVANCEDWALRUS;
@@ -124,8 +126,6 @@ void savegame(std::string filename)
                 subtype = VehicleSubTypes::BALAENIDAE;
             else if(Cephalopod* cp = dynamic_cast<Cephalopod*>(entities[i]))
                 subtype = VehicleSubTypes::CEPHALOPOD;
-            else if(Turtle* tu = dynamic_cast<Turtle*>(entities[i]))
-                subtype = VehicleSubTypes::TURTLE;
 
             ss << subtype << std::endl;
 

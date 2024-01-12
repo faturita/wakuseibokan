@@ -495,3 +495,9 @@ EntityTypeId AdvancedWalrus::getTypeId()
 {
     return EntityTypeId::TAdvancedWalrus;
 }
+
+void AdvancedWalrus::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Seal", number);
+}

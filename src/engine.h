@@ -175,6 +175,7 @@ Walrus* findWalrus(int status, int faction, int order);
 Walrus* findWalrusByOrder(int faction, int order);
 Walrus* findWalrusByOrder2(int faction, int order);
 Walrus* findWalrusByFactionAndNumber(size_t &pos, int faction, int number);
+Walrus* findWalrusBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number);
 Walrus* findNearestWalrus(int faction, Vec3f l, float threshold);
 void list();
 

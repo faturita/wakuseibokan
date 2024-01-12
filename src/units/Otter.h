@@ -34,6 +34,8 @@ public:
 
     int  virtual getSubType();
     EntityTypeId virtual getTypeId();
+
+    void virtual setNameByNumber(int number);
 };
 
 #endif // OTTER_H

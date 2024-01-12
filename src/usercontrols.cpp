@@ -379,8 +379,20 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (keycontrol>=1 && keycontrol<=9)
                     controlmap[keycontrol-1] = atoi(entityid.c_str());
 
-            }
-            else if (controller.str.find("walrus") != std::string::npos)
+            } else
+            if (controller.str.find("turtle") != std::string::npos)
+            {
+                // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
+                int content = atoi(controller.str.substr(6).c_str());
+
+                printf ("Turtle %d\n", content);
+
+                size_t index = CONTROLLING_NONE;
+                findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::TURTLE, controller.faction, content);
+                switchControl(index);
+
+            } else
+            if (controller.str.find("walrus") != std::string::npos)
             {
                 // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
                 int content = atoi(controller.str.substr(6).c_str());
@@ -388,7 +400,19 @@ void handleKeypress(unsigned char key, int x, int y) {
                 printf ("Walrus %d\n", content);
 
                 size_t index = CONTROLLING_NONE;
-                findWalrusByFactionAndNumber(index, controller.faction, content);
+                findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::OTTER, controller.faction, content);
+                switchControl(index);
+
+            } else
+            if (controller.str.find("seal") != std::string::npos)
+            {
+                // @FIXME What happen when the controller.faction is both factions !!! Need to decide that.
+                int content = atoi(controller.str.substr(4).c_str());
+
+                printf ("Seal %d\n", content);
+
+                size_t index = CONTROLLING_NONE;
+                findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEWALRUS, controller.faction, content);
                 switchControl(index);
 
             } else
@@ -619,6 +643,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 controller.faction = BLUE_FACTION;
             } else
+            if (controller.str.find("aiplayerboth") != std::string::npos)
+            {
+                aiplayer = BOTH_AI;
+            } else
+            if (controller.str.find("aiplayerblue") != std::string::npos)
+            {
+                aiplayer = BLUE_AI;
+            } else
             if (controller.str.find("aiplayergreen") != std::string::npos)
             {
                 aiplayer = GREEN_AI;
@@ -829,8 +861,11 @@ void handleSpecKeypress(int key, int x, int y)
         case GLUT_KEY_RIGHT :
             ;break;
         case GLUT_KEY_UP :
+            controller.slider++;
             ;break;
         case GLUT_KEY_DOWN :
+            controller.slider--;
+            if (controller.slider<0) controller.slider = 0;
             ;break;
     }
 

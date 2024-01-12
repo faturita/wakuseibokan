@@ -188,3 +188,10 @@ void Otter::doDynamics(dBodyID body)
     }
 
 }
+
+
+void Otter::setNameByNumber(int number)
+{
+    setNumber(number);
+    setName("Walrus", number);
+}

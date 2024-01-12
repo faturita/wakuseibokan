@@ -199,12 +199,35 @@ void drawBoard()
         std::string message;
 
         // @FIXME: We need a slider because quickly we will run out of space.
-        int counter = 0;
+        int counter = 0, showingcounter=0;;
         while (messageboard.good())
         {
             std::getline (messageboard, message);
-            //std::cout << message << std::endl;
-            drawString(10,200-(counter++)*20,0,(char *)message.c_str(),0.2f,0.1f,1.0f,1.0f);
+
+            if (controller.slider<=counter)
+            {
+                size_t m = message.find("|");
+                size_t n = message.find(":");
+                if (n != std::string::npos && m != std::string::npos)
+                {
+                    std::string faction = message.substr(0,m);
+                    std::string timestamp = message.substr(m+1,n);
+                    std::string msg = message.substr(n+1);
+
+                    // @NOTE: Check file integrity otherwise this will generate in unexpected behaviour.
+
+                    if (controller.faction == FACTIONS::BOTH_FACTION || controller.faction == atoi(faction.c_str()))
+                    {
+                        char bfr[256];
+                        sprintf(bfr, "%08ul:%s", atol(timestamp.c_str()), msg.c_str());
+
+                        //std::cout << message << std::endl;
+                        drawString(10,200-(showingcounter++)*25,0,(char *)bfr,0.2f,0.1f,1.0f,1.0f);
+                    }
+                }
+
+            }
+            counter++;
         }
 
         messageboard.close();

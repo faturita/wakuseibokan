@@ -635,6 +635,23 @@ Walrus* findWalrusByFactionAndNumber(size_t &index, int faction, int number)
     return NULL;
 }
 
+Walrus* findWalrusBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType() == subtype)
+        {
+            if (number == v->getNumber())
+            {
+                index = i;
+                return (Walrus*)v;
+            }
+        }
+    }
+    return NULL;
+}
+
 Manta* findMantaBySubTypeAndFactionAndNumber(size_t &index, VehicleSubTypes subtype, int faction, int number)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
