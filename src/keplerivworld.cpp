@@ -344,6 +344,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {waterexplosion(v2,world, space);}
                  if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {waterexplosion(v1,world, space);}
 
+                 if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);waterexplosion(v2,world, space);}
+                 if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);waterexplosion(v1,world, space);}
+
 
             } else {
                 // Object against object collision.
