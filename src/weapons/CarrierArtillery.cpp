@@ -186,9 +186,9 @@ Vehicle* CarrierArtillery::fire(int weapon, dWorldID world, dSpaceID space, int 
     forward = toWorld(me, toVectorInFixedSystem(0,0,1,azimuth, -elevation));
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 
+    action->setOrigin(attachedTo);
+
     Vec3f orig;
-
-
     forward = forward.normalize();
     orig = position;
     position = position + 40*forward;

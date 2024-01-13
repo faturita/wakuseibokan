@@ -9,8 +9,6 @@ class Weapon : public Vehicle
 {
     GLuint _textureBox;
 
-    dJointID joint;
-
 protected:
     float height;
     float length;
@@ -18,6 +16,11 @@ protected:
 
     float azimuth=0;
     float elevation=0;
+
+    dJointID joint;
+
+    // @NOTE: Take care of this, if it ends in dangling pointer.
+    dBodyID attachedTo;
     
 public:
     Weapon(int faction);

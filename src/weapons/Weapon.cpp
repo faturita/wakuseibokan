@@ -115,6 +115,8 @@ void Weapon::attachTo(dWorldID world, Vehicle *attacher, float x, float y, float
     joint = dJointCreateFixed(world,0);
     dJointAttach (joint,attacher->getBodyID(), getBodyID());
 
+    attachedTo = attacher->getBodyID();
+
     dJointSetFixed(joint);     // @NOTE: SetFixed is mandatory, otherwise the objects share the same center.
     dJointSetFixedParam(joint,dParamSuspensionERP,0.0f );
     dJointSetFixedParam(joint,dParamSuspensionCFM, 0.0f);

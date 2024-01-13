@@ -212,8 +212,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.slip1 = 0.1f;
                 contact[i].surface.slip2 = 0.1f;
                 //printf("2\n");
-                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
-                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isCarrier(v2) && !isMineFire(v2, (Gunshot*)v1) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isCarrier(v1) && !isMineFire(v1, (Gunshot*)v2) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
