@@ -616,6 +616,11 @@ void inline initIslands()
         islands.push_back(kamehouse);
     }
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+    }
+
 }
 
 /**
