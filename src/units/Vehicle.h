@@ -60,6 +60,7 @@ struct TickRecord {
     ModelRecord location;
 
     float orientation;  // For structures
+    size_t islandId;    // For structures
 };
 
 

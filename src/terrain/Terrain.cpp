@@ -580,7 +580,6 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
  * @param x
  * @param z
  * @param angle in Radians !
- * @param space
  * @param world
  * @return
  */
@@ -605,6 +604,42 @@ Structure* BoxIsland::addStructure(Structure* structure, float x, float z, float
     return structure;
 }
 
+/**
+ * Attach an existing structure without adding it to entities (from replay and networking).
+ *
+ * @brief BoxIsland::attachStructure
+ * @param structure
+ * @param structureId
+ * @param x             Real x,y,z parameters
+ * @param y
+ * @param z
+ * @param angle in Radians !
+ * @param world
+ * @return
+ */
+Structure* BoxIsland::attachStructure(Structure* structure, size_t structureId, float x, float y, float z, float angle, dWorldID world)
+{
+    structure->init();
+    structure->embody(world,islandspace);
+    structure->setPos(x,y,z);
+    structure->rotate(angle);
+    structure->onIsland(this);
+
+    structures.push_back(structureId);
+
+    if (structure->getType() == CONTROL)
+        commandCenterId = structureId;          //@NOTE: commandCenterId is an index for entities !
+
+    return structure;
+
+}
+
+//v->init();
+//v->embody(world,space); //islandspace, Island is missing
+//v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+//v->rotate(record.orientation);
+//v->onIsland(this);
+
 void BoxIsland::checkStructures()
 {
     for(int i=0;i<structures.size();i++)
@@ -623,6 +658,15 @@ std::vector<size_t> BoxIsland::getStructures()
 {
     checkStructures();
     return structures;
+}
+
+size_t BoxIsland::getIslandId()
+{
+    return islandId;
+}
+void BoxIsland::setIslandId(size_t pIslandId)
+{
+    islandId = pIslandId;
 }
 
 

@@ -201,7 +201,7 @@ private:
     size_t commandCenterId=0;
 
     std::string name;
-
+    size_t islandId;
     std::string modelname;
     
 public:
@@ -224,6 +224,7 @@ public:
     Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
     Structure* addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight);
+    Structure* attachStructure(Structure* structure, size_t structureId, float x, float y, float z, float angle, dWorldID world);
 
     float getX();
     float getZ();
@@ -233,6 +234,8 @@ public:
 
     std::string getName();
     void setName(std::string name);
+    size_t getIslandId();
+    void setIslandId(size_t pIslandId);
 
     std::string getModelName();
     Structure* getCommandCenter();

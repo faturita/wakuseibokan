@@ -206,6 +206,7 @@ TickRecord Structure::serialize()
     t.azimuth = azimuth;
     t.elevation = elevation;
     t.orientation = getAzimuthRadians(getForward());
+    t.islandId = island->getIslandId();
 
     return t;
 }

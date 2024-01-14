@@ -54,6 +54,7 @@
 #include "weapons/CarrierTurret.h"
 
 extern container<Vehicle*> entities;
+extern std::vector<BoxIsland*> islands;
 
 void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 {
@@ -284,14 +285,19 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             v = new Structure(record.faction);
             break;
         }
-        // Need axis conversion.
-        v->init();
-        v->embody(world,space); //islandspace, Island is missing
-        v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
 
+        // I need to recover the island that is associated with the structure.
+        // The path to recreate the structure is the same that was used for creating originally the structure.
 
-        v->rotate(record.orientation);
+        BoxIsland *b = islands[record.islandId];
+
+        //v->init();
+        //v->embody(world,space); //islandspace, Island is missing
+        //v->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+        //v->rotate(record.orientation);
         //v->onIsland(this);
+
+        islands[record.islandId]->attachStructure(v,record.id,record.location.pos1,record.location.pos2, record.location.pos3,record.orientation,world);
         entities.assign(record.id, v, v->getGeom());
 
     }
