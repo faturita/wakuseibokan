@@ -299,3 +299,4 @@ More info
 * ARMA 3 https://en.wikipedia.org/wiki/Arma_3
 * Game Networking https://pvigier.github.io/2019/09/08/beginner-guide-game-networking.html
 * https://github.com/medialab-ku/openGLESbook
+* https://github.com/federico-busato/Modern-CPP-Programming
