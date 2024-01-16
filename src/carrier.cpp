@@ -1104,44 +1104,44 @@ void inline processCommandOrders()
                     {
                         Vec3f target(co.parameters.x,co.parameters.y,co.parameters.z);
 
-                        //if (_b)
+
+                        if (target.magnitude()>0)
                         {
-                                action->goTo(target);
-                                action->enableAuto();
+                            action->goTo(target);
+                            action->enableAuto();
 
-                                Vehicle *enemy = findNearestEnemyVehicle((entities[ctroler->controllingid])->getFaction(),target,1000.0f);
+                            Vehicle *enemy = findNearestEnemyVehicle((entities[ctroler->controllingid])->getFaction(),target,1000.0f);
 
-                                auto lambda = [](dGeomID sender,dGeomID recv) {
+                            auto lambda = [](dGeomID sender,dGeomID recv) {
 
-                                    Vehicle *snd = entities.find(sender);
-                                    Vehicle *rec = entities.find(recv);
+                                Vehicle *snd = entities.find(sender);
+                                Vehicle *rec = entities.find(recv);
 
-                                    if (snd != NULL && rec != NULL)
-                                    {
-                                        //printf ("Updating....\n");
-                                        rec->goTo(snd->getPos());
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        //printf ("End");
-                                        return false;
-                                    }
-
-
-                                };
-
-                                TrackRecord val;
-                                std::get<0>(val) = enemy->getGeom();
-                                std::get<1>(val) = action->getGeom();
-                                std::get<2>(val) = lambda;
-                                track.push_back(val);
+                                if (snd != NULL && rec != NULL)
+                                {
+                                    //printf ("Updating....\n");
+                                    rec->goTo(snd->getPos());
+                                    return true;
+                                }
+                                else
+                                {
+                                    //printf ("End");
+                                    return false;
+                                }
 
 
+                            };
 
-                                // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
-                                //switchControl(actionid);
-                                //gunshot();
+                            TrackRecord val;
+                            std::get<0>(val) = enemy->getGeom();
+                            std::get<1>(val) = action->getGeom();
+                            std::get<2>(val) = lambda;
+                            track.push_back(val);
+
+
+                            // @NOTE: The switch to see the missile only happens if the controlling faction can do it.
+                            //switchControl(actionid);
+                            //gunshot();
                         }
 
                     }
