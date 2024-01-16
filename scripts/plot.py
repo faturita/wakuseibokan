@@ -31,6 +31,7 @@ file = sys.argv[1]
 data1 = []
 data2 = []
 data3 = []
+data4 = []
 with open(file) as inputfile:
     for row in csv.reader(inputfile):
         print ( row )
@@ -38,28 +39,36 @@ with open(file) as inputfile:
             data1.append(float(row[0]))
             data2.append(float(row[1]))
             data3.append(float(row[2]))
+            data4.append(float(row[3]))
 
 print("File length:" + str(len(data1)))
 
 data1 = np.asarray(data1)
 data2 = np.asarray(data2)
 data3 = np.asarray(data3)
+data4 = np.asarray(data4)
 
-fig = plt.figure()
-ax1 = fig.add_subplot(311)
+fig = plt.figure(figsize=(7,7))
+ax1 = fig.add_subplot(411)
 
 ax1.plot(data1,'r', label='entities')
-ax1.set_ylim([0, 250])
+ax1.set_ylim([0, 650])
+ax1.legend()
 
-ax1 = fig.add_subplot(312)
+ax1 = fig.add_subplot(412)
 ax1.plot(data2,'g', label='fps')
 ax1.set_ylim([0, 65])
+ax1.legend()
 
-ax1 = fig.add_subplot(313)
-ax1.plot(data3,'b', label='elapsedtime')
-ax1.set_ylim([0, 15000])
+ax1 = fig.add_subplot(413)
+ax1.plot(data3,'b', label='elapsedmodeltime')
+ax1.set_ylim([0, 20000])
+ax1.legend()
 
-plt.legend(loc='upper left')
+ax1 = fig.add_subplot(414)
+ax1.plot(data4,'y', label='elapseddrawtime')
+ax1.set_ylim([0, 20000])
+ax1.legend()
 
 plt.savefig('output.png')
 

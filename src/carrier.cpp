@@ -123,11 +123,10 @@ std::ofstream msgboardfile;
 extern std::vector<Message> messages;
 
 extern int aiplayer;
-
 extern int gamemode;
-
 extern int tracemode;
 extern int peermode;
+bool profilemode;
 
 extern int controlmap[];
 
@@ -135,9 +134,12 @@ extern std::unordered_map<std::string, GLuint> textures;
 
 float fps=0;
 float latency=0;
+
 extern unsigned long timer;
 extern unsigned long seektimer;
-clock_t elapsedtime;
+
+clock_t elapsedmodeltime;
+clock_t elapseddrawtime;
 
 bool wincondition=false;
 
@@ -146,6 +148,7 @@ bool cull=false;
 bool wireframes=false;
 
 FILE *ledger;
+std::ofstream fpsfile;
 
 std::vector<Controller*> controllers;
 
@@ -524,6 +527,7 @@ void drawHUD()
 
 void drawScene() {
 
+    clock_t start = clock();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -701,6 +705,8 @@ void drawScene() {
 	glDisable(GL_TEXTURE_2D);
 	
 	glutSwapBuffers();
+
+    elapseddrawtime = (clock() - start); /// CLOCKS_PER_SEC;
 }
 
 
@@ -1173,6 +1179,10 @@ void update(int value)
         {
             fclose(ledger);
         }
+        if (profilemode)
+        {
+            fpsfile.close();
+        }
         exit(0);
     }
     if (!controller.pause)
@@ -1372,7 +1382,13 @@ void update(int value)
         clock_t inicio = clock();
         dSpaceCollide (space,0,&nearCallback);
         dWorldStep (world,0.05);        // 0.05
-        elapsedtime = (clock() - inicio); /// CLOCKS_PER_SEC;
+        elapsedmodeltime = (clock() - inicio); /// CLOCKS_PER_SEC;
+
+        if (profilemode)
+        {
+            fpsfile << entities.size() << "," <<  fps << "," << elapsedmodeltime << "," << elapseddrawtime << std::endl;
+            fpsfile.flush();
+        }
         
 
         //dWorldQuickStep(world,0.05);
@@ -1536,6 +1552,12 @@ int main(int argc, char** argv) {
 
     if (!isPresentCommandLineParameter(argc,argv,"-nointro") && !isPresentCommandLineParameter(argc,argv,"-test"))
         {intro();controller.view = 5;}
+
+    if (isPresentCommandLineParameter(argc,argv,"-profile"))
+    {
+        fpsfile.open ("fps.dat");
+        profilemode = true;
+    }
 
 
     const char *conf = dGetConfiguration ();

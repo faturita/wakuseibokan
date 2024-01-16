@@ -138,7 +138,8 @@ std::vector<BoxIsland*> islands;
 std::vector<Message> messages;
 
 extern float fps;
-extern clock_t elapsedtime;
+extern clock_t elapsedmodeltime;
+extern clock_t elapseddrawtime;
 
 int gamemode;
 int aiplayer;
@@ -2312,7 +2313,7 @@ void checktest25(unsigned long timer)
 {
     Balaenidae *b = (Balaenidae*)entities[1];
 
-    std::cout << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    std::cout << entities.size() << "," <<  fps << "," << elapsedmodeltime << "," << elapseddrawtime << std::endl;
 
     if (timer==100)  // This is not autopilot.  If you control the carrier, you will override the controlregister parameters (it wont move).
     {
@@ -2506,12 +2507,12 @@ void checktest26(unsigned long timer)
         fpsfile.open ("fps.dat");
     }
 
-    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedmodeltime << "," << elapseddrawtime << std::endl;
     fpsfile.flush();
 
     if (timer == 200)
     {
-        for (int j=0;j<islands.size();j++)
+        for (size_t j=0;j<islands.size();j++)
         {
             captureIsland(islands[j],GREEN_FACTION,DEFENSE_ISLAND,space,world);
         }
@@ -4564,7 +4565,7 @@ void checktest46(unsigned long timer)
         fpsfile.open ("fps.dat");
     }
 
-    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedmodeltime << "," << elapseddrawtime << std::endl;
     fpsfile.flush();
 
 
@@ -6073,7 +6074,7 @@ void checktest62(unsigned int timer)
     }
 
     // Elapsedtime is the time taken for ODE to process one step
-    fpsfile << entities.size() << "," <<  fps << "," << elapsedtime << std::endl;
+    fpsfile << entities.size() << "," <<  fps << "," << elapsedmodeltime << "," << elapseddrawtime << std::endl;
     fpsfile.flush();
 
     long unsigned starttime = 150;
