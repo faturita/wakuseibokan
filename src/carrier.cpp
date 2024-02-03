@@ -1138,11 +1138,14 @@ void inline processCommandOrders()
 
                             };
 
-                            TrackRecord val;
-                            std::get<0>(val) = enemy->getGeom();
-                            std::get<1>(val) = action->getGeom();
-                            std::get<2>(val) = lambda;
-                            track.push_back(val);
+                            if (enemy)
+                            {
+                                TrackRecord val;
+                                std::get<0>(val) = enemy->getGeom();
+                                std::get<1>(val) = action->getGeom();
+                                std::get<2>(val) = lambda;
+                                track.push_back(val);
+                            }
 
 
                             // @NOTE: The switch to see the missile only happens if the controlling faction can do it.

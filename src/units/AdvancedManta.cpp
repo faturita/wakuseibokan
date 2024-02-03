@@ -12,7 +12,7 @@ AdvancedManta::AdvancedManta(int newfaction) : SimplifiedDynamicManta(newfaction
 void AdvancedManta::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/medusa.3ds",0,0,0,1,1,1,0);
+    _model = (Model*)T3DSModel::loadModel("units/manta.3ds",0,0,0,1,1,1,0);
     if (_model != NULL)
     {
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);
@@ -39,7 +39,7 @@ void AdvancedManta::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(2.0f,2.0f,2.0f);
+        glScalef(1.0f,1.0f,1.0f);
 
         doTransform(f, R);
 
@@ -51,9 +51,13 @@ void AdvancedManta::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //drawRectangularBox(width/2.0f, height/2.0f, length/2.0f);
 
-        glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+        //glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+        //glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
+        //glRotatef(-180.0f, 0.0f, 1.0f, 0.0f);
+
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(-180.0f, 0.0f, 1.0f, 0.0f);
+        glRotatef(90.0, 0.0f, 1.0, 0.0f);
+
 
         glColor3f(1.0,1.0f,1.0f);
         _model->setTexture(textures["sky"]);
