@@ -102,6 +102,8 @@
 #include "networking/ledger.h"
 #include "networking/lobby.h"
 
+#include "version.h"
+
 extern  Controller controller;
 extern  Camera Camera;
 
@@ -156,7 +158,7 @@ std::vector<TrackRecord>   track;
 
 void disclaimer()
 {
-    printf ("惑星母艦\n");
+    printf ("惑星母艦 %s\n", WAKU::version);
     printf ("Warfare on the seas of Kepler IV\n");
 }
 

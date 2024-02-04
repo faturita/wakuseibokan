@@ -64,4 +64,19 @@ clean:
 	rm -f testcase
 	rm -f testcase.o
 
+version:
+	ifeq ($(VERSION),)
+		$(error VERSION is not set)
+
+	@echo "namespace WAKU { const char version[] = \"$(VERSION)\"; }" > src/version.h
+
+	git commit -m"Packging version" .
+	git tag -a $(VERSION) -m"Packaging version"
+	git push origin $(VERSION)
+
+
+pack: version clean $(PROG)
+	tar cvzf waku.tgz waku conf/ data/ dependencies/ docs/ images/ savegames/ scripts/ sky/ sounds/ structures/ terrain/ system/ units/ water/
+	tar cvzf waku_$(VERSION).tgz waku.tgz system/linux/install.sh
+
 
