@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=0.0.1
+Type=Application
+Terminal=false
+Exec=/usr/games/waku
+Comment=Excited warfare on the seas of Kepler IV
+Icon=/usr/games/waku.png
