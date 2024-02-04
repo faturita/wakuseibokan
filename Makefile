@@ -16,7 +16,6 @@ OBJS = $(SSRC:.cpp=.o)
 TCSRCS = $(SCS) src/carrier.cpp src/tests/tester.cpp src/tests/testcase.cpp src/tests/testcase_$(TC).cpp
 TCOBJS = $(TCSRCS:.cpp=.o)
 
-
 TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
@@ -65,8 +64,7 @@ clean:
 	rm -f testcase.o
 
 version:
-	ifeq ($(VERSION),)
-		$(error VERSION is not set)
+	@echo "Building version $(VERSION)"
 
 	@echo "namespace WAKU { const char version[] = \"$(VERSION)\"; }" > src/version.h
 
