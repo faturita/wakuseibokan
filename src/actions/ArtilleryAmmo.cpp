@@ -104,7 +104,7 @@ void ArtilleryAmmo::embody(dBodyID myBodySelf)
 
 int ArtilleryAmmo::getType()
 {
-    return ACTION;
+    return EXPLOTABLEACTION;
 }
 
 EntityTypeId ArtilleryAmmo::getTypeId()

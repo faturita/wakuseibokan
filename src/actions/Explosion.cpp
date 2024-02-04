@@ -26,6 +26,7 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
 
     Vec3f particledim(0.5f,0.5f,0.5f);
 
+    // @FIXME: Something is wrong with the way this is expanding.
     // This is a performance restriction to limit the size of each particle to 10^3.
     if (stride_width>=10 && stride_height >=10 && stride_length>=10)
         particledim = Vec3f(10.0f, 10.0f, 10.0f);

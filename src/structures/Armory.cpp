@@ -78,7 +78,7 @@ bool Armory::checkHeightOffset(int heightOffset)
 Vehicle* Armory::spawn(dWorldID  world,dSpaceID space,int type, int number)
 {
     Vec3f p;
-    p = pos + getForward().normalize()*(getDimensions()[2]/2.0-150.0);
+    p = pos + getForward().normalize()*150;
 
     Turtle* _turtle = spawnTurtle(pos, 0.0, getFaction(),number, 3, space,world);
 
@@ -102,6 +102,8 @@ Vehicle* Armory::spawn(dWorldID  world,dSpaceID space,int type, int number)
     r->setPos(p);
     bl->setPos(p);
     br->setPos(p);
+
+    dout << "Turtle::spawn: " << p << std::endl;
 
     return _turtle;
 }

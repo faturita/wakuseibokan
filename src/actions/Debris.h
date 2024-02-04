@@ -4,7 +4,7 @@
 #include "ArtilleryAmmo.h"
 
 
-class Debris : public ArtilleryAmmo
+class Debris : public Gunshot
 {
 protected:
     GLuint texture;
