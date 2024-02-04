@@ -8,5 +8,5 @@ Exec=/usr/games/waku/waku
 Comment=Excited warfare on the seas of Kepler IV
 Icon=/usr/games/waku/waku.png
 Path=/usr/games/waku/
-Version=0.1.1
+Version=v0.1.2_beta
 
