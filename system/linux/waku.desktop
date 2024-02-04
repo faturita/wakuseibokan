@@ -1,8 +1,12 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Version=0.0.1
+Name=Wakuseiboukan
+Name[jp]=惑星母艦
 Type=Application
-Terminal=false
-Exec=/usr/games/waku
+Terminal=true
+Exec=/usr/games/waku/waku
 Comment=Excited warfare on the seas of Kepler IV
-Icon=/usr/games/waku.png
+Icon=/usr/games/waku/waku.png
+Path=/usr/games/waku/
+Version=0.1.1
+

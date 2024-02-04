@@ -68,6 +68,8 @@ version:
 
 	@echo "namespace WAKU { const char version[] = \"$(VERSION)\"; }" > src/version.h
 
+	sed -i '' 's/Version=.*/Version=$(VERSION)/' system/linux/waku.desktop
+
 	git commit -m"Packging version" .
 	git tag -a $(VERSION) -m"Packaging version"
 	git push origin $(VERSION)
