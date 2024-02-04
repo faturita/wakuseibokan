@@ -1014,7 +1014,7 @@ void replayupdate(int value);
 
 void worldStep(int value)
 {
-    timer++;
+    if (!controller.pause) timer++;
     if (tracemode==REPLAY || peermode==CLIENT)
         replayupdate(value);
     else

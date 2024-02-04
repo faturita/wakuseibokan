@@ -238,7 +238,6 @@ Characteristics
 * Walruses
     * There are several models now.  They work very nicely on water as boats following the buyoncy model.  On land they work as Ackerman driving.  When they enter or leave an island, the model changes.  The thrust simulates and offboard engine.
 * Sound
-    * Using TEMPORARILY system calls and afplay.
     * STK
 * Manta
     * The FDM model from Flight Simulator works but it is very difficult to really control it. And there are many parameters.

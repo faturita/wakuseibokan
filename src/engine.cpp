@@ -271,7 +271,8 @@ bool hit(Vehicle *vehicle, Gunshot *g)
         if (vehicle->getType() == MANTA)
         {
             vehicle->damage(g->getDamage()*25);
-        } else
+        } 
+        else
             vehicle->damage(g->getDamage());
         return false;
     }

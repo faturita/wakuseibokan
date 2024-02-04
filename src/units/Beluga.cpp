@@ -31,6 +31,7 @@ void Beluga::init()
     width = 100;
     height = 58;
     length = 500;
+
 }
 
 

@@ -872,7 +872,11 @@ void Vehicle::updateScreenLocation()
     float winY=0;
     float winZ=0;
 
-    getScreenLocation(winX, winY, winZ, getPos()[0], getPos()[1], getPos()[2]);
+    Vec3f p = adjustViewLocation(Vehicle::offset, pos);
+
+    Vehicle::offset = offset;    
+
+    getScreenLocation(winX, winY, winZ, p[0], p[1], p[2]);
     //dout << winX << "," << winY << std::endl;
 
     onScreen[0] = winX;
