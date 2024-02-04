@@ -1502,7 +1502,7 @@ int main(int argc, char** argv) {
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
         {controller.faction = GREEN_FACTION;controller.controllingid = 2;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
     else
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
+        {controller.faction = GREEN_FACTION;controller.controllingid = 2;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
