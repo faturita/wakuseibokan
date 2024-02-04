@@ -68,7 +68,8 @@ version:
 
 	@echo "namespace WAKU { const char version[] = \"$(VERSION)\"; }" > src/version.h
 
-	sed -i '' 's/Version=.*/Version=$(VERSION)/' system/linux/waku.desktop
+	sed -i 's/Version=.*/Version=$(VERSION)/' system/linux/waku.desktop
+	sed -i 's/#define DEBUG/\/\/#define DEBUG/' src/profiling.h
 
 	git commit -m"Packging version" .
 	git tag -a $(VERSION) -m"Packaging version"
@@ -78,5 +79,7 @@ version:
 pack: version clean $(PROG)
 	tar cvzf waku.tgz waku conf/ data/ dependencies/ docs/ images/ savegames/ scripts/ sky/ sounds/ structures/ terrain/ system/ units/ water/
 	tar cvzf waku_$(VERSION).tgz waku.tgz system/linux/install.sh
+
+	sed -i 's/\/\/#define DEBUG/#define DEBUG/' src/profiling.h
 
 
