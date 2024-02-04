@@ -1,1 +1,1 @@
-namespace WAKU { const char version[] = "v0.1.0_beta"; }
+namespace WAKU { const char version[] = "v0.1.1"; }
