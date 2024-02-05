@@ -26,7 +26,7 @@ extern unsigned long timer;
 struct ModelRecord {
     unsigned long recordtimer;
     int number;
-    int health;
+    float health;
     int power;
     float bearing;
 
@@ -118,7 +118,7 @@ void inittelemetry()
 }
 
 
-void telemetryme(int number, int health, int power, float bearing, float *dBodyPosition, float *dBodyRotation)
+void telemetryme(int number, float health, int power, float bearing, float *dBodyPosition, float *dBodyRotation)
 {
     ModelRecord logstructure;
 

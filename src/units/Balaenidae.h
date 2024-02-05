@@ -25,6 +25,7 @@ public:
     void init();
     void clean();
     int getType();
+    void damage(float damage) override;
     int virtual getSubType();
     void virtual embody(dWorldID world, dSpaceID space);
     void virtual embody(dBodyID myBodySelf);

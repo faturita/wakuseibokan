@@ -49,7 +49,7 @@ struct TickRecord {
     int type;
     int subtype;
     int faction;
-    int health;
+    float health;
     int power;
     int status;
     int ttl;
@@ -140,7 +140,7 @@ class Vehicle : Observable
 private:
     int ttl=-1;  //Live for ever.
 
-    int health = 1000;
+    float health = 1000.0;
     int power = 1000;
 
     int faction=-1;
@@ -306,8 +306,8 @@ public:
 
     int getStatus() const;
     void setStatus(int value);
-    int getHealth() const;
-    void damage(int d);
+    float getHealth() const;
+    virtual void damage(float d);
     void destroy();
 
     const Vec3f map(Vec3f);

@@ -465,6 +465,11 @@ void Balaenidae::taxi(Manta *m)
     alignToMe(m->getBodyID());
 }
 
+void Balaenidae::damage(float damage)
+{
+    Vehicle::damage(damage/100.0);
+}
+
 void Balaenidae::launch(Manta* m)
 {
     if (m->getSubType() == CEPHALOPOD)

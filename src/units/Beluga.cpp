@@ -18,6 +18,11 @@ Beluga::Beluga(int faction) : Balaenidae(faction)
 
 }
 
+void Beluga::damage(float damage)
+{
+    Vehicle::damage(damage/100.0);
+}
+
 void Beluga::init()
 {
     //Load the model

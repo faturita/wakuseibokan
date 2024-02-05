@@ -12,7 +12,7 @@
 #include "../camera.h"
 
 
-extern  Camera Camera;
+extern  Camera camera;
 extern bool mute;
 
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
@@ -74,7 +74,7 @@ void playthissound(Vec3f source, char fl[256])
     //   and with which intensity.
     try {
         if (!mute) {
-            Vec3f dist = source - Camera.pos;
+            Vec3f dist = source - camera.pos;
             if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
             {
                 StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;

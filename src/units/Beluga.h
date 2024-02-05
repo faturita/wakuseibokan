@@ -17,6 +17,7 @@ public:
 
     int virtual getSubType();
     EntityTypeId virtual getTypeId();
+    void damage(float damage) override;
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 };

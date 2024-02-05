@@ -74,7 +74,7 @@
 #include "weapons/CarrierTurret.h"
 #include "weapons/CarrierLauncher.h"
 
-extern  Camera Camera;
+extern  Camera camera;
 
 extern  Controller controller;
 
@@ -86,7 +86,6 @@ unsigned long timer=0;
 
 dWorldID world;
 dSpaceID space;
-dBodyID body[NUM];
 dJointGroupID contactgroup;
 
 container<Vehicle*> entities;
