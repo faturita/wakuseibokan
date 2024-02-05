@@ -500,14 +500,15 @@ int Vehicle::getTtl()
     return Vehicle::ttl;
 }
 
-int Vehicle::getHealth() const
+float Vehicle::getHealth() const
 {
     return health;
 }
 
-void Vehicle::damage(int amount)
+void Vehicle::damage(float amount)
 {
     Vehicle::health-=amount;
+    std::cout << "Vehicle damage: " << getHealth() << std::endl;
 }
 
 void Vehicle::destroy()

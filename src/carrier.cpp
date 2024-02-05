@@ -105,7 +105,7 @@
 #include "version.h"
 
 extern  Controller controller;
-extern  Camera Camera;
+extern  Camera camera;
 
 float horizon = 100000.0f;   // 100 kmf
 
@@ -190,12 +190,12 @@ void drawHUD()
     
     char str[256];
 
-    assert( !isnan(Camera.pos[0]) || !"The height value of the Camera position is not a number.  There are numerical error somewhere.");
+    assert( !isnan(camera.pos[0]) || !"The height value of the Camera position is not a number.  There are numerical error somewhere.");
     
     fps = getTimedFPS(fps, timer);
 
     
-    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, Camera.pos[0],Camera.pos[1],Camera.pos[2],timer / CYCLES_IN_SOL, timer);
+    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, camera.pos[0],camera.pos[1],camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -295,11 +295,11 @@ void drawHUD()
 
     }
 
-    Vec3f f = (Camera.getForward().normalize())*30;
+    Vec3f f = (camera.getForward().normalize())*30;
 
-    f = (Camera.fw.normalize())*30;
+    f = (camera.fw.normalize())*30;
 
-    snprintf(str,7,  "%5.2f",Camera.getBearing());
+    snprintf(str,7,  "%5.2f",camera.getBearing());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
 
     // Add typical noisy signal when the aircraft has lost their signal.
@@ -346,7 +346,7 @@ void drawHUD()
         // Center cross
         int cc = crossc;
 
-        drawCross(uc + Camera.xAngle,lc + Camera.yAngle);
+        drawCross(uc + camera.xAngle,lc + camera.yAngle);
 
         // Bearing arrow
 
@@ -480,7 +480,7 @@ void drawHUD()
                             //drawOverlyMark(x,y, 10,10);
                             drawCross(x,y);
 
-                            float distance = (Vec3f(x,0.0,y) - Vec3f(uc + Camera.xAngle,0,lc + Camera.yAngle)).magnitude();
+                            float distance = (Vec3f(x,0.0,y) - Vec3f(uc + camera.xAngle,0,lc + camera.yAngle)).magnitude();
 
 
                             if (distance<closerOnTarget)
@@ -535,7 +535,7 @@ void drawScene() {
 	
         //glMatrixMode(GL_PROJECTION);
         //glLoadIdentity();
-        //gluPerspective(45.0, (float)1440 / (float)900, 1.0, Camera.pos[2]+ horizon /**+ yyy**/);
+        //gluPerspective(45.0, (float)1440 / (float)900, 1.0, camera.pos[2]+ horizon /**+ yyy**/);
 
 
 	glMatrixMode(GL_MODELVIEW);
@@ -560,27 +560,27 @@ void drawScene() {
         entities[ctrling]->getViewPort(up,pos,forward);
 
         Vec3f up2,pos2;
-        //Camera.getViewPort(up2,pos2,forward);
+        //camera.getViewPort(up2,pos2,forward);
 
-        Camera.fw = entities[ctrling]->getForward();
+        camera.fw = entities[ctrling]->getForward();
 
         if (entities[ctrling]->getType() == MANTA)
         {
-            Camera.yAngle = ((Manta*)entities[ctrling])->alpha*100;
-            Camera.xAngle = ((Manta*)entities[ctrling])->beta*100;
+            camera.yAngle = ((Manta*)entities[ctrling])->alpha*100;
+            camera.xAngle = ((Manta*)entities[ctrling])->beta*100;
         }
     } else
     {
-        Camera.getViewPort(up,pos,forward);
+        camera.getViewPort(up,pos,forward);
 
-        Camera.fw = forward;
+        camera.fw = forward;
 
         Vec3f f = forward.normalize();
         f = f * controller.registers.thrust;
 
         pos = pos + f;
 
-        if (Camera.dx!=0) {
+        if (camera.dx!=0) {
             pos[2]+=controller.registers.pitch;
             pos[1]+=controller.registers.precesion;
             pos[0]+=controller.registers.roll;
@@ -588,7 +588,7 @@ void drawScene() {
     }
     
     glPushAttrib(GL_CURRENT_BIT);
-    drawSky(Camera.fw[0],Camera.fw[1],Camera.fw[2]);
+    drawSky(camera.fw[0],camera.fw[1],camera.fw[2]);
     glPopAttrib();
 
     // @KDTree or voronoi
@@ -597,10 +597,10 @@ void drawScene() {
     if (gamemode == TOTALWAR) offset = Vec3f(0,0,0);
     
     Vec3f relPos = adjustViewLocation(offset,pos);
-    Camera.lookAtFrom(up, relPos, forward);
+    camera.lookAtFrom(up, relPos, forward);
     
     // Sets the camera and that changes the floor position.
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     // Put up there a sun like in minecraft.  @TODO: Configure it a light source and adjust its trajectory
     //   from east to west crossing the zenith.
@@ -642,7 +642,7 @@ void drawScene() {
     // @NOTE: I am only considering two carriers here.
     Vec3f carrierloc1(0,0,0);
     Vec3f carrierloc2(0,0,0);
-    Vec3f cameraloc = Camera.getPos();
+    Vec3f cameraloc = camera.getPos();
 
     float RENDER_RANGE = 10000.0;
 
@@ -691,7 +691,7 @@ void drawScene() {
     // This is the final color that is used to paint everything on the screen.
     glColor3f(daylight,daylight,daylight);
 
-    if (Camera.pos[1]<0) // Dark under the water (@NOTE: For the future developers: submarines could be nice)
+    if (camera.pos[1]<0) // Dark under the water (@NOTE: For the future developers: submarines could be nice)
         glColor3f(0.1,0.1,0.1);
 
     // GO with the HUD
@@ -767,7 +767,7 @@ void handleResize(int w, int h) {
     // @NOTE: Changing zNear helps to avoid as much as possible island z-fighting.
     //    However putting a value greater than 3.0 wrec havoc the sky which is bounded by this.
     //    https://stackoverflow.com/questions/3410096/setting-near-plane-in-opengl
-    gluPerspective(45.0, (float)w / (float)h, 3.0, Camera.pos[2]+ horizon /**+ yyy**/);
+    gluPerspective(45.0, (float)w / (float)h, 3.0, camera.pos[2]+ horizon /**+ yyy**/);
 }
 
 static bool didODEInit=false;
@@ -1486,7 +1486,7 @@ int main(int argc, char** argv) {
         aiplayer = BOTH_AI;
 
     controller.controllingid = 1;
-    Camera.pos = Vec3f(0,0,0);
+    camera.pos = Vec3f(0,0,0);
 
 
     if (isPresentCommandLineParameter(argc,argv,"-godmode"))

@@ -60,7 +60,7 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 
-Camera Camera;
+Camera camera;
 
 extern dWorldID world;
 extern dSpaceID space;
@@ -231,17 +231,17 @@ void processMouseActiveMotion(int x, int y) {
 
     //if (buttonState == 1)
     {
-    	Camera.xAngle += ( (x-_xoffset) * 0.005);
+    	camera.xAngle += ( (x-_xoffset) * 0.005);
 
-        Camera.yAngle += ( (y - _yoffset ) * 0.005) ;
+        camera.yAngle += ( (y - _yoffset ) * 0.005) ;
     } //else if (buttonState == 0)
     {
-    	//Vec3f forward = Camera.getForward();
-    	//Vec3f pos = Camera.getPos();
-    	//Camera.setPos(  ( (y - _yoffset ) * 0.05)*forward+pos   );
+    	//Vec3f forward = camera.getForward();
+    	//Vec3f pos = camera.getPos();
+    	//camera.setPos(  ( (y - _yoffset ) * 0.05)*forward+pos   );
     	
         
-        //Camera.dx += ( (y - _yoffset ) * 0.05) ;
+        //camera.dx += ( (y - _yoffset ) * 0.05) ;
     }
     //}
 }
@@ -273,9 +273,9 @@ void processMousePassiveMotion(int x, int y) {
 
     //if (buttonState == 1)
     {
-    //    Camera.xAngle += ( (x-_xoffset) * 0.005);
+    //    camera.xAngle += ( (x-_xoffset) * 0.005);
 
-    //    Camera.yAngle += ( (y - _yoffset ) * 0.005) ;
+    //    camera.yAngle += ( (y - _yoffset ) * 0.005) ;
     }
     //processMouseActiveMotion(x,y);
 }
@@ -696,9 +696,9 @@ void handleKeypress(unsigned char key, int x, int y) {
     switch (key) {
 		case 27: //Escape key
             controller.interrupt();
-        case '+':Camera.dx+=0.1;break;
-        case '-':Camera.dx-=0.1;break;
-        case 32 :Camera.dx=0.00001; controller.registers.thrust = 0;break;
+        case '+':camera.dx+=0.1;break;
+        case '-':camera.dx-=0.1;break;
+        case 32 :camera.dx=0.00001; controller.registers.thrust = 0;break;
         case '^':pp = !(pp);break;
         case 'a':controller.registers.roll-=1.0f;break;
         case 'A':controller.registers.roll-=50.0f;break;
@@ -740,7 +740,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '0':
             controller.controllingid = CONTROLLING_NONE;
             controller.reset();
-            Camera.reset();
+            camera.reset();
         break;
         case '1':case '2':case '3': case '4': case '5':case '6':case '7':case '8':case '9':
         {
@@ -760,7 +760,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;
         case '@':controller.view = 3;break;
         case '#':controller.view = 4;break;
-        case '~':Camera.control = 0;break;
+        case '~':camera.control = 0;break;
         case '?':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
         case 'S':
@@ -817,7 +817,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
                 {
-                    gunshot(Camera.pos);
+                    gunshot(camera.pos);
                     CommandOrder co;
                     co.command = Command::FireOrder;
                     Vec3f target;
