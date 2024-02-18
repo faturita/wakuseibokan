@@ -1500,9 +1500,9 @@ int main(int argc, char** argv) {
         #endif
         controlmap[0]=4;controlmap[1]=5;controlmap[2]=6;controlmap[3]=7;controlmap[4]=8;controlmap[5]=9;}
     else if (isPresentCommandLineParameter(argc,argv,"-greenmode"))
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
+        {controller.faction = GREEN_FACTION;}
     else
-        {controller.faction = GREEN_FACTION;controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;}
+        {controller.faction = GREEN_FACTION;}
 
 
     if (isPresentCommandLineParameter(argc,argv,"-strategy"))
@@ -1511,6 +1511,16 @@ int main(int argc, char** argv) {
         gamemode = ACTIONGAME;
     else if (isPresentCommandLineParameter(argc,argv,"-totalwar"))
         gamemode = TOTALWAR;
+
+    if (gamemode == STRATEGYGAME && controller.faction == GREEN_FACTION)
+    {
+        controller.controllingid = 2;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;    
+    }
+
+    if (gamemode == ACTIONGAME && controller.faction == GREEN_FACTION)
+    {
+        controller.controllingid = 1;controlmap[0]=1;controlmap[1]=2;controlmap[2]=3;    
+    }
 
 
     if (isPresentCommandLineParameter(argc,argv,"-record"))
