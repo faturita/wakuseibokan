@@ -190,6 +190,11 @@ The map can be activated by pressing "@".  And the main view can be restored by 
 * 'launch': Console command to launch any aircraft landed on the runways or carriers.
 * 'taxi': Moves the aircraft to launching position when necessary.
 * 'land': Order any nearby aircraft to land.
+* 'def Island#N': Control the structure N at island 'Island'.  Numbers go from 0 to 10 (depending how old is the island).
+* 'manta N': Control Manta number N
+* 'walurs N': Control Walrus number N
+* 'medusa N': Control Medusa Defense Airplane number N
+* 'seal N': Control Seal Speeder Boat number N
 
  
 </details>
