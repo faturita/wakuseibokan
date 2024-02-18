@@ -17,7 +17,7 @@ Artillery::Artillery(int faction)
 void Artillery::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/turretbase.3ds"),0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
 
@@ -52,7 +52,7 @@ void Artillery::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
-        draw3DSModel("structures/turrettop.3ds",0.0f,0.0f,0.0f,1,textures["sky"]);
+        draw3DSModel(filereader("structures/turrettop.3ds"),0.0f,0.0f,0.0f,1,textures["sky"]);
         glPopMatrix();
 
     }

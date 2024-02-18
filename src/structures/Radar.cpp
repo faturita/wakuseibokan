@@ -13,7 +13,7 @@ Radar::Radar(int faction)
 void Radar::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/radar.3ds",-0,-0,0,1,1,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/radar.3ds"),-0,-0,0,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
 

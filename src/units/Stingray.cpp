@@ -12,7 +12,7 @@ Stingray::Stingray(int newfaction) : SimplifiedDynamicManta(newfaction)
 void Stingray::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/stingray.3ds",0,0,0,1,1,1,0);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/stingray.3ds"),0,0,0,1,1,1,0);
     if (_model != NULL)
     {
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);

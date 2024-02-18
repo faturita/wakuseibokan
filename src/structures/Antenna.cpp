@@ -13,7 +13,7 @@ Antenna::Antenna(int faction)
 void Antenna::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/galileo.3ds",0,-0,0,1,1,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/galileo.3ds"),0,-0,0,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
 

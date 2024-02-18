@@ -5,13 +5,14 @@
 //  Created by Rodrigo Ramele on 1/12/17.
 //
 
+#include "../profiling.h"
 #include "MultiBodyVehicle.h"
 
 
 
 void MultiBodyVehicle::init()
 {
-    Image* image = loadBMP("terrain/vtr.bmp");
+    Image* image = loadBMP(filereader("terrain/vtr.bmp"));
     _textureBox = loadTexture(image);
     delete image;
     

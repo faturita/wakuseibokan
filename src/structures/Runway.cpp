@@ -13,7 +13,7 @@ Runway::Runway(int faction)
 void Runway::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/runway.3ds",-466.06f,0.0f,0.0f,20,1,10,textures["road"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/runway.3ds"),-466.06f,0.0f,0.0f,20,1,10,textures["road"]);
     if (_model != NULL)
     {
 

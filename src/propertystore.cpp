@@ -70,7 +70,8 @@ void PropertyStore::Load()
 
     Clear();
 
-    if ( (pFile=fopen(sPropertyFileName,"rw+"))==NULL) {
+    //if ( (pFile=fopen(sPropertyFileName,"rw+"))==NULL) {
+    if ( (pFile=fopen(sPropertyFileName,"r"))==NULL) {
         char dd[]="Archivo no encontrado.";
         throw (dd);
         cerr << "Archivo " << sPropertyFileName <<" no puedo ser abierto.";

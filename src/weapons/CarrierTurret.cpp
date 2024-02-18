@@ -17,10 +17,10 @@ CarrierTurret::CarrierTurret(int faction) : Weapon(faction)
 void CarrierTurret::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/turretbase.3ds"),0.0f,-8.14f,0.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
+        _topModel = (Model*) T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,1,1,1,0);
     }
 
     Weapon::height=4.68;

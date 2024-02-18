@@ -29,7 +29,7 @@ Torpedo::~Torpedo()
 void Torpedo::init()
 {
     // -130.46696	 180.85544	   5.74906
-    _model = (Model*)T3DSModel::loadModel("units/missile.3ds",130.46696,-5.74,178.85544,1,1,1,0);   // 130 180
+    _model = (Model*)T3DSModel::loadModel(filereader("units/missile.3ds"),130.46696,-5.74,178.85544,1,1,1,0);   // 130 180
     if (_model != NULL)
     {
 

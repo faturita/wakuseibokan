@@ -408,19 +408,19 @@ void drawMap()
                 {
                     if (entities[i]->getType() == CARRIER)
                     {
-                        placeMark(entities[i]->getPos(),iconsize,"units/carriertarget.bmp");
+                        placeMark(entities[i]->getPos(),iconsize,filereader("units/carriertarget.bmp"));
                     } else if (entities[i]->getType() == WALRUS)
                     {
-                        placeMark(entities[i]->getPos(),iconsize,"units/walrusicon.bmp");
+                        placeMark(entities[i]->getPos(),iconsize,filereader("units/walrusicon.bmp"));
                     } else if (entities[i]->getType() == MANTA)
                     {
                         if (entities[i]->getSubType() == MEDUSA)
                         {
-                            placeMark(entities[i]->getPos(),iconsize,"units/mantaicon.bmp");
+                            placeMark(entities[i]->getPos(),iconsize,filereader("units/mantaicon.bmp"));
 
                         } else
                         {
-                            placeMark(entities[i]->getPos(),iconsize,"units/mantaicon.bmp");
+                            placeMark(entities[i]->getPos(),iconsize,filereader("units/mantaicon.bmp"));
                         }
                     }
                 }
@@ -444,7 +444,7 @@ void drawMap()
 
             if (target.magnitude()>=1)
             {
-                placeMark(target,iconsize,"units/target.bmp");
+                placeMark(target,iconsize,filereader("units/target.bmp"));
             }
         }
 

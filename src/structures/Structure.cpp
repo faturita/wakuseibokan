@@ -26,7 +26,7 @@ Structure::~Structure()
 void Structure::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/structure.3ds",160.99f,-19.48f,76.36f,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/structure.3ds"),160.99f,-19.48f,76.36f,1,textures["sky"]);
     if (_model != NULL)
     {
 

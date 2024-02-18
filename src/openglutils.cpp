@@ -694,80 +694,80 @@ void initTextures()
 
     GLuint _texture;
 
-    Image* image = loadBMP("units/metal.bmp");
+    Image* image = loadBMP(filereader("units/metal.bmp"));
     _texture = loadTexture(image);              // Box
     textures["metal"] = _texture;
     delete image;
 
-    image = loadBMP("water/reflection.bmp");
+    image = loadBMP(filereader("water/reflection.bmp"));
     _texture = loadTexture(image);
     textures["sea"] = _texture;
     delete image;
     
-    image = loadBMP("sky/clouds.bmp");
+    image = loadBMP(filereader("sky/clouds.bmp"));
     _texture = loadTexture(image);
     textures["sky"] = _texture;
     delete image;
     
-    image = loadBMP("terrain/grass.bmp");
+    image = loadBMP(filereader("terrain/grass.bmp"));
     _texture = loadTexture(image);
     textures["land"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/road.bmp");
+    image = loadBMP(filereader("terrain/road.bmp"));
     _texture = loadTexture(image);
     textures["road"] = _texture;
     delete image;
 
-    image = loadBMP("structures/command.bmp");
+    image = loadBMP(filereader("structures/command.bmp"));
     assert( image != NULL || !"Something went wrong." );
     _texture = loadTexture(image);
     textures["military"] = _texture;
     delete image;
 
-    image = loadBMP("sky/saturn.bmp");
+    image = loadBMP(filereader("sky/saturn.bmp"));
     _texture = loadTexture(image);
     textures["saturn"] = _texture;
     delete image;
 
-    image = loadBMP("sky/solar.bmp");
+    image = loadBMP(filereader("sky/solar.bmp"));
     _texture = loadTexture(image);
     textures["solar"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/boat.bmp");
+    image = loadBMP(filereader("terrain/boat.bmp"));
     _texture = loadTexture(image);
     textures["boat"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/smoke.bmp");
+    image = loadBMP(filereader("terrain/smoke.bmp"));
     _texture = loadTexture(image);
     textures["solar"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/sun.bmp");
+    image = loadBMP(filereader("terrain/sun.bmp"));
     _texture = loadTexture(image);
     textures["sun"] = _texture;
     delete image;
 
 
-    image = loadBMP("terrain/moon.bmp");
+    image = loadBMP(filereader("terrain/moon.bmp"));
     _texture = loadTexture(image);
     textures["moon"] = _texture;
     delete image;
 
 
-    image = loadBMP("terrain/venus.bmp");
+    image = loadBMP(filereader("terrain/venus.bmp"));
     _texture = loadTexture(image);
     textures["venus"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/stars.bmp");
+    image = loadBMP(filereader("terrain/stars.bmp"));
     _texture = loadTexture(image);
     textures["stars"] = _texture;
     delete image;
 
-    image = loadBMP("terrain/theclouds.bmp");
+    image = loadBMP(filereader("terrain/theclouds.bmp"));
     _texture = loadTexture(image);
     textures["clouds"] = _texture;
     delete image;

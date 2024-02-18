@@ -35,7 +35,7 @@ Balaenidae::Balaenidae(int newfaction)
 void Balaenidae::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/carrier.3ds",-1.4f,0.0f,0.0f,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/carrier.3ds"),-1.4f,0.0f,0.0f,1,textures["metal"]);
 
     setForward(0,0,1);
 

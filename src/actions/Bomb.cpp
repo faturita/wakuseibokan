@@ -1,6 +1,8 @@
 #include <unordered_map>
 #include "../ThreeMaxLoader.h"
+#include "../profiling.h"
 #include "Bomb.h"
+
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -21,7 +23,7 @@ Bomb::~Bomb()
 
 void Bomb::init()
 {
-    _model = (Model*)T3DSModel::loadModel("units/bomb2.3ds",0,0,0,1,0);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/bomb2.3ds"),0,0,0,1,0);
 
     length = 4.12f;
     height = 2.06f;

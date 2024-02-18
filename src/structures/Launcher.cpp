@@ -17,10 +17,10 @@ Launcher::Launcher(int faction)
 void Launcher::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/missilelauncherbase.3ds",0.0f,0.0,0.0f,6,6,6,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/missilelauncherbase.3ds"),0.0f,0.0,0.0f,6,6,6,textures["metal"]);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/launchertop.3ds",0,0,0,4,4,4,0);
+        _topModel = (Model*) T3DSModel::loadModel(filereader("structures/launchertop.3ds"),0,0,0,4,4,4,0);
     }
 
     Structure::height=27.97;

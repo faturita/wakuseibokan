@@ -5,6 +5,7 @@
 //  Created by Rodrigo Ramele on 24/05/14.
 //
 
+#include "../profiling.h"
 #include "BoxVehicle.h"
 
 BoxVehicle::BoxVehicle()
@@ -20,7 +21,7 @@ BoxVehicle::BoxVehicle(int faction )
 void BoxVehicle::init()
 {
 
-    Image* image = loadBMP("terrain/vtr.bmp");
+    Image* image = loadBMP(filereader("terrain/vtr.bmp"));
     _textureBox = loadTexture(image);
     delete image;
     

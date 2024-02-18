@@ -26,7 +26,7 @@ void Beluga::damage(float damage)
 void Beluga::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/beluga.3ds",-1.4f,0.0f,0.0f,1,textures["boat"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/beluga.3ds"),-1.4f,0.0f,0.0f,1,textures["boat"]);
 
     setForward(0,0,1);
 

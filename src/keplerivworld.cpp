@@ -378,22 +378,22 @@ void inline initIslands()
         BoxIsland *statera = new BoxIsland(&entities);
         statera->setName("Statera");
         statera->setLocation(12000.0f,-1.0,0.0f);
-        statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        statera->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *thermopilae = new BoxIsland(&entities);
         thermopilae->setName("Thermopilae");
         thermopilae->setLocation(-12000.0f, -1.0,  0.0f);
-        thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        thermopilae->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *nonsquareisland = new BoxIsland(&entities);
         nonsquareisland->setName("Atolon");
         nonsquareisland->setLocation(0.0f,-1.0f,12000.0f);
-        nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+        nonsquareisland->buildTerrainModel(space,filereader("terrain/nonsquareisland.bmp"));
 
         BoxIsland *vulcano = new BoxIsland(&entities);
         vulcano->setName("Vulcano");
         vulcano->setLocation(-12000.0f, -1.0f, 0.0f);
-        vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+        vulcano->buildTerrainModel(space,filereader("terrain/vulcano.bmp"));
 
         islands.push_back(statera);
         islands.push_back(thermopilae);
@@ -404,138 +404,138 @@ void inline initIslands()
         BoxIsland *statera = new BoxIsland(&entities);
         statera->setName("Statera");
         statera->setLocation(0.0f,-1.0,0.0f);
-        statera->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        statera->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *thermopilae = new BoxIsland(&entities);
         thermopilae->setName("Thermopilae");
         thermopilae->setLocation(580 kmf, -1.0, -350 kmf);
-        thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        thermopilae->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *nonsquareisland = new BoxIsland(&entities);
         nonsquareisland->setName("Atolon");
         nonsquareisland->setLocation(0.0f,-1.0f,-100 kmf);
-        nonsquareisland->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+        nonsquareisland->buildTerrainModel(space,filereader("terrain/nonsquareisland.bmp"));
 
         BoxIsland *vulcano = new BoxIsland(&entities);
         vulcano->setName("Vulcano");
         vulcano->setLocation(145 kmf, -1.0f, 89 kmf);
-        vulcano->buildTerrainModel(space,"terrain/vulcano.bmp");
+        vulcano->buildTerrainModel(space,filereader("terrain/vulcano.bmp"));
 
         BoxIsland *nemesis = new BoxIsland(&entities);
         nemesis->setName("Nemesis");
         nemesis->setLocation(-450 kmf, -1.0, 300 kmf);
-        nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+        nemesis->buildTerrainModel(space,filereader("terrain/nemesis.bmp"));
 
         BoxIsland *hera = new BoxIsland(&entities);
         hera->setName("Hera");
         hera->setLocation(-200 kmf, -1.0, 200 kmf);
-        hera->buildTerrainModel(space,"terrain/nemesis.bmp");
+        hera->buildTerrainModel(space,filereader("terrain/nemesis.bmp"));
 
         BoxIsland *hestia = new BoxIsland(&entities);
         hestia->setName("Hestia");
         hestia->setLocation(-250 kmf, -1.0, 250 kmf);
-        hestia->buildTerrainModel(space,"terrain/vulcano.bmp");
+        hestia->buildTerrainModel(space,filereader("terrain/vulcano.bmp"));
 
         BoxIsland *atom = new BoxIsland(&entities);
         atom->setName("Atom");
         atom->setLocation( 500 kmf, -1.0, -100 kmf);
-        atom->buildTerrainModel(space,"terrain/atom.bmp");
+        atom->buildTerrainModel(space,filereader("terrain/atom.bmp"));
 
         BoxIsland *island = new BoxIsland(&entities);
         island->setName("Island");
         island->setLocation(-500 kmf, -1.0, 200 kmf);
-        island->buildTerrainModel(space,"terrain/island.bmp");
+        island->buildTerrainModel(space,filereader("terrain/island.bmp"));
 
         BoxIsland *baltimore = new BoxIsland(&entities);
         baltimore->setName("Baltimore");
         baltimore->setLocation(-450 kmf, -1.0, 250 kmf);
-        baltimore->buildTerrainModel(space,"terrain/baltimore.bmp");
+        baltimore->buildTerrainModel(space,filereader("terrain/baltimore.bmp"));
 
         BoxIsland *fulcrum = new BoxIsland(&entities);
         fulcrum->setName("Fulcrum");
         fulcrum->setLocation(70 kmf, -1.0, 70 kmf);
-        fulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+        fulcrum->buildTerrainModel(space,filereader("terrain/fulcrum.bmp"));
 
 
         BoxIsland *vulcrum = new BoxIsland(&entities);
         vulcrum->setName("Vulcrum");
         vulcrum->setLocation(450 kmf, -1.0, -300 kmf);
-        vulcrum->buildTerrainModel(space,"terrain/fulcrum.bmp");
+        vulcrum->buildTerrainModel(space,filereader("terrain/fulcrum.bmp"));
 
         BoxIsland *lunae = new BoxIsland(&entities);
         lunae->setName("Lunae");
         lunae->setLocation(490 kmf, -1.0, 320 kmf);
-        lunae->buildTerrainModel(space,"terrain/heightmap.bmp");
+        lunae->buildTerrainModel(space,filereader("terrain/heightmap.bmp"));
 
         BoxIsland *mururoa = new BoxIsland(&entities);
         mururoa->setName("Mururoa");
         mururoa->setLocation(-200 kmf, -1.0, 320 kmf);
-        mururoa->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        mururoa->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *bikini = new BoxIsland(&entities);
         bikini->setName("Bikini");
         bikini->setLocation(-150 kmf, -1.0, -235 kmf);
-        bikini->buildTerrainModel(space,"terrain/atom.bmp");
+        bikini->buildTerrainModel(space,filereader("terrain/atom.bmp"));
 
         BoxIsland *parentum = new BoxIsland(&entities);
         parentum->setName("Parentum");
         parentum->setLocation(-150 kmf, -1.0, 435 kmf);
-        parentum->buildTerrainModel(space,"terrain/parentum.bmp");
+        parentum->buildTerrainModel(space,filereader("terrain/parentum.bmp"));
 
         BoxIsland *goku = new BoxIsland(&entities);
         goku->setName("SonGoku");
         goku->setLocation(-200 kmf, -1.0, -435 kmf);
-        goku->buildTerrainModel(space,"terrain/goku.bmp");
+        goku->buildTerrainModel(space,filereader("terrain/goku.bmp"));
 
         BoxIsland *gaijin = new BoxIsland(&entities);
         gaijin->setName("Gaijin-shima");
         gaijin->setLocation(150 kmf, -1.0, -339 kmf);
-        gaijin->buildTerrainModel(space,"terrain/gaijin.bmp");
+        gaijin->buildTerrainModel(space,filereader("terrain/gaijin.bmp"));
 
         BoxIsland *kerama = new BoxIsland(&entities);
         kerama->setName("Kerama");
         kerama->setLocation(138 kmf, -1.0, -212 kmf);
-        kerama->buildTerrainModel(space,"terrain/gaijin.bmp");
+        kerama->buildTerrainModel(space,filereader("terrain/gaijin.bmp"));
 
         BoxIsland *tristan = new BoxIsland(&entities);
         tristan->setName("Tristan da Cunha");
         tristan->setLocation(250 kmf, -1.0, 10 kmf);
-        tristan->buildTerrainModel(space,"terrain/tristan.bmp");
+        tristan->buildTerrainModel(space,filereader("terrain/tristan.bmp"));
 
         BoxIsland *sentinel = new BoxIsland(&entities);
         sentinel->setName("North Sentinel");
         sentinel->setLocation(150 kmf, -1.0, 390 kmf);
-        sentinel->buildTerrainModel(space,"terrain/sentinel.bmp");
+        sentinel->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *midway = new BoxIsland(&entities);
         midway->setName("Midway");
         midway->setLocation(-150 kmf, -1.0, -290 kmf);
-        midway->buildTerrainModel(space,"terrain/heightmap.bmp");
+        midway->buildTerrainModel(space,filereader("terrain/heightmap.bmp"));
 
         BoxIsland *enewetak = new BoxIsland(&entities);
         enewetak->setName("Enewetak");
         enewetak->setLocation(-250 kmf, -1.0, -90 kmf);
-        enewetak->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        enewetak->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *yokatsu = new BoxIsland(&entities);
         yokatsu->setName("Yokatsu");
         yokatsu->setLocation(-350 kmf, -1.0, -120 kmf);
-        yokatsu->buildTerrainModel(space,"terrain/atom.bmp");
+        yokatsu->buildTerrainModel(space,filereader("terrain/atom.bmp"));
 
         BoxIsland *arachnid = new BoxIsland(&entities);
         arachnid->setName("Arachnid");
         arachnid->setLocation(-450 kmf, -1.0, -300 kmf);
-        arachnid->buildTerrainModel(space,"terrain/thermopilae.bmp");
+        arachnid->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         BoxIsland *outcrop = new BoxIsland(&entities);
         outcrop->setName("Outcrop");
         outcrop->setLocation(-450 kmf, -1.0, -210 kmf);
-        outcrop->buildTerrainModel(space,"terrain/atom.bmp");
+        outcrop->buildTerrainModel(space,filereader("terrain/atom.bmp"));
 
         BoxIsland *taksaven = new BoxIsland(&entities);
         taksaven->setName("Taksaven");
         taksaven->setLocation(-420 kmf, -1.0, -370 kmf);
-        taksaven->buildTerrainModel(space,"terrain/sentinel.bmp");
+        taksaven->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         islands.push_back(thermopilae);
         islands.push_back(nonsquareisland);
@@ -568,42 +568,42 @@ void inline initIslands()
         BoxIsland *oshima = new BoxIsland(&entities);
         oshima->setName("Oshima");
         oshima->setLocation(-310 kmf, -1.0, 210 kmf);
-        oshima->buildTerrainModel(space,"terrain/sentinel.bmp");
+        oshima->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *iriomote = new BoxIsland(&entities);
         iriomote->setName("Iriomote");
         iriomote->setLocation(-390 kmf, -1.0, 110 kmf);
-        iriomote->buildTerrainModel(space,"terrain/sentinel.bmp");
+        iriomote->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *amami = new BoxIsland(&entities);
         amami->setName("Amami");
         amami->setLocation(390 kmf, -1.0, -190 kmf);
-        amami->buildTerrainModel(space,"terrain/sentinel.bmp");
+        amami->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *miyake = new BoxIsland(&entities);
         miyake->setName("Miyake");
         miyake->setLocation(420 kmf, -1.0, -110 kmf);
-        miyake->buildTerrainModel(space,"terrain/sentinel.bmp");
+        miyake->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *tokunoshima = new BoxIsland(&entities);
         tokunoshima->setName("Tokunoshima");
         tokunoshima->setLocation(420 kmf, -1.0, 210 kmf);
-        tokunoshima->buildTerrainModel(space,"terrain/sentinel.bmp");
+        tokunoshima->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *dogojima = new BoxIsland(&entities);
         dogojima->setName("Dogojima");
         dogojima->setLocation(380 kmf, -1.0, 110 kmf);
-        dogojima->buildTerrainModel(space,"terrain/sentinel.bmp");
+        dogojima->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *kikajima = new BoxIsland(&entities);
         kikajima->setName("Kikajima");
         kikajima->setLocation(205 kmf, -1.0, 80 kmf);
-        kikajima->buildTerrainModel(space,"terrain/sentinel.bmp");
+        kikajima->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         BoxIsland *kamehouse = new BoxIsland(&entities);
         kamehouse->setName("KameHouse");
         kamehouse->setLocation(128 kmf, -1.0, 230 kmf);
-        kamehouse->buildTerrainModel(space,"terrain/sentinel.bmp");
+        kamehouse->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
         islands.push_back(oshima);
         islands.push_back(iriomote);

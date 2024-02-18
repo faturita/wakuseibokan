@@ -81,7 +81,7 @@ void inittelemetry()
     //connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
 
     char filename[256];
-    sprintf(filename,"%s%s%s","conf",DIRSEPARATOR,"telemetry.endpoints.ini");
+    sprintf(filename,"%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
     PropertyStore ps(filename);
 
     //ps.Set("client","127.0.0.1");

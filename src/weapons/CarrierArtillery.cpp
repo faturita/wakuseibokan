@@ -18,10 +18,10 @@ CarrierArtillery::CarrierArtillery(int faction) : Weapon(faction)
 void CarrierArtillery::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/turretbase.3ds",0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/turretbase.3ds"),0.0f,-8.14f,0.0f,1,1,1,textures["sky"]);
     if (_model != NULL)
     {
-        _topModel = (Model*) T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,1,1,1,0);
+        _topModel = (Model*) T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,1,1,1,0);
 
     }
 

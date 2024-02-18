@@ -12,7 +12,7 @@ AdvancedManta::AdvancedManta(int newfaction) : SimplifiedDynamicManta(newfaction
 void AdvancedManta::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/manta.3ds",0,0,0,1,1,1,0);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/manta.3ds"),0,0,0,1,1,1,0);
     if (_model != NULL)
     {
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);

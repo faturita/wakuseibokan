@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include "../ThreeMaxLoader.h"
 #include "ArtilleryAmmo.h"
+#include "../profiling.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -26,7 +27,7 @@ void ArtilleryAmmo::init()
     ArtilleryAmmo::mass = 10.01f;
 
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/shell.3ds",0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/shell.3ds"),0.0f,0.0f,0.0f,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
     }

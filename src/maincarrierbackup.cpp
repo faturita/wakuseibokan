@@ -913,11 +913,11 @@ void initRendering() {
 	glEnable(GL_CULL_FACE);
 
 	//Load the model
-    _modelManta = MD2Model::loadModel("units/manta.md2");
+    _modelManta = MD2Model::loadModel(filereader("units/manta.md2"));
     if (_modelManta != NULL)
         _modelManta->setAnimation("run");
 
-    _modelWalrus = MD2Model::loadModel("units/walrus.md2");
+    _modelWalrus = MD2Model::loadModel(filereader("units/walrus.md2"));
     if (_modelWalrus != NULL)
         _modelWalrus->setAnimation("run");
 

@@ -13,7 +13,7 @@ Factory::Factory(int faction)
 void Factory::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("structures/watertower.3ds",-19.0f,-6.36f,4.0f,1,1,1,textures["metal"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/watertower.3ds"),-19.0f,-6.36f,4.0f,1,1,1,textures["metal"]);
 
     if (_model != NULL)
     {

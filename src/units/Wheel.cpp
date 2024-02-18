@@ -31,7 +31,7 @@ Wheel::~Wheel()
 void Wheel::init()
 {
 
-    _model = (Model*)T3DSModel::loadModel("units/wheel.3ds",0,0,0,1,1,1,0);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/wheel.3ds"),0,0,0,1,1,1,0);
 
     Wheel::width = 0.2;
     Wheel::height = 1.0;

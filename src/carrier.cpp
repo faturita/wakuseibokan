@@ -104,6 +104,12 @@
 
 #include "version.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <limits.h>
+#endif
+
+
 extern  Controller controller;
 extern  Camera camera;
 
@@ -155,6 +161,8 @@ std::ofstream fpsfile;
 std::vector<Controller*> controllers;
 
 std::vector<TrackRecord>   track;
+
+char WORKING_PATH[256];
 
 void disclaimer()
 {
@@ -1421,6 +1429,20 @@ static void update_fade_factor(void)
 
 
 int main(int argc, char** argv) {
+
+#ifdef __APPLE__
+    char buf [PATH_MAX];
+    uint32_t bufsize = PATH_MAX;
+    if(!_NSGetExecutablePath(buf, &bufsize))
+    {
+      puts(buf);
+      strncpy(WORKING_PATH, buf, strlen(buf)-4);
+      puts(WORKING_PATH);
+    }
+#else
+    strncpy(WORKING_PATH,".",1);
+#endif
+
 	glutInit(&argc, argv);
 
 #ifdef DEBUG

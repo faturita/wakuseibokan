@@ -45,6 +45,19 @@ void CLog::Init()
     SetLevel(nDfltLevel);
 }
 
+extern char WORKING_PATH[256];
+
+char fullfilename[256];
+
+char * filereader(char filename[256])
+{
+    sprintf(fullfilename,"%s/%s",WORKING_PATH,filename);
+
+    return fullfilename;
+}
+
+
+
 //int main()
 //{
 //    CLog::Write(CLog::Debug, "testing 1 2 3");

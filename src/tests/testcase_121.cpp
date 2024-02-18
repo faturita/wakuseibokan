@@ -56,19 +56,19 @@ void TestCase_121::init()
 
     std::vector<std::string> islandshape;
 
-    islandshape.push_back("terrain/sentinel.bmp");
-    islandshape.push_back("terrain/atom.bmp");
-    islandshape.push_back("terrain/baltimore.bmp");
-    islandshape.push_back("terrain/fulcrum.bmp");
-    islandshape.push_back("terrain/gaijin.bmp");
-    islandshape.push_back("terrain/goku.bmp");
-    islandshape.push_back("terrain/nemesis.bmp");
-    islandshape.push_back("terrain/nonsquareisland.bmp");
-    islandshape.push_back("terrain/parentum.bmp");
-    islandshape.push_back("terrain/thermopilae.bmp");
-    islandshape.push_back("terrain/tristan.bmp");
-    islandshape.push_back("terrain/vulcano.bmp");
-    islandshape.push_back("terrain/vulcrum.bmp");
+    islandshape.push_back(filereader("terrain/sentinel.bmp"));
+    islandshape.push_back(filereader("terrain/atom.bmp"));
+    islandshape.push_back(filereader("terrain/baltimore.bmp"));
+    islandshape.push_back(filereader("terrain/fulcrum.bmp"));
+    islandshape.push_back(filereader("terrain/gaijin.bmp"));
+    islandshape.push_back(filereader("terrain/goku.bmp"));
+    islandshape.push_back(filereader("terrain/nemesis.bmp"));
+    islandshape.push_back(filereader("terrain/nonsquareisland.bmp"));
+    islandshape.push_back(filereader("terrain/parentum.bmp"));
+    islandshape.push_back(filereader("terrain/thermopilae.bmp"));
+    islandshape.push_back(filereader("terrain/tristan.bmp"));
+    islandshape.push_back(filereader("terrain/vulcano.bmp"));
+    islandshape.push_back(filereader("terrain/vulcrum.bmp"));
 
     std::string shape = islandshape[getRandomInteger(0,islandshape.size()-1)];
 

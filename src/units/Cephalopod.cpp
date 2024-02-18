@@ -33,7 +33,7 @@ void Cephalopod::init()
 
 
     //Load the model
-    _model = (Model*)T3DSModel::loadModel("units/drone.3ds",0,-13,0,0.4,1,1,0);
+    _model = (Model*)T3DSModel::loadModel(filereader("units/drone.3ds"),0,-13,0,0.4,1,1,0);
     if (_model != NULL)
     {
         //_topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.1,0.1,0.1,0);

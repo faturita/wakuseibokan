@@ -38,15 +38,15 @@ void Walrus::setIsland(BoxIsland *value)
 void Walrus::init()
 {
     if (getFaction()==BLUE_FACTION)
-        _model = (Model*)MD2Model::loadModel("units/walrusgood.md2");
+        _model = (Model*)MD2Model::loadModel(filereader("units/walrusgood.md2"));
     else {
-        _model = (Model*)MD2Model::loadModel("units/walrus.md2");
+        _model = (Model*)MD2Model::loadModel(filereader("units/walrus.md2"));
     }
 
     if (_model != NULL)
     {
         _model->setAnimation("run");
-        _topModel = (Model*)T3DSModel::loadModel("structures/turrettop.3ds",0,0,0,0.4,0.4,0.4,0);
+        _topModel = (Model*)T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,0.4,0.4,0.4,0);
     }
     else
     	printf ("Model has been initialized");

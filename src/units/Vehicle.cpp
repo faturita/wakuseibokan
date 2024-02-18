@@ -260,7 +260,7 @@ Vec3f Vehicle::dBodyGetAngularVelInBody(dBodyID body)
 void Vehicle::init()
 {
 	//Load the model
-    _model = MD2Model::loadModel("units/walrusgood.md2");
+    _model = MD2Model::loadModel(filereader("units/walrusgood.md2"));
     if (_model != NULL)
         _model->setAnimation("run");
 }

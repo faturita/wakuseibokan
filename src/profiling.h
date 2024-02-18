@@ -29,5 +29,7 @@ private:
     static int  m_nLevel;
 };
 
+char * filereader(char filename[256]);
+
 
 #endif // PROFILING_H
