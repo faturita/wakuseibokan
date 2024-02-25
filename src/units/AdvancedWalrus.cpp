@@ -26,7 +26,7 @@ void AdvancedWalrus::init()
     _model = (Model*)T3DSModel::loadModel(filereader("units/walrus.3ds"),0,0,0,1,1,1,0);
     if (_model != NULL)
     {
-        _topModel = (Model*)T3DSModel::loadModel(filereader(filereader("structures/turrettop.3ds")),0,0,0,0.1,0.1,0.1,0);
+        _topModel = (Model*)T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,0.1,0.1,0.1,0);
     }
 
     setForward(0,0,1);

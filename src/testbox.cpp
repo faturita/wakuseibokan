@@ -117,7 +117,7 @@
 
 #include "math/uuid.h"
 
-extern  Camera Camera;
+extern  Camera camera;
 
 extern  Controller controller;
 
@@ -498,14 +498,17 @@ void test1()
 
 void test2()
 {
-    SimplifiedDynamicManta *_manta1 = new AdvancedManta(GREEN_FACTION);
+    //SimplifiedDynamicManta *_manta1 = new AdvancedManta(GREEN_FACTION);
+    //SimplifiedDynamicManta *_manta1 = new SimplifiedDynamicManta(GREEN_FACTION);
+    Manta *_manta1 = new Manta(GREEN_FACTION);
 
     _manta1->init();
     _manta1->embody(world, space);
-    _manta1->setPos(0.0f,20.5f,-6000.0f);
+    _manta1->setPos(0.0f,580.5f,-6000.0f);
     _manta1->setStatus(0);
     _manta1->inert = false;
     _manta1->setStatus(FlyingStatus::FLYING);
+    _manta1->setNameByNumber(1);
     _manta1->elevator = +12;
     struct controlregister c;
     c.thrust = 1000.0f/(10.0);
@@ -514,6 +517,8 @@ void test2()
     _manta1->setThrottle(1000.0f);
 
     entities.push_back(_manta1, _manta1->getGeom());
+
+    controller.controllingid = 2;
 }
 
 void checktest2(unsigned long timer)
@@ -529,7 +534,7 @@ void checktest2(unsigned long timer)
         _manta1->setThrottle(0.0f);
         _manta1->inert = true;
     }
-    if (timer==1600)
+    if (timer==1600000)
     {
         Vehicle *_b = entities[2];
         Vec3f val = _b->getPos();
@@ -564,7 +569,7 @@ void checktest2(unsigned long timer)
 void test6()
 {
     Vec3f pos(0.0f,10.0f,-4400.0f);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     Balaenidae *b = (Balaenidae*)entities[1];
 
@@ -575,7 +580,7 @@ void test6()
 void test7()
 {
     Vec3f pos(0.0f,10.0f,-3700.0f);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void test8()
@@ -1043,7 +1048,7 @@ void test9()
     entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void checktest9(unsigned long timer)     // Check walrus stability.
@@ -2547,7 +2552,7 @@ void test27()
     entities.push_back(_b, _b->getGeom());
 
     Vec3f pos(0.0f,10.0f,-4400.0f);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     controller.controllingid = CONTROLLING_NONE;
 }
@@ -2639,12 +2644,12 @@ void test28()
     Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,0,world);
 
     Vec3f pos(4000,60.0f,-1500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
-    Camera.dy = 0;
-    Camera.dz = 0;
-    Camera.xAngle = 90;
-    Camera.yAngle = 0;
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 90;
+    camera.yAngle = 0;
 
     controller.controllingid = CONTROLLING_NONE;
 
@@ -2728,7 +2733,7 @@ void test29()
     t3->enableAuto();
 
     Vec3f pos(0.0f,60.0f,-71.0f);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void checktest29(unsigned long timer)
@@ -3141,7 +3146,7 @@ void test33()
 
 
     Vec3f pos(0.0f,60.0f,-71.0f);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 
@@ -3232,7 +3237,7 @@ void test34()
     entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(200.0,1.32,-6000 - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void checktest34(unsigned long timer)
@@ -3297,7 +3302,7 @@ void test35()
     entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void checktest35(unsigned long timer)
@@ -3412,7 +3417,7 @@ void test36()
 
 
     Vec3f pos(-230,1.32, 0);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 void checktest36(unsigned long timer)
@@ -3530,7 +3535,7 @@ void test37()
 
 
     Vec3f pos(-230,1.32, 0);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 }
 
 
@@ -3687,7 +3692,7 @@ void test38()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = GREEN_AI;
 }
@@ -3756,7 +3761,7 @@ void test39()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = GREEN_AI;
 }
@@ -3843,7 +3848,7 @@ void test40()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = GREEN_AI;
 }
@@ -3931,7 +3936,7 @@ void test41()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = GREEN_FACTION;
 }
@@ -3979,7 +3984,7 @@ void test42()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BOTH_AI;
 }
@@ -4028,7 +4033,7 @@ void test43()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -4172,7 +4177,7 @@ void test44()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -4289,7 +4294,7 @@ void test45()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -4603,7 +4608,7 @@ void checktest46(unsigned long timer)
     {
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
-            if (!((entities[i]->getPos() - Camera.getPos()).magnitude()<10000))
+            if (!((entities[i]->getPos() - camera.getPos()).magnitude()<10000))
             {
                 if (entities[i]->getBodyID() == NULL)
                 {
@@ -4739,7 +4744,7 @@ void test47()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -4795,7 +4800,7 @@ void test48()
 
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -4863,7 +4868,7 @@ void test49()
     Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -4902,7 +4907,7 @@ void test50()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -4959,7 +4964,7 @@ void test51()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5068,7 +5073,7 @@ void test52()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
@@ -5161,7 +5166,7 @@ void test53()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
@@ -5299,7 +5304,7 @@ void test54()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5380,7 +5385,7 @@ void test55()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = FREE_AI;
     controller.faction = BOTH_FACTION;
@@ -5609,7 +5614,7 @@ void test57()
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5693,7 +5698,7 @@ void test58()
     entities.push_back(_b, _b->getGeom());
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5752,7 +5757,7 @@ void test81()
     entities.push_back(_b, _b->getGeom());
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = GREEN_AI;
     controller.faction = BOTH_FACTION;
@@ -5820,7 +5825,7 @@ void test59()
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5896,7 +5901,7 @@ void test60()
     size_t idx = entities.push_back(_walrus, _walrus->getGeom());
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -5965,7 +5970,7 @@ void test61()
     entities.push_back(_b, _b->getGeom());
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -6058,7 +6063,7 @@ void test62()
     entities.push_back(_b2, _b2->getGeom());
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6223,7 +6228,7 @@ void test63()
     Structure *t17 = islands[0]->addStructure(new Warehouse(GREEN_FACTION),world);
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     controller.faction = BOTH_FACTION;
 }
@@ -6311,7 +6316,7 @@ void test64()
     Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6410,7 +6415,7 @@ void test65()
     Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6473,7 +6478,7 @@ void test66()
     Structure *t17 = islands[0]->addStructure(new Warehouse(BLUE_FACTION),world);
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6588,7 +6593,7 @@ void test67()
 
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6636,7 +6641,7 @@ void test68()
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,33,world);
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6752,7 +6757,7 @@ void test69()
 
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6812,7 +6817,7 @@ void test70()
 
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6966,7 +6971,7 @@ void test72()
 
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;
@@ -6988,8 +6993,8 @@ void checktest72(unsigned long timer)
     {
         controller.controllingid = CONTROLLING_NONE;
         Vec3f pos(10.0f,10.0f,-30.0f);
-        Camera.setPos(pos);
-        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+        camera.setPos(pos);
+        camera.fw = Vec3f(0.0f,0.0f,1.0f);
     }
 
     if (timer == 300)
@@ -7524,8 +7529,8 @@ void checktest79(unsigned long timer)
     {
         controller.controllingid = CONTROLLING_NONE;
         Vec3f pos(-5000,1000.0f,-5500);
-        Camera.setPos(pos);
-        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+        camera.setPos(pos);
+        camera.fw = Vec3f(0.0f,0.0f,1.0f);
     }
 
     if (timer == 3000)
@@ -7631,7 +7636,7 @@ void test82()
     Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
 
     Vec3f pos(0.0,1.32, - 60);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;

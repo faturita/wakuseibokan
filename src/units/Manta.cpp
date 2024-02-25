@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "Manta.h"
 #include "../md2model.h"
+#include "../profiling.h"
 #include "../actions/Gunshot.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
@@ -40,7 +41,7 @@ void Manta::dogfight(Vec3f target)
 void Manta::init()
 {
     //Load the model
-    _model = MD2Model::loadModel("mantagood.md2");
+    _model = MD2Model::loadModel(filereader("units/mantagood.md2"));
     if (_model != NULL)
         _model->setAnimation("run");
 

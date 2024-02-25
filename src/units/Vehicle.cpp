@@ -508,7 +508,6 @@ float Vehicle::getHealth() const
 void Vehicle::damage(float amount)
 {
     Vehicle::health-=amount;
-    std::cout << "Vehicle damage: " << getHealth() << std::endl;
 }
 
 void Vehicle::destroy()
