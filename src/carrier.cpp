@@ -1364,7 +1364,10 @@ void update(int value)
                         messages.insert(messages.begin(), mg);
                     }
 
-                    if (entities[i]->getType() != VehicleTypes::WEAPON)
+                    if ((entities[i]->getType() == VehicleTypes::MANTA) || (entities[i]->getType() == VehicleTypes::WALRUS) || 
+                        (entities[i]->getType() == VehicleTypes::CARRIER) ||
+                        (entities[i]->getType() == VehicleTypes::COLLISIONABLE) || 
+                        (entities[i]->getType() == VehicleTypes::CONTROL))
                     {
                         Vec3f loc = entities[i]->getPos();
                         explosion(loc);

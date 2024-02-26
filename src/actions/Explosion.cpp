@@ -7,7 +7,7 @@ extern container<Vehicle*> entities;
 
 Explosion::Explosion()
 {
-    Vehicle::setTtl(150);
+    Vehicle::setTtl(150); 
 }
 
 void Explosion::expand(float height, float length, float width, float dense, dWorldID world, dSpaceID space)
@@ -33,7 +33,7 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
 
     for(int w=-dense;w<dense;w++)
     {
-        for (int l=-dense;w<dense;w++)
+        for (int l=-dense;l<dense;l++)
         {
             for (int h=-dense;h<dense;h++)
             {
@@ -44,6 +44,7 @@ void Explosion::expand(float height, float length, float width, float dense, dWo
                 Vec3f randloc = Vec3f((rand() % 10 -5 +1)*0.1,(rand() % 10 -5 +1)*0.1,(rand() % 10 -5 +1)*0.1);
                 Vec3f strideloc = Vec3f(loc[0]+w*stride_width,loc[1]+h*stride_height,loc[2]+l*stride_length);
                 b1->setPos(randloc + strideloc);
+                b1->antigravity(b1->getBodyID());
                 b1->stop();
 
                 Vec3f targ;

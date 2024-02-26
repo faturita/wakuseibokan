@@ -562,7 +562,7 @@ void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space)
         Vec3f loc = v->getPos();
         splash(loc);
 
-        Explosion* b1 = new Explosion();
+        Explosion* b1 = new Explosion(); 
         b1->init();
         b1->setTexture(textures["water"]);
         b1->embody(world, space);
