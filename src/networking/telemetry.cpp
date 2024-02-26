@@ -94,8 +94,6 @@ void inittelemetry()
 
     int iendpoints = atoi(endpoints);
 
-    dout << iendpoints << std::endl;
-
     for(int i=0;i<iendpoints;i++)
     {
         char telkey[256];

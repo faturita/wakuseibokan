@@ -1283,6 +1283,15 @@ void update(int value)
                 // @NOTE: Extra safeguard (ODE stability issues).
                 entities[i]->stop();
             }
+
+            // @NOTE: This is a guardrail to avoid too many bullets moving around that turn the game unplayable.
+            if (fps<10 && ( (entities[i]->getType() == VehicleTypes::EXPLOTABLEACTION) ||
+            (entities[i]->getType() == VehicleTypes::CONTROLABLEACTION) ||
+            (entities[i]->getTypeId() == EntityTypeId::TDebris) ) )
+            {
+                entities[i]->damage(100);
+            }
+
             entities[i]->doDynamics();
             entities[i]->tick();
 
@@ -1438,9 +1447,7 @@ int main(int argc, char** argv) {
     uint32_t bufsize = PATH_MAX;
     if(!_NSGetExecutablePath(buf, &bufsize))
     {
-      puts(buf);
-      strncpy(WORKING_PATH, buf, strlen(buf)-4);
-      puts(WORKING_PATH);
+      strncpy(WORKING_PATH, buf, strlen(buf)-(strlen(argv[0])-2));
     }
 #else
     strncpy(WORKING_PATH,".",1);
