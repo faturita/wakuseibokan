@@ -40,7 +40,7 @@ extern std::vector<BoxIsland*> islands;
 extern dWorldID world;
 extern dSpaceID space;
 extern int testing;
-extern  Camera Camera;
+extern  Camera camera;
 extern int  aiplayer;
 
 TestCase_113::TestCase_113()
@@ -81,7 +81,7 @@ void TestCase_113::init()
 
     //Vec3f pos(0.0,1.32, - 3500);
     Vec3f pos(-10,1.32,10);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
@@ -123,8 +123,8 @@ int TestCase_113::check(unsigned long timertick)
 
         pos += Vec3f(200.0f,10,-100.0-500.0);
 
-        Camera.setPos(pos);
-        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+        camera.setPos(pos);
+        camera.fw = Vec3f(0.0f,0.0f,1.0f);
 
     }
 
@@ -136,8 +136,8 @@ int TestCase_113::check(unsigned long timertick)
 
         pos += Vec3f(450.0f,10,340.0-500.0);
 
-        Camera.setPos(pos);
-        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+        camera.setPos(pos);
+        camera.fw = Vec3f(0.0f,0.0f,1.0f);
 
     }
 
@@ -149,8 +149,8 @@ int TestCase_113::check(unsigned long timertick)
 
         pos += Vec3f(-450.0f,10,340.0-500.0);
 
-        Camera.setPos(pos);
-        Camera.fw = Vec3f(0.0f,0.0f,1.0f);
+        camera.setPos(pos);
+        camera.fw = Vec3f(0.0f,0.0f,1.0f);
 
     }
 

@@ -7648,6 +7648,64 @@ void checktest82(unsigned long timer)
 }
 
 
+void test83()
+{
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,-0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(3100.0f,-1.0,-0.0f);
+    thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
+
+    islands.push_back(thermopilae);
+
+
+    Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+    _walrus->init();
+    _walrus->embody(world, space);
+    _walrus->setPos(0.0f,20.5f,2000);
+    _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setSignal(4);
+
+    size_t idx = entities.push_back(_walrus, _walrus->getGeom());
+
+
+    Vec3f pos(0.0,1.32, - 3500);
+    camera.setPos(pos);
+
+    //aiplayer = BOTH_AI;
+    controller.faction = BOTH_FACTION;
+
+
+}
+
+void checktest83(unsigned long timer)
+{
+    if (timer == 10000000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+    }
+}
+
+
 
 static int testing=-1;
 
@@ -7777,6 +7835,7 @@ void initWorldModelling(int testcase)
     case 80:test80();break;                         // Check multiple controllers and the command order.
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
+    case 83:test83();break;                         // Check walrus flow dynamics on water
     default:initIslands();test1();break;
     }
 
@@ -7876,6 +7935,7 @@ void worldStep(int value)
     case 79:checktest79(timer);break;
     case 80:checktest80(timer);break;
     case 81:checktest81(timer);break;
+    case 83:checktest83(timer);break;
     default: break;
     }
 

@@ -37,7 +37,7 @@ extern std::vector<BoxIsland*> islands;
 extern dWorldID world;
 extern dSpaceID space;
 extern int testing;
-extern  Camera Camera;
+extern  Camera camera;
 extern int  aiplayer;
 
 TestCase_<TC>::TestCase_118()

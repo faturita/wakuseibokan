@@ -32,7 +32,7 @@ extern std::vector<BoxIsland*> islands;
 extern dWorldID world;
 extern dSpaceID space;
 extern int testing;
-extern  Camera Camera;
+extern  Camera camera;
 
 TestCase_103::TestCase_103()
 {
@@ -119,7 +119,7 @@ void TestCase_103::init()
 
 
     Vec3f pos(0.0,1.32, - 3500);
-    Camera.setPos(pos);
+    camera.setPos(pos);
 
     //aiplayer = BOTH_AI;
     controller.faction = BOTH_FACTION;

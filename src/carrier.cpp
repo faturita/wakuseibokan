@@ -601,8 +601,16 @@ void drawScene() {
 
     // @KDTree or voronoi
     BoxIsland *b = findNearestIsland(pos);
-    Vec3f offset = b->getPos();
-    if (gamemode == TOTALWAR) offset = Vec3f(0,0,0);
+    Vec3f offset; 
+    if (gamemode == TOTALWAR || !b) 
+    {
+        offset = Vec3f(0,0,0);
+    }
+    else
+    {
+        offset = b->getPos();
+    }
+    
     
     Vec3f relPos = adjustViewLocation(offset,pos);
     camera.lookAtFrom(up, relPos, forward);
@@ -1611,7 +1619,7 @@ int main(int argc, char** argv) {
 
     CLog::Write(CLog::Debug,"ODE Configuration: %s\n", conf);
 
-    // Draw vehicles and objects
+    // Dump vehicles and objects
     CLog::Write(CLog::Debug,"Size %d\n", entities.size());
     synchronized(entities.m_mutex)
     {

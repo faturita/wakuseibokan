@@ -38,7 +38,7 @@ extern std::vector<BoxIsland*> islands;
 extern dWorldID world;
 extern dSpaceID space;
 extern int testing;
-extern  Camera Camera;
+extern  Camera camera;
 extern int  aiplayer;
 
 TestCase_120::TestCase_120()
@@ -157,11 +157,11 @@ void TestCase_120::init()
 
 
     Vec3f pos(0,10,-4000);
-    Camera.setPos(pos);
-    Camera.dy = 0;
-    Camera.dz = 0;
-    Camera.xAngle = 0;
-    Camera.yAngle = 0;
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
     controller.controllingid = CONTROLLING_NONE;
 
     aiplayer = BOTH_AI;
