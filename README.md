@@ -305,3 +305,5 @@ More info
 * Game Networking https://pvigier.github.io/2019/09/08/beginner-guide-game-networking.html
 * https://github.com/medialab-ku/openGLESbook
 * https://github.com/federico-busato/Modern-CPP-Programming
+* CubbyFlow Open flow dynamic engine https://github.com/CubbyFlow/CubbyFlow
+* Flow Dynamics Engine https://github.com/BlainMaguire/3dfluid?tab=readme-ov-file
