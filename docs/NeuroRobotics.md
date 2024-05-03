@@ -1,10 +1,16 @@
+# Trabajo Práctico
+
+Este trabajo consiste en utilizando el escenario 111, proponer un *agente* que reciba la información de los dos tanques, y desarrolle una estrategia para ganar la batalla.  Una vez desarrollada, la estrategia la vamos a estar probando en la "arena" del simulador en un esquema de play-offs.  Quien gane el torneo, obtendra la nota más alta, en tanto que los subsiguiente iran obteniendo las notas sucesivas.  Completado el torneo cada equipo deberá escribir una informe de dos carillas, describiendo los detalles de la estrategia implementada.
+
 # Escenario 111
 
 Este escenario consiste en dos tanques que arrancan en una isla plana.  Los dos tanques tienen como objetivo identificar la posición del otro y dispararle hasta destruirlo.  El valor de "health" inicial es 1000 así como el de "power".  Si se van al agua o quedan dados de vuelta se reduce la salud.  Cada vez que disparan se consume un punto de energía.
 
 Tener en cuenta que las localizaciones al inicio son siempre aleatorias, así como las orientaciones.
 
-Tener presente que el cliente puntualmente puede correr en cualquier computadora, sólo necesita tener la capacidad para enviar y recibir UDP (conectividad) y poder hacer los cálculos que son necesarios para determinar la acción correspondiente.  Es decir, el simulador es más restrictivo con el tipo de sistema operativo, pero el cliente no.
+El simulador necesita correr en un servidor linux, mac o eventualmente windows.  Requiere además compilarse en cada uno de los sistemas.  Para correr requiere bastante capacidad de procesamiento.
+
+El cliente por otro lado, puede correr en cualquier computadora, sólo necesita tener la capacidad para enviar y recibir UDP (conectividad) y poder hacer los cálculos que son necesarios para determinar la acción correspondiente.  Es decir, el simulador es más restrictivo con el tipo de sistema operativo, pero el cliente no.
 
 La bala sale con una velocidad inicial de 600 m/s.  El ángulo de tiro es directamente el valor en grados en “pitch” con 90 grados positivo apuntando al zenith.
 
