@@ -24,7 +24,7 @@ Estas computadoras tienen sistema operativo Linux, el SO de los hackers.  Les va
 * 2- Tienen que abrir la terminal
 * 3- Escriben y ejecutan
 ```bash
-sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev
+sudo apt-get install libbsd-dev git libasound2 libasound2-dev
 ```
 * 4- Descargan el proyecto del game engine: 
 ```bash
