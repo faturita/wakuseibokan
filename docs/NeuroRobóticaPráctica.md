@@ -33,9 +33,12 @@ git clone https://github.com/faturita/wakuseibokan.git
 
 ```bash
 sudo apt-get install python3-numpy
+cd wakuseibokan/scripts
 ```
 
-
+```bash
+python3 Controller.py
+```
 
 HASTA ACA
 
