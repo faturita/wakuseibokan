@@ -20,17 +20,17 @@ La cosa es así: Vamos a descargar un juego completo que va a servir de platafor
 
 Estas computadoras tienen sistema operativo Linux, el SO de los hackers.  Les va a resultar intuitivo usarlo.
 
-1- Se tienen que conectar a la red del ITBA invitados.
-2- Tienen que abrir la terminal
-3- Escriben y ejecutan
+* 1- Se tienen que conectar a la red del ITBA invitados.
+* 2- Tienen que abrir la terminal
+* 3- Escriben y ejecutan
 ```bash
 sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev
 ```
-4- Descargan el proyecto del game engine: 
+* 4- Descargan el proyecto del game engine: 
 ```bash
 git clone git@github.com:faturita/wakuseibokan.git
 ```
-5- Primero hay que compilar un motor ODE:
+* 5- Primero hay que compilar un motor ODE:
 ```bash
 cp wakuseibokan/dependencies/ode.tgz
 tar xvzf ode.tgz
@@ -41,7 +41,7 @@ make
 sudo make install
 cd ..
 ```
-6- Ahora hay que compilar el driver de sonido:
+* 6- Ahora hay que compilar el driver de sonido:
 ```bash
 cp wakuseibokan/dependencies/stk.tgz ../../
 tar xvzf stk.tgz
@@ -52,7 +52,7 @@ make
 sudo make install
 cd ..
 ```
-7- Finalmente hay que compilar el propio motor:
+* 7- Finalmente hay que compilar el propio motor:
 ```bash
 export LD_LIBRARY_PATH=/usr/local/lib/
 cd wakuseibokan
