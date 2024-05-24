@@ -30,6 +30,15 @@ sudo apt-get install libbsd-dev git libasound2 libasound2-dev
 ```bash
 git clone https://github.com/faturita/wakuseibokan.git
 ```
+
+```bash
+sudo apt-get install python3-numpy
+```
+
+
+
+HASTA ACA
+
 * 5- Primero hay que compilar un motor ODE:
 ```bash
 cp wakuseibokan/dependencies/ode.tgz .
