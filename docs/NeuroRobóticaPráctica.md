@@ -28,7 +28,7 @@ sudo apt-get install libbsd-dev git libasound2 libasound2-dev
 ```
 * 4- Descargan el proyecto del game engine: 
 ```bash
-git clone git@github.com:faturita/wakuseibokan.git
+git clone https://github.com/faturita/wakuseibokan.git
 ```
 * 5- Primero hay que compilar un motor ODE:
 ```bash
