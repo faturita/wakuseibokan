@@ -32,7 +32,7 @@ git clone https://github.com/faturita/wakuseibokan.git
 ```
 * 5- Primero hay que compilar un motor ODE:
 ```bash
-cp wakuseibokan/dependencies/ode.tgz
+cp wakuseibokan/dependencies/ode.tgz .
 tar xvzf ode.tgz
 cd ode
 ./bootstrap
