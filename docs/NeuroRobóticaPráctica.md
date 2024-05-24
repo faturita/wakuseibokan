@@ -61,8 +61,27 @@ make
 
 # Escenario 111
 
+## Compilación
+Hay que realizar la compilación del escenario en sí mismo, que corre sobre el motor.
+
+```bash
+make testcase TC=111
+```
+
+Luego lo pueden ejecutar con:
+```bash
+./testcase -mute -nointro -random
+```
+
+El detalle de los parámetros los pueden encontrar en: https://github.com/faturita/wakuseibokan
+
+## Descripción del Trabajo
+
 Este trabajo consiste en utilizando el escenario 111, proponer un *agente* que reciba la información de los dos tanques, y desarrolle una estrategia para ganar la batalla.  Una vez desarrollada, la estrategia la vamos a estar probando en la "arena" del simulador en un esquema de play-offs.  Quien gane el torneo, obtendra la nota más alta, en tanto que los subsiguiente iran obteniendo las notas sucesivas.  Completado el torneo cada equipo deberá escribir una informe de dos carillas, describiendo los detalles de la estrategia implementada.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6zzyJAs3FTQ?si=JlWUqoYbEWtykpxJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+# Descripción del Escenario
 Este escenario consiste en dos tanques que arrancan en una isla plana.  Los dos tanques tienen como objetivo identificar la posición del otro y dispararle hasta destruirlo.  El valor de "health" inicial es 1000 así como el de "power".  Si se van al agua o quedan dados de vuelta se reduce la salud.  Cada vez que disparan se consume un punto de energía.
 
 Tener en cuenta que las localizaciones al inicio son siempre aleatorias, así como las orientaciones.
