@@ -134,9 +134,24 @@ export LD_LIBRARY_PATH=/usr/local/lib/
 
 Ubuntu Packages
 ---------------
+**Tested with Ubuntu 20.02.4**
 
  libbsd-dev  freeglut3-dev
  libasound2  libasound2-dev
+
+<details>
+ <summary>Setting up a Ubuntu Dev Box</summary>
+ 
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev
+sudo apt-get install git make gcc g++
+sudo apt-get install python3-pip
+ ```
+ 
+ </details>
+ 
 
 # Compiling the game
 
