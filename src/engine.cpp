@@ -598,7 +598,8 @@ void groundexplosion(Vehicle* v, dWorldID world, dSpaceID space)
 
         entities.push_back(b1, b1->getGeom());
 
-        b1->expand(10,10,10,2,world, space);
+        // Remove this to allow @FIXME the simulator to work faster.
+        //b1->expand(10,10,10,2,world, space);
 
         Gunshot *g = (Gunshot*)v;
         v->damage(10000);

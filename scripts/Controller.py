@@ -59,9 +59,9 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
     # This is the structure fron CommandOrder
     data=pack("iffffffiLiiifffi?i",
         controllingid,
-        thrust,
+        thrust,     # Forward or backward
         roll,
-        pitch,
+        pitch,      # Left or right turn
         yaw,
         precesion,
         bank,

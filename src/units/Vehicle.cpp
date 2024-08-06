@@ -788,6 +788,16 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
         return false;
     }
 
+    
+    if (getPos()[1]<3.0)
+    {
+        static int counter = 0;
+        counter++;
+
+        float force = sin((1.0/2000.0) * 2 * PI * counter)*10;   // From 0.2 -- 1.0
+        dout << "Force:" << force << std::endl;
+        dBodyAddForceAtRelPos(who,0,force,0,0,0,3);
+    }
 
     return true;
 }
