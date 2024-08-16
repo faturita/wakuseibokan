@@ -151,7 +151,6 @@ sudo apt-get install python3-pip
  ```
  
  </details>
- 
 
 # Compiling the game
 
@@ -219,12 +218,37 @@ The map can be activated by pressing "@".  And the main view can be restored by 
 
 There are several scenarios in the engine that are used for research and as test cases.
 
-The scenario 111 is the tank battleground:
+The scenario 111 is the tank battleground.  To compile everything do:
+
+```bash
+cd wakuseibokan
+cp dependencies/stk.tgz ../../
+cd ../../
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+cd ..
+cp dependencies/ode.tgz ../../
+cd ../../
+tar xvzf ode.tgz
+cd ode
+ ./configure --disable-asserts
+ make clean && make && sudo make install
+cd ..
+cd wakuseibokan
+```
+
+and then compile the scenario itself from the same directory.
 
 ```bash
  make testcase TC=111
- ./testcase -mute -random
+ ./testcase -mute -nointro 
 ```
+
+It is possible to add -seed NN to set a seed number for the simulation.
 
 # Description
 
