@@ -61,6 +61,177 @@ TestCase_111::TestCase_111()
 
 }
 
+void TestCase_111::addTank1(BoxIsland *nemesis)
+{
+    // 6,3,12
+    Otter *_otter = new Otter(GREEN_FACTION);
+    _otter->init();
+    dSpaceID car_space = _otter->embody_in_space(world, space);
+
+    Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
+    _otter->setPos(p);
+    _otter->stop();
+    _otter->setSignal(4);
+    _otter->setNameByNumber(1);
+    _otter->setStatus(SailingStatus::SAILING);
+    _otter->setIsland(nemesis);
+
+    Vec3f dimensions(5.0f,4.0f,10.0f);
+
+    size_t id = entities.push_back(_otter, _otter->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _otter->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+    dMatrix3 Re2;
+    dRSetIdentity(Re2);
+    //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
+
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
+
+    dBodySetRotation(_otter->getBodyID(),Re2);
+
+    //_otter->goTo(Vec3f(0,0,340));
+    _otter->enableAuto();
+    _otter->enableTelemetry();
+
+    Wheel *l,*r,*bl,*br;
+    _otter->setPos(p);
+    _otter->getWheels(l,r,bl,br);
+    l->setPos(p);
+    r->setPos(p);
+    bl->setPos(p);
+    br->setPos(p);
+
+    // To allow resets.
+    controller.controllingid = id;
+}
+
+void TestCase_111::addTank2(BoxIsland *nemesis)
+{
+    // 6,3,12
+    Otter *_otter = new Otter(BLUE_FACTION);
+    _otter->init();
+    dSpaceID car_space = _otter->embody_in_space(world, space);
+
+    Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
+    _otter->setPos(p);
+    _otter->stop();
+    _otter->setSignal(4);
+    _otter->setNameByNumber(2);
+    _otter->setStatus(SailingStatus::SAILING);
+    _otter->setIsland(nemesis);
+
+    Vec3f dimensions(5.0f,4.0f,10.0f);
+
+    entities.push_back(_otter, _otter->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(BLUE_FACTION, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(BLUE_FACTION, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(BLUE_FACTION, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(BLUE_FACTION, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _otter->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+    dMatrix3 Re2;
+    dRSetIdentity(Re2);
+    //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0 )*100 , ( (int)PI/2.0)/10.0 )/100.0    );
+    dBodySetRotation(_otter->getBodyID(),Re2);
+
+    //_otter->goTo(Vec3f(0,0,340));
+    _otter->enableAuto();
+    _otter->enableTelemetry();
+
+    Wheel *l,*r,*bl,*br;
+    _otter->setPos(p);
+    _otter->getWheels(l,r,bl,br);
+    l->setPos(p);
+    r->setPos(p);
+    bl->setPos(p);
+    br->setPos(p);
+}
+
+void TestCase_111::reset(BoxIsland *nemesis)
+{
+    addTank1(nemesis);
+    addTank2(nemesis);
+}
+
 void TestCase_111::init()
 {
 
@@ -107,8 +278,6 @@ void TestCase_111::init()
     }
     **/
 
-
-
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
     nemesis->setLocation(0.0f,-1.0,0.0f);
@@ -116,175 +285,7 @@ void TestCase_111::init()
 
     islands.push_back(nemesis);
 
-    {
-        // 6,3,12
-        Otter *_otter = new Otter(GREEN_FACTION);
-        _otter->init();
-        dSpaceID car_space = _otter->embody_in_space(world, space);
-
-        Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
-        _otter->setPos(p);
-        _otter->stop();
-        _otter->setSignal(4);
-        _otter->setNameByNumber(1);
-        _otter->setStatus(SailingStatus::SAILING);
-        _otter->setIsland(nemesis);
-
-        Vec3f dimensions(5.0f,4.0f,10.0f);
-
-        entities.push_back(_otter, _otter->getGeom());
-
-
-
-        Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
-        _fr->init();
-        _fr->embody(world, car_space);
-        _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
-        _fr->stop();
-
-        entities.push_back(_fr, _fr->getGeom());
-
-
-        Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
-        _fl->init();
-        _fl->embody(world, car_space);
-        _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
-        _fl->stop();
-
-        entities.push_back(_fl, _fl->getGeom());
-
-
-        Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
-        _br->init();
-        _br->embody(world, car_space);
-        _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
-        _br->stop();
-
-        entities.push_back(_br, _br->getGeom());
-
-
-        Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
-        _bl->init();
-        _bl->embody(world, car_space);
-        _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
-        _bl->stop();
-
-        entities.push_back(_bl, _bl->getGeom());
-
-        _otter->addWheels(_fl, _fr, _bl, _br);
-
-        _fl->setSteering(true);
-        _fr->setSteering(true);
-
-        dMatrix3 Re2;
-        dRSetIdentity(Re2);
-        //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-
-        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
-
-        dBodySetRotation(_otter->getBodyID(),Re2);
-
-        //_otter->goTo(Vec3f(0,0,340));
-        _otter->enableAuto();
-        _otter->enableTelemetry();
-
-        Wheel *l,*r,*bl,*br;
-        _otter->setPos(p);
-        _otter->getWheels(l,r,bl,br);
-        l->setPos(p);
-        r->setPos(p);
-        bl->setPos(p);
-        br->setPos(p);
-    }
-
-
-    {
-        // 6,3,12
-        Otter *_otter = new Otter(BLUE_FACTION);
-        _otter->init();
-        dSpaceID car_space = _otter->embody_in_space(world, space);
-
-        Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
-        _otter->setPos(p);
-        _otter->stop();
-        _otter->setSignal(4);
-        _otter->setNameByNumber(2);
-        _otter->setStatus(SailingStatus::SAILING);
-        _otter->setIsland(nemesis);
-
-        Vec3f dimensions(5.0f,4.0f,10.0f);
-
-        entities.push_back(_otter, _otter->getGeom());
-
-
-
-        Wheel * _fr= new Wheel(BLUE_FACTION, 0.001, 30.0);
-        _fr->init();
-        _fr->embody(world, car_space);
-        _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
-        _fr->stop();
-
-        entities.push_back(_fr, _fr->getGeom());
-
-
-        Wheel * _fl= new Wheel(BLUE_FACTION, 0.001, 30.0);
-        _fl->init();
-        _fl->embody(world, car_space);
-        _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
-        _fl->stop();
-
-        entities.push_back(_fl, _fl->getGeom());
-
-
-        Wheel * _br= new Wheel(BLUE_FACTION, 0.001, 30.0);
-        _br->init();
-        _br->embody(world, car_space);
-        _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
-        _br->stop();
-
-        entities.push_back(_br, _br->getGeom());
-
-
-        Wheel * _bl= new Wheel(BLUE_FACTION, 0.001, 30.0);
-        _bl->init();
-        _bl->embody(world, car_space);
-        _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
-        _bl->stop();
-
-        entities.push_back(_bl, _bl->getGeom());
-
-        _otter->addWheels(_fl, _fr, _bl, _br);
-
-        _fl->setSteering(true);
-        _fr->setSteering(true);
-
-        dMatrix3 Re2;
-        dRSetIdentity(Re2);
-        //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-        dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0 )*100 , ( (int)PI/2.0)/10.0 )/100.0    );
-        dBodySetRotation(_otter->getBodyID(),Re2);
-
-        //_otter->goTo(Vec3f(0,0,340));
-        _otter->enableAuto();
-        _otter->enableTelemetry();
-
-        Wheel *l,*r,*bl,*br;
-        _otter->setPos(p);
-        _otter->getWheels(l,r,bl,br);
-        l->setPos(p);
-        r->setPos(p);
-        bl->setPos(p);
-        br->setPos(p);
-    }
-
-
-    Vec3f pos(-10,1.32,10);
-    camera.setPos(pos);
-
-    aiplayer = FREE_AI;
-    controller.faction = BOTH_FACTION;
-
-    endtimer = 0;
+    reset(nemesis);
 
 }
 
@@ -357,6 +358,20 @@ int TestCase_111::check(unsigned long timertick)
                 //co.push(mesg.order);
 
                 _b->doControl(co);
+
+                if (mesg1.order.command == Command::JoinOrder)
+                {
+                    timer = 0;
+                    Vehicle* _b1 = findWalrus(GREEN_FACTION);
+                    _b1->damage(100000);
+                    Vehicle* _b2 = findWalrus(BLUE_FACTION);
+                    _b2->damage(100000);
+                    printf("FDSAFDSAFASDFAFA");
+                    distanceblue = 0;
+                    distancegreen = 0;
+                    BoxIsland *nemesis = findNearestIsland(_b->getPos());
+                    reset(nemesis);
+                }
 
 
                 if (mesg1.order.command == Command::FireOrder && _b->getPower()>0)

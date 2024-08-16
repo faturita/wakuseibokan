@@ -47,6 +47,9 @@ public:
     bool done();
     bool passed();
     std::string failedMessage();
+    void addTank1(BoxIsland *island);
+    void addTank2(BoxIsland *island);
+    void reset(BoxIsland *island);
 };
 
 

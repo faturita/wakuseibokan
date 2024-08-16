@@ -1469,10 +1469,17 @@ int main(int argc, char** argv) {
     CLog::SetLevel(CLog::None);
 #endif
 
-    if (isPresentCommandLineParameter(argc,argv,"-random"))
-        srand (time(NULL));
+    if (isPresentCommandLineParameter(argc,argv,"-seed"))
+    {
+        int seed = getDefaultedIntCommandLineParameter(argc,argv,"-seed",0);
+        srand( seed );
+        srand48(seed);
+    }
     else
-        srand (0);
+    {
+        srand (time(NULL));
+        srand48(time(NULL));
+    }
 
     if (isPresentCommandLineParameter(argc,argv,"-mute"))
         mute = true;

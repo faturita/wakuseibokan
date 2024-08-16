@@ -64,7 +64,8 @@ class Controller:
         elif (self.tank == 2):
             command = Command('127.0.0.1', 4502)
 
-        while (True):
+        shouldrun = True
+        while (shouldrun):
             #try:
                 tank1values = self.read()
                 if int(tank1values[td['number']]) != 1:
@@ -83,7 +84,7 @@ class Controller:
                     othervalues = tank1values
 
                 #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['bearing']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['bearing']]}")              
-                print (f"Health: {myvalues[td['health']]}")
+                print (f"Time: {myvalues[td['timer']]} Health: {myvalues[td['health']]}")
                 self.recorder.recordvalues(myvalues,othervalues)
 
 
@@ -101,6 +102,16 @@ class Controller:
                 if polardistance < 1700:
                     thrust = 10.0
                     steering = 0
+
+                # If you want to FIRE the weapon no do this:
+                # command.fire()
+                #   This will set the variable command.command to 11 and will fire the weapon on the simulator.
+                #   This will fire only once, because the alue will be reset the next time.
+
+                #if (int(myvalues[td['timer']]) == 6000):
+                #    # This allow RESETS of the simulation
+                #    command.command = 13
+                #    shouldrun = False
 
                 command.send_command(myvalues[td['timer']],self.tank,thrust,
                                      steering,
