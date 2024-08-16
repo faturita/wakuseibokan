@@ -245,7 +245,7 @@ and then compile the scenario itself from the same directory.
 
 ```bash
  make testcase TC=111
- ./testcase -mute -random -nointro 
+ ./testcase -mute -nointro 
 ```
 
 It is possible to add -seed NN to set a seed number for the simulation.
