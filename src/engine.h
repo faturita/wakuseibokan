@@ -217,6 +217,7 @@ Structure* findStructureFromIsland(BoxIsland *is, int subtype);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
+Vehicle* findCarrier(size_t &index, int faction);
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
 
 void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);

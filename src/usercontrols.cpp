@@ -117,10 +117,12 @@ void processMouse(int button, int state, int x, int y) {
 
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
+        // @NOTE: The following are the vehicles that allow mouse control on activation by changing pitch and roll.
         if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
                 ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) ||
                  (entities[controller.controllingid]->getType() == CONTROLABLEACTION)   ||
-                 (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ) )
+                 (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ||
+                 (entities[controller.controllingid]->getType() == VehicleTypes::WEAPON)) )
         {
             CLog::Write(CLog::Debug,"Active control\n");
             // Activate airplane controller.
@@ -356,6 +358,17 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 switchControl(content);
 
+            } else
+            if (controller.str.find("carrier") != std::string::npos)
+            {
+                Vehicle *v = findCarrier(controller.faction);
+                if (v)
+                {
+                    size_t index = CONTROLLING_NONE;
+                    Vehicle *b = findCarrier(index, v->getFaction());
+                    
+                    switchControl(index);
+                }
             } else
             if (controller.str.find("timer") != std::string::npos && tracemode == REPLAY)
             {

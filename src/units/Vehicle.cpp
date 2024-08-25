@@ -791,11 +791,12 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     
     if (getPos()[1]<3.0)
     {
+        // @NOTE: The counter should come from something related to the ocean level, a global parameter.
         static int counter = 0;
         counter++;
 
         float force = sin((1.0/2000.0) * 2 * PI * counter)*10;   // From 0.2 -- 1.0
-        dout << "Force:" << force << std::endl;
+        //dout << "Force:" << force << std::endl;
         dBodyAddForceAtRelPos(who,0,force,0,0,0,3);
     }
 

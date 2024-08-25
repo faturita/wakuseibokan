@@ -108,10 +108,10 @@ class Controller:
                 #   This will set the variable command.command to 11 and will fire the weapon on the simulator.
                 #   This will fire only once, because the alue will be reset the next time.
 
-                #if (int(myvalues[td['timer']]) == 6000):
-                #    # This allow RESETS of the simulation
-                #    command.command = 13
-                #    shouldrun = False
+                if (int(myvalues[td['timer']]) == 1000):
+                    # This allow RESETS of the simulation
+                    command.command = 13
+                    #shouldrun = False
 
                 command.send_command(myvalues[td['timer']],self.tank,thrust,
                                      steering,

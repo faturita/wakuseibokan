@@ -347,7 +347,7 @@ int TestCase_111::check(unsigned long timertick)
 
             if ((timer-mesg1.sourcetimer)>30000)
             {
-                printf("Message IGNORED !!!");
+                printf("Received Command Message is too old, IGNORED !!!\n");
             }
             else if (_b)
             {
@@ -366,7 +366,7 @@ int TestCase_111::check(unsigned long timertick)
                     _b1->damage(100000);
                     Vehicle* _b2 = findWalrus(BLUE_FACTION);
                     _b2->damage(100000);
-                    printf("FDSAFDSAFASDFAFA");
+                    dout << "Cleaning up sceneario to start it over again." << std::endl;
                     distanceblue = 0;
                     distancegreen = 0;
                     BoxIsland *nemesis = findNearestIsland(_b->getPos());

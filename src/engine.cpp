@@ -880,6 +880,20 @@ Walrus* findWalrus(int status, int faction)
     return findWalrus(status,faction,1);
 }
 
+Vehicle* findCarrier(size_t &index, int faction)
+{
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v->getType() == CARRIER && v->getFaction() == faction)
+        {
+            index = i;
+            return v;
+        }
+    }
+    return NULL;
+}
+
 Vehicle* findCarrier(int faction)
 {
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
