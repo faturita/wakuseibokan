@@ -112,7 +112,8 @@ enum EntityTypeId {
     TShell = 44,
     TTorpedo = 45,
     TTurtle = 46,
-    TArmory = 47
+    TArmory = 47,
+    TWindTurbine = 48
 };
 
 
