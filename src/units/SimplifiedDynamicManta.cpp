@@ -1121,12 +1121,15 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         Ft[1] = Ft[1] + forcesOnBody[1];
         Ft[2] = Ft[2] + forcesOnBody[2];
 
-        dBodyAddRelForce(body, Ft[0],Ft[1],Ft[2]);
+        if (getPower()>0)
+            dBodyAddRelForce(body, Ft[0],Ft[1],Ft[2]);
 
         dBodyAddTorque(body, 0.0f, Ml, 0.0f);
 
         //CLog::Write(CLog::Debug,"%8.4f\t%8.4f\t%6.4f\t",speed, alpha*180.0/PI, beta*180.0/PI);
         //dout << Ft << std::endl;
+
+
     }
 
     wrapDynamics(body);
@@ -1624,4 +1627,9 @@ Vehicle* SimplifiedDynamicManta::fireAmmo(dWorldID world, dSpaceID space)
 EntityTypeId SimplifiedDynamicManta::getTypeId()
 {
     return EntityTypeId::TSimplifiedDynamicManta;
+}
+
+float SimplifiedDynamicManta::getEnergyConsumption()
+{
+    return 0.0001;
 }

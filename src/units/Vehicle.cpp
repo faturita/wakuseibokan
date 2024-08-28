@@ -396,6 +396,11 @@ float Vehicle::getThrottle()
 	return Vehicle::throttle;
 }
 
+float Vehicle::getEnergyConsumption()
+{
+    return 0.00001;
+}
+
 void Vehicle::stop()
 {
     stop(me);
@@ -599,6 +604,13 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     Vec3f newpos(dBodyPosition[0], dBodyPosition[1], dBodyPosition[2]);
 
+    fueltank -= getEnergyConsumption() * getThrottle();
+    if (fueltank<0)
+    {
+        setPower(getPower()-1);
+        fueltank=1;
+    }
+
     /**
     if (getType()==WALRUS)
         CLog::Write(CLog::Debug,"Walrus   %p - %10.2f,%10.2f,%10.2f\n", getBodyID(), dBodyPosition[0],dBodyPosition[1],dBodyPosition[2]);
@@ -791,7 +803,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     
     if (getPos()[1]<3.0)
     {
-        // @NOTE: The counter should come from something related to the ocean level, a global parameter.
+        // @NOTE: The counter should come from something related to the ocean
         static int counter = 0;
         counter++;
 

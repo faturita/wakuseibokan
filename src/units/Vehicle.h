@@ -200,6 +200,11 @@ protected:
     Vec3f onScreen;
 
     Vec3f offset;
+
+    int cargo[256];
+    int capacity[256];
+
+    float fueltank=1;
     
 public:
     bool inert=false;
@@ -247,6 +252,8 @@ public:
 	void virtual setThrottle(float thorttle);
 	float virtual getThrottle();
     void virtual upThrottle(float throttle);
+
+    float virtual getEnergyConsumption();
 
     void virtual stop();
     void virtual stop(dBodyID who);
