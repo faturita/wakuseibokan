@@ -98,6 +98,7 @@
 #include "structures/Dock.h"
 #include "structures/Radar.h"
 #include "structures/Factory.h"
+#include "structures/WindTurbine.h"
 
 #include "weapons/Weapon.h"
 #include "weapons/CarrierTurret.h"
@@ -7725,7 +7726,7 @@ void test84()
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
-    Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
     Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
@@ -7874,6 +7875,7 @@ void initWorldModelling(int testcase)
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water
+    case 84:test84();break;                         // Check Energy production in windmills.
     default:initIslands();test1();break;
     }
 
@@ -7974,6 +7976,7 @@ void worldStep(int value)
     case 80:checktest80(timer);break;
     case 81:checktest81(timer);break;
     case 83:checktest83(timer);break;
+    case 84:checktest84(timer);break;
     default: break;
     }
 

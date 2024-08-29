@@ -13,15 +13,15 @@ WindTurbine::WindTurbine(int faction)
 void WindTurbine::init()
 {
     //Load the model
-    _model = (Model*)T3DSModel::loadModel(filereader("structures/waterdeposit.3ds"),-0,-0,0,1,1,1,textures["sky"]);
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/container.3ds"),-0,-0,0,1,1,1,textures["metal"]);
     if (_model != NULL)
     {
 
     }
 
-    Structure::height=150;
-    Structure::length=70;
-    Structure::width=40;
+    Structure::height=10;
+    Structure::length=10;
+    Structure::width=10;
 
     setName("WindTurbine");
 
@@ -39,12 +39,12 @@ void WindTurbine::drawModel(float yRot, float xRot, float x, float y, float z)
         glPushMatrix();
         glTranslatef(x, y, z);
 
-        glScalef(50.0f,50.0f,50.0f);
+        glScalef(10.0f,10.0f,10.0f);
 
         doTransform(f,R);
 
-        _model->draw(textures["sky"]);
-        //drawRectangularBox(Structure::width, Structure::height, Structure::length);
+        _model->draw(textures["metal"]);
+        drawRectangularBox(Structure::width, Structure::height, Structure::length);
 
         glPopMatrix();
     }
@@ -56,7 +56,7 @@ void WindTurbine::drawModel(float yRot, float xRot, float x, float y, float z)
 
 int WindTurbine::getSubType()
 {
-    return RADAR;
+    return WINDTURBINE;
 }
 
 EntityTypeId WindTurbine::getTypeId()
