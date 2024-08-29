@@ -248,6 +248,19 @@ void drawHUD()
     sprintf (str, "Vehicle:%d %s - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,name.c_str(), controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
+
+
+    sprintf (str, "Cargo: %d\n", entities[controller.controllingid]->getCargo(CargoTypes::POWERFUEL) );
+	drawString(0,-120,1,str,0.2f);
+
+
+
+
+
+
+
+
+
     if (controller.isTeletype())
     {
         sprintf(str, ">>>%s",controller.str.c_str());

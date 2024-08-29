@@ -5,6 +5,8 @@
 
 class WindTurbine : public Structure
 {
+private:
+    float production=1;
 public:
     WindTurbine(int faction);
     void init();
@@ -12,6 +14,8 @@ public:
 
     int getSubType() override;
     EntityTypeId virtual getTypeId();
+
+    void tick();
 };
 
 #endif // WINDTURBINE_H

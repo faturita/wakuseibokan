@@ -136,6 +136,8 @@ enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
 
 enum class WEAPONS { GUNSHOT=1, MISSILE=2, BOMB=3 };
 
+enum CargoTypes { POWERFUEL=0 };
+
 class Vehicle : Observable
 {
 private:
@@ -301,6 +303,8 @@ public:
 
     virtual int getTtl();
     virtual void tick();
+
+    int getCargo(int type);
 
     bool isAuto();
     void enableAuto();

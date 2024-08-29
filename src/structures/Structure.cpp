@@ -73,8 +73,6 @@ void Structure::onIsland(Island *island)
     Structure::island = island;
 }
 
-
-
 void Structure::embody(dWorldID world, dSpaceID space)
 {
     geom = dCreateBox(space, Structure::width, Structure::height, Structure::length);

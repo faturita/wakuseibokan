@@ -47,6 +47,7 @@ std::string Vehicle::subTypeText(int code)
     case VehicleSubTypes::BALAENIDAE:return std::string("Balaenidae Carrier");break;
     case VehicleSubTypes::LASERTURRET:return std::string("Laser Turret");break;
     case VehicleSubTypes::COMMANDCENTER:return std::string("CommandCenter");break;
+    case VehicleSubTypes::WINDTURBINE:return std::string("Wind Turbine");break;
     default:return std::string("Unit");break;
     }
 }
@@ -71,6 +72,8 @@ Vehicle::Vehicle()
 
     memset(&registers,0,sizeof(struct controlregister));
     Vehicle::speed = 0;
+    memset(cargo,0,sizeof(cargo));
+    memset(capacity,0,sizeof(capacity));
 
     pos = Vec3f(0.0f,0.0f,0.0f);
 
@@ -568,6 +571,11 @@ void Vehicle::setTtl(int ttlvalue)
 void Vehicle::tick()
 {
     Vehicle::ttl--;
+}
+
+int Vehicle::getCargo(int type)
+{
+    return cargo[type];
 }
 
 struct controlregister Vehicle::getControlRegisters()
