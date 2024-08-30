@@ -579,6 +579,23 @@ int Vehicle::getCargo(int type)
     return cargo[type];
 }
 
+int Vehicle::removeCargo(int type, int value)
+{
+    if (value>cargo[type])
+    {
+        value = cargo[type];
+    }
+    cargo[type] -= value;
+
+    return value;
+}
+
+int Vehicle::setCargo(int type, int value)
+{
+    // @NOTE: Check capacity
+    cargo[type] = value;
+}
+
 struct controlregister Vehicle::getControlRegisters()
 {
     return registers;

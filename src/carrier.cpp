@@ -1016,6 +1016,9 @@ void inline processCommandOrders()
                     entities[ctroler->controllingid]->enableTelemetry();
                 else
                     entities[ctroler->controllingid]->disableTelemetry();
+            } else if (co.command == Command::RefuelOrder)
+            {
+                refuelManta(entities[ctroler->controllingid]);
             } else if (co.command == Command::LaunchOrder)
             {
                 launchManta(entities[ctroler->controllingid]);

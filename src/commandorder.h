@@ -15,7 +15,8 @@ enum class Command {
     DockOrder,
     FireOrder,
     LandOrder,
-    JoinOrder};
+    JoinOrder,
+    RefuelOrder};
 
 
 enum TargetType {

@@ -2021,6 +2021,37 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
+void refuelManta(Vehicle *v)
+{
+    if (v->getType() == CARRIER || v->getType() == LANDINGABLE)
+    {
+        Balaenidae *b = (Balaenidae*)v;
+        Manta *m = findManta(v->getFaction(),FlyingStatus::ON_DECK);
+        if (!m)
+            m = findManta(v->getFaction(), FlyingStatus::LANDED, v->getPos());
+        if (m)
+        {
+            int power = m->getPower();
+            int filltank = 1000-power;
+            int remanent = b->removeCargo(CargoTypes::POWERFUEL,filltank);
+            m->setPower(power+remanent);
+            char msg[256];
+            Message mg;
+            mg.faction = b->getFaction();
+            sprintf(msg, "%s has been refilled.", m->getName().c_str());
+            mg.msg = std::string(msg); mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+            takeoff(m->getPos());
+        }
+        return;
+    } 
+
+    assert(!"This should not happen.  A manta should be ref either from a Runway or a Carrier.");
+
+    return;    
+}
+
+
 Manta* launchManta(Vehicle *v)
 {
     if (v->getType() == CARRIER)

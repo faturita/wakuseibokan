@@ -7724,10 +7724,21 @@ void test84()
 
     entities.push_back(_b, _b->getGeom());
 
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    runway->setCargo(CargoTypes::POWERFUEL,1000);
+    dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
     Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructureAtDesiredHeight(dock,world,2);
+
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
     Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
     Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);

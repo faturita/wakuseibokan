@@ -572,6 +572,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 controller.push(co);
             }
+            else 
+            if (controller.str.find("refuel") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::RefuelOrder;
+
+                controller.push(co);
+            } 
             else
             if (controller.str.find("launch") != std::string::npos)
             {

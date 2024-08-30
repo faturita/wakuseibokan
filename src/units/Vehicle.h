@@ -305,6 +305,8 @@ public:
     virtual void tick();
 
     int getCargo(int type);
+    int setCargo(int type, int value);
+    int removeCargo(int type, int value);
 
     bool isAuto();
     void enableAuto();
