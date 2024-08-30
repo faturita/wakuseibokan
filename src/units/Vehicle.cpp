@@ -531,6 +531,7 @@ int Vehicle::getPower() const
 void Vehicle::setPower(int value)
 {
     power = value;
+    if (power<0) power=0;
 }
 
 int Vehicle::getSignal() const

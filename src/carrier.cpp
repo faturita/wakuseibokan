@@ -214,6 +214,7 @@ void drawHUD()
     bool lostsignal = false;
     
     float speed=0, health=0, power = 0;
+    int cargo=0;
 
     std::string name;
     
@@ -223,6 +224,7 @@ void drawHUD()
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
         name = entities[controller.controllingid]->getName();
+        cargo = entities[controller.controllingid]->getCargo(CargoTypes::POWERFUEL);
 
         if (entities[controller.controllingid]->getType() == CEPHALOPOD)
         {
@@ -250,7 +252,7 @@ void drawHUD()
 
 
 
-    sprintf (str, "Cargo: %d\n", entities[controller.controllingid]->getCargo(CargoTypes::POWERFUEL) );
+    sprintf (str, "Cargo: %d\n", cargo );
 	drawString(0,-120,1,str,0.2f);
 
 

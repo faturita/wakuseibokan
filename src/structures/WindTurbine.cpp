@@ -64,7 +64,25 @@ EntityTypeId WindTurbine::getTypeId()
     return EntityTypeId::TWindTurbine;
 }
 
-void WindTurbine::tick()
+void WindTurbine::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
+{   
+    position = getPos();
+    fw = toVectorInFixedSystem(0, 0, 1,Structure::azimuth,Structure::elevation);
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+    fw = fw.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=10;// poner en 4 si queres que este un toque arriba desde atras.
+    position = position - 90*fw + Up;
+    fw = orig-position;
+
+    setForward(fw);
+}
+
+
+void WindTurbine::tick() 
 {
     production -= 0.01;
     if (production < 0)

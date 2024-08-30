@@ -33,7 +33,7 @@ protected:
     int islandType;
 
 public:
-    static const int BUILDING_TIME = 400;
+    static const int BUILDING_TIME = 400; 
 
 
     CommandCenter(int faction, int islandType);

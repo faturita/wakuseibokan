@@ -15,6 +15,8 @@ public:
     int getSubType() override;
     EntityTypeId virtual getTypeId();
 
+    void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw);
+
     void tick();
 };
 
