@@ -200,6 +200,25 @@ bool arrived(Vehicle *invadingunit, Island *island)
 }
 
 // SYNC
+bool docked(Vehicle *boat, Island *island)
+{
+    if (boat)
+    {
+        {
+            boat->stop();
+
+
+            char str[256];
+            Message mg;
+            mg.faction = boat->getFaction();
+            sprintf(str, "%s has docked on Island %s.", boat->getName().c_str(), island->getName().c_str());
+            mg.msg = std::string(str);mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+            return true;
+        }
+    }
+    return false;
+}
 bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
@@ -456,6 +475,15 @@ bool isRay(dGeomID o)
     }
     return false;
 }
+bool isDock(Structure* s)
+{
+    if (s && s->getSubType()==DOCK)
+    {
+        return true;
+    }
+    return false;
+}
+
 
 bool  isRunway(Structure* s)
 {

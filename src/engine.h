@@ -92,6 +92,8 @@ bool arrived(dSpaceID s, Island *island);
 // SYNC
 bool landed(Vehicle *manta, Island *island);
 
+// SYNC
+bool docked(Vehicle *boat, Island *island);
 
 // SYNC
 bool isMineFire(Vehicle* vehicle, Gunshot *g);
@@ -145,7 +147,7 @@ bool  isAction(Vehicle* vehicle);
 bool isRay(dGeomID o);
 
 bool  isRunway(Structure* s);
-
+bool isDock(Structure* s);
 bool isSubType(dGeomID geom, int subtype);
 bool isSubType(Vehicle *v, int subtype);
 

@@ -270,6 +270,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.slip1 = 0.0f;
                 contact[i].surface.slip2 = 0.0f;
                 contact[i].surface.bounce = 0.2f;
+            } else 
+            if (isDock(s1) || isDock(s2))
+            {
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+
+                if (isDock(s1) && docked(v2, s1->island)) {}
+                if (isDock(s2) && docked(v1, s2->island)) {}
             } else
             if  (isRunway(s1) || isRunway(s2))
             {
