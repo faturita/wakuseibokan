@@ -302,7 +302,7 @@ void Balaenidae::doDynamics(dBodyID body)
 
     if (offshoring == 1) {
         offshoring=0;
-        setStatus(Balaenidae::SAILING);
+        setStatus(SailingStatus::SAILING);
     }
     else if (offshoring > 0)
     {

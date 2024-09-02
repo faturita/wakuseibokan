@@ -506,7 +506,7 @@ void CargoShip::doDynamics(dBodyID body)
 
             p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
 
-            dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, -0.8, -4.9);
+            dBodyAddRelForceAtRelPos(body,p[0], p[1], p[2], 0.0, -37, -144);
         }
     }
 
@@ -589,7 +589,7 @@ void  CargoShip::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
 
     forward = forward.normalize();
     orig = position;
-    Up[0]=Up[2]=0;Up[1]=50;
+    Up[0]=Up[2]=0;Up[1]=70;
     position = position - 350*forward + Up;
     forward = orig-position;
 }

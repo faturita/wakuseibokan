@@ -964,7 +964,7 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
     {
         Balaenidae *b = (Balaenidae*)entities[1];
 
-        if (b->getStatus()==Balaenidae::OFFSHORING)
+        if (b->getStatus()==SailingStatus::OFFSHORING)
         {
             isOffshoring = true;
         }
@@ -990,7 +990,7 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
             endWorldModelling();
             exit(-1);
         }
-        if (b->getStatus() != Balaenidae::SAILING || vav.magnitude()>100)
+        if (b->getStatus() != SailingStatus::SAILING || vav.magnitude()>100)
         {
             printf("Test failed: Carrier is still moving.\n");
             endWorldModelling();

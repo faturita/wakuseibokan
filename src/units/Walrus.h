@@ -11,8 +11,6 @@
 #include "Vehicle.h"
 #include "../terrain/Terrain.h"
 
-enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING};
-
 class Walrus : public Vehicle
 {
 protected:
