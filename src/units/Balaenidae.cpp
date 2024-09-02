@@ -343,7 +343,8 @@ void Balaenidae::doDynamics(dBodyID body)
 
     if (VERIFY(pos, body))
     {
-        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+        if (getPower()>0)
+            dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
         dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 

@@ -18,6 +18,7 @@ public:
 
     static const int OFFSHORING = 1;
     static const int SAILING = 0;
+    static const int DOCKED = 2;
 
     ~Balaenidae();
     Balaenidae(int newfaction);

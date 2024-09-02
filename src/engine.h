@@ -216,11 +216,13 @@ BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, flo
 Antenna* findAntennaFromIsland(BoxIsland *is);
 Structure* findStructureFromIsland(BoxIsland *is, int subtype);
 
+
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 Vehicle* findCarrier(size_t &index, int faction);
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
 
 void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
 void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
@@ -232,6 +234,6 @@ bool structurecollisions(Structure *s, Vehicle *vehicle);
 
 void trackTargets();
 
-void refuelManta(Vehicle *v);
+void refuel(Vehicle *v);
 
 #endif // ENGINE_H

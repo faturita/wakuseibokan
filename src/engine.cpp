@@ -202,11 +202,11 @@ bool arrived(Vehicle *invadingunit, Island *island)
 // SYNC
 bool docked(Vehicle *boat, Island *island)
 {
-    if (boat)
+    if (boat && island && boat->getStatus() != Balaenidae::DOCKED)
     {
         {
             boat->stop();
-
+            boat->setStatus(Balaenidae::DOCKED);
 
             char str[256];
             Message mg;
@@ -219,6 +219,7 @@ bool docked(Vehicle *boat, Island *island)
     }
     return false;
 }
+
 bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
@@ -986,6 +987,27 @@ int findNextNumber(int faction, int type, int subtype)
 
     assert(!"No more available numbers !!!!!");
 }
+
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
+{
+    std::vector<size_t> enemies;
+    float closest = threshold;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+        if (v &&
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                && v->getFaction()==friendlyfaction)   // Fix this.
+        {
+            if ((v->getPos()-l).magnitude()<closest) {
+                enemies.push_back(i);
+            }
+        }
+    }
+
+    return enemies;
+}
+
 
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
 {
@@ -2049,32 +2071,46 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
-void refuelManta(Vehicle *v)
+void refuel(Vehicle *f)
 {
-    if (v->getType() == CARRIER || v->getType() == LANDINGABLE)
+    Vehicle *m = NULL;
+    if (f->getType() == CARRIER)
     {
-        Balaenidae *b = (Balaenidae*)v;
-        Manta *m = findManta(v->getFaction(),FlyingStatus::ON_DECK);
-        if (!m)
-            m = findManta(v->getFaction(), FlyingStatus::LANDED, v->getPos());
-        if (m)
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),VehicleTypes::MANTA, f->getPos(), 1000);   
+        if (vehicles.size()>0)
         {
-            int power = m->getPower();
-            int filltank = 1000-power;
-            int remanent = b->removeCargo(CargoTypes::POWERFUEL,filltank);
-            m->setPower(power+remanent);
-            char msg[256];
-            Message mg;
-            mg.faction = b->getFaction();
-            sprintf(msg, "%s has been refilled.", m->getName().c_str());
-            mg.msg = std::string(msg); mg.timer = timer;
-            messages.insert(messages.begin(), mg);
-            takeoff(m->getPos());
+            m = entities[vehicles[0]];
         }
-        return;
-    } 
+    } else if (f->getType() == LANDINGABLE)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),VehicleTypes::MANTA, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } else if (f->getSubType() == DOCK)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),VehicleTypes::CARRIER, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    }
 
-    assert(!"This should not happen.  A manta should be ref either from a Runway or a Carrier.");
+    if (m)
+    {
+        int power = m->getPower();
+        int filltank = 1000-power;
+        int remanent = f->removeCargo(CargoTypes::POWERFUEL,filltank);
+        m->setPower(power+remanent);
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s has been refilled.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+        takeoff(m->getPos());
+    }
 
     return;    
 }

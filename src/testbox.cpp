@@ -81,6 +81,7 @@
 #include "units/Medusa.h"
 #include "units/Cephalopod.h"
 #include "units/AdvancedManta.h"
+#include "units/CargoShip.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -7736,6 +7737,15 @@ void test84()
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+
+    entities.push_back(cg, cg->getGeom());
 
 
     Structure *runway = new Runway(GREEN_FACTION);

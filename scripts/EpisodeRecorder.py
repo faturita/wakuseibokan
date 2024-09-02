@@ -60,9 +60,9 @@ class Controller:
     
     def run(self):
         if (self.tank == 1):
-            command = Command('127.0.0.1', 4501)
+            command = Command('192.168.0.100', 4501)
         elif (self.tank == 2):
-            command = Command('127.0.0.1', 4502)
+            command = Command('192.168.0.100', 4502)
 
         shouldrun = True
         while (shouldrun):
