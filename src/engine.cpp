@@ -2082,6 +2082,43 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
+void departure(Vehicle *f)
+{
+    Vehicle *m = NULL;
+
+    std::vector<VehicleTypes> types;
+
+    types.push_back(VehicleTypes::MANTA);
+    types.push_back(VehicleTypes::WALRUS);
+    types.push_back(VehicleTypes::CARRIER);
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } 
+
+    if (m)
+    {
+        m->setStatus(SailingStatus::SAILING);
+        dBodyID body = m->getBodyID();
+        dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s has departured.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+    }
+
+    return;    
+}
+
+
 void refuel(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2113,7 +2150,6 @@ void refuel(Vehicle *f)
         sprintf(msg, "%s has been refilled.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
-        takeoff(m->getPos());
     }
 
     return;    

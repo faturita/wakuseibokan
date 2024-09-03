@@ -234,6 +234,7 @@ bool structurecollisions(Structure *s, Vehicle *vehicle);
 
 void trackTargets();
 
+void departure(Vehicle *f);
 void refuel(Vehicle *v);
 
 #endif // ENGINE_H
