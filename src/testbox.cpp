@@ -7772,6 +7772,11 @@ void test84()
 
     aiplayer = BLUE_AI;
     controller.faction = BOTH_FACTION;
+
+    cg->setAutoStatus(AutoStatus::DOCKING);
+    cg->setDestination(dock->getPos());
+    cg->enableAuto();
+
 }
 
 void checktest84(unsigned long timer)

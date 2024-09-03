@@ -1,7 +1,7 @@
 /*
- * Walrus.h
+ * CargoShip.h
  *
- *  Created on: Jan 16, 2011
+ *  Created on: Sep 02, 2024
  *      Author: faturita
  */
 
@@ -37,6 +37,7 @@ public:
 
     void virtual doControlAttack();
     void virtual doControlDestination();
+    void virtual doControlDocking();
     
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);

@@ -1259,7 +1259,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
         // Should check if the vehicle has some device to allow further control.
         if ((entities[i]->getType() == WALRUS || entities[i]->getType() == MANTA ) && (entities[i]->getFaction() == faction) )
         {
-            if (entities[i]->getSignal()!=4)
+            if (entities[i]->getSignal()!=CommLink::LONG_RANGE)
             {
                 if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
                 {
@@ -1275,7 +1275,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
 
                     if (!is || (is && !a))
                     {
-                        if (entities[i]->getSignal()==3)
+                        if (entities[i]->getSignal()==CommLink::SHORT_RANGE)
                         {
                             char msg[256];
                             Message mg;
@@ -1285,17 +1285,17 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                             mg.msg = stream.str(); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                         }
-                        entities[i]->setSignal(2);
+                        entities[i]->setSignal(CommLink::NO_LINK);
                         entities[i]->damage(1);
                     } else {
                         // This means that now the unit is again close to the island's antenna so we should put the connection back.
-                        entities[i]->setSignal(3);
+                        entities[i]->setSignal(CommLink::SHORT_RANGE);
                     }
 
                 }
                 else
                 {
-                    entities[i]->setSignal(3);                  // Put connection back to normal.
+                    entities[i]->setSignal(CommLink::SHORT_RANGE);                  // Put connection back to normal.
                 }
             }
         }
@@ -2125,9 +2125,13 @@ void refuel(Vehicle *f)
 
     std::vector<VehicleTypes> types;
 
-    types.push_back(VehicleTypes::MANTA);
-    types.push_back(VehicleTypes::WALRUS);
-    types.push_back(VehicleTypes::CARRIER);
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE ) 
+        types.push_back(VehicleTypes::MANTA);
+    else
+    {
+        types.push_back(VehicleTypes::WALRUS);
+        types.push_back(VehicleTypes::CARRIER);
+    }
 
     if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
     {

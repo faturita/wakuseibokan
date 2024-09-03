@@ -894,6 +894,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 
         break;
 	}
+
+
+    // @NOTE: Check general controllers
+    if (controller.registers.thrust>1000.0f)
+        controller.registers.thrust = 1000.0f;
+
+
+
 }
 
 void handleSpecKeypress(int key, int x, int y)

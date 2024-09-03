@@ -1,6 +1,23 @@
-// ThreeMaxLoader.cpp: implementation of the CThreeMaxLoader class.
-//
-//////////////////////////////////////////////////////////////////////
+/* ============================================================================
+**
+** 3DS Max Model File Reader - Wakuseiboukan - 19/07/2016
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #include "ThreeMaxLoader.h"
 #include "profiling.h"
@@ -774,11 +791,11 @@ T3DSModel* T3DSModel::loadModel(const char *p_filename,float x, float y, float z
 
 /**
  * @brief T3DSModel::loadModel
- * @param p_filename
- * @param x
+ * @param p_filename    3DS Filename.  This needs to be just one figure in the 3DS file.
+ * @param x             x,y,z location where the ZERO from the 3DS model will be located relative to the world model.
  * @param y
  * @param z
- * @param scalex
+ * @param scalex        Scale of the model relative to the world model.
  * @param scaley
  * @param scalez
  * @param texture       Zero if you dont want any texture at all.

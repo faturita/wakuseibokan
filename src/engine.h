@@ -66,6 +66,8 @@ using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeo
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
 
+enum CommLink { NO_LINK=2, SHORT_RANGE=3, LONG_RANGE=4};
+
 #define DOCK_RANGE      600
 #define COMM_RANGE      50000
 #define CLOSE_RANGE     1000

@@ -51,6 +51,8 @@ public:
     void addWeapon(size_t w);
 
     virtual EntityTypeId getTypeId();
+
+    float getEnergyConsumption();
 };
 
 #endif // BALAENIDAE_H

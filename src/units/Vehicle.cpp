@@ -48,6 +48,7 @@ std::string Vehicle::subTypeText(int code)
     case VehicleSubTypes::LASERTURRET:return std::string("Laser Turret");break;
     case VehicleSubTypes::COMMANDCENTER:return std::string("CommandCenter");break;
     case VehicleSubTypes::WINDTURBINE:return std::string("Wind Turbine");break;
+    case VehicleSubTypes::CARGOSHIP:return std::string("Cargo Ship");break;
     default:return std::string("Unit");break;
     }
 }
@@ -552,6 +553,11 @@ int Vehicle::getOrder() const
 void Vehicle::setOrder(int value)
 {
     order = value;
+}
+
+bool Vehicle::isAutoStatusFree()
+{
+    return autostatus == AutoStatus::FREE;
 }
 
 AutoStatus Vehicle::getAutoStatus() const

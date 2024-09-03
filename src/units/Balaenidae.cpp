@@ -265,6 +265,11 @@ void Balaenidae::doControl(struct controlregister regs)
 {
     if (getThrottle()==0 and regs.thrust != 0)
         honk(getPos());
+
+    // @FIXME: Need to add a global control check to verify all the register variables to be within margins.
+    if (regs.thrust>1000.0)
+        regs.thrust = 1000.0;
+
     setThrottle(regs.thrust*2*5);
 
     Balaenidae::rudder = -regs.roll;
@@ -563,4 +568,9 @@ void Balaenidae::addWeapon(size_t w)
 EntityTypeId Balaenidae::getTypeId()
 {
     return EntityTypeId::TBalaenidae;
+}
+
+float Balaenidae::getEnergyConsumption()
+{
+    return 0.000004;
 }
