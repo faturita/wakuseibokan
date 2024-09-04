@@ -1799,6 +1799,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         int subType=VehicleSubTypes::STRUCTURE;
                         float chance=0;
                         bool onlyonce=false;
+                        bool mandatory=false;
                     };
 
                     std::vector<struct templatestructure> islandstructs;
@@ -1807,6 +1808,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     {
                         // Softmax, boltzman decay.
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.85;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1821,7 +1823,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         // Factory island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::FACTORY;tp.chance = 0.2;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.1;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.45;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1834,7 +1836,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1842,20 +1844,37 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.85;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.chance = 0.7;islandstructs.push_back(tp);}
 
                     }
 
-                    int which = (rand() % islandstructs.size());
+                    std::vector<size_t> strs = island->getStructures();
 
-                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", which, prob, islandstructs[which].chance );
+                    // Search for any mandatory structure
+                    int which = (rand() % islandstructs.size());
+                    for(size_t i=0;i<islandstructs.size();i++)
+                    {
+                        if (islandstructs[i].mandatory)
+                        {
+                            bool ispresent = false;
+                            for(size_t ids=0;ids<strs.size();ids++)
+                            {
+                                if (entities[strs[ids]]->getSubType() == islandstructs[i].subType)
+                                    ispresent = true;
+                            }
+                            if (!ispresent)
+                                {which = i;break;}
+                        }
+                    }
+
+
+                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
 
                         bool ispresent = false;
-                        std::vector<size_t> strs = island->getStructures();
                         for(size_t i=0;i<strs.size();i++)
                         {
                             if (entities[strs[i]]->getSubType() == islandstructs[which].subType)
@@ -1914,6 +1933,10 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 s = new Radar(c->getFaction());
                                 island->addStructure(s,world);
                                 break;
+                            case VehicleSubTypes::WINDTURBINE:
+                                s = new WindTurbine(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::STRUCTURE:default:
                                 s = new Structure(c->getFaction());
                                 island->addStructure(s,world);
@@ -1938,6 +1961,45 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     c->restart();
                 }
 
+            }
+        }
+
+        CommandCenter *c = findCommandCenter(island);
+        if (c)
+        {
+            if (c->getTtl()<=0|| force)
+            {
+                std::vector<size_t> ws;
+                std::vector<size_t> shares;
+                std::vector<size_t> str = island->getStructures();
+
+                for(size_t id=0;id<str.size();id++)
+                {
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
+                        ws.push_back(str[id]);
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                        shares.push_back(str[id]);
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::RUNWAY)
+                        shares.push_back(str[id]);
+                }
+
+                for(size_t id=0;id<ws.size();id++)
+                {
+                    Vehicle *w = entities[ws[id]];
+                    if (w && w->getCargo(CargoTypes::POWERFUEL) > 100)
+                    {
+                        int cargo = w->getCargo(CargoTypes::POWERFUEL);
+                        float fcargoshare = ((float)cargo / (float)shares.size());
+                        int effectivecargo = 0;
+                        for(size_t shareid=0;shareid<shares.size();shareid++)
+                        {
+                            CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                            effectivecargo += entities[shares[shareid]]->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
+                        }
+                        w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
+                        CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
+                    }
+                }
             }
         }
 

@@ -52,6 +52,7 @@
 #include "structures/Factory.h"
 #include "structures/Radar.h"
 #include "structures/Armory.h"
+#include "structures/WindTurbine.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"

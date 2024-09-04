@@ -133,6 +133,21 @@ public:
     int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
 };
 
+class DockInIslandForRefuel : public QAction
+{
+public:
+    DockInIslandForRefuel() { }
+    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
+};
+
+class RefuelCarrier : public QAction
+{
+public:
+    RefuelCarrier() { }
+    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
+};
+
+
 
 class Player
 {

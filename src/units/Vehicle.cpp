@@ -596,10 +596,23 @@ int Vehicle::removeCargo(int type, int value)
     return value;
 }
 
+int Vehicle::addCargo(int type, int value)
+{
+    // @NOTE: Check capacity
+    cargo[type] += value;
+    if (cargo[type]>1000)
+        cargo[type] = 1000;
+    return cargo[type];
+}
+
 int Vehicle::setCargo(int type, int value)
 {
     // @NOTE: Check capacity
     cargo[type] = value;
+    
+    if (cargo[type]>1000)
+        cargo[type] = 1000;
+    return cargo[type];
 }
 
 struct controlregister Vehicle::getControlRegisters()

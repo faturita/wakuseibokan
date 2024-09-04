@@ -141,7 +141,147 @@ void Balaenidae::embody(dBodyID myBodySelf)
     me = myBodySelf;
 }
 
+void Balaenidae::doControlDocking()
+{
+    Controller c;
+
+    c.registers = registers;
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float roundederror = 100;
+
+
+    if (dst_status != DestinationStatus::REACHED && getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
+    {
+        // Potential fields from the islands (to avoid them)
+        int nearesti = 0;
+        float closest = 0;
+        for(size_t i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+            Vec3f l(b->getX(),0.0f,b->getZ());
+
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
+        if (T.magnitude()>2000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            T = T-l;
+            Vec3f newdestination = destination + T.normalize()*1000.0;
+            T = newdestination - Po;
+        }
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+
+
+        c.registers.thrust = 400.0f;
+
+
+
+        // Potential fields to avoid islands (works great).
+        if (closest > 1800 && closest < 4000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            Vec3f d = Po-l;
+            d = d.normalize();
+
+            if (distance>2000.0)
+            {
+                T = T+d;
+                T = T.normalize();
+            }
+
+            c.registers.thrust = 40.0f;
+            
+        }
+
+        if (distance<800.0f)
+        {
+            c.registers.thrust = 10.0f;
+        }
+
+
+        float e = _acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+
+        /**
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }**/
+
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
+
+
+    } else {
+        if (dst_status != DestinationStatus::REACHED)
+        {
+            char str[256];
+            Message mg;
+            mg.faction = getFaction();
+            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            mg.msg = std::string(str);mg.timer = 0;
+            messages.insert(messages.begin(), mg);
+            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            dst_status = DestinationStatus::REACHED;
+            autostatus = AutoStatus::FREE;
+            c.registers.thrust = 0.0f;
+            setThrottle(0.0);
+            c.registers.roll = 0.0f;
+            disableAuto();
+        }
+    }
+
+    doControl(c);    
+}
+
+
 void Balaenidae::doControl()
+{
+    switch (autostatus) {
+        case AutoStatus::DESTINATION:   doControlDestination(); break;
+        case AutoStatus::DOCKING:       doControlDocking(); break;
+        default: break;
+    }
+
+}
+
+
+void Balaenidae::doControlDestination()
 {
     Controller c;
 

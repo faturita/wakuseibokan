@@ -244,14 +244,6 @@ void CargoShip::doControlDocking()
 
     if (dst_status != DestinationStatus::REACHED && getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
     {
-        float distance = T.magnitude();
-
-        Vec3f F = getForward();
-
-        F = F.normalize();
-        T = T.normalize();
-
-
         // Potential fields from the islands (to avoid them)
         int nearesti = 0;
         float closest = 0;
@@ -265,6 +257,24 @@ void CargoShip::doControlDocking()
                 nearesti = i;
             }
         }
+
+        if (T.magnitude()>2000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            T = T-l;
+            Vec3f newdestination = destination + T.normalize()*1000.0;
+            T = newdestination - Po;
+        }
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+
 
         c.registers.thrust = 400.0f;
 

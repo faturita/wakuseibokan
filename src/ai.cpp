@@ -684,7 +684,85 @@ int AirborneAttack::apply(int state, int faction, unsigned long &timeevent, unsi
 }
 
 
+int DockInIslandForRefuel::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+{
+    Vehicle *b = findCarrier(faction);
 
+    if (b && b->getPower()<1001.0)
+    {
+        //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
+
+        BoxIsland *is = findNearestIsland(b->getPos());
+
+        if (is)
+        {
+            std::vector<size_t> str = is->getStructures();
+
+            if (str.size() == 0)
+                return 9;
+
+            for(size_t id=0;id<str.size();id++)
+            {
+
+                dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[id]];
+
+                    if (d->getFaction() == faction)
+                    {
+                        b->setAutoStatus(AutoStatus::DOCKING);
+                        b->setDestination(d->getPos()-d->getForward().normalize()*400);
+                        b->enableAuto();
+                        dout << "DOCKING!" << std::endl;
+                        timeevent = timer; return 24;
+                    }
+                } 
+            }
+            // Wait for the dock to be created.
+            return state;
+        }
+        assert( true || !"No island around. Crazy thing.");
+    }
+
+    return 9;
+}
+
+int RefuelCarrier::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
+{
+    Vehicle *b = findCarrier(faction);
+
+    if (b && b->getStatus() == SailingStatus::DOCKED)
+    {
+        //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
+
+        BoxIsland *is = findNearestIsland(b->getPos());
+
+        if (is)
+        {
+            std::vector<size_t> str = is->getStructures();
+
+            for(size_t id=0;id<str.size();id++)
+            {
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[id]];
+
+                    if (d->getFaction() == faction)
+                    {
+                        refuel(d);
+                        departure(d);
+                        timeevent = timer; return 9;
+                    }
+                } 
+            }
+            return state;
+        }
+        assert( true || !"The carrier is docked but there are no nearby islands around it !!!");
+    }
+
+    return state;
+}
 
 int ApproachFreeIsland::apply(int state, int faction, unsigned long &timeevent, unsigned long timer)
 {
@@ -1017,7 +1095,7 @@ int DockBack::apply(int state, int faction, unsigned long &timeevent, unsigned l
     if (done1 && done2)
     {
         // There are no walrus so I can departure to the next island.
-        timeevent=timer;return 9;
+        timeevent=timer;return 23;
     }
 
     return state;
@@ -1053,6 +1131,8 @@ Player::Player(int faction)
     qactions[2] = new CaptureIsland();
     qactions[3] = new ReturnToCarrier();
     qactions[4] = new DockBack();
+    qactions[23] = new DockInIslandForRefuel();
+    qactions[24] = new RefuelCarrier();
 
     state = 4;
     timeevent = 0;
@@ -1071,7 +1151,7 @@ void Player::playFaction(unsigned long timer)
     // Check for enemies nearby and shift strategy if they are present.
     state = interruption->apply(state,faction,timeevent,timer);
 
-    //dout << "Status:" << state << std::endl;
+    dout << "Status:" << state << std::endl;
 
     // Fire the action according to the state.
     state = qactions[state]->apply(state,faction,timeevent,timer);

@@ -7739,20 +7739,20 @@ void test84()
     entities.push_back(_b, _b->getGeom());
 
 
-    CargoShip *cg = new CargoShip(GREEN_FACTION);
-    cg->init();
-    cg->embody(world,space);
-    cg->setPos(0.0f,20.5f,-10000.0f);
-    cg->stop();
+    // CargoShip *cg = new CargoShip(GREEN_FACTION);
+    // cg->init();
+    // cg->embody(world,space);
+    // cg->setPos(0.0f,20.5f,-10000.0f);
+    // cg->stop();
 
-    entities.push_back(cg, cg->getGeom());
+    // entities.push_back(cg, cg->getGeom());
 
 
     Structure *runway = new Runway(GREEN_FACTION);
     Structure *dock = new Dock(GREEN_FACTION);
 
-    runway->setCargo(CargoTypes::POWERFUEL,1000);
-    dock->setCargo(CargoTypes::POWERFUEL,1000);
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
     _b->setCargo(CargoTypes::POWERFUEL,1000);
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
@@ -7770,12 +7770,16 @@ void test84()
     Vec3f pos(0.0,1.32, - 60);
     camera.setPos(pos);
 
-    aiplayer = BLUE_AI;
+    aiplayer = GREEN_AI;
     controller.faction = BOTH_FACTION;
 
-    cg->setAutoStatus(AutoStatus::DOCKING);
-    cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
-    cg->enableAuto();
+    //cg->setAutoStatus(AutoStatus::DOCKING);
+    //cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+    //cg->enableAuto();
+
+    //_b->setAutoStatus(AutoStatus::DOCKING);
+    //_b->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+    //_b->enableAuto();
 
 }
 
