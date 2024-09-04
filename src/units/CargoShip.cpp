@@ -239,10 +239,10 @@ void CargoShip::doControlDocking()
 
     Vec3f T = Pf - Po;
 
-    float roundederror = 5;
+    float roundederror = 100;
 
 
-    if (dst_status != DestinationStatus::REACHED && T.magnitude()>roundederror)
+    if (dst_status != DestinationStatus::REACHED && getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
     {
         float distance = T.magnitude();
 
@@ -268,25 +268,29 @@ void CargoShip::doControlDocking()
 
         c.registers.thrust = 400.0f;
 
-        if (distance<800.0f)
-        {
-            c.registers.thrust = 20.0f;
-        }
 
-        if (T.magnitude() > 500)
+
         // Potential fields to avoid islands (works great).
         if (closest > 1800 && closest < 4000)
         {
             BoxIsland *b = islands[nearesti];
             Vec3f l = b->getPos();
             Vec3f d = Po-l;
-
             d = d.normalize();
 
-            T = T+d;
-            T = T.normalize();
+            if (distance>2000.0)
+            {
+                T = T+d;
+                T = T.normalize();
+            }
 
-            c.registers.thrust = 45.0f;
+            c.registers.thrust = 40.0f;
+            
+        }
+
+        if (distance<800.0f)
+        {
+            c.registers.thrust = 10.0f;
         }
 
         // Potential fields from Carrier

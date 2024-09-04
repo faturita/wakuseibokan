@@ -123,6 +123,19 @@ bool departed(dSpaceID space)
 
 bool departed(Vehicle *walrus)
 {
+    if (walrus && walrus->getSubType() == VehicleSubTypes::CARGOSHIP && walrus->getStatus() == SailingStatus::ROLLING)
+    {
+        CargoShip *w = (CargoShip*)walrus;
+
+        w->setStatus(SailingStatus::OFFSHORING);
+        char str[256];
+        Message mg;
+        sprintf(str, "%s has departed.", w->getName().c_str());
+        mg.msg = std::string(str);mg.timer = timer;
+        mg.faction = w->getFaction();
+        messages.insert(messages.begin(), mg);
+        return true;
+    } else
     if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == SailingStatus::ROLLING)
     {
         Walrus *w = (Walrus*)walrus;
@@ -162,6 +175,22 @@ bool arrived(dSpaceID s, Island *island)
 
 bool arrived(Vehicle *invadingunit, Island *island)
 {
+
+    if (island && invadingunit && invadingunit->getSubType() == VehicleSubTypes::CARGOSHIP && invadingunit->getStatus() == SailingStatus::SAILING)
+    {
+        CargoShip *w = (CargoShip*)invadingunit;
+
+        w->setStatus(SailingStatus::INSHORING);
+        char str[256];
+        Message mg;
+        sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
+        mg.msg = std::string(str);mg.timer = timer;
+        mg.faction = w->getFaction();
+        messages.insert(messages.begin(), mg);
+        return true;
+    }
+
+    else
     if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == SailingStatus::SAILING)
     {
         Walrus *w = (Walrus*)invadingunit;

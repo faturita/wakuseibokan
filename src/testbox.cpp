@@ -7725,7 +7725,7 @@ void test84()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
 
     islands.push_back(nemesis);
 
@@ -7760,7 +7760,7 @@ void test84()
     Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
 
-    islands[0]->addStructureAtDesiredHeight(dock,world,2);
+    islands[0]->addStructureAtDesiredHeight(dock,world,-1);
 
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
     Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
@@ -7774,7 +7774,7 @@ void test84()
     controller.faction = BOTH_FACTION;
 
     cg->setAutoStatus(AutoStatus::DOCKING);
-    cg->setDestination(dock->getPos());
+    cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
     cg->enableAuto();
 
 }

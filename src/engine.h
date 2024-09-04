@@ -34,6 +34,7 @@
 #include "units/Stingray.h"
 #include "units/Otter.h"
 #include "units/Turtle.h"
+#include "units/CargoShip.h"
 
 #include "terrain/Terrain.h"
 

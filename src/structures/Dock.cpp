@@ -21,7 +21,7 @@ void Dock::init()
 
     Structure::width=20;
     Structure::height=5;
-    Structure::length=500;
+    Structure::length=800;
 
     setName("Dock");
 
@@ -44,8 +44,7 @@ void Dock::drawModel(float yRot, float xRot, float x, float y, float z)
         doTransform(f,R);
 
         //drawRectangularBox(width, height, length);
-
-        drawTexturedBox(textures["metal"],20,50,40);
+        glPushMatrix();glTranslatef(0, 0, 400.0);drawTexturedBox(textures["metal"],20,50,40);glPopMatrix();
         // @FIXME: Modify the ODE model to make a small box in the middle with the right size.
         // Here I put "2" because I want to look like a dock, but a little bit bigger to make it easier to be hit.
         drawTexturedBox(textures["metal"],Structure::width, Structure::height, Structure::length);
