@@ -119,6 +119,8 @@
 
 #include "math/uuid.h"
 
+#include "ai2.h"
+
 extern  Camera camera;
 
 extern  Controller controller;
@@ -7739,13 +7741,13 @@ void test84()
     entities.push_back(_b, _b->getGeom());
 
 
-    // CargoShip *cg = new CargoShip(GREEN_FACTION);
-    // cg->init();
-    // cg->embody(world,space);
-    // cg->setPos(0.0f,20.5f,-10000.0f);
-    // cg->stop();
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
 
-    // entities.push_back(cg, cg->getGeom());
+    entities.push_back(cg, cg->getGeom());
 
 
     Structure *runway = new Runway(GREEN_FACTION);
@@ -7784,6 +7786,16 @@ void test84()
 }
 
 void checktest84(unsigned long timer)
+{
+
+}
+
+void test85()
+{
+
+}
+
+void checktest85(unsigned long timer)
 {
 
 }
@@ -7919,6 +7931,7 @@ void initWorldModelling(int testcase)
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water
     case 84:test84();break;                         // Check Energy production in windmills.
+    case 85:test85();break;                         // Check state machine for the player.
     default:initIslands();test1();break;
     }
 
@@ -8020,6 +8033,7 @@ void worldStep(int value)
     case 81:checktest81(timer);break;
     case 83:checktest83(timer);break;
     case 84:checktest84(timer);break;
+    case 85:checktest85(timer);break;
     default: break;
     }
 

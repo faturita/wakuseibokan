@@ -557,7 +557,7 @@ void Vehicle::setOrder(int value)
 
 bool Vehicle::isAutoStatusFree()
 {
-    return autostatus == AutoStatus::FREE;
+    return autostatus == AutoStatus::IDLE;
 }
 
 AutoStatus Vehicle::getAutoStatus() const

@@ -237,7 +237,7 @@ void Torpedo::doControl()
         if (dst_status != DestinationStatus::REACHED)
         {
             dst_status = DestinationStatus::REACHED;
-            autostatus = AutoStatus::FREE;
+            autostatus = AutoStatus::IDLE;
         }
     }
 

@@ -385,7 +385,7 @@ void Turtle::doControlDestination()
         if (dst_status != DestinationStatus::REACHED)
         {
             dst_status = DestinationStatus::REACHED;
-            autostatus = AutoStatus::FREE;
+            autostatus = AutoStatus::IDLE;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;

@@ -66,7 +66,7 @@ void SimplifiedDynamicManta::doControl()
     case AutoStatus::WAYPOINT:
         doControlWaypoint();
         break;
-    case AutoStatus::FREE:
+    case AutoStatus::IDLE:
         goTo(getPos()+getForward().normalize()*100);
         setAutoStatus(AutoStatus::DESTINATION);
         break;
@@ -976,7 +976,7 @@ void SimplifiedDynamicManta::attack(Vec3f target)
 
 void SimplifiedDynamicManta::hold()
 {
-    autostatus = AutoStatus::FREE;
+    autostatus = AutoStatus::IDLE;
 }
 
 void SimplifiedDynamicManta::enableAuto()
