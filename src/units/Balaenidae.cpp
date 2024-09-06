@@ -383,6 +383,7 @@ void Balaenidae::doControlDestination()
             Message mg;
             mg.faction = getFaction();
             sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
+            CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
             dst_status = DestinationStatus::REACHED;

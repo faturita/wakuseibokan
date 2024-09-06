@@ -6,147 +6,173 @@
 #define DEFENSE_RANGE   8000
 #define IN_RANGE        30000
 
+class TSequencer {
+    const int length = 15;
+    unsigned int T[15];
+public:
+    TSequencer()
+    {
+        memset(&T,0,length*sizeof(unsigned int));
+    }
+
+    void init()
+    {
+        memset(&T,0,length);
+    }
+
+    TSequencer operator+(TSequencer T2)
+    {
+        for(int i=0;i<length;i++)
+        {
+            T[i] += T2[i];
+        }
+        return *this;
+    }
+
+    TSequencer operator*(unsigned int val)
+    {
+        for(int i=0;i<length;i++)
+        {
+            T[i] *= val;
+        }
+        return *this;
+    }
+
+    unsigned int &operator[](int idx)
+    {
+        return T[idx];
+    }
+
+    void set(int idx, unsigned int val)
+    {
+        T[idx]=val;
+    }
+
+    TSequencer operator=(TSequencer T2)
+    {
+        for(int i=0;i<length;i++)
+        {
+            T[i] = T2[i];
+        }
+        return *this;
+    }
+
+    TSequencer sign()
+    {
+        TSequencer T2;
+        for(int i=0;i<length;i++)
+        {
+            T2.set(i,sgn(T[i]));
+        }
+        return T2;
+    }
+
+    void print()
+    {
+        printf("[");
+        for(int i=0;i<length;i++)
+        {
+            printf("%lu,", T[i]);
+        }
+        printf("]\n");
+    }
+};
+
+enum class State {
+    IDLE=0,
+    DOCKING=1,
+    DOCKED=3,
+    APPROACHFREEISLAND=4,
+    APPROACHENEMYISLAND=5,
+    INVADEISLAND=6
+};
+
+
+// class State
+// {
+// protected:
+//     TSequencer T;
+// public:
+//     StateType type;
+//     State()
+//     {
+//         type = StateType::IDLE;
+//     }
+
+//     State(StateType type) 
+//     {
+//         State::type = type;
+//     }
+
+//     void tick()
+//     {
+//         T = T + T.sign() * 1;
+//     }
+
+// };
+
+
 class QAction
-{
-private:
-    unsigned long timerdelay;
+{   
 public:
-    QAction() {}
-
-    void set(unsigned long timer)
+    virtual void apply(int faction)
     {
-        timerdelay = timer;
+        return ;
     }
+};
 
-    bool delay(unsigned long timer, unsigned long delay)
+
+class Condition 
+{
+protected:
+
+public:
+    bool virtual evaluate(int faction)
     {
-        return timer > (timerdelay + delay);
+        return false;
     }
+};
 
-    int virtual apply(const int status,int faction,unsigned long &timerevent, unsigned long timer)
+class Transition
+{
+protected:
+    State s;
+    State sprime;
+    Condition *c;
+public:
+    Transition(State s, State sprime, Condition *c) 
+    { 
+        this->s = s;
+        this->sprime = sprime;
+        this->c = c;
+    }
+    State virtual transit(int faction, const State current )
     {
-        return status;
+        if (current == s && c->evaluate(faction))
+        {
+            return sprime;
+        }
+        return current;
+    }    
+};
+
+class Interruption : public Transition
+{
+public:
+    Interruption(State sprime, Condition *c) :  Transition (State::IDLE, sprime, c)
+    { 
+        this->sprime = sprime;
+        this->c = c;
     }
-
-};
-
-class DefCon : public QAction
-{
-public:
-    DefCon() { }
-
-    int virtual apply(int status,int faction,unsigned long &timerevent, unsigned long timer);
-};
-
-class AirDefense : public QAction
-{
-public:
-    AirDefense() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class NavalDefense : public QAction
-{
-public:
-    NavalDefense() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class NavalDefending : public QAction
-{
-public:
-    NavalDefending() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-class ApproachEnemyIsland : public QAction
-{
-public:
-    ApproachEnemyIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-
-class ApproachAnyEnemyIsland : public QAction
-{
-public:
-    ApproachAnyEnemyIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class ApproachingEnemyIsland : public QAction
-{
-public:
-    ApproachingEnemyIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-class BallisticAttack : public QAction
-{
-public:
-    BallisticAttack() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class AirborneAttack : public QAction
-{
-public:
-    AirborneAttack() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-class ApproachFreeIsland : public QAction
-{
-public:
-    ApproachFreeIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class InvadeIsland : public QAction
-{
-public:
-    InvadeIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class AirborneInvadeIsland : public QAction
-{
-public:
-    AirborneInvadeIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class CaptureIsland : public QAction
-{
-public:
-    CaptureIsland() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class ReturnToCarrier : public QAction
-{
-public:
-    ReturnToCarrier() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-class DockBack : public QAction
-{
-public:
-    DockBack() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class DockInIslandForRefuel : public QAction
-{
-public:
-    DockInIslandForRefuel() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
-class RefuelCarrier : public QAction
-{
-public:
-    RefuelCarrier() { }
-    int virtual apply(int status, int faction, unsigned long &timerevent, unsigned long timer);
-};
-
+    State virtual transit(int faction, const State current )
+    {
+        if (c->evaluate(faction))
+        {
+            return sprime;
+        }
+        return current;
+    }   
+};    
 
 
 class Player
@@ -154,18 +180,14 @@ class Player
 private:
 
     int faction;
-    int state;
-    unsigned long timeevent;
-
-    QAction *interruption;
-
-    QAction *qactions[25];
+    State state;
 
 public:
+    Transition *transitions[25];
+    QAction *qactions[25];
     Player(int faction);
     void playFaction(unsigned long timer);
-    int pickQAction();
-
+    State getCurrentState();
 };
 
 #endif // AI_H
