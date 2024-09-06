@@ -79,12 +79,7 @@ public:
 class IslandIsFree : public Condition
 {
 public:
-    IslandIsFree(int faction, State s, State sprime) : Condition(faction,s,sprime)
-    {
-
-    }
-
-    State evaluate(const State current )
+    bool evaluate(int faction, const State current )
     {
         Vehicle *b = findCarrier(faction);
 
@@ -99,12 +94,12 @@ public:
                 std::vector<size_t> str = is->getStructures();
 
                 if (str.size() == 0)
-                    return sprime;
+                    return true;
 
             }
 
         }
-        return current;
+        return false;
     }
 };
 
@@ -112,42 +107,33 @@ public:
 class EnoughFuelForNextOperation : public Condition
 {
 public:
-    EnoughFuelForNextOperation(int faction, State s, State sprime) : Condition(faction,s,sprime)
-    {
-
-    }
     
-    State evaluate(const State current )
+    bool evaluate(int faction, const State current )
     {
         Vehicle *b = findCarrier(faction);
 
         if (b && b->getPower()>1001.0)
         {
-            return sprime;
+            return true;
         }
 
-        return current;
+        return false;
     }
 };
 
 class NotEnoughFuelForNextOperation : public Condition
 {
 public:
-    NotEnoughFuelForNextOperation(int faction, State s, State sprime) : Condition(faction,s,sprime)
-    {
-
-    }
-    
-    State evaluate(const State current )
+    bool evaluate(int faction, const State current )
     {
         Vehicle *b = findCarrier(faction);
 
         if (b && b->getPower()<1001.0)
         {
-            return sprime;
+            return true;
         }
 
-        return current;
+        return false;
     }
 };
 
@@ -157,20 +143,16 @@ public:
 class DockedCondition : public Condition
 {
 public:
-    DockedCondition(int faction, State s, State sprime) : Condition(faction,s,sprime)
-    {
-
-    }
-    State evaluate(const State current )
+    bool evaluate(int faction, const State current )
     {
         Vehicle *b = findCarrier(faction);
 
         if (b && b->getStatus() == SailingStatus::DOCKED)
         {
-            return sprime;
+            return true;
         }
 
-        return current;
+        return false;
     }
 };
 
@@ -181,12 +163,12 @@ Player::Player(int faction)
 
 
     for(int i=0;i<25;i++) qactions[i] = new QAction();
-    for(int i=0;i<25;i++) conditions[i] = new Condition(faction, State::DOCKING,State::DOCKED);
+    for(int i=0;i<25;i++) transitions[i] = new Transition(State::IDLE,State::IDLE,Condition());
 
-    conditions[0] = new DockedCondition(faction, State::DOCKING,State::DOCKED);
-    conditions[1] = new IslandIsFree(faction,State::DOCKING,State::IDLE);
-    conditions[2] = new EnoughFuelForNextOperation(faction,State::DOCKING, State::IDLE);
-    conditions[3] = new NotEnoughFuelForNextOperation(faction,State::DOCKING, State::DOCKING);
+    transitions[0] = new Transition(State::IDLE,State::DOCKING,NotEnoughFuelForNextOperation());
+    transitions[1] = new Transition(State::DOCKING,State::DOCKED,DockedCondition());
+    transitions[2] = new Transition(State::IDLE,State::IDLE,EnoughFuelForNextOperation());
+
 
 
     qactions[(int)State::IDLE] = new QAction();
@@ -215,6 +197,6 @@ void Player::playFaction(unsigned long timer)
     qactions[(int)state]->apply(faction);
 
     for(int i=0;i<25;i++)
-        state = conditions[i]->evaluate(state);
+        state = transitions[i]->transit(faction,state);
 
 }

@@ -121,22 +121,36 @@ public:
 
 class Condition 
 {
-
 protected:
-    int faction;
+
+public:
+    bool virtual evaluate(int faction)
+    {
+        return false;
+    }
+};
+
+class Transition
+{
+protected:
     State s;
     State sprime;
+    Condition c;
 public:
-    Condition(int faction, State s, State sprime) 
+    Transition(State s, State sprime, Condition c) 
     { 
-        this->faction = faction;
         this->s = s;
         this->sprime = sprime;
+        this->c = c;
     }
-    State virtual evaluate(const State current )
+    State virtual transit(int faction, const State current )
     {
+        if (c.evaluate(faction))
+        {
+            return sprime;
+        }
         return current;
-    }
+    }    
 };
 
 
@@ -148,7 +162,7 @@ private:
     State state;
 
 public:
-    Condition *conditions[25];
+    Transition *transitions[25];
     QAction *qactions[25];
     Player(int faction);
     void playFaction(unsigned long timer);
