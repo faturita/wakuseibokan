@@ -104,6 +104,7 @@ public:
             }
 
         }
+        return current;
     }
 };
 
@@ -124,10 +125,34 @@ public:
         {
             return sprime;
         }
+
+        return current;
     }
 };
 
+class NotEnoughFuelForNextOperation : public Condition
+{
+public:
+    NotEnoughFuelForNextOperation(int faction, State s, State sprime) : Condition(faction,s,sprime)
+    {
 
+    }
+    
+    State evaluate(const State current )
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b && b->getPower()<1001.0)
+        {
+            return sprime;
+        }
+
+        return current;
+    }
+};
+
+// The condition should return true or false and this must be implemented in classes because it is code
+// The evaluator and the transition from one state to the other can be just one class because it is always the same based on input.
 
 class DockedCondition : public Condition
 {
@@ -145,7 +170,7 @@ public:
             return sprime;
         }
 
-        return s;
+        return current;
     }
 };
 
@@ -161,11 +186,14 @@ Player::Player(int faction)
     conditions[0] = new DockedCondition(faction, State::DOCKING,State::DOCKED);
     conditions[1] = new IslandIsFree(faction,State::DOCKING,State::IDLE);
     conditions[2] = new EnoughFuelForNextOperation(faction,State::DOCKING, State::IDLE);
+    conditions[3] = new NotEnoughFuelForNextOperation(faction,State::DOCKING, State::DOCKING);
 
 
     qactions[(int)State::IDLE] = new QAction();
     qactions[(int)State::DOCKING] = new DockingQAction();
     qactions[(int)State::DOCKED] = new RefuelQAction();
+    
+    state = State::IDLE;
 }
 
 State Player::getCurrentState()
