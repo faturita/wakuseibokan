@@ -1175,11 +1175,12 @@ Antenna* findAntennaFromIsland(BoxIsland *is)
     return NULL;
 }
 
+
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = -1;
     float closest = 0;
-    for(int i=0;i<islands.size();i++)
+    for(size_t i=0;i<islands.size();i++)
     {
         BoxIsland *b = islands[i];
         Vec3f l(b->getX(),0.0f,b->getZ());
@@ -2194,7 +2195,7 @@ void departure(Vehicle *f)
 
     if (m)
     {
-        m->setStatus(SailingStatus::SAILING);
+        m->setStatus(SailingStatus::OFFSHORING);
         dBodyID body = m->getBodyID();
         dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
 

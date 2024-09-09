@@ -84,7 +84,8 @@ enum class State {
     DOCKED=3,
     APPROACHFREEISLAND=4,
     APPROACHENEMYISLAND=5,
-    INVADEISLAND=6
+    INVADEISLAND=6,
+    RENDEZVOUS=7
 };
 
 
@@ -150,6 +151,7 @@ public:
     {
         if (current == s && c->evaluate(faction))
         {
+            std::cout << "Transitioning from " << (int)s << " to " << (int)sprime << std::endl;
             return sprime;
         }
         return current;

@@ -31,7 +31,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && b->getPower()<1001.0 && b->getAutoStatus() != AutoStatus::DOCKING)
+        if (b && b->getPower()<500.0 && b->getAutoStatus() != AutoStatus::DOCKING)
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
@@ -53,6 +53,7 @@ public:
                         {
                             b->setAutoStatus(AutoStatus::DOCKING);
                             b->setDestination(d->getPos()-d->getForward().normalize()*400);
+                            b->setAutoStatus(AutoStatus::DOCKING);
                             b->enableAuto();
                             dout << "DOCKING!" << std::endl;
                         }
@@ -88,10 +89,13 @@ public:
 
                         if (d->getFaction() == faction)
                         {
-                            dout << "Refueling!" << std::endl;
-                            refuel(d);
-                            departure(d);
-                            
+                            // Check if refueling is enough...
+                            if ( (d->getCargo(CargoTypes::POWERFUEL)+b->getPower()) > 500)
+                            {
+                                dout << "Refueling!" << std::endl;
+                                refuel(d);
+                                departure(d);
+                            }
                         }
                     } 
                 }
@@ -172,56 +176,195 @@ class InvadeIslandQAction : public QAction
             BoxIsland *is = findNearestIsland(b->getPos());
 
             // Check if the island is still free
-            if (is->getCommandCenter())
+            if (!is->getCommandCenter())
             {
-                return;
-            }
-
-            if ((b->getPos()-is->getPos()).magnitude()<5000.0 && b->getAutoStatus() != AutoStatus::DESTINATION)
-            {
-
-                // @FIXME: Find the closest walrus to the carrier or to the island.
-                Walrus *w = findNearestWalrus(faction,is->getPos(),10000.0);
-
-                if (!w)
+                if ((b->getPos()-is->getPos()).magnitude()<5000.0 && b->getAutoStatus() != AutoStatus::DESTINATION)
                 {
-                    w = spawnWalrus(space,world,b);
-                    w->goTo(getRandomCircularSpot(is->getPos(),200.0));
-                    w->enableAuto();
-                }
 
-                dout << "Walrus status:" << (int)w->getAutoStatus() << std::endl;
+                    // @FIXME: Find the closest walrus to the carrier or to the island.
+                    Walrus *w = findNearestWalrus(faction,is->getPos(),10000.0);
 
-                if (w->getAutoStatus() == AutoStatus::IDLE)
-                {
-                    if ((is->getPos()-w->getPos()).magnitude()>300.0)
-                    {   
+                    if (!w)
+                    {
+                        w = spawnWalrus(space,world,b);
                         w->goTo(getRandomCircularSpot(is->getPos(),200.0));
                         w->enableAuto();
                     }
-                    else
+
+                    dout << "Walrus status:" << (int)w->getAutoStatus() << std::endl;
+
+                    if (w->getAutoStatus() == AutoStatus::IDLE)
                     {
-                        if ( w->getIsland() == is)
-                        {
-                            // Capture island
-                            assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-                            int which = (rand() % 3);
-                            captureIsland(is,w->getFaction(),which,space, world);
-
-                            w->goTo(getRandomCircularSpot(b->getPos(),200.0));
+                        if ((is->getPos()-w->getPos()).magnitude()>300.0)
+                        {   
+                            w->goTo(getRandomCircularSpot(is->getPos(),200.0));
                             w->enableAuto();
+                        }
+                        else
+                        {
+                            if ( w->getIsland() == is)
+                            {
+                                // Capture island
+                                assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
+                                int which = (rand() % 3);
+                                captureIsland(is,w->getFaction(),which,space, world);
 
+                                w->goTo(getRandomCircularSpot(b->getPos(),200.0));
+                                w->enableAuto();
+
+                            }
                         }
                     }
                 }
+            }
+            else
+            {
+                // Check where is the walrus and dock it back.
+                Walrus *w = findNearestWalrus(faction,b->getPos(),1000.0);
+
+                if (w && (w->getPos()-b->getPos()).magnitude()<200.0)
+                {
+                    synchronized(entities.m_mutex)
+                    {
+                        dockWalrus(b);
+                    }
+                }
+
             }
         }
     }
 };
 
+class RendezvousQAction : public QAction
+{
+    void apply(int faction)
+    {
+        Vehicle *b = findCarrier(faction);
 
+        if (!b)
+            return;
+
+        bool done1 = true;
+        bool done2 = true;
+
+        // Find walruses around the carrier and dock them (do not instruct the walruses to come back to the carrier)
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            Vehicle *v=entities[i];
+            if (v->getType() == WALRUS && v->getFaction() == faction)
+            {
+                if ((v->getPos()-b->getPos()).magnitude()<10000)   {
+
+                    done1 = false;
+                    Walrus *w = (Walrus*)v;
+                    if (w)
+                    {
+                        synchronized(entities.m_mutex)
+                        {
+                            dockWalrus(b);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        // Find all the mantas around, land them, and dock them.
+        Manta *m1 = findManta(faction,FlyingStatus::ON_DECK);
+        Manta *m2 = findNearestManta(FlyingStatus::FLYING,b->getFaction(),b->getPos(),30000);
+        Manta *m3 = findNearestManta(FlyingStatus::HOLDING,b->getFaction(), b->getPos(),30000);
+
+        Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+        if (m)
+        {
+            landManta(b,m);
+            b->stop();
+        }
+
+
+        if (m2)
+        {
+            // Updating the current carrier postion to Manta so that it improves landing.
+            //m2->setDestination(b->getPos());
+            m2->setAttitude(b->getForward());
+        } else
+        {
+            if (m3)
+            {
+                if (m3->getAutoStatus() != AutoStatus::LANDING)
+                    landManta(b,m3);
+                b->stop();
+            }
+        }
+
+
+        if (m1)
+        {
+            synchronized(entities.m_mutex)
+            {
+                dockManta();
+            }
+        }
+    }
+};
 
 // ===================================== Conditions =====================================
+class AllUnitsDocked : public Condition
+{
+public:
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b)
+            return false;
+
+        bool done1 = true;
+        bool done2 = true;
+
+        // Find walruses around and dock them.
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            Vehicle *v=entities[i];
+            if (v->getType() == WALRUS && v->getFaction() == faction)
+            {
+                if ((v->getPos()-b->getPos()).magnitude()<10000)   {
+
+                    done1 = false;
+                }
+
+            }
+        }
+
+        // Find all the mantas around, land them, and dock them.
+        Manta *m1 = findManta(faction,FlyingStatus::ON_DECK);
+        Manta *m2 = findNearestManta(FlyingStatus::FLYING,b->getFaction(),b->getPos(),30000);
+        Manta *m3 = findNearestManta(FlyingStatus::HOLDING,b->getFaction(), b->getPos(),30000);
+
+        Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+        if (m)
+        {
+            done2=false;
+        }
+        if (m2)
+        {
+            done2 = false;
+        } else
+        {
+            if (m3)
+            {
+                done2 = false;
+            }
+        }
+
+        return (done1 && done2);
+
+    }
+};
+
+
 class NoNearbyFreeIsland : public Condition
 {
 public:
@@ -243,7 +386,7 @@ public:
     }
 };
 
-class FreeIslandIsClose : public Condition
+class ClosestIslandIsFriendly : public Condition
 {
 public:
     bool evaluate(int faction) override
@@ -252,7 +395,7 @@ public:
 
         if (b)
         {
-            BoxIsland *is = findNearestEmptyIsland(b->getPos());
+            BoxIsland *is = findNearestFriendlyIsland(b->getPos(),false,faction,10000.0);
 
             if (is && (is->getPos()-b->getPos()).magnitude()<10000.0)
             {
@@ -264,26 +407,65 @@ public:
     }
 };
 
-class IslandIsFree : public Condition
+class ClosestIslandIsFree : public Condition
 {
 public:
     bool evaluate(int faction) override
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && b->getPower()<1001.0)
+        if (b)
+        {
+            BoxIsland *is =findNearestIsland(b->getPos());
+
+            if (is && (is->getPos()-b->getPos()).magnitude()<10000.0)
+            {
+                Structure *sc = is->getCommandCenter();
+                if (!sc)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class ClosestFarAwayIslandIsFree : public Condition
+{
+public:
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        dout << "ClosestFarAwayIslandIsFree" << std::endl;  
+
+        // Do I have power to get to the next island
+        if (b && b->getPower()>500.0)
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
-            BoxIsland *is = findNearestIsland(b->getPos());
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
 
-            if (is)
+
+            dout << freeis << std::endl;
+            dout << enemyis << std::endl;
+            dout << "Free island:" << (freeis->getPos()-b->getPos()).magnitude() << std::endl;
+
+            if (freeis && !enemyis)
+                return true;
+
+            if (enemyis && !freeis)
+                return false;
+
+            if (freeis && enemyis)
             {
-                std::vector<size_t> str = is->getStructures();
-
-                if (str.size() == 0)
+                if ((freeis->getPos()-b->getPos()).magnitude() > 40000.0 && (freeis->getPos()-b->getPos()).magnitude() < (enemyis->getPos()-b->getPos()).magnitude())
+                {
                     return true;
-
+                }
             }
 
         }
@@ -291,6 +473,39 @@ public:
     }
 };
 
+class ClosestFarAwayIslandIsEnemy : public Condition
+{
+public:
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        // Do I have power to get to the next island
+        if (b && b->getPower()>500.0)
+        {
+            //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
+
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
+
+            if (!freeis && enemyis)
+                return true;
+
+            if (!enemyis && freeis)
+                return false;
+
+            if (freeis && enemyis)
+            {
+                if ((enemyis->getPos()-b->getPos()).magnitude() > 40000.0 && (enemyis->getPos()-b->getPos()).magnitude() < (freeis->getPos()-b->getPos()).magnitude())
+                {
+                    return true;
+                }
+            }
+
+        }
+        return false;
+    }
+};
 
 class EnoughFuelForNextOperation : public Condition
 {
@@ -300,7 +515,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && b->getPower()>998.0)
+        if (b && b->getPower()>500.0)
         {
             return true;
         }
@@ -384,11 +599,13 @@ Player::Player(int faction)
     transitions[1] = new Transition(State::DOCKING,State::DOCKED,new DockedCondition());
     transitions[2] = new Transition(State::IDLE,State::IDLE,new EnoughFuelForNextOperation());
     transitions[3] = new Transition(State::DOCKED,State::IDLE,new CarrierIsSailing());
-    transitions[4] = new Transition(State::IDLE,State::INVADEISLAND,new FreeIslandIsClose());
-    transitions[5] = new Transition(State::IDLE,State::APPROACHENEMYISLAND,new NoNearbyFreeIsland());
-    transitions[6] = new Transition(State::IDLE,State::APPROACHFREEISLAND,new IslandIsFree());
+    transitions[4] = new Transition(State::IDLE,State::INVADEISLAND,new ClosestIslandIsFree());
+    transitions[5] = new Transition(State::IDLE,State::APPROACHENEMYISLAND,new ClosestFarAwayIslandIsEnemy());
+    transitions[6] = new Transition(State::IDLE,State::APPROACHFREEISLAND,new ClosestFarAwayIslandIsFree());
     transitions[7] = new Transition(State::APPROACHFREEISLAND,State::INVADEISLAND,new CarrierHasArrived());
     transitions[8] = new Transition(State::APPROACHENEMYISLAND,State::INVADEISLAND,new CarrierHasArrived());
+    transitions[9] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());
+    transitions[10] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());
 
 
     qactions[(int)State::IDLE] = new QAction();
@@ -397,6 +614,7 @@ Player::Player(int faction)
     qactions[(int)State::APPROACHFREEISLAND] = new ApproachFreeIslandQAction();
     qactions[(int)State::APPROACHENEMYISLAND] = new ApproachEnemyIslandQAction();
     qactions[(int)State::INVADEISLAND] = new InvadeIslandQAction();
+    qactions[(int)State::RENDEZVOUS] = new RendezvousQAction();
 
 
     state = State::IDLE;
@@ -413,13 +631,17 @@ void Player::playFaction(unsigned long timer)
     // Check for enemies nearby and shift strategy if they are present.
     //state = interruption->apply(state,faction,timeevent,timer);
 
-    dout << "Status:" << (int)state << std::endl;
+    if (timer % 1000 == 0)
+        dout << "Status:" << (int)state << std::endl;
 
     // Fire the action according to the state.
     qactions[(int)state]->apply(faction);
 
-
+    //dout << "Statuses -------" << std::endl;
     for(int i=0;i<25;i++)
+    {
+        //dout << "Status:" << (int)state << std::endl;
         state = transitions[i]->transit(faction,state);
+    }
 
 }

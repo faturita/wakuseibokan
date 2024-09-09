@@ -157,6 +157,7 @@ void Balaenidae::doControlDocking()
 
     float roundederror = 100;
 
+    dout << "Running docking control." << std::endl;
 
     if (dst_status != DestinationStatus::REACHED && getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
     {
@@ -277,6 +278,8 @@ void Balaenidae::doControl()
         case AutoStatus::DOCKING:       doControlDocking(); break;
         default: break;
     }
+
+    dout << "Carrier control." <<  (int)autostatus << std::endl;
 
 }
 

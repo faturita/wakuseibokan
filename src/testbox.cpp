@@ -119,7 +119,7 @@
 
 #include "math/uuid.h"
 
-#include "ai2.h"
+#include "ai.h"
 
 extern  Camera camera;
 
@@ -7731,6 +7731,14 @@ void test84()
 
     islands.push_back(nemesis);
 
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -7756,6 +7764,8 @@ void test84()
     //runway->setCargo(CargoTypes::POWERFUEL,1000);
     //dock->setCargo(CargoTypes::POWERFUEL,1000);
     _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(100);
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
