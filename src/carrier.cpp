@@ -1130,6 +1130,15 @@ void inline processCommandOrders()
                         size_t idx = entities.push_back(m, m->getGeom());
                     }
                 }
+                else if (co.parameters.spawnid == VehicleSubTypes::CARGOSHIP)
+                {
+                    if (entities[ctroler->controllingid]->getSubType()==DOCK)
+                    {
+                        CargoShip* m = (CargoShip*)(entities[ctroler->controllingid]->spawn(world,space,CARGOSHIP,findNextNumber(entities[ctroler->controllingid]->getFaction(),WALRUS,CARGOSHIP)));
+
+                        size_t idx = entities.push_back(m, m->getGeom());
+                    }
+                }
             } else if (co.command == Command::FireOrder)
             {
                 if (ctroler->controllingid != CONTROLLING_NONE && entities.isValid(ctroler->controllingid))

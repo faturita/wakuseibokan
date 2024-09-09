@@ -9,8 +9,6 @@ class Balaenidae : public Vehicle
 {
 protected:
     float rudder;
-    int offshoring = 0;
-    Vec3f ap;
     std::vector<size_t> weapons;
 
 

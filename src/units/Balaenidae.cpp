@@ -159,7 +159,7 @@ void Balaenidae::doControlDocking()
 
     dout << "Running docking control." << std::endl;
 
-    if (dst_status != DestinationStatus::REACHED && getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
+    if (getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
     {
         // Potential fields from the islands (to avoid them)
         int nearesti = 0;
@@ -259,7 +259,6 @@ void Balaenidae::doControlDocking()
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
             dst_status = DestinationStatus::REACHED;
-            autostatus = AutoStatus::IDLE;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;
@@ -278,8 +277,6 @@ void Balaenidae::doControl()
         case AutoStatus::DOCKING:       doControlDocking(); break;
         default: break;
     }
-
-    dout << "Carrier control." <<  (int)autostatus << std::endl;
 
 }
 
@@ -449,22 +446,22 @@ void Balaenidae::doDynamics(dBodyID body)
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
 
 
-    if (offshoring == 1) {
-        offshoring=0;
-        setStatus(SailingStatus::SAILING);
-    }
-    else if (offshoring > 0)
-    {
-        // Add a retractive force to keep it out of the island.
-        Vec3f ap = Balaenidae::ap;
+    // if (offshoring == 1) {
+    //     offshoring=0;
+    //     setStatus(SailingStatus::SAILING);
+    // }
+    // else if (offshoring > 0)
+    // {
+    //     // Add a retractive force to keep it out of the island.
+    //     Vec3f ap = Balaenidae::ap;
 
-        setThrottle(0.0);
+    //     setThrottle(0.0);
 
-        Vec3f V = ap*(-10000);
+    //     Vec3f V = ap*(-10000);
 
-        dBodyAddForce(body,V[0],V[1],V[2]);
-        offshoring--;
-    }
+    //     dBodyAddForce(body,V[0],V[1],V[2]);
+    //     offshoring--;
+    // }
 
 
     dReal *v = (dReal *)dBodyGetLinearVel(body);
@@ -506,9 +503,9 @@ void Balaenidae::doDynamics(dBodyID body)
 
 void Balaenidae::offshore()
 {
-    Balaenidae::offshoring = 100;
-    Balaenidae::ap =getForward();
-    Balaenidae::ap = Balaenidae::ap.normalize();
+    dBodyID body = getBodyID();
+    dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+    setDelayedStatus(SailingStatus::OFFSHORING,100, SailingStatus::SAILING);
 }
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)

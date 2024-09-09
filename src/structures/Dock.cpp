@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include "../units/Walrus.h"
+#include "../units/CargoShip.h"
 #include "Dock.h"
 
 extern std::unordered_map<std::string, GLuint> textures;
@@ -74,29 +75,44 @@ bool Dock::checkHeightOffset(int heightOffset)
 
 Vehicle* Dock::spawn(dWorldID  world,dSpaceID space,int type, int number)
 {
-    Walrus *_walrus = new Walrus(getFaction());
-    _walrus->init();
-    _walrus->setNameByNumber(number);
-    _walrus->embody(world,space);
+    Vehicle *v = NULL;
+
+    if (type == VehicleSubTypes::CARGOSHIP)
+    {
+        CargoShip *cg = new CargoShip(getFaction());
+        cg->init();
+        cg->setNameByNumber(number);
+        cg->embody(world,space);
+        v = cg;
+    }
+    else 
+    {
+        Walrus *_walrus = new Walrus(getFaction());
+        _walrus->init();
+        _walrus->setNameByNumber(number);
+        _walrus->embody(world,space);
+        v = _walrus;
+    }
+
     Vec3f p;
     p = getForward().normalize()*(getDimensions()[2]/2.0+300.0);
-    _walrus->setPos(pos[0]-p[0],pos[1]-p[1]+1,pos[2]-p[2]);
-    _walrus->setStatus(SailingStatus::SAILING);
-    _walrus->stop();
-    _walrus->inert = true;
+    v->setPos(pos[0]-p[0],pos[1]-p[1]+1,pos[2]-p[2]);
+    v->setStatus(SailingStatus::SAILING);
+    v->stop();
+    v->inert = true;
 
     p = getForward().normalize()*(1500);
-    _walrus->goTo(Vec3f(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]));
-    _walrus->enableAuto();
+    v->goTo(Vec3f(pos[0]-p[0]-140*(number+1),pos[1]-p[1]+1,pos[2]-p[2]));
+    v->enableAuto();
 
-    alignToMe(_walrus->getBodyID());
+    alignToMe(v->getBodyID());
 
     dMatrix3 Re2;
     dRSetIdentity(Re2);
     dRFromAxisAndAngle(Re2,0.0,1.0,0.0,PI);
-    dBodySetRotation(_walrus->getBodyID(),Re2);
+    dBodySetRotation(v->getBodyID(),Re2);
 
-    return _walrus;
+    return v;
 }
 
 void Dock::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)

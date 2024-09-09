@@ -153,6 +153,9 @@ private:
 
     bool dotelemetry=false;
 
+    int statuschangedelay=0;
+    int finaldelayedstatus = SailingStatus::SAILING;
+
 protected:
     Vec3f pos;
     Vec3f vel;
@@ -324,6 +327,7 @@ public:
 
     int getStatus() const;
     void setStatus(int value);
+    void setDelayedStatus(int status, int delay, int finalstatus);
     float getHealth() const;
     virtual void damage(float d);
     void destroy();

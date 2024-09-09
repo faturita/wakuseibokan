@@ -2195,7 +2195,7 @@ void departure(Vehicle *f)
 
     if (m)
     {
-        m->setStatus(SailingStatus::OFFSHORING);
+        m->setDelayedStatus(SailingStatus::OFFSHORING, 100, SailingStatus::SAILING);
         dBodyID body = m->getBodyID();
         dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
 

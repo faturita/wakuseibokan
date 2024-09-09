@@ -808,6 +808,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.push(co);
             }
             break;
+        case 'y':
+            {
+                CommandOrder co;
+                co.command = Command::SpawnOrder;
+                co.parameters.spawnid = VehicleSubTypes::CARGOSHIP;
+                controller.push(co);
+            }
+            break;
         case 'm':
             {
                 CommandOrder co;

@@ -51,7 +51,6 @@ public:
 
                         if (d->getFaction() == faction)
                         {
-                            b->setAutoStatus(AutoStatus::DOCKING);
                             b->setDestination(d->getPos()-d->getForward().normalize()*400);
                             b->setAutoStatus(AutoStatus::DOCKING);
                             b->enableAuto();

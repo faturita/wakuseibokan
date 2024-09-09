@@ -63,6 +63,13 @@ void Vehicle::setStatus(int value)
     status = value;
 }
 
+void Vehicle::setDelayedStatus(int status, int delay, int finalstatus)
+{
+    setStatus(status);
+    statuschangedelay = delay;
+    finaldelayedstatus = finalstatus;    
+}
+
 Vehicle::Vehicle()
 {
     for(int i=0;i<12;i++)
@@ -649,11 +656,22 @@ void Vehicle::wrapDynamics(dBodyID body)
 
     Vec3f newpos(dBodyPosition[0], dBodyPosition[1], dBodyPosition[2]);
 
+    // @NOTE: Reduce the power based on the throttle and the specific energy consumption.
     fueltank -= getEnergyConsumption() * getThrottle();
     if (fueltank<0)
     {
         setPower(getPower()-1);
         fueltank=1;
+    }
+
+    // Allow some histeresis in state changes.
+    if (statuschangedelay>0)
+    {
+        statuschangedelay--;
+        if (statuschangedelay==0)
+        {
+            setStatus(finaldelayedstatus);
+        }
     }
 
     /**
