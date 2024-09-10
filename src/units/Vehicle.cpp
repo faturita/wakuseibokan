@@ -776,7 +776,7 @@ void Vehicle::setDestination(Vec3f dest)
 
 void Vehicle::goWaypoints()
 {
-    dst_status = DestinationStatus::STILL;
+    dst_status = DestinationStatus::READY;
     autostatus = AutoStatus::WAYPOINT;
 }
 
@@ -903,6 +903,12 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
 bool Vehicle::arrived()
 {
     return dst_status == DestinationStatus::REACHED;
+}
+
+void Vehicle::ready()
+{
+    // @NOTE: Clears the destination status flag to allow new orders.
+    dst_status = DestinationStatus::READY;
 }
 
 std::string Vehicle::getName()

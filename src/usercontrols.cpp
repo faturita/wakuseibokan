@@ -383,9 +383,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("set") != std::string::npos)
             {
                 std::string command = controller.str.substr(3+1,1);
-                std::string entityid = controller.str.substr(controller.str.find("#")+1);
 
-                dout << "Command-" << command << " map to " << entityid << std::endl;
+                std::string entityid;
+                if (controller.str.find("#") != std::string::npos)
+                    entityid = controller.str.substr(controller.str.find("#")+1);
+                else
+                    entityid = std::to_string((int)controller.controllingid);
+
+                std::cout << "Command-" << command << " map to " << entityid << std::endl;
 
                 int keycontrol = atoi(command.c_str());
 
@@ -459,6 +464,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
                 CLog::Write(CLog::Debug,"Manta %d\n", index);
+
+                switchControl(index);
+
+            } else
+            if (controller.str.find("cargoship") != std::string::npos)
+            {
+                int content = atoi(controller.str.substr(9).c_str());
+
+                size_t index = CONTROLLING_NONE;
+                findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CARGOSHIP, controller.faction, content);
+
+                CLog::Write(CLog::Debug,"CargoShip %d\n", content);
 
                 switchControl(index);
 
@@ -577,6 +594,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             {
                 CommandOrder co;
                 co.command = Command::RefuelOrder;
+
+                controller.push(co);
+            } 
+            else
+            if (controller.str.find("refill") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::RefillOrder;
 
                 controller.push(co);
             } 

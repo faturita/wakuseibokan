@@ -94,8 +94,9 @@ Vehicle* Dock::spawn(dWorldID  world,dSpaceID space,int type, int number)
         v = _walrus;
     }
 
-    Vec3f p;
-    p = getForward().normalize()*(getDimensions()[2]/2.0+300.0);
+    Vec3f p(0,0,0);
+    // @NOTE: Be sure that 600 is enough according to the dock size.
+    p = getForward().normalize()*800;
     v->setPos(pos[0]-p[0],pos[1]-p[1]+1,pos[2]-p[2]);
     v->setStatus(SailingStatus::SAILING);
     v->stop();
@@ -109,7 +110,7 @@ Vehicle* Dock::spawn(dWorldID  world,dSpaceID space,int type, int number)
 
     dMatrix3 Re2;
     dRSetIdentity(Re2);
-    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,PI);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,2*PI);
     dBodySetRotation(v->getBodyID(),Re2);
 
     return v;

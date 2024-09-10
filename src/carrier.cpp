@@ -1016,6 +1016,9 @@ void inline processCommandOrders()
                     entities[ctroler->controllingid]->enableTelemetry();
                 else
                     entities[ctroler->controllingid]->disableTelemetry();
+            } else if (co.command == Command::RefillOrder)
+            {
+                refill(entities[ctroler->controllingid]);
             } else if (co.command == Command::RefuelOrder)
             {
                 refuel(entities[ctroler->controllingid]);

@@ -578,7 +578,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
 
 void SimplifiedDynamicManta::doControlWaypoint(float threshold)
 {
-    if (dst_status == DestinationStatus::STILL)
+    if (dst_status == DestinationStatus::READY)
     {
         if (!waypoints.empty()) destination = waypoints.front();waypoints.pop();
         dst_status = DestinationStatus::TRAVELLING;
@@ -639,7 +639,7 @@ void SimplifiedDynamicManta::land(Vec3f landplace, Vec3f placelattitude)
     addWaypoint(w3);
     addWaypoint(w4);
     addWaypoint(w5);
-    dst_status = DestinationStatus::STILL;
+    dst_status = DestinationStatus::READY;
     enableAuto();
 }
 
@@ -982,8 +982,10 @@ void SimplifiedDynamicManta::hold()
 void SimplifiedDynamicManta::enableAuto()
 {
     Vehicle::enableAuto();
+
+    // Clear all the flags
     flyingstate=0;
-    dst_status == DestinationStatus::STILL;
+    dst_status == DestinationStatus::READY;
 }
 
 void SimplifiedDynamicManta::dogfight(Vec3f target)

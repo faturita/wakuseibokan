@@ -241,5 +241,6 @@ void trackTargets();
 
 void departure(Vehicle *f);
 void refuel(Vehicle *v);
+void refill(Vehicle *f);
 
 #endif // ENGINE_H

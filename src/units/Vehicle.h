@@ -133,7 +133,7 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
-enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
+enum class DestinationStatus { READY=0, TRAVELLING, REACHED};
 
 enum class WEAPONS { GUNSHOT=1, MISSILE=2, BOMB=3 };
 
@@ -322,6 +322,7 @@ public:
     void goWaypoints();
 
     bool arrived();
+    void ready();
 
     virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type, int number);
 
