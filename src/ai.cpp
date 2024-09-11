@@ -199,20 +199,18 @@ class InvadeIslandQAction : public QAction
                             w->goTo(getRandomCircularSpot(is->getPos(),200.0));
                             w->enableAuto();
                         }
-                        else
-                        {
-                            if ( w->getIsland() == is)
-                            {
-                                // Capture island
-                                assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-                                int which = (rand() % 3);
-                                captureIsland(is,w->getFaction(),which,space, world);
+                    }
 
-                                w->goTo(getRandomCircularSpot(b->getPos(),200.0));
-                                w->enableAuto();
+                    if ( w->getIsland() == is)
+                    {
+                        // Capture island
+                        assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
+                        int which = (rand() % 3);
+                        captureIsland(is,w->getFaction(),which,space, world);
 
-                            }
-                        }
+                        w->goTo(getRandomCircularSpot(b->getPos(),200.0));
+                        w->enableAuto();
+
                     }
                 }
             }

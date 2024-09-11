@@ -2211,6 +2211,31 @@ void departure(Vehicle *f)
     return;    
 }
 
+void unfill(Vehicle *f)
+{
+    Vehicle *dock = NULL;
+
+    if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+    {
+        BoxIsland *is = findNearestIsland(f->getPos());
+        dock = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+
+        if (dock)
+        {
+            int cargo = dock->getCargo(CargoTypes::POWERFUEL);
+            int fillcargo = 1000-cargo;
+            int remanent = f->removeCargo(CargoTypes::POWERFUEL,fillcargo);
+            dock->addCargo(CargoTypes::POWERFUEL,remanent);
+            char msg[256];
+            Message mg;
+            mg.faction = dock->getFaction();
+            sprintf(msg, "%s cargo has been unloaded on %s.", f->getName().c_str(), is->getName().c_str());
+            mg.msg = std::string(msg); mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+        }
+    } 
+}
+
 void refill(Vehicle *f)
 {
     Vehicle *m = NULL;

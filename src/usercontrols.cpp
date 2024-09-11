@@ -598,6 +598,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.push(co);
             } 
             else
+            if (controller.str.find("unfill") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::UnfillOrder;
+
+                controller.push(co);
+            } 
+            else
             if (controller.str.find("refill") != std::string::npos)
             {
                 CommandOrder co;
