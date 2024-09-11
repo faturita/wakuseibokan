@@ -52,7 +52,7 @@ public:
 
     virtual EntityTypeId getTypeId();
 
-    float getEnergyConsumption();
+    float virtual getEnergyConsumption();
 };
 
 #endif // BALAENIDAE_H
