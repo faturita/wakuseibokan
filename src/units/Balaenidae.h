@@ -31,6 +31,7 @@ public:
     void virtual doControl();
     void doControlDocking();
     void doControlDestination();
+    void doControlWaypoint();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     void doDynamics();

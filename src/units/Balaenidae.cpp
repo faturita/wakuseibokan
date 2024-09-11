@@ -241,7 +241,7 @@ void Balaenidae::doControlDocking()
         if (abs(e)>=0.2f)
             c.registers.roll = 10.0 * (signn>0?+1:-1) ;
         else {
-            c.registers.roll = 0.0f;
+            c.registers.roll = 0.0f; 
         }**/
 
 
@@ -275,9 +275,29 @@ void Balaenidae::doControl()
     switch (autostatus) {
         case AutoStatus::DESTINATION:   doControlDestination(); break;
         case AutoStatus::DOCKING:       doControlDocking(); break;
+        case AutoStatus::WAYPOINT:      doControlWaypoint(); break;
         default: break;
     }
 
+}
+
+void Balaenidae::doControlWaypoint()
+{
+    if (dst_status == DestinationStatus::READY)
+    {
+        if (!waypoints.empty())
+        {
+            destination = waypoints.front();
+            waypoints.pop();
+            dst_status = DestinationStatus::TRAVELLING;
+        }
+        if (dst_status == DestinationStatus::REACHED && !waypoints.empty())
+        {
+            destination = waypoints.front();
+            waypoints.pop();
+            dst_status = DestinationStatus::TRAVELLING;
+        }
+    } ghgjhgjhgjhgjh
 }
 
 
