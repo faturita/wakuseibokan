@@ -283,25 +283,30 @@ void Balaenidae::doControl()
 
 void Balaenidae::doControlWaypoint()
 {
-    if (dst_status == DestinationStatus::READY)
+    if ( (dst_status == DestinationStatus::READY || dst_status == DestinationStatus::REACHED) && !waypoints.empty())
     {
-        if (!waypoints.empty())
-        {
-            destination = waypoints.front();
-            waypoints.pop();
-            dst_status = DestinationStatus::TRAVELLING;
-        }
-        if (dst_status == DestinationStatus::REACHED && !waypoints.empty())
-        {
-            destination = waypoints.front();
-            waypoints.pop();
-            dst_status = DestinationStatus::TRAVELLING;
-        }
-    } ghgjhgjhgjhgjh
+        destination = waypoints.front();
+        waypoints.pop();
+        dst_status = DestinationStatus::TRAVELLING;
+    }
+    if (dst_status == DestinationStatus::REACHED && waypoints.empty())
+    {
+        char str[256];
+        Message mg;
+        mg.faction = getFaction();
+        sprintf(str, "%s has arrived to destination.", getName().c_str());
+        mg.msg = std::string(str);mg.timer = 0;
+        messages.insert(messages.begin(), mg);
+        CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
+        dst_status = DestinationStatus::REACHED;
+        setAutoStatus(AutoStatus::IDLE);
+    }
+
+    doControlDestination(false);
 }
 
 
-void Balaenidae::doControlDestination()
+void Balaenidae::doControlDestination(bool notifyfinish)
 {
     Controller c;
 
@@ -399,18 +404,23 @@ void Balaenidae::doControlDestination()
     } else {
         if (dst_status != DestinationStatus::REACHED )
         {
-            char str[256];
-            Message mg;
-            mg.faction = getFaction();
-            sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
-            CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
-            mg.msg = std::string(str);mg.timer = 0;
-            messages.insert(messages.begin(), mg);
+            if (notifyfinish)
+            {
+                char str[256];
+                Message mg;
+                mg.faction = getFaction();
+                sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
+                CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
+                mg.msg = std::string(str);mg.timer = 0;
+                messages.insert(messages.begin(), mg);
+
+                c.registers.thrust = 0.0f;
+                setThrottle(0.0);
+                c.registers.roll = 0.0f;
+                setAutoStatus(AutoStatus::IDLE);
+            }
+
             dst_status = DestinationStatus::REACHED;
-            c.registers.thrust = 0.0f;
-            setThrottle(0.0);
-            c.registers.roll = 0.0f;
-            setAutoStatus(AutoStatus::IDLE);
         }
     }
 

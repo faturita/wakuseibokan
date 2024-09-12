@@ -7782,7 +7782,7 @@ void test84()
     Vec3f pos(0.0,1.32, - 60);
     camera.setPos(pos);
 
-    aiplayer = GREEN_AI;
+    aiplayer = FREE_AI; 
     controller.faction = BOTH_FACTION;
 
     //cg->setAutoStatus(AutoStatus::DOCKING);
@@ -7792,6 +7792,22 @@ void test84()
     //_b->setAutoStatus(AutoStatus::DOCKING);
     //_b->setDestination(dock->getPos()-dock->getForward().normalize()*400);
     //_b->enableAuto();
+
+    Vec3f w1(16000.0f,20.5f,0);
+    Vec3f w2(16000.0f,20.5f,10000);
+    Vec3f w3(16000.0f,20.5f,20000);
+
+    dout << w1 << w2 << w3  << std::endl;
+
+    _b->clearWaypoints();
+
+    _b->addWaypoint(w1);
+    _b->addWaypoint(w2);
+    _b->addWaypoint(w3);
+
+    _b->ready();
+    _b->setAutoStatus(AutoStatus::WAYPOINT);
+    _b->enableAuto();
 
 }
 

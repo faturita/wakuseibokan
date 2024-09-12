@@ -30,7 +30,7 @@ public:
     void doControl(struct controlregister regs);
     void virtual doControl();
     void doControlDocking();
-    void doControlDestination();
+    void doControlDestination(bool notifyfinish=false);
     void doControlWaypoint();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
