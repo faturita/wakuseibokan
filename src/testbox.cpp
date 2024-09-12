@@ -7765,7 +7765,7 @@ void test84()
     //dock->setCargo(CargoTypes::POWERFUEL,1000);
     _b->setCargo(CargoTypes::POWERFUEL,1000);
 
-    _b->setPower(100);
+    _b->setPower(1000);
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
@@ -7813,7 +7813,33 @@ void test84()
 
 void checktest84(unsigned long timer)
 {
+    if (timer>2000)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
 
+        if (b)
+        {
+            Vec3f w3(16000.0f,20.5f,20000);
+
+            std::cout << (b->getPos()-w3).magnitude() << std::endl;
+
+
+            if (b->getPos().isCloseTo(w3,400))
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+
+    }
+    if (timer == 10000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+
+    }
 }
 
 void test85()
