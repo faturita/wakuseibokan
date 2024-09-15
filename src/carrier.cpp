@@ -1025,6 +1025,9 @@ void inline processCommandOrders()
             } else if (co.command == Command::RefuelOrder)
             {
                 refuel(entities[ctroler->controllingid]);
+            } else if (co.command == Command::CollectOrder)
+            {
+                collect(entities[ctroler->controllingid]);
             } else if (co.command == Command::Departure)
             {
                 departure(entities[ctroler->controllingid]);

@@ -95,6 +95,9 @@ Vehicle::Vehicle()
     steering=0.0f;
 
     destination = Vec3f(0.0f, 0.0f, 0.0f);
+
+    dst_status = DestinationStatus::READY;
+    autostatus = AutoStatus::IDLE;
 }
 
 Vehicle::~Vehicle()

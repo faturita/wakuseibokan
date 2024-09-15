@@ -217,6 +217,7 @@ BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+int countNumberOfIslands(int faction);
 
 Antenna* findAntennaFromIsland(BoxIsland *is);
 Structure* findStructureFromIsland(BoxIsland *is, int subtype);
@@ -243,5 +244,7 @@ void departure(Vehicle *f);
 void refuel(Vehicle *v);
 void refill(Vehicle *f);
 void unfill(Vehicle *f);
+void collect(Vehicle *v);
+int getIslandCargo(BoxIsland *is,int cargo);
 
 #endif // ENGINE_H

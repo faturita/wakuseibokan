@@ -151,7 +151,9 @@ public:
     {
         if (current == s && c->evaluate(faction))
         {
-            std::cout << "Transitioning from " << (int)s << " to " << (int)sprime << std::endl;
+            Vehicle *v = findCarrier(faction);
+
+            std::cout << (int)v->dst_status << " - Transitioning from " << (int)s << " to " << (int)sprime << std::endl;
             return sprime;
         }
         return current;

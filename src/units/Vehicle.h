@@ -156,6 +156,8 @@ private:
     int statuschangedelay=0;
     int finaldelayedstatus = SailingStatus::SAILING;
 
+
+
 protected:
     Vec3f pos;
     Vec3f vel;
@@ -175,8 +177,7 @@ protected:
     // Signal determines if the vehicle can be remotely controlled despite of not being close the carrier or a friendly island.
     int signal=3;
 
-    // State Machine for handling destinations.
-    DestinationStatus dst_status;
+
     
     // ODE objects
     dBodyID me=NULL;
@@ -215,6 +216,7 @@ protected:
 
     float fueltank=1;
     
+
 public:
     bool inert=false;
     float xRotAngle=0;
@@ -374,6 +376,9 @@ public:
     virtual void        deserialize(TickRecord);
 
     virtual EntityTypeId getTypeId();
+
+    // State Machine for handling destinations.
+    DestinationStatus dst_status;
 
 };
 

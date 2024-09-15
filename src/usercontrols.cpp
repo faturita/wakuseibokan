@@ -606,6 +606,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.push(co);
             } 
             else
+            if (controller.str.find("collect") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::CollectOrder;
+
+                controller.push(co);
+            } 
+            else
             if (controller.str.find("refill") != std::string::npos)
             {
                 CommandOrder co;
@@ -640,7 +648,13 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
+                int ownislands = countNumberOfIslands(controller.faction);
+
                 int typeofisland = DEFEND_ISLAND;
+                
+                if (ownislands==0)
+                    typeofisland = ISLANDTYPES::CAPITAL_ISLAND;
+                else
 
                 if (controller.str.find("factory") != std::string::npos)
                     typeofisland = FACTORY_ISLAND;

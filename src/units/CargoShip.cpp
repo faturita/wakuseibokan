@@ -457,6 +457,10 @@ void CargoShip::doControlDestination()
         CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
+        if (abs(e)>=0.5f)
+        {
+            c.registers.thrust = 300.0f;
+        } 
         /**
         if (abs(e)>=0.5f)
         {

@@ -19,7 +19,8 @@ enum class Command {
     RefuelOrder,
     Departure,
     RefillOrder,
-    UnfillOrder};
+    UnfillOrder,
+    CollectOrder};
 
 
 enum TargetType {
