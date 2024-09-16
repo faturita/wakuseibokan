@@ -6,6 +6,8 @@
 #define DEFENSE_RANGE   8000
 #define IN_RANGE        30000
 
+#define ENOUGH_FUEL     700.0
+
 class TSequencer {
     const int length = 15;
     unsigned int T[15];
@@ -85,7 +87,9 @@ enum class State {
     APPROACHFREEISLAND=4,
     APPROACHENEMYISLAND=5,
     INVADEISLAND=6,
-    RENDEZVOUS=7
+    RENDEZVOUS=7,
+    BALLISTICATTACK=8,
+    AIRBORNEATTACK=9
 };
 
 
@@ -116,6 +120,10 @@ enum class State {
 class QAction
 {   
 public:
+    virtual void start()
+    {
+        return ;
+    }
     virtual void apply(int faction)
     {
         return ;

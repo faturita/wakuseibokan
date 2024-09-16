@@ -965,13 +965,14 @@ Vehicle* findCarrier(int faction)
     return NULL;
 }
 
-int findAvailableNumber(int bitmap)
+int findAvailableNumber(long bitmap)
 {
-
-    for(unsigned short a=0;a<20;a++)
+    // Show the hexa value of bitmap
+    //printf("The bitmap is %lx\n", bitmap);
+    for(unsigned short a=0;a<63;a++)
     {
-        int val = bitmap & 0x01;
-        //printf("The number %d is %d\n", a, val);
+        long val = bitmap & 0x01;
+        //printf("The number %d is %ld\n", a, val);
         bitmap = bitmap  >> 1;
 
         if (val == 0)
@@ -981,10 +982,10 @@ int findAvailableNumber(int bitmap)
     assert(false || !"No more available numbers!");
 }
 
-
+// @NOTE: This creates the idgenerator based on what really exists, and then it finds the next available number.
 int findNextNumber(int faction, int type, int subtype)
 {
-    std::map<std::tuple<int,int,int>, int> idGenerator;
+    std::map<std::tuple<int,int,int>, long> idGenerator;
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -993,11 +994,11 @@ int findNextNumber(int faction, int type, int subtype)
         if (idGenerator.find(std::make_tuple(v->getFaction(), v->getType(), v->getSubType())) == idGenerator.end() )
         {
             int number = v->getNumber();
-            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = (0x01 << (number-1));
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = ((long)0x01 << ((long)number-1));
         } else {
             int number = v->getNumber();
-            int bmap = idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())];
-            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = bmap | (0x01 << (number-1));
+            long bmap = idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())];
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = bmap | ((long)0x01 << ((long)number-1));
         }
 
     }
@@ -1008,7 +1009,7 @@ int findNextNumber(int faction, int type, int subtype)
     }
     else
     {
-        int bmap = idGenerator[std::make_tuple(faction,type,subtype)];
+        long bmap = idGenerator[std::make_tuple(faction,type,subtype)];
         int number = findAvailableNumber(bmap);
         return number;
     }
@@ -1799,6 +1800,33 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
         CommandCenter *c = findCommandCenter(island);
 
+        // Find the main dock, and spawn just one CargoShip per island, assigning the dockid to the cargoship.
+        std::vector<size_t> str = island->getStructures();
+        if (c && c->getTtl()<=0 || force)
+        {
+            if (str.size()>2)
+            {
+                if (entities[str[1]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[1]];          // @FIXME: 1 is always the first and main dock
+
+                    Vehicle *ca = findWalrusByOrder2(d->getFaction(), str[1]);
+
+                    if (!ca)
+                    {
+                        Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
+                        ca->setOrder(str[1]);
+                        if (ca)
+                        {
+                            size_t idx = entities.push_back(ca, ca->getGeom());
+                            ca->ready();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Go through all the structures, build new and repair the old ones.
         if (c && (  (c->getIslandType() == ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<24) ||
                     (c->getIslandType() != ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<14) ) )
         {
@@ -1997,29 +2025,6 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
             }
         }
 
-
-        // Find the dock, and spawn just one CargoShip per dock, assigning the dockid to the cargoship.
-        std::vector<size_t> str = island->getStructures();
-        for(size_t i=0;i<str.size();i++)
-        {
-            if (entities[str[i]]->getSubType() == VehicleSubTypes::DOCK)
-            {
-                Dock *d = (Dock*)entities[str[i]];
-
-                Vehicle *c = findWalrusByOrder2(d->getFaction(), str[i]);
-
-                if (!c)
-                {
-                    Vehicle *c = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
-                    c->setOrder(str[i]);
-                    if (c)
-                    {
-                        size_t idx = entities.push_back(c, c->getGeom());
-                        c->ready();
-                    }
-                }
-            }
-        }
 
         // BASIC logistic strategy: find the cargoships, and move all the cargo from its dock towards the closer
         //   dock where the carrier is actually located.
