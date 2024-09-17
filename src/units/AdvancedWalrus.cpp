@@ -236,7 +236,7 @@ void AdvancedWalrus::doDynamics(dBodyID body)
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
             //dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
-            Vec3f p(0.0, 0.0, getThrottle());
+            Vec3f p(0.0, 0.0, getThrottle()*2);
 
             p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
 

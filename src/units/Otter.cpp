@@ -87,7 +87,7 @@ void Otter::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 20.0f;
+    float myMass = 30.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,width, height, length);

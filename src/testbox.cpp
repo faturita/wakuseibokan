@@ -82,6 +82,7 @@
 #include "units/Cephalopod.h"
 #include "units/AdvancedManta.h"
 #include "units/CargoShip.h"
+#include "units/Seal.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -7681,7 +7682,7 @@ void test83()
 
 void checktest83(unsigned long timer)
 {
-    if (timer == 10000000)
+    if (timer == 1000)
     {
         printf("Test Passed\n");
         endWorldModelling();
@@ -8001,6 +8002,144 @@ void checktest86(unsigned long timer)
     }
 }
 
+void test87()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+    cg->setOrder(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(1000);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(6000.0f,20.5f,-10300);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+
+    cg->setAutoStatus(AutoStatus::DESTINATION);
+    cg->setDestination(Vec3f(0.0f,20.5f,20000.0f));
+    cg->enableAuto();
+}
+
+void checktest87(unsigned long timer)
+{
+    if (timer == 200)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+        Vehicle *w = spawnWalrus(space,world,b);
+
+
+
+        Walrus *_walrus = new Walrus(GREEN_FACTION);
+
+        _walrus->init();
+        _walrus->embody(world, space);
+        _walrus->setPos(5000.0f,20.5f,-10000);
+        _walrus->setStatus(SailingStatus::SAILING);
+        _walrus->setSignal(4);
+        _walrus->setNameByNumber(1);
+
+        size_t idx1 = entities.push_back(_walrus, _walrus->getGeom());
+
+
+        Seal *_seal = new Seal(GREEN_FACTION);
+
+        _seal->init();
+        _seal->embody(world, space);
+        _seal->setPos(6000.0f,20.5f,-10000);
+        _seal->setStatus(SailingStatus::SAILING);
+        _seal->setSignal(4);
+        _seal->setNameByNumber(1);
+
+        size_t idx2 = entities.push_back(_seal, _seal->getGeom());
+
+
+
+
+    }
+    if (timer>5000)
+    {
+        Vehicle *b = findWalrusByOrder(GREEN_FACTION,1);
+
+        if (b)
+        {
+            Vec3f w3(0.0f,20.5f,20000);
+
+            std::cout << (b->getPos()-w3).magnitude() << std::endl;
+
+
+            if (b->getPos().isCloseTo(w3,400))
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+
+    }
+    if (timer == 15000)
+    {
+        printf("Test Failed\n");
+        endWorldModelling();
+        exit(0);
+
+    }
+}
 static int testing=-1;
 
 void initWorldModelling()
@@ -8133,6 +8272,7 @@ void initWorldModelling(int testcase)
     case 84:test84();break;                         // Check Energy production in windmills.
     case 85:test85();break;                         // Check CargoShip docking on the other side of the island.
     case 86:test86();break;                         // Check CargoShip travelling to the other side of the island.
+    case 87:test87();break;                         // Check Boats waypoint system
     default:initIslands();test1();break;
     }
 
@@ -8236,6 +8376,7 @@ void worldStep(int value)
     case 84:checktest84(timer);break;
     case 85:checktest85(timer);break;
     case 86:checktest86(timer);break;
+    case 87:checktest87(timer);break;
     default: break;
     }
 

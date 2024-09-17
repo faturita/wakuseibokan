@@ -418,6 +418,7 @@ int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float 
         else
             glColor3f(0.2f,0.2f,0.2f);
 
+        //glNormal3f(0.0f,0.0f,1.0f);
         //----------------- FIRST VERTEX -----------------
         // Coordinates of the first vertex
         glTexCoord2f(0.0f,0.0f);

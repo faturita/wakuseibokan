@@ -40,13 +40,15 @@ void Walrus::init()
     if (getFaction()==BLUE_FACTION)
         _model = (Model*)MD2Model::loadModel(filereader("units/walrusgood.md2"));
     else {
-        _model = (Model*)MD2Model::loadModel(filereader("units/walrus.md2"));
+        _model = (Model*)MD2Model::loadModel(filereader("units/walrusgood.md2"));
     }
+
+    //_model = (Model*)T3DSModel::loadModel(filereader("units/seal.3ds"),0,0,0,3,3,3,0);
 
     if (_model != NULL)
     {
-        _model->setAnimation("run");
-        _topModel = (Model*)T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,0.4,0.4,0.4,0);
+        //_model->setAnimation("run");
+        _topModel = (Model*)T3DSModel::loadModel(filereader("structures/turrettop.3ds"),0,0,0,0.3,0.3,0.3,0);
     }
     else
     	printf ("Model has been initialized");
@@ -110,7 +112,7 @@ void Walrus::drawModel(float yRot, float xRot, float x, float y, float z)
         doMaterial();
         //drawRectangularBox(width, height, length);
 
-        _model->setTexture(textures["sky"]);
+        ///_model->setTexture(textures["metal"]);
         glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 
@@ -528,7 +530,7 @@ void Walrus::doDynamics(dBodyID body)
             //dBodyAddRelForce (body,0, 0,getThrottle());
 
             //dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
-            Vec3f p(0.0, 0.0, getThrottle());
+            Vec3f p(0.0, 0.0, getThrottle()*2);
 
             p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
 
@@ -557,6 +559,7 @@ Vehicle* Walrus::fire(int weapon, dWorldID world, dSpaceID space)
     Vec3f orig;
 
     forward = forward.normalize();
+    //forward[1] = 0.0f;   //Gimbal lock avoidance.
     orig = position;
     position = position + 60.0f*forward;
     forward = -orig+position;
