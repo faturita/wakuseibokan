@@ -536,6 +536,7 @@ void Balaenidae::offshore()
     dBodyID body = getBodyID();
     dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
     setDelayedStatus(SailingStatus::OFFSHORING,100, SailingStatus::SAILING);
+    enableAuto();
 }
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)

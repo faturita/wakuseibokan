@@ -395,6 +395,20 @@ void CargoShip::doControlDestination()
 
     if (dst_status != DestinationStatus::REACHED && T.magnitude()>roundederror)
     {
+        // Potential fields from the islands (to avoid them)
+        int nearesti = 0;
+        float closest = 0;
+        for(size_t i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+            Vec3f l(b->getX(),0.0f,b->getZ());
+
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
         float distance = T.magnitude();
 
         Vec3f F = getForward();
@@ -402,31 +416,30 @@ void CargoShip::doControlDestination()
         F = F.normalize();
         T = T.normalize();
 
+        c.registers.thrust = 400.0f;
 
         // Potential fields from the islands (to slow down Walrus)
+        // Potential fields to avoid islands (works great).
+        if (closest > 1800 && closest < 4000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            Vec3f d = Po-l;
+            d = d.normalize();
 
-        c.registers.thrust = 400.0f;
+            if (distance>2000.0)
+            {
+                T = T+d;
+                T = T.normalize();
+            }
+
+            c.registers.thrust = 40.0f;
+            
+        }
 
         if (distance<800.0f)
         {
             c.registers.thrust = 20.0f;
-        }
-
-        float closest=0;
-        BoxIsland *b = findNearestIsland(Po);
-        if (b)
-        {
-            closest = (b->getPos() - Po).magnitude();
-            if (closest > 1600 && closest < 2200)
-            {
-                c.registers.thrust = 15.0f;
-
-            }
-        }
-
-        if (island != NULL)
-        {
-            c.registers.thrust = 400.0;
         }
 
         // Potential fields from Carrier
@@ -457,7 +470,7 @@ void CargoShip::doControlDestination()
         CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
-        if (abs(e)>=0.5f)
+        if (abs(e)>=0.5f && c.registers.thrust>300.0f)
         {
             c.registers.thrust = 300.0f;
         } 

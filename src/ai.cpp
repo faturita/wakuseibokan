@@ -670,7 +670,9 @@ public:
 
             dout << freeis << std::endl;
             dout << enemyis << std::endl;
-            dout << "Free island:" << (freeis->getPos()-b->getPos()).magnitude() << std::endl;
+
+            if (freeis)
+                dout << "Free island:" << (freeis->getPos()-b->getPos()).magnitude() << std::endl;
 
             if (freeis && !enemyis)
                 return true;
