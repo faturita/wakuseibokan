@@ -585,10 +585,7 @@ void drawScene() {
         ctrling = controller.controllingid;
         entities[ctrling]->getViewPort(up,pos,forward);
 
-        Vec3f up2,pos2;
-        //camera.getViewPort(up2,pos2,forward);
-
-        camera.fw = entities[ctrling]->getForward();
+        camera.fw = forward;                            // This is very important for the Sky.  So forward for the camera is the viewport from the object.
 
         if (entities[ctrling]->getType() == MANTA)
         {
@@ -642,7 +639,10 @@ void drawScene() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glPushMatrix();
-    glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
+    //glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
+    glColor3f(1.0,1.0,1.0);
+    glTranslatef(cos(daylight_frequency * 2 * PI * timer)*(300),200.0+sin(daylight_frequency * 2 * PI * timer)*(300),0);
+    //glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
     drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
     glPopMatrix();
     glPopAttrib();
