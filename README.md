@@ -346,3 +346,7 @@ More info
 * https://github.com/federico-busato/Modern-CPP-Programming
 * CubbyFlow Open flow dynamic engine https://github.com/CubbyFlow/CubbyFlow
 * Flow Dynamics Engine https://github.com/BlainMaguire/3dfluid?tab=readme-ov-file
+* https://www.nature.com/articles/s41586-024-07886-z
+* https://math.hws.edu/graphicsbook/c4/s2.html
+
+
