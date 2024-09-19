@@ -34,7 +34,6 @@ public:
     void init();
     void clean();
     void drawModel(float yRot, float xRot, float x, float y, float z);
-    void doMaterial();
 
     void rotateBody(dBodyID body);
     void doDynamics(dBodyID body);

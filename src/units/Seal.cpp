@@ -78,7 +78,7 @@ void Seal::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        //doMaterial();
+        //Vehicle::doMaterial();
         //drawRectangularBox(width, height, length);
 
         _model->setTexture(textures["metal"]);

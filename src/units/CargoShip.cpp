@@ -57,18 +57,6 @@ EntityTypeId CargoShip::getTypeId()
     return EntityTypeId::TCargoShip;
 }
 
-void CargoShip::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
-}
-
 
 void CargoShip::drawModel(float yRot, float xRot, float x, float y, float z)
 {
@@ -90,7 +78,7 @@ void CargoShip::drawModel(float yRot, float xRot, float x, float y, float z)
 
         //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 
-        doMaterial();
+        Vehicle::doMaterial();
 
 
         _model->draw();

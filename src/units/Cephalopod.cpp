@@ -102,7 +102,7 @@ void Cephalopod::drawModel(float yRot, float xRot, float x, float y, float z)
         glRotatef(-180.0f, 0.0f, 1.0f, 0.0f);
 
         glColor3f(1.0,1.0f,1.0f);
-        doMaterial();
+        Vehicle::doMaterial();
         _model->setTexture(textures["metal"]);
         _model->draw();
 
@@ -132,18 +132,6 @@ void  Cephalopod::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)
     Up[0]=Up[2]=0;Up[1]=20;
     position = position - 90*viewforward + Up;
     viewforward = orig-position;
-}
-
-void Cephalopod::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
 }
 
 void Cephalopod::doControl(struct controlregister regs)

@@ -374,6 +374,18 @@ void Vehicle::drawModel(Vec3f offset)
     drawModel(0,0,p[0],p[1],p[2]);
 }
 
+void Vehicle::doMaterial()
+{
+    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
+
+    glEnable(GL_COLOR_MATERIAL);
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+    glMateriali(GL_FRONT, GL_SHININESS,128);
+}
+
 /**
 void Vehicle::drawModel()
 {

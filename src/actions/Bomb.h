@@ -16,7 +16,6 @@ public:
     ~Bomb();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
-    void doMaterial();
     int getType();
     EntityTypeId virtual getTypeId();
 

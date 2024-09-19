@@ -46,18 +46,6 @@ void AdvancedWalrus::init()
 
 }
 
-void AdvancedWalrus::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
-}
-
 void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z)
 {
     float f[3];
@@ -75,7 +63,7 @@ void AdvancedWalrus::drawModel(float yRot, float xRot, float x, float y, float z
 
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
-        doMaterial();
+        Vehicle::doMaterial();
         //drawRectangularBox(width, height, length);
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);

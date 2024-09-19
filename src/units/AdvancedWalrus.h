@@ -28,8 +28,6 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
-    void doMaterial();
-
     void doControl(Controller controller);
     void doControl();
     void doControl(struct controlregister cons);

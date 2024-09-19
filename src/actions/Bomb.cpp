@@ -59,7 +59,7 @@ void Bomb::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
 
-        doMaterial();
+        Vehicle::doMaterial();
 
         //drawRectangularBox(width, height, length);
         _model->setTexture(textures["metal"]);
@@ -67,18 +67,6 @@ void Bomb::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glPopMatrix();
     }
-}
-
-void Bomb::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
 }
 
 void  Bomb::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &viewforward)

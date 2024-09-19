@@ -216,6 +216,7 @@ protected:
 
     float fueltank=1;
     
+    void doMaterial();
 
 public:
     bool inert=false;
@@ -226,7 +227,6 @@ public:
     
     int virtual getType();
     int virtual getSubType();
-
 
     void setAutoStatus(AutoStatus au);
     

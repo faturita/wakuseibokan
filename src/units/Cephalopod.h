@@ -48,8 +48,6 @@ public:
 
     void drop();
 
-    void doMaterial();
-
     void setNameByNumber(int number);
 };
 
