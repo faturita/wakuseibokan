@@ -411,6 +411,23 @@ int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float 
 
         //glColor3f((float)(l_index/2)/object.polygons_qty,(float)(l_index/2)/object.polygons_qty,(float)(l_index/2)/object.polygons_qty);
 
+        // Compute the normals of ech face
+        Vec3f a(object.vertex[ object.polygon[l_index].a ].x,
+                 object.vertex[ object.polygon[l_index].a ].y,
+                 object.vertex[ object.polygon[l_index].a ].z);
+        
+        Vec3f b(object.vertex[ object.polygon[l_index].b ].x,
+                 object.vertex[ object.polygon[l_index].b ].y,
+                 object.vertex[ object.polygon[l_index].b ].z);
+
+        Vec3f c(object.vertex[ object.polygon[l_index].c ].x,
+                 object.vertex[ object.polygon[l_index].c ].y,
+                 object.vertex[ object.polygon[l_index].c ].z);
+
+        Vec3f normal = (b-a).cross(c-a);
+        normal.normalize();
+        glNormal3f(normal[0],normal[1],normal[2]);
+
         if (l_index % 3 == 0)
             glColor3f(0.3f,0.3f,0.3f);
         else if (l_index % 3 == 1)

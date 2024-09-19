@@ -749,7 +749,7 @@ void initRendering() {
     glEnable(GL_LIGHTING);
     
     // Lighting not working.
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT0);
 
     
 	// Normalize the normals (this is very expensive).

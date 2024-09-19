@@ -898,7 +898,7 @@ void drawLightning()
     glLightfv(GL_LIGHT0, GL_SPECULAR,specular);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     
-	glEnable(GL_COLOR_MATERIAL);
+	//glEnable(GL_COLOR_MATERIAL);
     
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
