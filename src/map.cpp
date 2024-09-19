@@ -254,6 +254,7 @@ void placeIsland(BoxIsland *b, int iconsize)
 void drawMap()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -457,4 +458,5 @@ void drawMap()
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
 
+    glEnable(GL_LIGHTING);
 }

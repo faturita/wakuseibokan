@@ -178,6 +178,7 @@ void disclaimer()
 void drawHUD()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
     
     //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glMatrixMode(GL_PROJECTION);
@@ -545,6 +546,8 @@ void drawHUD()
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+
+    glEnable(GL_LIGHTING);
 }
 
 
@@ -748,7 +751,7 @@ void initRendering() {
 	// Lightning
     glEnable(GL_LIGHTING);
     
-    // Lighting not working.
+    // Lighting not working. 
     //glEnable(GL_LIGHT0);
 
     
