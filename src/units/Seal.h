@@ -25,6 +25,8 @@ public:
     EntityTypeId virtual getTypeId();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 
+    void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
+
 };
 
 #endif /* SEAL_H */

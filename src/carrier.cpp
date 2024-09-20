@@ -551,8 +551,6 @@ void drawHUD()
 }
 
 
-
-
 void drawScene() {
 
     clock_t start = clock();

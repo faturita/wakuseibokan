@@ -97,3 +97,18 @@ void Seal::drawModel(float yRot, float xRot, float x, float y, float z)
     }
 }
 
+void  Seal::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward)
+{
+    position = getPos();
+    forward = getForward();
+    Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
+
+    Vec3f orig;
+
+
+    forward = forward.normalize();
+    orig = position;
+    Up[0]=Up[2]=0;Up[1]=10;
+    position = position - 50*forward + Up;
+    forward = orig-position;
+}
