@@ -23,6 +23,7 @@ extern std::vector<TrackRecord>   track;
 extern dWorldID world;
 extern dSpaceID space;
 
+float REQUIRED_FUEL;
 
 class DockingQAction : public QAction
 {   
@@ -31,7 +32,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && b->getPower()<ENOUGH_FUEL && b->getAutoStatus() != AutoStatus::DOCKING)
+        if (b && b->getPower()<REQUIRED_FUEL && b->getAutoStatus() != AutoStatus::DOCKING)
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
@@ -90,7 +91,7 @@ public:
                         if (d->getFaction() == faction)
                         {
                             // Check if refueling is enough...
-                            if ( (getIslandCargo(is,CargoTypes::POWERFUEL)+b->getPower()) > ENOUGH_FUEL)
+                            if ( (getIslandCargo(is,CargoTypes::POWERFUEL)+b->getPower()) > REQUIRED_FUEL)
                             {
                                 dout << "Refueling!" << std::endl;
                                 collect(d);
@@ -660,7 +661,7 @@ public:
         dout << "ClosestFarAwayIslandIsFree" << std::endl;  
 
         // Do I have power to get to the next island
-        if (b && b->getPower()>ENOUGH_FUEL)
+        if (b && b->getPower()>REQUIRED_FUEL)
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
@@ -701,7 +702,7 @@ public:
         Vehicle *b = findCarrier(faction);
 
         // Do I have power to get to the next island
-        if (b && b->getPower()>ENOUGH_FUEL)    
+        if (b && b->getPower()>REQUIRED_FUEL)    
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
@@ -735,12 +736,54 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && b->getPower()>ENOUGH_FUEL)
+        if (b)
         {
-            return true;
-        }
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
 
-        return false;
+            Vec3f destination;
+
+            if (freeis && !enemyis)
+            {
+                destination = freeis->getPos();
+            }
+            else
+            if (enemyis && !freeis)
+            {
+                destination = enemyis->getPos();
+            }
+            else
+            {
+                if ((freeis->getPos()-b->getPos()).magnitude() < (enemyis->getPos()-b->getPos()).magnitude())
+                {
+                    destination = freeis->getPos();
+                }
+                else
+                {
+                    destination = enemyis->getPos();
+                }
+            }
+
+
+            float distance = (freeis->getPos()-b->getPos()).magnitude();
+            float requiredfuel = distance * (  1000.0 / 254000.0 );
+
+            assert ( requiredfuel <= 1000.0 || !"The required fuel is too high. This should not happen.");
+
+            REQUIRED_FUEL = (requiredfuel + 50.0);
+
+            if (REQUIRED_FUEL > 1000.0)
+                REQUIRED_FUEL = 1000.0;
+
+            std::cout << "Required fuel for next operation:" << requiredfuel << std::endl;
+
+            if (b->getPower()>REQUIRED_FUEL)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 };
 
@@ -805,6 +848,7 @@ public:
 
         if (b && b->arrived())
         {
+            REQUIRED_FUEL = 1000.0;
             return ClosestIslandIsFree::evaluate(faction);
         }
 
@@ -829,6 +873,7 @@ public:
 
         if (b && b->arrived())
         {
+                        REQUIRED_FUEL = 1000.0;
             return ClosestIslandIsEnemy::evaluate(faction);
         }
 
@@ -869,9 +914,9 @@ Player::Player(int faction)
     for(int i=0;i<25;i++) qactions[i] = new QAction();
     for(int i=0;i<25;i++) transitions[i] = new Transition(State::IDLE,State::IDLE,new Condition());
 
-    transitions[0] = new Transition(State::IDLE,State::DOCKING,new NotEnoughFuelForNextOperation());            // Power < ENOUGH_FUEL
+    transitions[0] = new Transition(State::IDLE,State::DOCKING,new NotEnoughFuelForNextOperation());            // Power < REQUIRED_FUEL
     transitions[1] = new Transition(State::DOCKING,State::DOCKED,new DockedCondition());                        // SailingStatus::DOCKED
-    //transitions[2] = new Transition(State::IDLE,State::IDLE,new EnoughFuelForNextOperation());                  // Power > ENOUGH_FUEL
+    //transitions[2] = new Transition(State::IDLE,State::IDLE,new EnoughFuelForNextOperation());                  // Power > REQUIRED_FUEL
     transitions[3] = new Transition(State::DOCKED,State::IDLE,new CarrierIsSailing());                          // SailingStatus::SAILING 
     transitions[4] = new Transition(State::IDLE,State::INVADEISLAND,new ClosestIslandIsFree());                 // <10000.0, no command center
     transitions[5] = new Transition(State::IDLE,State::BALLISTICATTACK,new ClosestIslandIsEnemy());             // <10000.0, command center

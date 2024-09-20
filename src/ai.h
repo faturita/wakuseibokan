@@ -6,8 +6,6 @@
 #define DEFENSE_RANGE   8000
 #define IN_RANGE        30000
 
-#define ENOUGH_FUEL     700.0
-
 class TSequencer {
     const int length = 15;
     unsigned int T[15];

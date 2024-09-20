@@ -1863,7 +1863,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.4;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.4;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
                     {
                         // Softmax, boltzman decay.
@@ -1878,7 +1878,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
@@ -1893,7 +1893,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
@@ -1906,7 +1906,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.25;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
 
                     }
 
