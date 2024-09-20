@@ -81,7 +81,7 @@ void Seal::drawModel(float yRot, float xRot, float x, float y, float z)
         //Vehicle::doMaterial();
         //drawRectangularBox(width, height, length);
 
-        _model->setTexture(textures["metal"]);
+        _model->setTexture(textures["sky"]);
         //glTranslatef(0.0f,0.0f,-2.0f);
         _model->draw();
 

@@ -547,7 +547,7 @@ Vehicle* Walrus::fire(int weapon, dWorldID world, dSpaceID space)
     Vec3f orig;
 
     forward = forward.normalize();
-    //forward[1] = 0.0f;   //Gimbal lock avoidance.
+    forward[1] = 0.0f;                                      //@NOTE: This has the effect of a Gimbal lock avoidance (fires always perpendicular to the ground).
     orig = position;
     position = position + 60.0f*forward;
     forward = -orig+position;

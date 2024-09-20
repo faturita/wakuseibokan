@@ -831,7 +831,7 @@ void drawFloor(float x, float y, float z)
     glPopMatrix();
 }
 
-
+// Pick the forward orientation and adjust the sky to make it
 void drawSky (float posX, float posY, float posZ)
 {
     float sky_scale=1.0f;
@@ -917,30 +917,6 @@ void drawLightning()
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, lightPos);
     
-    
-	//glTranslatef(0.0f+posx, 0.0f+posy, -20.0f+posz);
-	
-    // Lighting, ambient light...
-	//GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
-     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-    
-    // Add positioned light (outisde glBegin-glEnd)
-     //GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
-     //GLfloat lightPos0[] = { 4.0f, 0.0f, 8.0f, 1.0f  };
-     //glLightfv(GL_LIGHT2, GL_DIFFUSE, lightColor0);
-     //glLightfv(GL_LIGHT2, GL_POSITION, lightPos0);
-     
-     // Add directed light
-     //GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f};
-     //GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
-     //glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
-     //glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
-    
-    /**
-     GLfloat lightColor[] = {0.7f, 0.7f, 0.7f, 1.0f};
-     GLfloat lightPos[] = {-2 * BOX_SIZE, BOX_SIZE, 4 * BOX_SIZE, 1.0f};
-     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);**/
 }
 
 
