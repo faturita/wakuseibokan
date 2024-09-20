@@ -528,40 +528,6 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glPushMatrix();
     glBegin(GL_QUADS);
 
-    //Top face
-    //glColor3f(1.0f, 1.0f, 0.0f);
-    glNormal3f(0.0, 0.0f, 1.0f);
-    glVertex3f(-x, -y, z);
-    glVertex3f(x, -y,  z);
-    glVertex3f(x, y, z);
-    glVertex3f(-x, y, z);
-
-    //Bottom face
-    //glColor3f(1.0f, 0.0f, 1.0f);
-    glNormal3f(0.0, -1.0f, 0.0f);
-    glVertex3f(-x, -y, -z);
-    glVertex3f(x, -y, - z);
-    glVertex3f(x, -y,  z);
-    glVertex3f(-x, -y, z);
-
-    //Left face
-    //glNormal3f(-1.0, 0.0f, 0.0f);
-    //glColor3f(0.0f, 1.0f, 1.0f);
-    glVertex3f(-x, -y, -z);
-    glVertex3f(- x, - y, z);
-    //glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(-x, y, z);
-    glVertex3f(-x, y, -z);
-
-    //Right face
-    glNormal3f(1.0, 0.0f, 0.0f);
-    //glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(x, -y, -z);
-    glVertex3f(x, y, -z);
-    //glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(x, y, z);
-    glVertex3f(x, -y, z);
-
     glEnd();
 
     glEnable(GL_TEXTURE_2D);
@@ -572,7 +538,51 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
 
     glBegin(GL_QUADS);
 
-    //glColor3f(1.0f, 1.0f, 1.0f);
+    //Top face
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, z);
+
+    //Bottom face
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y, - z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, -y, z);
+
+    //Left face
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(- x, - y, z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, -z);
+
+    //Right face
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, y, -z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, -y, z);
+
+
     glNormal3f(0.0, 1.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, y, -z);

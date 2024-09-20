@@ -563,7 +563,6 @@ void drawScene() {
         //glLoadIdentity();
         //gluPerspective(45.0, (float)1440 / (float)900, 1.0, camera.pos[2]+ horizon /**+ yyy**/);
 
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
     
@@ -639,11 +638,10 @@ void drawScene() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glPushMatrix();
-    //glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
     glColor3f(1.0,1.0,1.0);
-    glTranslatef(cos(daylight_frequency * 2 * PI * timer)*(300),200.0+sin(daylight_frequency * 2 * PI * timer)*(300),0);
-    //glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
-    drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
+    glRotatef(daylight_frequency * timer * 360.0,0,0,-1);   // 1 cycle per 10000 cycles (glRotatef is in degrees)
+    glTranslatef(relPos[0]-(80 kmf),0,relPos[2]);
+    drawTheRectangularBox(textures["venus"], 1200.0,1200.0,1200.0);
     glPopMatrix();
     glPopAttrib();
     
