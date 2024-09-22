@@ -257,18 +257,24 @@ Objective and design guidelines
 
 The purpose was to create a multiplatform simple game engine based on physics dynamic engine and a fluid simulation solver, and a testbed platform to simulate manipulators and mobile robots.
 
-The game is a remake of an old and amazing game, which uses the engine as platform.  The design guideline for the game was to create a networked game where it is possible to control indepentendly all of the entities that are available.  You can be anyone anywhere.
+The game is a remake of an old and amazing game, which uses the engine as platform.  The design guideline for the game was to create a networked game where it is possible to control indepentendly all of the entities that are available.  You can be anyone, anywhere.
 
 Characteristics
 ---------------
-* Floor
-    * The floor is a flat square that extends to the horizon, located based on camera position.  Horizon works according the fulcrum representation.
-    * Sea works as a texture that is shifted based on the camera position.
+* Floor and Sea
+    * The sea floor is a flat square that extends to the horizon, located based on camera position.  Horizon works according the fulcrum representation.
+    * It is a blanket that moves along with the camera view.
+    * Sea works as a texture that is shifted based on the camera position.  So it gives the appearance of movement.
+    * The buoyancy model works really well.
     * Reflections and alpha are missing.
     * Waves and boat wakes are missing.  
 * Sky
     * The Sky is a far-away-box with textures on the insides.
-    * It works well, but the representation relies on the camera view and there are issues with how they look like from certain viewports.
+    * It is similar to the sea floor.  It is always drawn on front of the camera view, and the texture shifts depending where do you look at.
+    * What you see in the sky is based on the forward direction of the camera view (Vehicle->getViewPort()).
+* Sun and Lightning
+    * The day lasts for 10000 ticks.  Depending on the simulation fps, it will last around 250 seconds or 4.6 minutes.  The sun raises from the east at 0 and sets at 5000.
+    * Lightning implementation has been messy in this game but current implementation works and is aligned with the sun. 
 * Islands
     * The engine is calculating the islands perfectly.  What you see is what you feel.
     * Islands are BMP heightmaps 60x60.  These values are hardcoded to 3600x3600 in the model.
@@ -280,7 +286,11 @@ Characteristics
     * MDModel: Unreal.
     * 3DSModel: it works only when you have just one object and without textures.
 * Walruses
-    * There are several models now.  They work very nicely on water as boats following the buyoncy model.  On land they work as Ackerman driving.  When they enter or leave an island, the model changes.  The thrust simulates and offboard engine.
+    * There are several models now.
+    * They work very nicely on water as boats following the buyoncy model.
+    * On land they work as Ackerman driving.
+    * When they enter or leave an island, the model changes.
+    * The thrust simulates and offboard engine.
 * Sound
     * STK
 * Manta
