@@ -400,6 +400,8 @@ void drawMap()
         if (mapzoom>5)
             iconsize = 4;
 
+        char msg[256];
+
         // Now show all the available units.
         synchronized(entities.m_mutex)
         {
@@ -410,6 +412,21 @@ void drawMap()
                     if (entities[i]->getType() == CARRIER)
                     {
                         placeMark(entities[i]->getPos(),iconsize,filereader("units/carriertarget.bmp"));
+                    } else if (entities[i]->getType() == WALRUS && entities[i]->getSubType() == VehicleSubTypes::CARGOSHIP)
+                    {
+                        placeMark(entities[i]->getPos(),iconsize,filereader("units/cargoshipicon.bmp"));
+                        Vehicle *b = entities[i];
+                        if (b->getNumber()>0 && b->getNumber()<10)
+                        {
+                            sprintf(msg, "ui/%d.bmp", b->getNumber());
+                            placeMark(entities[i]->getPos()+Vec3f(-3500,0,0),iconsize,filereader(msg)); 
+                        } else if (b->getNumber()>=10 && b->getNumber()<100)
+                        {
+                            sprintf(msg, "ui/%d.bmp", b->getNumber()/10);
+                            placeMark(entities[i]->getPos()+Vec3f(-3500,0,0),iconsize,filereader(msg)); 
+                            sprintf(msg, "ui/%d.bmp", b->getNumber()%10);
+                            placeMark(entities[i]->getPos()+Vec3f(-7000,0,0),iconsize,filereader(msg)); 
+                        }
                     } else if (entities[i]->getType() == WALRUS)
                     {
                         placeMark(entities[i]->getPos(),iconsize,filereader("units/walrusicon.bmp"));

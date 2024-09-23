@@ -246,5 +246,6 @@ void refill(Vehicle *f);
 void unfill(Vehicle *f);
 void collect(Vehicle *v);
 int getIslandCargo(BoxIsland *is,int cargo);
+void dockInNearestIsland(Vehicle *b);
 
 #endif // ENGINE_H

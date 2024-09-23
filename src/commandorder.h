@@ -12,7 +12,7 @@ enum class Command {
     AutoOrder,
     StopOrder,
     SpawnOrder,
-    DockOrder,
+    RecoveryOrder,
     FireOrder,
     LandOrder,
     JoinOrder,
@@ -20,7 +20,8 @@ enum class Command {
     Departure,
     RefillOrder,
     UnfillOrder,
-    CollectOrder};
+    CollectOrder,
+    DockOrder};
 
 
 enum TargetType {

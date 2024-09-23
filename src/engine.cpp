@@ -2357,6 +2357,42 @@ int getIslandCargo(BoxIsland *is, int cargotype)
     return cargo;
 }
 
+
+void dockInNearestIsland(Vehicle *b)
+{
+    if (b && b->getAutoStatus() != AutoStatus::DOCKING)
+    {
+        int faction = b->getFaction();
+        BoxIsland *is = findNearestIsland(b->getPos());
+
+        if (is)
+        {
+            std::vector<size_t> str = is->getStructures();
+
+            for(size_t id=0;id<str.size();id++)
+            {
+
+                dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[id]];
+
+                    if (d->getFaction() == faction)
+                    {
+                        b->ready();
+                        b->setDestination(d->getPos()-d->getForward().normalize()*400);
+                        b->setAutoStatus(AutoStatus::DOCKING);
+                        b->enableAuto();
+                        dout << "DOCKING!" << std::endl;
+                    }
+                } 
+            }
+        }    
+    }
+}
+
+
+
 void collect(Vehicle *v)
 {
     BoxIsland *is = findNearestIsland(v->getPos()); 
