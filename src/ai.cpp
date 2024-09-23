@@ -25,6 +25,8 @@ extern dSpaceID space;
 
 float REQUIRED_FUEL;
 
+float RANGE[] = {40000.0, 20000.0, 6000.0};
+
 class DockingQAction : public QAction
 {   
 public:
@@ -121,7 +123,7 @@ class ApproachFreeIslandQAction : public QAction
                 Vec3f vector = (b->getPos()) - (is->getPos());
 
                 // @FIXME: Solve the range
-                if (b->getAutoStatus() == AutoStatus::IDLE && vector.magnitude()>4000.0)
+                if (b->getAutoStatus() == AutoStatus::IDLE && vector.magnitude()>RANGE[2])
                 {
 
                     vector = vector.normalize();
@@ -165,10 +167,9 @@ class ApproachEnemyIslandQAction : public QAction
             if (is)
             {
 
-
                 Vec3f vector = (b->getPos()) - (is->getPos());
 
-                if (b->getAutoStatus() == AutoStatus::IDLE && vector.magnitude()>4000.0)
+                if (b->getAutoStatus() == AutoStatus::IDLE && vector.magnitude()>RANGE[1])
                 {
                     vector = vector.normalize();
 
@@ -223,17 +224,15 @@ class InvadeIslandQAction : public QAction
                     {
                         // Capture island
                         assert( ( is != NULL && w->getIsland() != NULL ) || !"The island and the Walrus' island are both null. This should not happen.");
-                        int which = (rand() % 3);
+                        int typeofisland = (rand() % 3);
 
-                        static bool firstisland=true;
+                        int ownislands = countNumberOfIslands(controller.faction);
+                        
+                        if (ownislands==0)
+                            typeofisland = ISLANDTYPES::CAPITAL_ISLAND;
 
-                        if (firstisland)
-                        {
-                            which = ISLANDTYPES::CAPITAL_ISLAND;  // The first island should be the capital island, all the types together.
-                            firstisland = false;
-                        }
 
-                        captureIsland(is,w->getFaction(),which,space, world);
+                        captureIsland(is,w->getFaction(),typeofisland,space, world);
 
                         w->goTo(getRandomCircularSpot(b->getPos(),200.0));
                         w->enableAuto();
@@ -419,13 +418,14 @@ class BallisticAttackQAction : public QAction
     }
 };
 
-class AirboneAttackQAction : public QAction
+class AirborneAttackQAction : public QAction
 {   
     TSequencer T;
 
     void start()
     {
         T[0] = 1;
+        T[1] = 1;
     }
 
     void tick()
@@ -450,7 +450,7 @@ class AirboneAttackQAction : public QAction
 
         if (m1)
         {
-            if (T[0]==200)
+            if (T[1]==200)
             {
                 launchManta(b);
             }
@@ -462,17 +462,29 @@ class AirboneAttackQAction : public QAction
 
             CommandCenter *c = (CommandCenter*)is->getCommandCenter();
 
-            if (c && T[0]>400 && m4->getAutoStatus() != AutoStatus::ATTACK)
+            if (c && T[1]>400 && m4->getAutoStatus() != AutoStatus::ATTACK)
             {
                 m4->attack(c->getPos());
                 m4->enableAuto();
             }
 
-            if (!c && T[0]>400 && m4->getAutoStatus() != AutoStatus::IDLE) // Get back to carrier....
+            if (!c && T[1]>400 && m4->getAutoStatus() != AutoStatus::IDLE) // Get back to carrier....
             {
                 m4->doHold(is->getPos(),100.0); // @FIXME Check the power.
                 m4->enableAuto() ;                    
             } 
+        } else {
+            // Launch a new manta.
+            Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
+
+            if (!m)
+            {
+                size_t idx = 0;
+                Manta *m = spawnManta(space,world,b, idx);
+
+                m->setOrder(ATTACK_ISLAND);
+            }
+            T[1] = 1;  // Reset the counter
         }
 
     }
@@ -637,6 +649,8 @@ public:
         {
             BoxIsland *is =findNearestIsland(b->getPos());
 
+            std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
+
             if (is && (is->getPos()-b->getPos()).magnitude()<range)
             {
                 Structure *sc = is->getCommandCenter();
@@ -672,6 +686,9 @@ public:
             dout << freeis << std::endl;
             dout << enemyis << std::endl;
 
+            if (!freeis && !enemyis)
+                return false;
+
             if (freeis)
                 dout << "Free island:" << (freeis->getPos()-b->getPos()).magnitude() << std::endl;
 
@@ -683,7 +700,7 @@ public:
 
             if (freeis && enemyis)
             {
-                if ((freeis->getPos()-b->getPos()).magnitude() > 40000.0 && (freeis->getPos()-b->getPos()).magnitude() < (enemyis->getPos()-b->getPos()).magnitude())
+                if ((freeis->getPos()-b->getPos()).magnitude() > RANGE[0] && (freeis->getPos()-b->getPos()).magnitude() < (enemyis->getPos()-b->getPos()).magnitude())
                 {
                     return true;
                 }
@@ -709,6 +726,9 @@ public:
             BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
             BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
 
+            if (!freeis && !enemyis)
+                return false;
+
             if (!freeis && enemyis)
                 return true;
 
@@ -717,7 +737,7 @@ public:
 
             if (freeis && enemyis)
             {
-                if ((enemyis->getPos()-b->getPos()).magnitude() > 40000.0 && (enemyis->getPos()-b->getPos()).magnitude() < (freeis->getPos()-b->getPos()).magnitude())
+                if ((enemyis->getPos()-b->getPos()).magnitude() > RANGE[0] && (enemyis->getPos()-b->getPos()).magnitude() < (freeis->getPos()-b->getPos()).magnitude())
                 {
                     return true;
                 }
@@ -743,6 +763,9 @@ public:
 
             Vec3f destination;
 
+            if (!freeis && !enemyis)
+                return false;
+
             if (freeis && !enemyis)
             {
                 destination = freeis->getPos();
@@ -765,7 +788,7 @@ public:
             }
 
 
-            float distance = (freeis->getPos()-b->getPos()).magnitude();
+            float distance = (destination-b->getPos()).magnitude();
             float requiredfuel = distance * (  1000.0 / 254000.0 );
 
             assert ( requiredfuel <= 1000.0 || !"The required fuel is too high. This should not happen.");
@@ -923,10 +946,10 @@ Player::Player(int faction)
     transitions[6] = new Transition(State::IDLE,State::APPROACHENEMYISLAND,new ClosestFarAwayIslandIsEnemy());  // >40000.0, closer than any other empty island
     transitions[7] = new Transition(State::IDLE,State::APPROACHFREEISLAND,new ClosestFarAwayIslandIsFree());    // >40000.0, closer than any other enemy island
     transitions[8] = new Transition(State::APPROACHFREEISLAND,State::INVADEISLAND,new CarrierHasArrivedToFreeIsland());     // arrived(), dst_status == REACHED
-    transitions[9] = new Transition(State::APPROACHENEMYISLAND,State::BALLISTICATTACK,new CarrierHasArrivedToEnemyIsland());    // arrived(), dst_status == REACHED
-    transitions[10] = new Transition(State::BALLISTICATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(15000)); 
+    transitions[9] = new Transition(State::APPROACHENEMYISLAND,State::BALLISTICATTACK,new CarrierHasArrivedToEnemyIsland(RANGE[1]));    // arrived(), dst_status == REACHED
+    transitions[10] = new Transition(State::BALLISTICATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1])); 
     transitions[11] = new Transition(State::BALLISTICATTACK,State::AIRBORNEATTACK, new UnitsDeployedForAttack());                  // No enemies around
-    transitions[12] = new Transition(State::AIRBORNEATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(15000));                  // No enemies around
+    transitions[12] = new Transition(State::AIRBORNEATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1]));                  // No enemies around
     transitions[13] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());       // <10000.0, command center
     transitions[14] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());                       // No units around
 
@@ -939,7 +962,7 @@ Player::Player(int faction)
     qactions[(int)State::INVADEISLAND] = new InvadeIslandQAction();
     qactions[(int)State::RENDEZVOUS] = new RendezvousQAction();
     qactions[(int)State::BALLISTICATTACK] = new BallisticAttackQAction();
-    qactions[(int)State::AIRBORNEATTACK] = new AirboneAttackQAction();
+    qactions[(int)State::AIRBORNEATTACK] = new AirborneAttackQAction();
 
 
     state = State::IDLE;

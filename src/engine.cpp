@@ -845,8 +845,8 @@ Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
-        Vehicle *v=entities[i];
-        if (v->getType() == WALRUS && v->getFaction() == faction)
+        Vehicle *v=entities[i]; // @FIXME: Forcing the walrus to not being a cargoship.
+        if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType()!= VehicleSubTypes::CARGOSHIP)
         {
             if (((v->getPos()-l).magnitude()<closest || closest == 0) && ((v->getPos()-l).magnitude()<threshold) )  {
                 closest = (v->getPos()-l).magnitude();
