@@ -159,7 +159,7 @@ public:
         {
             Vehicle *v = findCarrier(faction);
 
-            std::cout << (int)v->dst_status << " - Transitioning from " << (int)s << " to " << (int)sprime << std::endl;
+            if (v) std::cout << (int)v->dst_status << " - Transitioning from " << (int)s << " to " << (int)sprime << std::endl;
             return sprime;
         }
         return current;
