@@ -589,6 +589,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 controller.push(co);
             }
+            else
+            if (controller.str.find("dock") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::DockOrder;
+
+                controller.push(co);
+            }
             else 
             if (controller.str.find("refuel") != std::string::npos)
             {
@@ -874,7 +882,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'M':
             {
                 CommandOrder co;
-                co.command = Command::DockOrder;
+                co.command = Command::RecoveryOrder;
                 co.parameters.spawnid = VehicleSubTypes::SIMPLEMANTA;
                 controller.push(co);
             }
@@ -891,7 +899,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'O':
             {
                 CommandOrder co;
-                co.command = Command::DockOrder;
+                co.command = Command::RecoveryOrder;
                 co.parameters.spawnid = VehicleSubTypes::ADVANCEDWALRUS;
 
                 controller.push(co);

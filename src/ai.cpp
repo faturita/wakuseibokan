@@ -195,7 +195,7 @@ class InvadeIslandQAction : public QAction
             // Check if the island is still free
             if (!is->getCommandCenter())
             {
-                if ((b->getPos()-is->getPos()).magnitude()<5000.0 && b->getAutoStatus() != AutoStatus::DESTINATION)
+                if ((b->getPos()-is->getPos()).magnitude()<10000.0 && b->getAutoStatus() != AutoStatus::DESTINATION)
                 {
 
                     // @FIXME: Find the closest walrus to the carrier or to the island.

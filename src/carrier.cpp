@@ -1027,6 +1027,9 @@ void inline processCommandOrders()
             } else if (co.command == Command::CollectOrder)
             {
                 collect(entities[ctroler->controllingid]);
+            } else if (co.command == Command::DockOrder)
+            {
+                dockInNearestIsland(entities[ctroler->controllingid]);
             } else if (co.command == Command::Departure)
             {
                 departure(entities[ctroler->controllingid]);
@@ -1061,7 +1064,7 @@ void inline processCommandOrders()
                     entities[ctroler->controllingid]->enableAuto();
                 else
                     entities[ctroler->controllingid]->disableAuto();
-            } else if (co.command == Command::DockOrder)
+            } else if (co.command == Command::RecoveryOrder)
             {
                 if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
                 {

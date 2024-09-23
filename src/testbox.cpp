@@ -8035,6 +8035,7 @@ void test87()
     cg->setPos(0.0f,20.5f,-10000.0f);
     cg->stop();
     cg->setOrder(1);
+    cg->setNameByNumber(1);
 
     entities.push_back(cg, cg->getGeom());
 
