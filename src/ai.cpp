@@ -20,6 +20,8 @@ extern std::vector<BoxIsland*> islands;
 extern std::vector<Message> messages;
 extern std::vector<TrackRecord>   track;
 
+extern unsigned long timer;
+
 extern dWorldID world;
 extern dSpaceID space;
 
@@ -799,6 +801,15 @@ public:
                 REQUIRED_FUEL = 1000.0;
 
             std::cout << "Required fuel for next operation:" << requiredfuel << std::endl;
+
+
+            char msg[256];
+            Message mg;
+            mg.faction = b->getFaction();
+            sprintf(msg, "Required fuel for next operation %5.2f.", REQUIRED_FUEL);
+            mg.msg = std::string(msg); mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+
 
             if (b->getPower()>REQUIRED_FUEL)
             {
