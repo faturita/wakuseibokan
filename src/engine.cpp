@@ -91,8 +91,9 @@ bool stranded(Vehicle *carrier, Island *island)
     if (island && carrier && carrier->getType() == CARRIER && carrier->getStatus() != SailingStatus::OFFSHORING)
     {
         Balaenidae *b = (Balaenidae*)carrier;
-
-        b->offshore();
+        Vec3f offshoreDirection = b->getPos() - ((BoxIsland*)island)->getPos();
+        offshoreDirection = offshoreDirection.normalize();
+        b->offshore(offshoreDirection);
         controller.reset();
         b->stop();
         b->damage(100);
@@ -2264,7 +2265,15 @@ void departure(Vehicle *f)
         m->setDelayedStatus(SailingStatus::OFFSHORING, 100, SailingStatus::SAILING);
         m->ready();
         dBodyID body = m->getBodyID();
-        dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+
+        Vec3f dDir = f->getForward();
+        dDir = dDir.normalize();
+        dDir = dDir * -200000.0f;         
+
+        // @NOTE: I move the boat backwards regardless of its orientation.
+        //   This helps in the AI scheme because it is easy to handle if the orientation is not right.          
+        //dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+        dBodyAddForce(body,dDir[0],0,dDir[2]);
 
         char msg[256];
         Message mg;

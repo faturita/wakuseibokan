@@ -531,10 +531,12 @@ void Balaenidae::doDynamics(dBodyID body)
     wrapDynamics(body);
 }
 
-void Balaenidae::offshore()
+void Balaenidae::offshore(Vec3f d)
 {
     dBodyID body = getBodyID();
-    dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+    //dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+    d = d*200000;
+    dBodyAddForce(body,d[0],0,d[2]);
     setDelayedStatus(SailingStatus::OFFSHORING,100, SailingStatus::SAILING);
     enableAuto();
 }

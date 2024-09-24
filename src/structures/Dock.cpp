@@ -110,7 +110,7 @@ Vehicle* Dock::spawn(dWorldID  world,dSpaceID space,int type, int number)
     dBodyID objectbody = v->getBodyID();
     if (type == VehicleSubTypes::CARGOSHIP)
     {
-        dBodyAddRelForce(objectbody,0.0f,0.0f,-200000.0f);
+        dBodyAddRelForce(objectbody,0.0f,0.0f,-300000.0f);
     }
     else 
     {
