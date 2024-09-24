@@ -1811,12 +1811,12 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                 {
                     Dock *d = (Dock*)entities[str[1]];          // @FIXME: 1 is always the first and main dock
 
-                    Vehicle *ca = findWalrusByOrder2(d->getFaction(), str[1]);
+                    Vehicle *ca = findWalrusByOrder2(d->getFaction(), i);       // @NOTE: One per island !!! Island indexes are fixed.
 
                     if (!ca)
                     {
                         Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
-                        ca->setOrder(str[1]);
+                        ca->setOrder(i);
                         if (ca)
                         {
                             size_t idx = entities.push_back(ca, ca->getGeom());
@@ -1983,9 +1983,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 break;
                             case VehicleSubTypes::DOCK:
                                 s = new Dock(c->getFaction());
-
                                 island->addStructureAtDesiredHeight(s,world,0);
-
                                 break;
                             case VehicleSubTypes::ANTENNA:
                                 s = new Antenna(c->getFaction());
@@ -2028,7 +2026,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
 
         // BASIC logistic strategy: find the cargoships, and move all the cargo from its dock towards the closer
-        //   dock where the carrier is actually located.
+        //   dock where the carrier is actually located.  This is an optimal transport problem.  Literally.
 
 
 

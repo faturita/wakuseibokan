@@ -17,6 +17,7 @@
 #include "units/Stingray.h"
 #include "units/Otter.h"
 #include "units/Turtle.h"
+#include "units/CargoShip.h"
 
 #include "terrain/Terrain.h"
 
@@ -34,6 +35,7 @@
 #include "structures/Factory.h"
 #include "structures/Radar.h"
 #include "structures/Armory.h"
+#include "structures/WindTurbine.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -56,6 +58,8 @@
 extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 
+// @NOTE: Creates an entity from a tick record.  This replicates what "spawn" functions do in engine, but this is
+//       used to create entities for replaying and networking.
 void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 {
     if (record.typeId == EntityTypeId::TCarrierArtillery ||
@@ -146,7 +150,19 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
 
     if (record.type == VehicleTypes::WALRUS)
     {
-        if (record.typeId == EntityTypeId::TAdvancedWalrus)
+        if (record.typeId == EntityTypeId::TCargoShip)
+        {
+            CargoShip *_cargoship = new CargoShip(record.faction);
+            _cargoship->init();
+            _cargoship->embody(world, space);
+            _cargoship->setPos(Vec3f(record.location.pos1,record.location.pos2, record.location.pos3));
+            _cargoship->setNameByNumber(record.number);
+            _cargoship->setSignal(4);
+
+            entities.assign(record.id, _cargoship, _cargoship->getGeom());
+
+        }
+        else if (record.typeId == EntityTypeId::TAdvancedWalrus)
         {
             Walrus *_walrus = new AdvancedWalrus(record.faction);
             _walrus->init();
@@ -280,6 +296,9 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
             break;
         case EntityTypeId::TRadar:
             v = new Radar(record.faction);
+            break;
+        case EntityTypeId::TWindTurbine:
+            v = new WindTurbine(record.faction);
             break;
         case EntityTypeId::TStructure:default:
             v = new Structure(record.faction);

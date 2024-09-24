@@ -113,6 +113,8 @@ void savegame(std::string filename)
                 subtype = VehicleSubTypes::OTTER;
             else if(AdvancedWalrus *lb = dynamic_cast<AdvancedWalrus*>(entities[i]))
                 subtype = VehicleSubTypes::ADVANCEDWALRUS;
+            else if (CargoShip *cg = dynamic_cast<CargoShip*>(entities[i]))
+                subtype = VehicleSubTypes::CARGOSHIP;
             else if (Walrus *lb = dynamic_cast<Walrus*>(entities[i]))
                 subtype = VehicleSubTypes::SIMPLEWALRUS;
             else if (Medusa *lb = dynamic_cast<Medusa*>(entities[i]))
@@ -163,6 +165,8 @@ void savegame(std::string filename)
             ss << name << std::endl;
 
             ss << entities[i]->getNumber() << std::endl;
+
+            ss << entities[i]->getCargo(CargoTypes::POWERFUEL) << std::endl;
 
 
         }
@@ -219,6 +223,8 @@ void savegame(std::string filename)
                 ss << entities[strs[i]]->getHealth() << std::endl;
                 ss << entities[strs[i]]->getPower() << std::endl;
 
+                ss << entities[strs[i]]->getCargo(CargoTypes::POWERFUEL) << std::endl;
+
             }
         } else {
             ss << 0x4f << std::endl;
@@ -246,6 +252,13 @@ void loadgame(std::string filename)
     ss.close();**/
 
     std::ifstream ss(filename, std::ios_base::binary);
+
+    if (ss.fail())
+    {
+        CLog::Write(CLog::Error,"Failed to open file %s\n", filename.c_str());
+        assert(!"Savegame file not found.  A universe has vanished.");
+        return;
+    }
 
     // @FIXME: Verify the version when loading.
     int version;
@@ -409,10 +422,22 @@ void loadgame(std::string filename)
                 break;
             }
             case WALRUS:
-                Walrus *_walrus = NULL;
+                if (subtype == VehicleSubTypes::CARGOSHIP)
+                {
+                    CargoShip* _cg = new CargoShip(faction);
+                    v = _cg;
+                    _cg->init();
+                    _cg->embody(world, space);
+                    ss >> f[0] >> f[1] >> f[2] ;
+                    v->setPos(f);
+                    float R[12];
+                    for(int j=0;j<12;j++) ss >> R[j];
+                    v->setRotation(R);
+                    entities.push_back(_cg, _cg->getGeom());
+                } else
                 if (subtype == VehicleSubTypes::ADVANCEDWALRUS)
                 {
-                    _walrus = new AdvancedWalrus(faction);
+                    Walrus* _walrus = new AdvancedWalrus(faction);
                     v = _walrus;
                     _walrus->init();
                     _walrus->embody(world, space);
@@ -426,7 +451,7 @@ void loadgame(std::string filename)
                 }
                 else if (subtype == VehicleSubTypes::SIMPLEWALRUS)
                 {
-                    _walrus = new Walrus(faction);
+                    Walrus* _walrus = new Walrus(faction);
                     v = _walrus;
                     _walrus->init();
                     _walrus->embody(world, space);
@@ -451,7 +476,7 @@ void loadgame(std::string filename)
                     float R[12];
                     for(int j=0;j<12;j++) ss >> R[j];
 
-                    _walrus = _ot;
+                    Walrus* _walrus = _ot;
                     entities.push_back(_walrus, _walrus->getGeom());
 
                     Wheel * _fr= new Wheel(faction, 0.001, 30.0);
@@ -511,7 +536,7 @@ void loadgame(std::string filename)
                     float R[12];
                     for(int j=0;j<12;j++) ss >> R[j];
 
-                    _walrus = _tu;
+                    Walrus* _walrus = _tu;
                     entities.push_back(_walrus, _walrus->getGeom());
 
                     Wheel * _fr= new Wheel(faction, 0.001, 30.0);
@@ -561,7 +586,6 @@ void loadgame(std::string filename)
                 }
 
                 //_walrus->inert = true;
-                v = _walrus;
 
             }
             float health;ss >> health ;v->damage(1000-health);
@@ -616,6 +640,11 @@ void loadgame(std::string filename)
             ss >> number;
 
             v->setNumber(number);
+
+            int cargofuel;
+            ss >> cargofuel;
+
+            v->setCargo(CargoTypes::POWERFUEL, cargofuel);
 
 
         }
@@ -731,6 +760,12 @@ void loadgame(std::string filename)
                 float orientation; ss >> orientation;
                 float health;ss >> health ;
                 float power; ss >> power ;
+                float cargofuel; ss >> cargofuel ;
+
+                v->damage(1000-health);
+                v->setPower(power);
+
+                v->setCargo(CargoTypes::POWERFUEL, cargofuel);
 
                 is->addStructure(v   ,       -is->getX()+f[0],    -is->getZ()+f[2],orientation,world);
 

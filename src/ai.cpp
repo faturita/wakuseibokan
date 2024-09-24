@@ -793,6 +793,8 @@ public:
             float distance = (destination-b->getPos()).magnitude();
             float requiredfuel = distance * (  1000.0 / 254000.0 );
 
+            std::cout << "Required fuel for next operation:" << requiredfuel << std::endl;
+
             assert ( requiredfuel <= 1000.0 || !"The required fuel is too high. This should not happen.");
 
             REQUIRED_FUEL = (requiredfuel + 50.0);
@@ -800,7 +802,7 @@ public:
             if (REQUIRED_FUEL > 1000.0)
                 REQUIRED_FUEL = 1000.0;
 
-            std::cout << "Required fuel for next operation:" << requiredfuel << std::endl;
+            
 
 
             char msg[256];

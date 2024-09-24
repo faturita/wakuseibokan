@@ -1061,6 +1061,8 @@ TickRecord Vehicle::serialize()
     tickrecord.location.vel2 = getVelocity()[1];
     tickrecord.location.vel3 = getVelocity()[2];
 
+    tickrecord.cargo[0] = cargo[0];
+
     return tickrecord;
 }
 
@@ -1095,5 +1097,7 @@ void Vehicle::deserialize(TickRecord record)
     setStatus(record.status);
 
     setTtl(record.ttl);
+
+    setCargo(0, record.cargo[0]);
 
 }
