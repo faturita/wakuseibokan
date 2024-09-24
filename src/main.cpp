@@ -547,7 +547,7 @@ void drawSea(float x, float y, float z)
 
 
 
-void drawLightning()
+void setLightning()
 {
 	GLfloat ambientLight[] = { 0.3f  , 0.3f, 0.3f,   1.0f};
 	GLfloat diffuseLight[] = { 0.7f  , 0.7f, 0.7f,   1.0f};

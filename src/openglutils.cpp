@@ -528,40 +528,6 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
     glPushMatrix();
     glBegin(GL_QUADS);
 
-    //Top face
-    //glColor3f(1.0f, 1.0f, 0.0f);
-    glNormal3f(0.0, 0.0f, 1.0f);
-    glVertex3f(-x, -y, z);
-    glVertex3f(x, -y,  z);
-    glVertex3f(x, y, z);
-    glVertex3f(-x, y, z);
-
-    //Bottom face
-    //glColor3f(1.0f, 0.0f, 1.0f);
-    glNormal3f(0.0, -1.0f, 0.0f);
-    glVertex3f(-x, -y, -z);
-    glVertex3f(x, -y, - z);
-    glVertex3f(x, -y,  z);
-    glVertex3f(-x, -y, z);
-
-    //Left face
-    //glNormal3f(-1.0, 0.0f, 0.0f);
-    //glColor3f(0.0f, 1.0f, 1.0f);
-    glVertex3f(-x, -y, -z);
-    glVertex3f(- x, - y, z);
-    //glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(-x, y, z);
-    glVertex3f(-x, y, -z);
-
-    //Right face
-    glNormal3f(1.0, 0.0f, 0.0f);
-    //glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(x, -y, -z);
-    glVertex3f(x, y, -z);
-    //glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(x, y, z);
-    glVertex3f(x, -y, z);
-
     glEnd();
 
     glEnable(GL_TEXTURE_2D);
@@ -572,7 +538,51 @@ void drawTheRectangularBox(GLuint _textureId, float xx, float yy, float zz)
 
     glBegin(GL_QUADS);
 
-    //glColor3f(1.0f, 1.0f, 1.0f);
+    //Top face
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, z);
+
+    //Bottom face
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, -y, - z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, -y,  z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, -y, z);
+
+    //Left face
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(- x, - y, z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-x, y, -z);
+
+    //Right face
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(x, -y, -z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x, y, -z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x, y, z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, -y, z);
+
+
     glNormal3f(0.0, 1.0f, 0.0f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-x, y, -z);
@@ -821,7 +831,7 @@ void drawFloor(float x, float y, float z)
     glPopMatrix();
 }
 
-
+// Pick the forward orientation and adjust the sky to make it
 void drawSky (float posX, float posY, float posZ)
 {
     float sky_scale=1.0f;
@@ -881,6 +891,56 @@ void drawSky (float posX, float posY, float posZ)
 }
 
 
+void altdrawLightning()
+{
+    float daylights = 0.1f;
+    // Set upt the global ambient light to any specific value.  This is independent of all the rest.
+    GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    ambientLight[0] = ambientLight[1] = ambientLight[2] = daylights;
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+
+
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+
+    //glEnable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, ambientLight);
+    
+    static int count = 0;
+
+    glPushAttrib(GL_CURRENT_BIT);
+    glPushMatrix();
+    {
+        count++;
+
+        GLfloat signs = -1;
+        if (count % 100>50)
+            signs = +1;
+
+        // The sun, directional light from the east
+        GLfloat position[4] = { signs*3600,50*daylights,0,0 };
+        GLfloat specular[4]     = { 1.0f  , 1.0f, 1.0f,   1.0f};
+        glLightfv(GL_LIGHT1, GL_SPECULAR,specular);
+        glLightfv(GL_LIGHT1, GL_POSITION, position);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, specular);
+
+        // Some light spot on top of the island.
+        GLfloat position2[4] = { 5,signs*100,0,1 };
+        GLfloat specular2[4]     = { 1.0f  , 1.0f, 1.0f,   1.0f};
+        glLightfv(GL_LIGHT2, GL_SPECULAR,specular2);
+        glLightfv(GL_LIGHT2, GL_POSITION, position2);
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, specular2);
+
+    }
+    glPopMatrix();
+    glPopAttrib();
+
+        //glEnable(GL_LIGHT0);
+        glEnable(GL_LIGHT1);
+        //glEnable(GL_LIGHT2);
+}
+
+
+
 
 void drawLightning()
 {
@@ -898,7 +958,7 @@ void drawLightning()
     glLightfv(GL_LIGHT0, GL_SPECULAR,specular);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     
-	glEnable(GL_COLOR_MATERIAL);
+	//glEnable(GL_COLOR_MATERIAL);
     
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
@@ -907,30 +967,6 @@ void drawLightning()
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, lightPos);
     
-    
-	//glTranslatef(0.0f+posx, 0.0f+posy, -20.0f+posz);
-	
-    // Lighting, ambient light...
-	//GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
-     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-    
-    // Add positioned light (outisde glBegin-glEnd)
-     //GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
-     //GLfloat lightPos0[] = { 4.0f, 0.0f, 8.0f, 1.0f  };
-     //glLightfv(GL_LIGHT2, GL_DIFFUSE, lightColor0);
-     //glLightfv(GL_LIGHT2, GL_POSITION, lightPos0);
-     
-     // Add directed light
-     //GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f};
-     //GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
-     //glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
-     //glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
-    
-    /**
-     GLfloat lightColor[] = {0.7f, 0.7f, 0.7f, 1.0f};
-     GLfloat lightPos[] = {-2 * BOX_SIZE, BOX_SIZE, 4 * BOX_SIZE, 1.0f};
-     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);**/
 }
 
 

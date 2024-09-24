@@ -70,7 +70,7 @@ void Torpedo::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.5f,1.5f,1.5f);
 
-        doMaterial();
+        Vehicle::doMaterial();
 
         //drawRectangularBox(width, height, length);
         _model->setTexture(textures["road"]);
@@ -83,19 +83,6 @@ void Torpedo::drawModel(float yRot, float xRot, float x, float y, float z)
         //CLog::Write(CLog::Debug,"Model is null.\n");
     //}
 }
-
-void Torpedo::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
-}
-
 
 void Torpedo::doDynamics(dBodyID body)
 {
@@ -237,7 +224,7 @@ void Torpedo::doControl()
         if (dst_status != DestinationStatus::REACHED)
         {
             dst_status = DestinationStatus::REACHED;
-            autostatus = AutoStatus::FREE;
+            autostatus = AutoStatus::IDLE;
         }
     }
 

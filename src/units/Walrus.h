@@ -11,8 +11,6 @@
 #include "Vehicle.h"
 #include "../terrain/Terrain.h"
 
-enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING};
-
 class Walrus : public Vehicle
 {
 protected:
@@ -28,7 +26,6 @@ public:
     EntityTypeId virtual getTypeId();
 	void virtual drawModel(float yRot, float xRot, float x, float y, float z);
 	void virtual drawDirectModel();
-	void doMaterial();
 	void virtual doDynamics(dBodyID);
     void doDynamics();
 

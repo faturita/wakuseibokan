@@ -62,6 +62,8 @@ clean:
 	rm -f test
 	rm -f testcase
 	rm -f testcase.o
+	rm -f $(TOBJS)
+	rm -f $(TCOBJS)
 
 version:
 	@echo "Building version $(VERSION)"

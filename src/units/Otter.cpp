@@ -43,7 +43,7 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
-        doMaterial();
+        Vehicle::doMaterial();
         //drawRectangularBox(width/1, height/1, length/1);
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
@@ -87,7 +87,7 @@ void Otter::embody(dBodyID myBodySelf)
 {
     dMass m;
 
-    float myMass = 20.0f;
+    float myMass = 30.0f;
 
     dBodySetPosition(myBodySelf, pos[0], pos[1], pos[2]);
     dMassSetBox(&m,1,width, height, length);

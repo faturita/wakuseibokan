@@ -124,8 +124,6 @@ void processMouseActiveMotion(int x, int y) {
     //int specialKey = glutGetModifiers();
     // the ALT key was used in the previous function
     //if (specialKey != GLUT_ACTIVE_ALT) {
-
-    //printf ("X value:%d\n", x);
     
     if (_xoffset ==0 ) _xoffset = x;
     
@@ -243,8 +241,6 @@ static void nearCallback (void *data, dGeomID o1, dGeomID o2)
   /* exit without doing anything if the two bodies are connected by a joint */
   dBodyID b1,b2;
   dContact contact;
-
-  //printf ("Collision near\n");
 
   b1 = dGeomGetBody(o1);
   b2 = dGeomGetBody(o2);

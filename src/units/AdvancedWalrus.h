@@ -28,13 +28,13 @@ public:
     void embody(dWorldID world, dSpaceID space);
     void embody(dBodyID myBodySelf);
 
-    void doMaterial();
-
     void doControl(Controller controller);
     void doControl();
     void doControl(struct controlregister cons);
 
+    void doControlWaypoint();
     void doControlAttack();
+    void doControlDocking();
 
     Vec3f getFiringPort();
     void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);

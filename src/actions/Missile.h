@@ -29,7 +29,6 @@ public:
     ~Missile();
     void init();
     void drawModel(float yRot, float xRot, float x, float y, float z);
-    void doMaterial();
     void clean();
 
     void doDynamics(dBodyID body);

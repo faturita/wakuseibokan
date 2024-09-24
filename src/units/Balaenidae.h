@@ -9,15 +9,10 @@ class Balaenidae : public Vehicle
 {
 protected:
     float rudder;
-    int offshoring = 0;
-    Vec3f ap;
     std::vector<size_t> weapons;
 
 
 public:
-
-    static const int OFFSHORING = 1;
-    static const int SAILING = 0;
 
     ~Balaenidae();
     Balaenidae(int newfaction);
@@ -34,6 +29,9 @@ public:
     void doControl(Controller controller);
     void doControl(struct controlregister regs);
     void virtual doControl();
+    void doControlDocking();
+    void doControlDestination(bool notifyfinish=true);
+    void doControlWaypoint();
 
     void getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
     void doDynamics();
@@ -41,7 +39,7 @@ public:
 
     void doDynamics(dBodyID body);
 
-    void offshore();
+    void offshore(Vec3f d);
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 
@@ -54,6 +52,8 @@ public:
     void addWeapon(size_t w);
 
     virtual EntityTypeId getTypeId();
+
+    float virtual getEnergyConsumption();
 };
 
 #endif // BALAENIDAE_H

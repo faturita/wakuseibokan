@@ -31,19 +31,6 @@ EntityTypeId MultiBodyVehicle::getTypeId()
     return EntityTypeId::TMultiBodyVehicle;
 }
 
-void MultiBodyVehicle::doMaterial()
-{
-    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
-    
-    glEnable(GL_COLOR_MATERIAL);
-    
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-    glMateriali(GL_FRONT, GL_SHININESS,128);
-}
-
-
 
 
 void MultiBodyVehicle::doControl(Controller controller)
@@ -160,7 +147,7 @@ void MultiBodyVehicle::drawModel(float yRot, float xRot, float x, float y, float
     
     //glRotatef(xRot, 1.0f, 0.0f, 0.0f);
     
-    doMaterial();
+    Vehicle::doMaterial();
     //glutSolidSphere(4.0, 20, 50);
     drawRectangularBox(10.0, 2.0f, 30.0f);
     //_model->draw();

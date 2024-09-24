@@ -68,7 +68,7 @@ void Turtle::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glRotatef(-180.0f, 1.0f, 0.0f, 0.0f);
 
-        doMaterial();
+        Vehicle::doMaterial();
         //drawRectangularBox(width/1, height/1, length/1);
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
@@ -385,7 +385,7 @@ void Turtle::doControlDestination()
         if (dst_status != DestinationStatus::REACHED)
         {
             dst_status = DestinationStatus::REACHED;
-            autostatus = AutoStatus::FREE;
+            autostatus = AutoStatus::IDLE;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;

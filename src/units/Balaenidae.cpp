@@ -141,7 +141,172 @@ void Balaenidae::embody(dBodyID myBodySelf)
     me = myBodySelf;
 }
 
+void Balaenidae::doControlDocking()
+{
+    Controller c;
+
+    c.registers = registers;
+
+    Vec3f Po = getPos();
+
+    Po[1] = 0.0f;
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float roundederror = 100;
+
+    dout << "Running docking control." << std::endl;
+
+    if (getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
+    {
+        // Potential fields from the islands (to avoid them)
+        int nearesti = 0;
+        float closest = 0;
+        for(size_t i=0;i<islands.size();i++)
+        {
+            BoxIsland *b = islands[i];
+            Vec3f l(b->getX(),0.0f,b->getZ());
+
+            if ((l-Po).magnitude()<closest || closest ==0) {
+                closest = (l-Po).magnitude();
+                nearesti = i;
+            }
+        }
+
+        if (T.magnitude()>2000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            T = T-l;
+            Vec3f newdestination = destination + T.normalize()*1000.0;
+            T = newdestination - Po;
+        }
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+
+
+        c.registers.thrust = 400.0f;
+
+
+
+        // Potential fields to avoid islands (works great).
+        if (closest > 1800 && closest < 4000)
+        {
+            BoxIsland *b = islands[nearesti];
+            Vec3f l = b->getPos();
+            Vec3f d = Po-l;
+            d = d.normalize();
+
+            if (distance>2000.0)
+            {
+                T = T+d;
+                T = T.normalize();
+            }
+
+            c.registers.thrust = 40.0f;
+            
+        }
+
+        if (distance<800.0f)
+        {
+            c.registers.thrust = 10.0f;
+        }
+
+
+        float e = _acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+
+
+        /**
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f; 
+        }**/
+
+
+        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
+
+
+    } else {
+        if (dst_status != DestinationStatus::REACHED)
+        {
+            char str[256];
+            Message mg;
+            mg.faction = getFaction();
+            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            mg.msg = std::string(str);mg.timer = 0;
+            messages.insert(messages.begin(), mg);
+            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            dst_status = DestinationStatus::REACHED;
+            c.registers.thrust = 0.0f;
+            setThrottle(0.0);
+            c.registers.roll = 0.0f;
+            setAutoStatus(AutoStatus::IDLE);
+        }
+    }
+
+    doControl(c);    
+}
+
+
 void Balaenidae::doControl()
+{
+    switch (autostatus) {
+        case AutoStatus::DESTINATION:   doControlDestination(); break;
+        case AutoStatus::DOCKING:       doControlDocking(); break;
+        case AutoStatus::WAYPOINT:      doControlWaypoint(); break;
+        default: break;
+    }
+
+}
+
+void Balaenidae::doControlWaypoint()
+{
+    if ( (dst_status == DestinationStatus::READY || dst_status == DestinationStatus::REACHED) && !waypoints.empty())
+    {
+        destination = waypoints.front();
+        waypoints.pop();
+        dst_status = DestinationStatus::TRAVELLING;
+    }
+    if (dst_status == DestinationStatus::REACHED && waypoints.empty())
+    {
+        char str[256];
+        Message mg;
+        mg.faction = getFaction();
+        sprintf(str, "%s has arrived to destination.", getName().c_str());
+        mg.msg = std::string(str);mg.timer = 0;
+        messages.insert(messages.begin(), mg);
+        CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
+        dst_status = DestinationStatus::REACHED;
+        setAutoStatus(AutoStatus::IDLE);
+    }
+
+    doControlDestination(false);
+}
+
+
+void Balaenidae::doControlDestination(bool notifyfinish)
 {
     Controller c;
 
@@ -239,17 +404,23 @@ void Balaenidae::doControl()
     } else {
         if (dst_status != DestinationStatus::REACHED )
         {
-            char str[256];
-            Message mg;
-            mg.faction = getFaction();
-            sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
-            mg.msg = std::string(str);mg.timer = 0;
-            messages.insert(messages.begin(), mg);
+            if (notifyfinish)
+            {
+                char str[256];
+                Message mg;
+                mg.faction = getFaction();
+                sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
+                CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
+                mg.msg = std::string(str);mg.timer = 0;
+                messages.insert(messages.begin(), mg);
+
+                c.registers.thrust = 0.0f;
+                setThrottle(0.0);
+                c.registers.roll = 0.0f;
+                setAutoStatus(AutoStatus::IDLE);
+            }
+
             dst_status = DestinationStatus::REACHED;
-            c.registers.thrust = 0.0f;
-            setThrottle(0.0);
-            c.registers.roll = 0.0f;
-            disableAuto();
         }
     }
 
@@ -265,6 +436,11 @@ void Balaenidae::doControl(struct controlregister regs)
 {
     if (getThrottle()==0 and regs.thrust != 0)
         honk(getPos());
+
+    // @FIXME: Need to add a global control check to verify all the register variables to be within margins.
+    if (regs.thrust>1000.0)
+        regs.thrust = 1000.0;
+
     setThrottle(regs.thrust*2*5);
 
     Balaenidae::rudder = -regs.roll;
@@ -300,22 +476,22 @@ void Balaenidae::doDynamics(dBodyID body)
     Ft[0]=0;Ft[1]=0;Ft[2]=getThrottle();
 
 
-    if (offshoring == 1) {
-        offshoring=0;
-        setStatus(Balaenidae::SAILING);
-    }
-    else if (offshoring > 0)
-    {
-        // Add a retractive force to keep it out of the island.
-        Vec3f ap = Balaenidae::ap;
+    // if (offshoring == 1) {
+    //     offshoring=0;
+    //     setStatus(SailingStatus::SAILING);
+    // }
+    // else if (offshoring > 0)
+    // {
+    //     // Add a retractive force to keep it out of the island.
+    //     Vec3f ap = Balaenidae::ap;
 
-        setThrottle(0.0);
+    //     setThrottle(0.0);
 
-        Vec3f V = ap*(-10000);
+    //     Vec3f V = ap*(-10000);
 
-        dBodyAddForce(body,V[0],V[1],V[2]);
-        offshoring--;
-    }
+    //     dBodyAddForce(body,V[0],V[1],V[2]);
+    //     offshoring--;
+    // }
 
 
     dReal *v = (dReal *)dBodyGetLinearVel(body);
@@ -343,7 +519,8 @@ void Balaenidae::doDynamics(dBodyID body)
 
     if (VERIFY(pos, body))
     {
-        dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
+        if (getPower()>0)
+            dBodyAddRelForce(body,Ft[0],Ft[1],Ft[2]);
 
         dBodyAddRelTorque(body,0.0f,Balaenidae::rudder*1000,0.0f);
 
@@ -354,11 +531,14 @@ void Balaenidae::doDynamics(dBodyID body)
     wrapDynamics(body);
 }
 
-void Balaenidae::offshore()
+void Balaenidae::offshore(Vec3f d)
 {
-    Balaenidae::offshoring = 100;
-    Balaenidae::ap =getForward();
-    Balaenidae::ap = Balaenidae::ap.normalize();
+    dBodyID body = getBodyID();
+    //dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+    d = d*200000;
+    dBodyAddForce(body,d[0],0,d[2]);
+    setDelayedStatus(SailingStatus::OFFSHORING,100, SailingStatus::SAILING);
+    enableAuto();
 }
 
 Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
@@ -562,4 +742,9 @@ void Balaenidae::addWeapon(size_t w)
 EntityTypeId Balaenidae::getTypeId()
 {
     return EntityTypeId::TBalaenidae;
+}
+
+float Balaenidae::getEnergyConsumption()
+{
+    return 0.000004;
 }

@@ -41,6 +41,7 @@
 #include "structures/CommandCenter.h"
 #include "structures/Launcher.h"
 #include "structures/Armory.h"
+#include "structures/WindTurbine.h"
 
 #include "weapons/CarrierArtillery.h"
 #include "weapons/CarrierTurret.h"
@@ -716,6 +717,9 @@ void loadgame(std::string filename)
                     break;
                 case VehicleSubTypes::RADAR:
                     v = new Radar(faction);
+                    break;
+                case VehicleSubTypes::WINDTURBINE:
+                    v = new WindTurbine(faction);
                     break;
                 case VehicleSubTypes::STRUCTURE:default:
                     v = new Structure(faction);

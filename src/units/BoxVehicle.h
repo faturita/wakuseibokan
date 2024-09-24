@@ -30,7 +30,6 @@ public:
     
     
 	void  drawDirectModel();
-	void doMaterial();
 	void  doDynamics(dBodyID);
     void  doDynamics();
     void  embody(dBodyID);

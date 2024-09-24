@@ -81,6 +81,8 @@
 #include "units/Medusa.h"
 #include "units/Cephalopod.h"
 #include "units/AdvancedManta.h"
+#include "units/CargoShip.h"
+#include "units/Seal.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -98,6 +100,7 @@
 #include "structures/Dock.h"
 #include "structures/Radar.h"
 #include "structures/Factory.h"
+#include "structures/WindTurbine.h"
 
 #include "weapons/Weapon.h"
 #include "weapons/CarrierTurret.h"
@@ -116,6 +119,8 @@
 #include "map.h"
 
 #include "math/uuid.h"
+
+#include "ai.h"
 
 extern  Camera camera;
 
@@ -269,6 +274,19 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.slip1 = 0.0f;
                 contact[i].surface.slip2 = 0.0f;
                 contact[i].surface.bounce = 0.2f;
+            } else 
+            if (isDock(s1) || isDock(s2))
+            {
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+
+                if (isDock(s1) && docked(v2, s1->island)) {}
+                if (isDock(s2) && docked(v1, s2->island)) {}
             } else
             if  (isRunway(s1) || isRunway(s2))
             {
@@ -443,6 +461,25 @@ void __nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
+void testFailed(char *str)
+{
+    printf("Test failed: %s\n", str);
+    endWorldModelling();
+    exit(-1);
+}
+
+void testFailed()
+{
+    testFailed(" ");
+}
+
+void testSucceeded()
+{
+    printf("Test passed OK.\n");
+    endWorldModelling();
+    exit(1);
+}
+
 void inline initIslands()
 {
     BoxIsland *thermopilae = new BoxIsland(&entities);
@@ -518,7 +555,7 @@ void test2()
 
     entities.push_back(_manta1, _manta1->getGeom());
 
-    controller.controllingid = 2;
+    controller.controllingid = 1;
 }
 
 void checktest2(unsigned long timer)
@@ -534,7 +571,7 @@ void checktest2(unsigned long timer)
         _manta1->setThrottle(0.0f);
         _manta1->inert = true;
     }
-    if (timer==1600000)
+    if (timer==5000)
     {
         Vehicle *_b = entities[2];
         Vec3f val = _b->getPos();
@@ -546,19 +583,15 @@ void checktest2(unsigned long timer)
 
         if (val[1]<4.0f)
         {
-            printf("Test failed: Height bellow expected.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Height bellow expected.");
         } else if (vec3fV.magnitude()>5)
         {
-            printf("Test failed: Object is moving.\n");
-            endWorldModelling();
-            exit(-1);
-
+            testFailed("Object is moving.");
         } else {
             printf("Test passed OK!\n");
             endWorldModelling();
             exit(1);
+            testSucceeded();
         }
     }
 }
@@ -633,17 +666,11 @@ void checktest8(unsigned long  timer)      // Check Walrus entering and leaving 
 
         if (!isWalrusInIsland)
         {
-            printf("Test failed: Walrus has not associated island.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Walrus has not associated island.");
         } else if (!didWalrusLeftIsland) {
-            printf("Test failed: Walrus never left the island.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Walrus never left the island.");
         } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 
@@ -763,9 +790,7 @@ void checktest15(unsigned long timer)
     if (timer>10000)
     {
         // Timeout
-        printf("Test failed.\n");
-        endWorldModelling();
-        exit(0);
+        testFailed("Timeout.");
     }
 }
 
@@ -788,24 +813,15 @@ void checktest1(unsigned long timer)
 
         if (val.magnitude()>100)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else if (vav.magnitude()>10)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else if (vec3fV.magnitude()>5)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
-
+            testFailed();
         } else {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 }
@@ -837,13 +853,9 @@ void checktest3(unsigned long timer)
 
         if (_manta1->getHealth()==1000)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 }
@@ -874,13 +886,9 @@ void checktest4(unsigned long  timer)
 
         if (_manta1->getStatus()!=FlyingStatus::LANDED)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 }
@@ -917,13 +925,9 @@ void checktest5(unsigned long  timer)   // Manta lands on carrier.
 
         if (_manta1->getStatus()!=FlyingStatus::ON_DECK)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 
@@ -949,7 +953,7 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
     {
         Balaenidae *b = (Balaenidae*)entities[1];
 
-        if (b->getStatus()==Balaenidae::OFFSHORING)
+        if (b->getStatus()==SailingStatus::OFFSHORING)
         {
             isOffshoring = true;
         }
@@ -971,19 +975,13 @@ void checktest6(unsigned long timer)   // Carrier offshoring.
         vav[0]= av[0];vav[1] = av[1]; vav[2] = av[2];
 
         if (!isOffshoring){
-            printf("Test failed: Carrier never offshored.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Carrier never offshored.");
         }
-        if (b->getStatus() != Balaenidae::SAILING || vav.magnitude()>100)
+        if (b->getStatus() != SailingStatus::SAILING || vav.magnitude()>100)
         {
-            printf("Test failed: Carrier is still moving.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Carrier is still moving.");
         } else {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 }
@@ -1024,13 +1022,9 @@ void checktest7(unsigned long  timer)    // Manta crashing on water (reducing it
         // Manta should be immediately destroyed at this speed.
         if (_manta1->getHealth()==1000)
         {
-            printf("Test failed.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed();
         } else {
-            printf("Test succedded\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 
@@ -1069,24 +1063,15 @@ void checktest9(unsigned long timer)     // Check walrus stability.
 
         if (posVector.magnitude()>100)
         {
-            printf("Test failed: Walrus is not in their expected position.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Walrus is not in their expected position.");
         } else if (vav.magnitude()>10)
         {
-            printf("Test failed: Walrus is still moving.\n");
-            endWorldModelling();
-            exit(-1);
+            testFailed("Walrus is still moving.");
         } else if (vec3fV.magnitude()>5)
         {
-            printf("Test failed: Walrus is still circling.\n");
-            endWorldModelling();
-            exit(-1);
-
+            testFailed("Walrus is still circling.");
         } else {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 }
@@ -7697,7 +7682,7 @@ void test83()
 
 void checktest83(unsigned long timer)
 {
-    if (timer == 10000000)
+    if (timer == 1000)
     {
         printf("Test Passed\n");
         endWorldModelling();
@@ -7705,6 +7690,434 @@ void checktest83(unsigned long timer)
     }
 }
 
+void test84()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(1000);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructureAtDesiredHeight(dock,world,-1);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+
+    Vec3f w1(16000.0f,20.5f,0);
+    Vec3f w2(16000.0f,20.5f,10000);
+    Vec3f w3(16000.0f,20.5f,20000);
+
+    dout << w1 << w2 << w3  << std::endl;
+
+    _b->clearWaypoints();
+
+    _b->addWaypoint(w1);
+    _b->addWaypoint(w2);
+    _b->addWaypoint(w3);
+
+    _b->ready();
+    _b->setAutoStatus(AutoStatus::WAYPOINT);
+    _b->enableAuto();
+
+}
+
+void checktest84(unsigned long timer)
+{
+    if (timer>2000)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        if (b)
+        {
+            Vec3f w3(16000.0f,20.5f,20000);
+
+            std::cout << (b->getPos()-w3).magnitude() << std::endl;
+
+
+            if (b->getPos().isCloseTo(w3,400))
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+
+    }
+    if (timer == 10000)
+    {
+        printf("Test Passed\n");
+        endWorldModelling();
+        exit(1);
+
+    }
+}
+
+void test85()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+    cg->setOrder(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(1000);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+
+    cg->setAutoStatus(AutoStatus::DOCKING);
+    cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+    cg->enableAuto();
+
+    //_b->setAutoStatus(AutoStatus::DOCKING);
+    //_b->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+    //_b->enableAuto();
+}
+
+void checktest85(unsigned long timer)
+{
+    if (timer>5000)
+    {
+        Vehicle *b = findWalrusByOrder(GREEN_FACTION,1);
+
+        if (b)
+        {
+            if (b->getStatus() == SailingStatus::DOCKED)
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+
+    }
+    if (timer == 15000)
+    {
+        printf("Test Failed\n");
+        endWorldModelling();
+        exit(0);
+
+    }
+}
+
+
+void test86()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+    cg->setOrder(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(1000);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+
+    cg->setAutoStatus(AutoStatus::DESTINATION);
+    cg->setDestination(Vec3f(0.0f,20.5f,20000.0f));
+    cg->enableAuto();
+}
+
+void checktest86(unsigned long timer)
+{
+    if (timer>5000)
+    {
+        Vehicle *b = findWalrusByOrder(GREEN_FACTION,1);
+
+        if (b)
+        {
+            Vec3f w3(0.0f,20.5f,20000);
+
+            std::cout << (b->getPos()-w3).magnitude() << std::endl;
+
+
+            if (b->getPos().isCloseTo(w3,400))
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            }
+        }
+
+    }
+    if (timer == 15000)
+    {
+        printf("Test Failed\n");
+        endWorldModelling();
+        exit(0);
+
+    }
+}
+
+void test87()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(5000.0f,20.5f,-15000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-5000.0f);
+    cg->stop();
+    cg->setOrder(1);
+    cg->setNameByNumber(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(6000.0f,20.5f,-10300);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = GREEN_AI; 
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest87(unsigned long timer)
+{
+    if (timer>5000)
+    {
+        BoxIsland *nemesis = islands[0];
+
+        if (nemesis->getStructures().size() > 0)
+        {
+            testSucceeded();
+        }
+
+    }
+    if (timer == 15000)
+    {
+        testFailed();
+    }
+}
+
+
+
+void test88()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(5000.0f,20.5f,-35000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, FACTORY_ISLAND)    ,       200.0f,    -100.0f,0,world);
+
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(6000.0f,20.5f,-10300);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = GREEN_AI; 
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest88(unsigned long timer)
+{
+    if (timer>500000)
+    {
+        BoxIsland *nemesis = islands[0];
+
+        if (nemesis->getStructures().size() > 0)
+        {
+            testSucceeded();
+        }
+
+    }
+    if (timer == 1500000)
+    {
+        testFailed();
+    }
+}
 
 
 static int testing=-1;
@@ -7836,6 +8249,11 @@ void initWorldModelling(int testcase)
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water
+    case 84:test84();break;                         // Check Energy production in windmills.
+    case 85:test85();break;                         // Check CargoShip docking on the other side of the island.
+    case 86:test86();break;                         // Check CargoShip travelling to the other side of the island.
+    case 87:test87();break;                         // Check Carrier AI arriving to an island where there is already a cargos ship.
+    case 88:test88();break;                         // Check Carrier attacking an island.
     default:initIslands();test1();break;
     }
 
@@ -7936,6 +8354,11 @@ void worldStep(int value)
     case 80:checktest80(timer);break;
     case 81:checktest81(timer);break;
     case 83:checktest83(timer);break;
+    case 84:checktest84(timer);break;
+    case 85:checktest85(timer);break;
+    case 86:checktest86(timer);break;
+    case 87:checktest87(timer);break;
+    case 88:checktest88(timer);break;
     default: break;
     }
 

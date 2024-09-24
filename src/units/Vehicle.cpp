@@ -47,6 +47,8 @@ std::string Vehicle::subTypeText(int code)
     case VehicleSubTypes::BALAENIDAE:return std::string("Balaenidae Carrier");break;
     case VehicleSubTypes::LASERTURRET:return std::string("Laser Turret");break;
     case VehicleSubTypes::COMMANDCENTER:return std::string("CommandCenter");break;
+    case VehicleSubTypes::WINDTURBINE:return std::string("Wind Turbine");break;
+    case VehicleSubTypes::CARGOSHIP:return std::string("Cargo Ship");break;
     default:return std::string("Unit");break;
     }
 }
@@ -61,6 +63,13 @@ void Vehicle::setStatus(int value)
     status = value;
 }
 
+void Vehicle::setDelayedStatus(int status, int delay, int finalstatus)
+{
+    setStatus(status);
+    statuschangedelay = delay;
+    finaldelayedstatus = finalstatus;    
+}
+
 Vehicle::Vehicle()
 {
     for(int i=0;i<12;i++)
@@ -71,6 +80,8 @@ Vehicle::Vehicle()
 
     memset(&registers,0,sizeof(struct controlregister));
     Vehicle::speed = 0;
+    memset(cargo,0,sizeof(cargo));
+    memset(capacity,0,sizeof(capacity));
 
     pos = Vec3f(0.0f,0.0f,0.0f);
 
@@ -84,6 +95,9 @@ Vehicle::Vehicle()
     steering=0.0f;
 
     destination = Vec3f(0.0f, 0.0f, 0.0f);
+
+    dst_status = DestinationStatus::READY;
+    autostatus = AutoStatus::IDLE;
 }
 
 Vehicle::~Vehicle()
@@ -360,6 +374,18 @@ void Vehicle::drawModel(Vec3f offset)
     drawModel(0,0,p[0],p[1],p[2]);
 }
 
+void Vehicle::doMaterial()
+{
+    GLfloat specref[] = { 1.0f, 1.0f, 1.0f, 1.0f};
+
+    glEnable(GL_COLOR_MATERIAL);
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+    glMateriali(GL_FRONT, GL_SHININESS,128);
+}
+
 /**
 void Vehicle::drawModel()
 {
@@ -394,6 +420,11 @@ float Vehicle::getThrottle()
 {
 
 	return Vehicle::throttle;
+}
+
+float Vehicle::getEnergyConsumption()
+{
+    return 0.00001;
 }
 
 void Vehicle::stop()
@@ -523,6 +554,7 @@ int Vehicle::getPower() const
 void Vehicle::setPower(int value)
 {
     power = value;
+    if (power<0) power=0;
 }
 
 int Vehicle::getSignal() const
@@ -545,6 +577,11 @@ void Vehicle::setOrder(int value)
     order = value;
 }
 
+bool Vehicle::isAutoStatusFree()
+{
+    return autostatus == AutoStatus::IDLE;
+}
+
 AutoStatus Vehicle::getAutoStatus() const
 {
     return autostatus;
@@ -563,6 +600,41 @@ void Vehicle::setTtl(int ttlvalue)
 void Vehicle::tick()
 {
     Vehicle::ttl--;
+}
+
+int Vehicle::getCargo(int type)
+{
+    return cargo[type];
+}
+
+int Vehicle::removeCargo(int type, int value)
+{
+    if (value>cargo[type])
+    {
+        value = cargo[type];
+    }
+    cargo[type] -= value;
+
+    return value;
+}
+
+int Vehicle::addCargo(int type, int value)
+{
+    // @NOTE: Check capacity
+    cargo[type] += value;
+    if (cargo[type]>1000)
+        cargo[type] = 1000;
+    return cargo[type];
+}
+
+int Vehicle::setCargo(int type, int value)
+{
+    // @NOTE: Check capacity
+    cargo[type] = value;
+    
+    if (cargo[type]>1000)
+        cargo[type] = 1000;
+    return cargo[type];
 }
 
 struct controlregister Vehicle::getControlRegisters()
@@ -598,6 +670,24 @@ void Vehicle::wrapDynamics(dBodyID body)
     const dReal *dBodyRotation = dBodyGetRotation(body);
 
     Vec3f newpos(dBodyPosition[0], dBodyPosition[1], dBodyPosition[2]);
+
+    // @NOTE: Reduce the power based on the throttle and the specific energy consumption.
+    fueltank -= getEnergyConsumption() * getThrottle();
+    if (fueltank<0)
+    {
+        setPower(getPower()-1);
+        fueltank=1;
+    }
+
+    // Allow some histeresis in state changes.
+    if (statuschangedelay>0)
+    {
+        statuschangedelay--;
+        if (statuschangedelay==0)
+        {
+            setStatus(finaldelayedstatus);
+        }
+    }
 
     /**
     if (getType()==WALRUS)
@@ -701,7 +791,7 @@ void Vehicle::setDestination(Vec3f dest)
 
 void Vehicle::goWaypoints()
 {
-    dst_status = DestinationStatus::STILL;
+    dst_status = DestinationStatus::READY;
     autostatus = AutoStatus::WAYPOINT;
 }
 
@@ -791,7 +881,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     
     if (getPos()[1]<3.0)
     {
-        // @NOTE: The counter should come from something related to the ocean level, a global parameter.
+        // @NOTE: The counter should come from something related to the ocean
         static int counter = 0;
         counter++;
 
@@ -828,6 +918,12 @@ Vec3f Vehicle::toBody(dBodyID body,Vec3f fw)
 bool Vehicle::arrived()
 {
     return dst_status == DestinationStatus::REACHED;
+}
+
+void Vehicle::ready()
+{
+    // @NOTE: Clears the destination status flag to allow new orders.
+    dst_status = DestinationStatus::READY;
 }
 
 std::string Vehicle::getName()

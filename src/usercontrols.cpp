@@ -383,9 +383,14 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (controller.str.find("set") != std::string::npos)
             {
                 std::string command = controller.str.substr(3+1,1);
-                std::string entityid = controller.str.substr(controller.str.find("#")+1);
 
-                dout << "Command-" << command << " map to " << entityid << std::endl;
+                std::string entityid;
+                if (controller.str.find("#") != std::string::npos)
+                    entityid = controller.str.substr(controller.str.find("#")+1);
+                else
+                    entityid = std::to_string((int)controller.controllingid);
+
+                std::cout << "Command-" << command << " map to " << entityid << std::endl;
 
                 int keycontrol = atoi(command.c_str());
 
@@ -459,6 +464,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::SIMPLEMANTA, controller.faction, content);
 
                 CLog::Write(CLog::Debug,"Manta %d\n", index);
+
+                switchControl(index);
+
+            } else
+            if (controller.str.find("cargoship") != std::string::npos)
+            {
+                int content = atoi(controller.str.substr(9).c_str());
+
+                size_t index = CONTROLLING_NONE;
+                findWalrusBySubTypeAndFactionAndNumber(index, VehicleSubTypes::CARGOSHIP, controller.faction, content);
+
+                CLog::Write(CLog::Debug,"CargoShip %d\n", content);
 
                 switchControl(index);
 
@@ -573,6 +590,54 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.push(co);
             }
             else
+            if (controller.str.find("dock") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::DockOrder;
+
+                controller.push(co);
+            }
+            else 
+            if (controller.str.find("refuel") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::RefuelOrder;
+
+                controller.push(co);
+            } 
+            else
+            if (controller.str.find("unfill") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::UnfillOrder;
+
+                controller.push(co);
+            } 
+            else
+            if (controller.str.find("collect") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::CollectOrder;
+
+                controller.push(co);
+            } 
+            else
+            if (controller.str.find("refill") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::RefillOrder;
+
+                controller.push(co);
+            } 
+            else
+            if (controller.str.find("departure") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::Departure;
+
+                controller.push(co);
+            } 
+            else
             if (controller.str.find("launch") != std::string::npos)
             {
                 CommandOrder co;
@@ -591,7 +656,13 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else
             if (controller.str.find("command") != std::string::npos)
             {
+                int ownislands = countNumberOfIslands(controller.faction);
+
                 int typeofisland = DEFEND_ISLAND;
+                
+                if (ownislands==0)
+                    typeofisland = ISLANDTYPES::CAPITAL_ISLAND;
+                else
 
                 if (controller.str.find("factory") != std::string::npos)
                     typeofisland = FACTORY_ISLAND;
@@ -792,6 +863,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 controller.push(co);
             }
             break;
+        case 'y':
+            {
+                CommandOrder co;
+                co.command = Command::SpawnOrder;
+                co.parameters.spawnid = VehicleSubTypes::CARGOSHIP;
+                controller.push(co);
+            }
+            break;
         case 'm':
             {
                 CommandOrder co;
@@ -803,7 +882,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'M':
             {
                 CommandOrder co;
-                co.command = Command::DockOrder;
+                co.command = Command::RecoveryOrder;
                 co.parameters.spawnid = VehicleSubTypes::SIMPLEMANTA;
                 controller.push(co);
             }
@@ -820,7 +899,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case 'O':
             {
                 CommandOrder co;
-                co.command = Command::DockOrder;
+                co.command = Command::RecoveryOrder;
                 co.parameters.spawnid = VehicleSubTypes::ADVANCEDWALRUS;
 
                 controller.push(co);
@@ -878,6 +957,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 
         break;
 	}
+
+
+    // @NOTE: Check general controllers
+    if (controller.registers.thrust>1000.0f)
+        controller.registers.thrust = 1000.0f;
+
+
+
 }
 
 void handleSpecKeypress(int key, int x, int y)

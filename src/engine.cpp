@@ -88,16 +88,17 @@ void deleteEntity(size_t i)
 // SYNC
 bool stranded(Vehicle *carrier, Island *island)
 {
-    if (island && carrier && carrier->getType() == CARRIER && carrier->getStatus() != Balaenidae::OFFSHORING)
+    if (island && carrier && carrier->getType() == CARRIER && carrier->getStatus() != SailingStatus::OFFSHORING)
     {
         Balaenidae *b = (Balaenidae*)carrier;
-
-        b->offshore();
+        Vec3f offshoreDirection = b->getPos() - ((BoxIsland*)island)->getPos();
+        offshoreDirection = offshoreDirection.normalize();
+        b->offshore(offshoreDirection);
         controller.reset();
         b->stop();
         b->damage(100);
         b->setControlRegisters(controller.registers);
-        b->setStatus(Balaenidae::OFFSHORING);
+        b->setStatus(SailingStatus::OFFSHORING);
         b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
         char str[256];
         Message mg;
@@ -123,6 +124,19 @@ bool departed(dSpaceID space)
 
 bool departed(Vehicle *walrus)
 {
+    if (walrus && walrus->getSubType() == VehicleSubTypes::CARGOSHIP && walrus->getStatus() == SailingStatus::ROLLING)
+    {
+        CargoShip *w = (CargoShip*)walrus;
+
+        w->setStatus(SailingStatus::OFFSHORING);
+        char str[256];
+        Message mg;
+        sprintf(str, "%s has departed.", w->getName().c_str());
+        mg.msg = std::string(str);mg.timer = timer;
+        mg.faction = w->getFaction();
+        messages.insert(messages.begin(), mg);
+        return true;
+    } else
     if (walrus && walrus->getType() == WALRUS && walrus->getStatus() == SailingStatus::ROLLING)
     {
         Walrus *w = (Walrus*)walrus;
@@ -162,6 +176,22 @@ bool arrived(dSpaceID s, Island *island)
 
 bool arrived(Vehicle *invadingunit, Island *island)
 {
+
+    if (island && invadingunit && invadingunit->getSubType() == VehicleSubTypes::CARGOSHIP && invadingunit->getStatus() == SailingStatus::SAILING)
+    {
+        CargoShip *w = (CargoShip*)invadingunit;
+
+        w->setStatus(SailingStatus::INSHORING);
+        char str[256];
+        Message mg;
+        sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
+        mg.msg = std::string(str);mg.timer = timer;
+        mg.faction = w->getFaction();
+        messages.insert(messages.begin(), mg);
+        return true;
+    }
+
+    else
     if (island && invadingunit && invadingunit->getType() == WALRUS && invadingunit->getStatus() == SailingStatus::SAILING)
     {
         Walrus *w = (Walrus*)invadingunit;
@@ -200,6 +230,26 @@ bool arrived(Vehicle *invadingunit, Island *island)
 }
 
 // SYNC
+bool docked(Vehicle *boat, Island *island)
+{
+    if (boat && island && boat->getStatus() != SailingStatus::DOCKED)
+    {
+        {
+            boat->stop();
+            boat->setStatus(SailingStatus::DOCKED);
+
+            char str[256];
+            Message mg;
+            mg.faction = boat->getFaction();
+            sprintf(str, "%s has docked on Island %s.", boat->getName().c_str(), island->getName().c_str());
+            mg.msg = std::string(str);mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
@@ -456,6 +506,15 @@ bool isRay(dGeomID o)
     }
     return false;
 }
+bool isDock(Structure* s)
+{
+    if (s && s->getSubType()==DOCK)
+    {
+        return true;
+    }
+    return false;
+}
+
 
 bool  isRunway(Structure* s)
 {
@@ -787,8 +846,8 @@ Walrus* findNearestWalrus(int faction, Vec3f l, float threshold = 100000 kmf)
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
-        Vehicle *v=entities[i];
-        if (v->getType() == WALRUS && v->getFaction() == faction)
+        Vehicle *v=entities[i]; // @FIXME: Forcing the walrus to not being a cargoship.
+        if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType()!= VehicleSubTypes::CARGOSHIP)
         {
             if (((v->getPos()-l).magnitude()<closest || closest == 0) && ((v->getPos()-l).magnitude()<threshold) )  {
                 closest = (v->getPos()-l).magnitude();
@@ -907,13 +966,14 @@ Vehicle* findCarrier(int faction)
     return NULL;
 }
 
-int findAvailableNumber(int bitmap)
+int findAvailableNumber(long bitmap)
 {
-
-    for(unsigned short a=0;a<20;a++)
+    // Show the hexa value of bitmap
+    //printf("The bitmap is %lx\n", bitmap);
+    for(unsigned short a=0;a<63;a++)
     {
-        int val = bitmap & 0x01;
-        //printf("The number %d is %d\n", a, val);
+        long val = bitmap & 0x01;
+        //printf("The number %d is %ld\n", a, val);
         bitmap = bitmap  >> 1;
 
         if (val == 0)
@@ -923,10 +983,10 @@ int findAvailableNumber(int bitmap)
     assert(false || !"No more available numbers!");
 }
 
-
+// @NOTE: This creates the idgenerator based on what really exists, and then it finds the next available number.
 int findNextNumber(int faction, int type, int subtype)
 {
-    std::map<std::tuple<int,int,int>, int> idGenerator;
+    std::map<std::tuple<int,int,int>, long> idGenerator;
 
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -935,11 +995,11 @@ int findNextNumber(int faction, int type, int subtype)
         if (idGenerator.find(std::make_tuple(v->getFaction(), v->getType(), v->getSubType())) == idGenerator.end() )
         {
             int number = v->getNumber();
-            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = (0x01 << (number-1));
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = ((long)0x01 << ((long)number-1));
         } else {
             int number = v->getNumber();
-            int bmap = idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())];
-            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = bmap | (0x01 << (number-1));
+            long bmap = idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())];
+            idGenerator[std::make_tuple(v->getFaction(), v->getType(), v->getSubType())] = bmap | ((long)0x01 << ((long)number-1));
         }
 
     }
@@ -950,7 +1010,7 @@ int findNextNumber(int faction, int type, int subtype)
     }
     else
     {
-        int bmap = idGenerator[std::make_tuple(faction,type,subtype)];
+        long bmap = idGenerator[std::make_tuple(faction,type,subtype)];
         int number = findAvailableNumber(bmap);
         return number;
     }
@@ -958,6 +1018,38 @@ int findNextNumber(int faction, int type, int subtype)
 
     assert(!"No more available numbers !!!!!");
 }
+
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleTypes> types, Vec3f l, float threshold)
+{
+    std::vector<size_t> enemies;
+    float closest = threshold;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+
+        bool bMatch = false;
+        for (int j=0;j<types.size();j++)
+        {
+            if (v->getType() == types[j])
+            {
+                bMatch = true;
+                break;
+            }
+        }
+
+        if (v &&
+                ( (types.size() == 0 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (bMatch) )
+                && v->getFaction()==friendlyfaction)   // Fix this.
+        {
+            if ((v->getPos()-l).magnitude()<closest) {
+                enemies.push_back(i);
+            }
+        }
+    }
+
+    return enemies;
+}
+
 
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
 {
@@ -1085,11 +1177,12 @@ Antenna* findAntennaFromIsland(BoxIsland *is)
     return NULL;
 }
 
+
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = -1;
     float closest = 0;
-    for(int i=0;i<islands.size();i++)
+    for(size_t i=0;i<islands.size();i++)
     {
         BoxIsland *b = islands[i];
         Vec3f l(b->getX(),0.0f,b->getZ());
@@ -1160,6 +1253,19 @@ BoxIsland* findIslandByName(std::string islandname)
     return NULL;
 }
 
+int countNumberOfIslands(int faction)
+{
+    int ownislands = 0;
+    // @FIXME: Please this is so nasty....
+    for(int i=0;i<islands.size();i++)
+    {
+        Structure *c = islands[i]->getCommandCenter();
+        if (c && c->getFaction() == controller.faction)
+            ownislands++;
+    }
+    return ownislands;
+}
+
 
 void list()
 {
@@ -1198,7 +1304,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
         // Should check if the vehicle has some device to allow further control.
         if ((entities[i]->getType() == WALRUS || entities[i]->getType() == MANTA ) && (entities[i]->getFaction() == faction) )
         {
-            if (entities[i]->getSignal()!=4)
+            if (entities[i]->getSignal()!=CommLink::LONG_RANGE)
             {
                 if ((entities[i]->getPos() - b).magnitude() > COMM_RANGE)
                 {
@@ -1214,7 +1320,7 @@ void commLink(int faction, dSpaceID space, dWorldID world)
 
                     if (!is || (is && !a))
                     {
-                        if (entities[i]->getSignal()==3)
+                        if (entities[i]->getSignal()==CommLink::SHORT_RANGE)
                         {
                             char msg[256];
                             Message mg;
@@ -1224,17 +1330,17 @@ void commLink(int faction, dSpaceID space, dWorldID world)
                             mg.msg = stream.str(); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                         }
-                        entities[i]->setSignal(2);
+                        entities[i]->setSignal(CommLink::NO_LINK);
                         entities[i]->damage(1);
                     } else {
                         // This means that now the unit is again close to the island's antenna so we should put the connection back.
-                        entities[i]->setSignal(3);
+                        entities[i]->setSignal(CommLink::SHORT_RANGE);
                     }
 
                 }
                 else
                 {
-                    entities[i]->setSignal(3);                  // Put connection back to normal.
+                    entities[i]->setSignal(CommLink::SHORT_RANGE);                  // Put connection back to normal.
                 }
             }
         }
@@ -1693,9 +1799,38 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
     {
         BoxIsland *island = islands[i];
 
-        if (island->getStructures().size()<14)
+        CommandCenter *c = findCommandCenter(island);
+
+        // Find the main dock, and spawn just one CargoShip per island, assigning the dockid to the cargoship.
+        std::vector<size_t> str = island->getStructures();
+        if (c && c->getTtl()<=0 || force)
         {
-            CommandCenter *c = findCommandCenter(island);
+            if (str.size()>2)
+            {
+                if (entities[str[1]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[1]];          // @FIXME: 1 is always the first and main dock
+
+                    Vehicle *ca = findWalrusByOrder2(d->getFaction(), str[1]);
+
+                    if (!ca)
+                    {
+                        Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
+                        ca->setOrder(str[1]);
+                        if (ca)
+                        {
+                            size_t idx = entities.push_back(ca, ca->getGeom());
+                            ca->ready();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Go through all the structures, build new and repair the old ones.
+        if (c && (  (c->getIslandType() == ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<24) ||
+                    (c->getIslandType() != ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<14) ) )
+        {
             if (c)
             {
                 if (c->getTtl()<=0 || force)
@@ -1709,15 +1844,34 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         int subType=VehicleSubTypes::STRUCTURE;
                         float chance=0;
                         bool onlyonce=false;
+                        bool mandatory=false;
                     };
 
                     std::vector<struct templatestructure> islandstructs;
 
-                    if (c->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
+                    if (c->getIslandType() == ISLANDTYPES::CAPITAL_ISLAND)
+                    {
+                        // Capital island
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::FACTORY;tp.chance = 0.2;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.3;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.1;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.45;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.25;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::RADAR;tp.chance = 0.45;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.001;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.4;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.4;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.4;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
+                    } else if (c->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
                     {
                         // Softmax, boltzman decay.
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.2;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.85;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1725,12 +1879,13 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.7;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::FACTORY_ISLAND){
 
                         // Factory island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::FACTORY;tp.chance = 0.2;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.1;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.45;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.02;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1739,10 +1894,11 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.02;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.3;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -1750,19 +1906,37 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::STRUCTURE;tp.chance = 0.01;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.25;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LAUNCHER;tp.chance = 0.25;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.85;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::ARMORY;tp.chance = 0.25;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
 
                     }
 
-                    int which = (rand() % islandstructs.size());
+                    std::vector<size_t> strs = island->getStructures();
 
-                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", which, prob, islandstructs[which].chance );
+                    // Search for any mandatory structure
+                    int which = (rand() % islandstructs.size());
+                    for(size_t i=0;i<islandstructs.size();i++)
+                    {
+                        if (islandstructs[i].mandatory)
+                        {
+                            bool ispresent = false;
+                            for(size_t ids=0;ids<strs.size();ids++)
+                            {
+                                if (entities[strs[ids]]->getSubType() == islandstructs[i].subType)
+                                    ispresent = true;
+                            }
+                            if (!ispresent)
+                                {which = i;break;}
+                        }
+                    }
+
+
+                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
 
                         bool ispresent = false;
-                        std::vector<size_t> strs = island->getStructures();
                         for(size_t i=0;i<strs.size();i++)
                         {
                             if (entities[strs[i]]->getSubType() == islandstructs[which].subType)
@@ -1821,6 +1995,10 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 s = new Radar(c->getFaction());
                                 island->addStructure(s,world);
                                 break;
+                            case VehicleSubTypes::WINDTURBINE:
+                                s = new WindTurbine(c->getFaction());
+                                island->addStructure(s,world);
+                                break;
                             case VehicleSubTypes::STRUCTURE:default:
                                 s = new Structure(c->getFaction());
                                 island->addStructure(s,world);
@@ -1845,6 +2023,51 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     c->restart();
                 }
 
+            }
+        }
+
+
+        // BASIC logistic strategy: find the cargoships, and move all the cargo from its dock towards the closer
+        //   dock where the carrier is actually located.
+
+
+
+        // Move naturally the fuel from wind turbines to docks and runways.
+        if (c)
+        {
+            if (c->getTtl()<=0|| force)
+            {
+                std::vector<size_t> ws;
+                std::vector<size_t> shares;
+                std::vector<size_t> str = island->getStructures();
+
+                for(size_t id=0;id<str.size();id++)
+                {
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
+                        ws.push_back(str[id]);
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                        shares.push_back(str[id]);
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::RUNWAY)
+                        shares.push_back(str[id]);
+                }
+
+                for(size_t id=0;id<ws.size();id++)
+                {
+                    Vehicle *w = entities[ws[id]];
+                    if (w && w->getCargo(CargoTypes::POWERFUEL) > 100)
+                    {
+                        int cargo = w->getCargo(CargoTypes::POWERFUEL);
+                        float fcargoshare = ((float)cargo / (float)shares.size());
+                        int effectivecargo = 0;
+                        for(size_t shareid=0;shareid<shares.size();shareid++)
+                        {
+                            CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                            effectivecargo += entities[shares[shareid]]->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
+                        }
+                        w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
+                        CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
+                    }
+                }
             }
         }
 
@@ -2017,6 +2240,258 @@ Manta* taxiManta(Vehicle *v)
     }
     return m;
 }
+
+void departure(Vehicle *f)
+{
+    Vehicle *m = NULL;
+
+    std::vector<VehicleTypes> types;
+
+    types.push_back(VehicleTypes::MANTA);
+    types.push_back(VehicleTypes::WALRUS);
+    types.push_back(VehicleTypes::CARRIER);
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } 
+
+    if (m)
+    {
+        m->setDelayedStatus(SailingStatus::OFFSHORING, 100, SailingStatus::SAILING);
+        m->ready();
+        dBodyID body = m->getBodyID();
+
+        Vec3f dDir = f->getForward();
+        dDir = dDir.normalize();
+
+        if (m->getSubType() == VehicleSubTypes::CARGOSHIP || m->getType() == VehicleTypes::CARRIER)
+            dDir = dDir * -200000.0f;     
+        else
+            dDir = dDir * -10000.0f;    
+
+        // @NOTE: I move the boat backwards regardless of its orientation.
+        //   This helps in the AI scheme because it is easy to handle if the orientation is not right.          
+        //dBodyAddRelForce(body,0.0f,0.0f,-200000.0f);
+        dBodyAddForce(body,dDir[0],0,dDir[2]);
+
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s has departured.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+    }
+
+    return;    
+}
+
+void unfill(Vehicle *f)
+{
+    Vehicle *dock = NULL;
+
+    if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+    {
+        BoxIsland *is = findNearestIsland(f->getPos());
+        dock = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+
+        if (dock)
+        {
+            int cargo = dock->getCargo(CargoTypes::POWERFUEL);
+            int fillcargo = 1000-cargo;
+            int remanent = f->removeCargo(CargoTypes::POWERFUEL,fillcargo);
+            dock->addCargo(CargoTypes::POWERFUEL,remanent);
+            char msg[256];
+            Message mg;
+            mg.faction = dock->getFaction();
+            sprintf(msg, "%s cargo has been unloaded on %s.", f->getName().c_str(), is->getName().c_str());
+            mg.msg = std::string(msg); mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+        }
+    } 
+}
+
+void refill(Vehicle *f)
+{
+    Vehicle *m = NULL;
+
+    std::vector<VehicleTypes> types;
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE ) 
+        types.push_back(VehicleTypes::MANTA);
+    else
+    {
+        types.push_back(VehicleTypes::WALRUS);
+        types.push_back(VehicleTypes::CARRIER);
+    }
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } 
+
+    if (m)
+    {
+        int cargo = m->getCargo(CargoTypes::POWERFUEL);
+        int fillcargo = 1000-cargo;
+        int remanent = f->removeCargo(CargoTypes::POWERFUEL,fillcargo);
+        m->addCargo(CargoTypes::POWERFUEL,remanent);
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s cargo has been refilled.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+    }
+
+    return; 
+}
+
+int getIslandCargo(BoxIsland *is, int cargotype)
+{
+    int cargo = 0;
+    std::vector<size_t> str = is->getStructures();
+    for(size_t id=0;id<str.size();id++)
+    {
+        if ( (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK) || (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
+            || (entities[str[id]]->getSubType() == VehicleSubTypes::RUNWAY) )
+        {
+            cargo += entities[str[id]]->getCargo(cargotype);
+        }
+    }
+    return cargo;
+}
+
+
+void dockInNearestIsland(Vehicle *b)
+{
+    if (b && b->getAutoStatus() != AutoStatus::DOCKING)
+    {
+        int faction = b->getFaction();
+        BoxIsland *is = findNearestIsland(b->getPos());
+
+        if (is)
+        {
+            std::vector<size_t> str = is->getStructures();
+
+            for(size_t id=0;id<str.size();id++)
+            {
+
+                dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                {
+                    Dock *d = (Dock*)entities[str[id]];
+
+                    if (d->getFaction() == faction)
+                    {
+                        b->ready();
+                        b->setDestination(d->getPos()-d->getForward().normalize()*400);
+                        b->setAutoStatus(AutoStatus::DOCKING);
+                        b->enableAuto();
+                        dout << "DOCKING!" << std::endl;
+                    }
+                } 
+            }
+        }    
+    }
+}
+
+
+
+void collect(Vehicle *v)
+{
+    BoxIsland *is = findNearestIsland(v->getPos()); 
+    if (is && v)
+    {
+
+        std::vector<size_t> ws;
+        std::vector<size_t> shares;     // Use me if you want to refuel all the boats at the deck.
+        std::vector<size_t> str = is->getStructures();
+
+        for(size_t id=0;id<str.size();id++)
+        {
+            // Bring the stuff from all the others.
+            if (entities[str[id]] != v)
+            {
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
+                    ws.push_back(str[id]);
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
+                    ws.push_back(str[id]);
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::RUNWAY)
+                    ws.push_back(str[id]);
+            }
+        }
+
+        for(size_t id=0;id<ws.size();id++)
+        {
+            Vehicle *w = entities[ws[id]];
+            if (w && w->getCargo(CargoTypes::POWERFUEL) > 0)
+            {
+                int cargo = w->getCargo(CargoTypes::POWERFUEL);
+                float fcargoshare = ((float)cargo / 1);
+                int effectivecargo = 0;
+
+                CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                effectivecargo += v->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
+
+                w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
+                CLog::Write(CLog::Debug,"Sharing %d from Island \n", effectivecargo);
+            }
+        }
+
+
+    }
+
+}
+
+void refuel(Vehicle *f)
+{
+    Vehicle *m = NULL;
+
+    std::vector<VehicleTypes> types;
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE ) 
+        types.push_back(VehicleTypes::MANTA);
+    else
+    {
+        types.push_back(VehicleTypes::WALRUS);
+        types.push_back(VehicleTypes::CARRIER);
+    }
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    {
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } 
+
+    if (m)
+    {
+        int power = m->getPower();
+        int filltank = 1000-power;
+        int remanent = f->removeCargo(CargoTypes::POWERFUEL,filltank);
+        m->setPower(power+remanent);
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s has been recharged.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+    }
+
+    return;    
+}
+
 
 Manta* launchManta(Vehicle *v)
 {

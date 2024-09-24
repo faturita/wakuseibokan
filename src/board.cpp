@@ -73,6 +73,7 @@ float Y(float y);
 void drawIntro()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -152,12 +153,15 @@ void drawIntro()
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+
+    glEnable(GL_LIGHTING);
 }
 
 
 void drawBoard()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -238,11 +242,14 @@ void drawBoard()
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+
+    glEnable(GL_LIGHTING);
 }
 
 void drawEntities()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -294,4 +301,5 @@ void drawEntities()
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
 
+    glEnable(GL_LIGHTING);
 }

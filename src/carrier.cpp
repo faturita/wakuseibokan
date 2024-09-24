@@ -178,6 +178,7 @@ void disclaimer()
 void drawHUD()
 {
     // This will make things dark.
+    glDisable(GL_LIGHTING);
     
     //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glMatrixMode(GL_PROJECTION);
@@ -214,6 +215,7 @@ void drawHUD()
     bool lostsignal = false;
     
     float speed=0, health=0, power = 0;
+    int cargo=0;
 
     std::string name;
     
@@ -223,6 +225,7 @@ void drawHUD()
         health = entities[controller.controllingid]->getHealth();
         power = entities[controller.controllingid]->getPower();
         name = entities[controller.controllingid]->getName();
+        cargo = entities[controller.controllingid]->getCargo(CargoTypes::POWERFUEL);
 
         if (entities[controller.controllingid]->getType() == CEPHALOPOD)
         {
@@ -247,6 +250,19 @@ void drawHUD()
     
     sprintf (str, "Vehicle:%d %s - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,name.c_str(), controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
+
+
+
+    sprintf (str, "Cargo: %d\n", cargo );
+	drawString(0,-120,1,str,0.2f);
+
+
+
+
+
+
+
+
 
     if (controller.isTeletype())
     {
@@ -530,9 +546,9 @@ void drawHUD()
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+
+    glEnable(GL_LIGHTING);
 }
-
-
 
 
 void drawScene() {
@@ -544,7 +560,6 @@ void drawScene() {
         //glMatrixMode(GL_PROJECTION);
         //glLoadIdentity();
         //gluPerspective(45.0, (float)1440 / (float)900, 1.0, camera.pos[2]+ horizon /**+ yyy**/);
-
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -567,10 +582,7 @@ void drawScene() {
         ctrling = controller.controllingid;
         entities[ctrling]->getViewPort(up,pos,forward);
 
-        Vec3f up2,pos2;
-        //camera.getViewPort(up2,pos2,forward);
-
-        camera.fw = entities[ctrling]->getForward();
+        camera.fw = forward;                            // This is very important for the Sky.  So forward for the camera is the viewport from the object.
 
         if (entities[ctrling]->getType() == MANTA)
         {
@@ -624,8 +636,10 @@ void drawScene() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glPushMatrix();
-    glTranslatef(relPos[0]-cos(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[1]+200.0+sin(daylight_frequency * 2 * PI * timer)*(horizon-100),relPos[2]);
-    drawTheRectangularBox(textures["venus"], 800.0,800.0,800.0);
+    glColor3f(1.0,1.0,1.0);
+    glRotatef(daylight_frequency * timer * 360.0,0,0,-1);   // 1 cycle per 10000 cycles (glRotatef is in degrees)
+    glTranslatef(relPos[0]-(80 kmf),0,relPos[2]);
+    drawTheRectangularBox(textures["venus"], 1200.0,1200.0,1200.0);
     glPopMatrix();
     glPopAttrib();
     
@@ -733,8 +747,8 @@ void initRendering() {
 	// Lightning
     glEnable(GL_LIGHTING);
     
-    // Lighting not working.
-    glEnable(GL_LIGHT0);
+    // Lighting not working. 
+    //glEnable(GL_LIGHT0);
 
     
 	// Normalize the normals (this is very expensive).
@@ -1001,6 +1015,24 @@ void inline processCommandOrders()
                     entities[ctroler->controllingid]->enableTelemetry();
                 else
                     entities[ctroler->controllingid]->disableTelemetry();
+            } else if (co.command == Command::UnfillOrder)
+            {
+                unfill(entities[ctroler->controllingid]);
+            } else if (co.command == Command::RefillOrder)
+            {
+                refill(entities[ctroler->controllingid]);
+            } else if (co.command == Command::RefuelOrder)
+            {
+                refuel(entities[ctroler->controllingid]);
+            } else if (co.command == Command::CollectOrder)
+            {
+                collect(entities[ctroler->controllingid]);
+            } else if (co.command == Command::DockOrder)
+            {
+                dockInNearestIsland(entities[ctroler->controllingid]);
+            } else if (co.command == Command::Departure)
+            {
+                departure(entities[ctroler->controllingid]);
             } else if (co.command == Command::LaunchOrder)
             {
                 launchManta(entities[ctroler->controllingid]);
@@ -1032,7 +1064,7 @@ void inline processCommandOrders()
                     entities[ctroler->controllingid]->enableAuto();
                 else
                     entities[ctroler->controllingid]->disableAuto();
-            } else if (co.command == Command::DockOrder)
+            } else if (co.command == Command::RecoveryOrder)
             {
                 if (co.parameters.spawnid == VehicleSubTypes::ADVANCEDWALRUS)
                 {
@@ -1105,6 +1137,15 @@ void inline processCommandOrders()
                     if (entities[ctroler->controllingid]->getType()==CARRIER || entities[ctroler->controllingid]->getType()==LANDINGABLE )
                     {
                         Cephalopod* m = (Cephalopod*)(entities[ctroler->controllingid]->spawn(world,space,CEPHALOPOD,findNextNumber(entities[ctroler->controllingid]->getFaction(),MANTA,CEPHALOPOD)));
+
+                        size_t idx = entities.push_back(m, m->getGeom());
+                    }
+                }
+                else if (co.parameters.spawnid == VehicleSubTypes::CARGOSHIP)
+                {
+                    if (entities[ctroler->controllingid]->getSubType()==DOCK)
+                    {
+                        CargoShip* m = (CargoShip*)(entities[ctroler->controllingid]->spawn(world,space,CARGOSHIP,findNextNumber(entities[ctroler->controllingid]->getFaction(),WALRUS,CARGOSHIP)));
 
                         size_t idx = entities.push_back(m, m->getGeom());
                     }

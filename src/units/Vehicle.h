@@ -1,9 +1,23 @@
-/*
- * Vehicle.h
- *
- *  Created on: Jan 16, 2011
- *      Author: faturita
- */
+/* ============================================================================
+**
+** Vehicle Base Class for all Entities - Wakuseiboukan - 16/01/2011
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** ========================================================================= */
 
 #ifndef VEHICLE_H_
 #define VEHICLE_H_
@@ -112,7 +126,9 @@ enum EntityTypeId {
     TShell = 44,
     TTorpedo = 45,
     TTurtle = 46,
-    TArmory = 47
+    TArmory = 47,
+    TWindTurbine = 48,
+    TCargoShip = 49
 };
 
 
@@ -121,9 +137,9 @@ enum EntityTypeId {
  */
 enum VehicleTypes { RAY=1, WALRUS=2, MANTA=3, CARRIER=4, ACTION=5, CONTROLABLEACTION = 6 , EXPLOTABLEACTION = 7, WEAPON = 8, COLLISIONABLE=15, LANDINGABLE = 16, CONTROL=17};
 
-enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, OTTER = 9, TURTLE = 10, ARTILLERY = 11, COMMANDCENTER = 12, HANGAR = 13, WAREHOUSE = 14, RUNWAY = 15, LASERTURRET = 16, TURRET = 17, LAUNCHER = 18, FACTORY = 19, DOCK = 20, ANTENNA = 21, RADAR = 22, STRUCTURE = 23, ARMORY = 24};
+enum VehicleSubTypes { BALAENIDAE = 1, BELUGA = 2, SIMPLEWALRUS = 3, ADVANCEDWALRUS = 4, SIMPLEMANTA = 5, MEDUSA = 6, STINGRAY = 7, CEPHALOPOD = 8, OTTER = 9, TURTLE = 10, CARGOSHIP = 11, ARTILLERY = 12, COMMANDCENTER = 13, HANGAR = 14, WAREHOUSE = 15, RUNWAY = 16,  TURRET = 17, LAUNCHER = 18, FACTORY = 19, DOCK = 20, ANTENNA = 21, RADAR = 22, STRUCTURE = 23, ARMORY = 24, WINDTURBINE = 25,LASERTURRET = 26};
 
-enum class AutoStatus { FREE=1, DESTINATION, WAYPOINT, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR, WATER };
+enum class AutoStatus { IDLE=1, DESTINATION, WAYPOINT, LANDING, ATTACK, DOGFIGHT, DROP, GROUND, AIR, WATER, DOCKING };
 
 enum ORDERS { ATTACK_ISLAND=1, DEFEND_CARRIER, DEFEND_ISLAND, CONQUEST_ISLAND };
 
@@ -131,9 +147,13 @@ enum FACTIONS {GREEN_FACTION = 1, BLUE_FACTION = 2, BOTH_FACTION = 3};
 
 #define FACTION(m) ( m == GREEN_FACTION ? "Balaenidae" : "Beluga")
 
-enum class DestinationStatus { STILL=0, TRAVELLING, REACHED};
+enum class DestinationStatus { READY=0, TRAVELLING, REACHED};
 
 enum class WEAPONS { GUNSHOT=1, MISSILE=2, BOMB=3 };
+
+enum CargoTypes { POWERFUEL=0 };
+
+enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING, DOCKED};
 
 class Vehicle : Observable
 {
@@ -146,6 +166,11 @@ private:
     int faction=-1;
 
     bool dotelemetry=false;
+
+    int statuschangedelay=0;
+    int finaldelayedstatus = SailingStatus::SAILING;
+
+
 
 protected:
     Vec3f pos;
@@ -166,8 +191,7 @@ protected:
     // Signal determines if the vehicle can be remotely controlled despite of not being close the carrier or a friendly island.
     int signal=3;
 
-    // State Machine for handling destinations.
-    DestinationStatus dst_status;
+
     
     // ODE objects
     dBodyID me=NULL;
@@ -177,7 +201,7 @@ protected:
     struct controlregister registers;
 
     bool aienable = false;
-    AutoStatus autostatus = AutoStatus::FREE;
+    AutoStatus autostatus = AutoStatus::IDLE;
 
     int status=0;
     int order=0;
@@ -200,7 +224,14 @@ protected:
     Vec3f onScreen;
 
     Vec3f offset;
+
+    int cargo[256];
+    int capacity[256];
+
+    float fueltank=1;
     
+    void doMaterial();
+
 public:
     bool inert=false;
     float xRotAngle=0;
@@ -210,7 +241,6 @@ public:
     
     int virtual getType();
     int virtual getSubType();
-
 
     void setAutoStatus(AutoStatus au);
     
@@ -247,6 +277,8 @@ public:
 	void virtual setThrottle(float thorttle);
 	float virtual getThrottle();
     void virtual upThrottle(float throttle);
+
+    float virtual getEnergyConsumption();
 
     void virtual stop();
     void virtual stop(dBodyID who);
@@ -294,6 +326,11 @@ public:
     virtual int getTtl();
     virtual void tick();
 
+    int getCargo(int type);
+    int setCargo(int type, int value);
+    int removeCargo(int type, int value);
+    int addCargo(int type, int value);
+
     bool isAuto();
     void enableAuto();
     void disableAuto();
@@ -301,11 +338,13 @@ public:
     void goWaypoints();
 
     bool arrived();
+    void ready();
 
     virtual Vehicle* spawn(dWorldID world, dSpaceID space,int type, int number);
 
     int getStatus() const;
     void setStatus(int value);
+    void setDelayedStatus(int status, int delay, int finalstatus);
     float getHealth() const;
     virtual void damage(float d);
     void destroy();
@@ -325,6 +364,7 @@ public:
     int getOrder() const;
     void setOrder(int value);
     AutoStatus getAutoStatus() const;
+    bool isAutoStatusFree();
 
     std::string subTypeText(int code);
 
@@ -350,6 +390,9 @@ public:
     virtual void        deserialize(TickRecord);
 
     virtual EntityTypeId getTypeId();
+
+    // State Machine for handling destinations.
+    DestinationStatus dst_status;
 
 };
 

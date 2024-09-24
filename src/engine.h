@@ -34,6 +34,7 @@
 #include "units/Stingray.h"
 #include "units/Otter.h"
 #include "units/Turtle.h"
+#include "units/CargoShip.h"
 
 #include "terrain/Terrain.h"
 
@@ -51,6 +52,7 @@
 #include "structures/Factory.h"
 #include "structures/Radar.h"
 #include "structures/Armory.h"
+#include "structures/WindTurbine.h"
 
 #include "actions/Gunshot.h"
 #include "actions/Missile.h"
@@ -65,6 +67,8 @@ using TrackRecord = std::tuple<dGeomID, dGeomID, std::function<bool(dGeomID,dGeo
 
 enum AIPLAYERSTATUS { FREE_AI, BLUE_AI, GREEN_AI, BOTH_AI};
 
+
+enum CommLink { NO_LINK=2, SHORT_RANGE=3, LONG_RANGE=4};
 
 #define DOCK_RANGE      600
 #define COMM_RANGE      50000
@@ -92,6 +96,8 @@ bool arrived(dSpaceID s, Island *island);
 // SYNC
 bool landed(Vehicle *manta, Island *island);
 
+// SYNC
+bool docked(Vehicle *boat, Island *island);
 
 // SYNC
 bool isMineFire(Vehicle* vehicle, Gunshot *g);
@@ -145,7 +151,7 @@ bool  isAction(Vehicle* vehicle);
 bool isRay(dGeomID o);
 
 bool  isRunway(Structure* s);
-
+bool isDock(Structure* s);
 bool isSubType(dGeomID geom, int subtype);
 bool isSubType(Vehicle *v, int subtype);
 
@@ -210,15 +216,19 @@ BoxIsland* findIslandByName(std::string islandname);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+int countNumberOfIslands(int faction);
 
 Antenna* findAntennaFromIsland(BoxIsland *is);
 Structure* findStructureFromIsland(BoxIsland *is, int subtype);
+
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,Vec3f l, float threshold);
 Vehicle* findCarrier(int faction);
 Vehicle* findCarrier(size_t &index, int faction);
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
 
 void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
 void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
@@ -229,5 +239,13 @@ void waterexplosion(Vehicle* v, dWorldID world, dSpaceID space);
 bool structurecollisions(Structure *s, Vehicle *vehicle);
 
 void trackTargets();
+
+void departure(Vehicle *f);
+void refuel(Vehicle *v);
+void refill(Vehicle *f);
+void unfill(Vehicle *f);
+void collect(Vehicle *v);
+int getIslandCargo(BoxIsland *is,int cargo);
+void dockInNearestIsland(Vehicle *b);
 
 #endif // ENGINE_H

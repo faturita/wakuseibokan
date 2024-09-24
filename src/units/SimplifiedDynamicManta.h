@@ -63,6 +63,8 @@ public:
     void hold();
 
     virtual EntityTypeId getTypeId();
+
+    float getEnergyConsumption();
 };
 
 #endif // SIMPLIFIEDMANTA_H

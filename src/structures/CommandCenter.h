@@ -6,7 +6,7 @@
 
 #include "Structure.h"
 
-enum ISLANDTYPES { DEFENSE_ISLAND, FACTORY_ISLAND, LOGISTICS_ISLAND };
+enum ISLANDTYPES { DEFENSE_ISLAND, FACTORY_ISLAND, LOGISTICS_ISLAND, CAPITAL_ISLAND };
 
 class CommandCenter : public Structure
 {
@@ -33,7 +33,7 @@ protected:
     int islandType;
 
 public:
-    static const int BUILDING_TIME = 400;
+    static const int BUILDING_TIME = 400; 
 
 
     CommandCenter(int faction, int islandType);

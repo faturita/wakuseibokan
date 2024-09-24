@@ -717,7 +717,7 @@ void drawTerrain(Terrain *_landmass, float fscale,float r,float g,float b)
     glBindTexture(GL_TEXTURE_2D, textures["land"]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    //glColor3f(1.0f, 1.0f, 1.0f);
     
     
     for(int z = 0; z < _landmass->length() - 1; z++) {

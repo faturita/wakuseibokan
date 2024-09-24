@@ -20,6 +20,8 @@ public:
     void damage(float damage) override;
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
+
+    float getEnergyConsumption();
 };
 
 #endif // BELUGA_H
