@@ -891,6 +891,56 @@ void drawSky (float posX, float posY, float posZ)
 }
 
 
+void altdrawLightning()
+{
+    float daylights = 0.1f;
+    // Set upt the global ambient light to any specific value.  This is independent of all the rest.
+    GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    ambientLight[0] = ambientLight[1] = ambientLight[2] = daylights;
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+
+
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+
+    //glEnable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, ambientLight);
+    
+    static int count = 0;
+
+    glPushAttrib(GL_CURRENT_BIT);
+    glPushMatrix();
+    {
+        count++;
+
+        GLfloat signs = -1;
+        if (count % 100>50)
+            signs = +1;
+
+        // The sun, directional light from the east
+        GLfloat position[4] = { signs*3600,50*daylights,0,0 };
+        GLfloat specular[4]     = { 1.0f  , 1.0f, 1.0f,   1.0f};
+        glLightfv(GL_LIGHT1, GL_SPECULAR,specular);
+        glLightfv(GL_LIGHT1, GL_POSITION, position);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, specular);
+
+        // Some light spot on top of the island.
+        GLfloat position2[4] = { 5,signs*100,0,1 };
+        GLfloat specular2[4]     = { 1.0f  , 1.0f, 1.0f,   1.0f};
+        glLightfv(GL_LIGHT2, GL_SPECULAR,specular2);
+        glLightfv(GL_LIGHT2, GL_POSITION, position2);
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, specular2);
+
+    }
+    glPopMatrix();
+    glPopAttrib();
+
+        //glEnable(GL_LIGHT0);
+        glEnable(GL_LIGHT1);
+        //glEnable(GL_LIGHT2);
+}
+
+
+
 
 void drawLightning()
 {

@@ -40,7 +40,7 @@
 #include "weapons/CarrierTurret.h"
 #include "profiling.h"
 #include "engine.h"
-#include "ai.h"
+#include "aiold.h"
 
 extern  Controller controller;
 

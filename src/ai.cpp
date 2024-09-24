@@ -162,7 +162,7 @@ class ApproachEnemyIslandQAction : public QAction
 
         if (b)
         {
-            BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction,100 kmf);
+            BoxIsland *is = findNearestEnemyIsland(b->getPos(),false, faction,1000 kmf);
 
             if (is)
             {
