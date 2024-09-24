@@ -2268,7 +2268,11 @@ void departure(Vehicle *f)
 
         Vec3f dDir = f->getForward();
         dDir = dDir.normalize();
-        dDir = dDir * -200000.0f;         
+
+        if (m->getSubType() == VehicleSubTypes::CARGOSHIP || m->getType() == VehicleTypes::CARRIER)
+            dDir = dDir * -200000.0f;     
+        else
+            dDir = dDir * -10000.0f;    
 
         // @NOTE: I move the boat backwards regardless of its orientation.
         //   This helps in the AI scheme because it is easy to handle if the orientation is not right.          
