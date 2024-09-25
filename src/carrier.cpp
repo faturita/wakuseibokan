@@ -540,6 +540,175 @@ void drawHUD()
 
         
     } glPopMatrix();
+
+
+    // Displays the target mark at the center. The position of the center cross depends on camera angles.
+    glMatrixMode(GL_MODELVIEW);
+	glPushMatrix(); {
+		glTranslatef(0, -400, 1);
+        glPushAttrib (GL_LINE_BIT);
+        glLineWidth(2.5);
+
+        int x=600;                     // Horizontal center, screen is 1100 pixels.
+        int y=0+aimc;                   // Center is at 50.
+        int w=40;
+        int h=40;
+
+
+        float altitude = camera.pos[1];
+
+        snprintf(str,7,  "%5.2f",speed);
+        drawString(x-350, y-5, 0,str,0.1f);
+
+        int ys = y - (int)speed%10;
+
+
+        snprintf(str,7,  "%5.2f",altitude);
+        drawString(x+313, y-5, 0,str,0.1f);
+
+        int ya = y - (int)camera.pos[1]%10;
+
+        glBegin(GL_TRIANGLES);
+
+        glVertex3f(x-290, y-10  , 0);
+        glVertex3f(x-300, y     , 0);
+        glVertex3f(x-290, y+10  , 0);
+
+        glEnd();
+
+        glBegin(GL_TRIANGLES);
+
+        glVertex3f(x+290, y-10  , 0);
+        glVertex3f(x+300, y     , 0);
+        glVertex3f(x+290, y+10  , 0);
+
+        glEnd();
+
+
+
+        int thrust = (int)controller.registers.thrust/10;
+
+        glBegin(GL_TRIANGLES);
+
+        glVertex3f(x-280, thrust + y-90  , 0);
+        glVertex3f(x-300, thrust + y-95  , 0);
+        glVertex3f(x-280, thrust + y-100  , 0);
+
+        glEnd();
+
+
+
+
+        glBegin(GL_LINES);glVertex3f(x-310, ys-100, 0);glVertex3f(x-298, ys-100, 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-90 , 0);glVertex3f(x-298, ys-90, 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-80 , 0);glVertex3f(x-298, ys-80 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-70 , 0);glVertex3f(x-298, ys-70 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-60 , 0);glVertex3f(x-298, ys-60 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-50 , 0);glVertex3f(x-298, ys-50 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-40 , 0);glVertex3f(x-298, ys-40 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-30 , 0);glVertex3f(x-298, ys-30 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-20 , 0);glVertex3f(x-298, ys-20 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys-10 , 0);glVertex3f(x-298, ys-10 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys    , 0);glVertex3f(x-298, ys    , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+10 , 0);glVertex3f(x-298, ys+10 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+20 , 0);glVertex3f(x-298, ys+20 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+30 , 0);glVertex3f(x-298, ys+30 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+40 , 0);glVertex3f(x-298, ys+40 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+50 , 0);glVertex3f(x-298, ys+50 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+60 , 0);glVertex3f(x-298, ys+60 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+70 , 0);glVertex3f(x-298, ys+70 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+80 , 0);glVertex3f(x-298, ys+80 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+90 , 0);glVertex3f(x-298, ys+90 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x-310, ys+100, 0);glVertex3f(x-298, ys+100, 0);glEnd();
+
+        glBegin(GL_LINES);glVertex3f(x+310, ya-100, 0);glVertex3f(x+298, ya-100, 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-90 , 0);glVertex3f(x+298, ya-90, 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-80 , 0);glVertex3f(x+298, ya-80 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-70 , 0);glVertex3f(x+298, ya-70 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-60 , 0);glVertex3f(x+298, ya-60 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-50 , 0);glVertex3f(x+298, ya-50 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-40 , 0);glVertex3f(x+298, ya-40 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-30 , 0);glVertex3f(x+298, ya-30 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-20 , 0);glVertex3f(x+298, ya-20 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya-10 , 0);glVertex3f(x+298, ya-10 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya    , 0);glVertex3f(x+298, ya    , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+10 , 0);glVertex3f(x+298, ya+10 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+20 , 0);glVertex3f(x+298, ya+20 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+30 , 0);glVertex3f(x+298, ya+30 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+40 , 0);glVertex3f(x+298, ya+40 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+50 , 0);glVertex3f(x+298, ya+50 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+60 , 0);glVertex3f(x+298, ya+60 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+70 , 0);glVertex3f(x+298, ya+70 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+80 , 0);glVertex3f(x+298, ya+80 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+90 , 0);glVertex3f(x+298, ya+90 , 0);glEnd();
+        glBegin(GL_LINES);glVertex3f(x+310, ya+100, 0);glVertex3f(x+298, ya+100, 0);glEnd();
+
+
+
+
+        glBegin(GL_LINES);
+        glVertex3f(x+595, y-100, 0);
+        glVertex3f(x+595, y+100, 0);
+        glVertex3f(x+600, y-100, 0);
+        glVertex3f(x+600, y+100, 0);
+        glVertex3f(x+595, y-100, 0);
+        glVertex3f(x+600, y-100, 0);
+        glVertex3f(x+595, y+100, 0);
+        glVertex3f(x+600, y+100, 0);
+        glEnd();
+
+
+        float pwpw = power * 200.0f/1000.0f;
+        int pw = 200 - pwpw;
+
+        glBegin(GL_LINES);
+        glVertex3f(x+596, y+100-pw, 0);
+        glVertex3f(x+596, y-100, 0);
+        glVertex3f(x+597, y+100-pw, 0);
+        glVertex3f(x+597, y-100, 0);
+        glVertex3f(x+598, y+100-pw, 0);
+        glVertex3f(x+598, y-100, 0);
+        glVertex3f(x+599, y+100-pw, 0);
+        glVertex3f(x+599, y-100, 0);
+        glEnd();
+
+
+        glBegin(GL_LINES);
+        glVertex3f(x-200, y-270, 0);
+        glVertex3f(x+200, y-270, 0);
+        glVertex3f(x-200, y-275, 0);
+        glVertex3f(x+200, y-275, 0);
+        glVertex3f(x-200, y-270, 0);
+        glVertex3f(x-200, y-275, 0);
+        glVertex3f(x+200, y-270, 0);
+        glVertex3f(x+200, y-275, 0);
+        glEnd();
+
+
+        float pp = health * 400.0f/1000.0f;
+        int p = 400 - pp;
+
+        // Power Bar
+        glPushAttrib(GL_CURRENT_BIT);  // Reset the color bit.
+        if (health > 750.0) glColor4f(0.0f, 1.0f, 0.0f, 0.5);
+        if (health < 750.0) glColor4f(1.0f, 1.0f, 0.0f, 0.5);
+        if (health < 400.0) glColor4f(1.0f, 0.0f, 0.0f, 0.5);
+        glBegin(GL_LINES);
+        glVertex3f(x-200, y-271, 0);
+        glVertex3f(x+200-p, y-271, 0);
+        glVertex3f(x-200, y-272, 0);
+        glVertex3f(x+200-p, y-272, 0);
+        glVertex3f(x-200, y-273, 0);
+        glVertex3f(x+200-p, y-273, 0);
+        glVertex3f(x-200, y-274, 0);
+        glVertex3f(x+200-p, y-274, 0);
+        glEnd();
+
+        glPopAttrib();
+
+
+
+    } glPopMatrix();    
     
     glPopAttrib();
 	glEnable(GL_DEPTH_TEST);
