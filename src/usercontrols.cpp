@@ -118,7 +118,7 @@ void processMouse(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && button == GLUT_LEFT_BUTTON)
     {
         // @NOTE: The following are the vehicles that allow mouse control on activation by changing pitch and roll.
-        if (controller.view == 1 && controller.controllingid != CONTROLLING_NONE &&
+        if ( (controller.view == 1 || controller.view == 6) && controller.controllingid != CONTROLLING_NONE &&
                 ((entities[controller.controllingid]->getType() == VehicleTypes::MANTA) ||
                  (entities[controller.controllingid]->getType() == CONTROLABLEACTION)   ||
                  (entities[controller.controllingid]->getType() == VehicleTypes::WALRUS) ||
@@ -844,6 +844,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         case '!':( (controller.view == 1)?controller.view=2:controller.view=1);break;
         case '@':controller.view = 3;break;
         case '#':controller.view = 4;break;
+        case '%':controller.view = 6;break;
         case '~':camera.control = 0;break;
         case '?':gltWriteTGA("file.tga");break;
         case 't':controller.teletype = true;break;
