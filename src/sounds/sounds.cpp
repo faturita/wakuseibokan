@@ -18,6 +18,43 @@ extern bool mute;
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
 SoundTexture s;
 
+struct soundorder {
+    Vec3f source;
+    char soundname[256];
+} soundelement ;
+
+bool newsound = false;
+
+void playthissound_(Vec3f source, char fl[256]);
+
+void playthissound(Vec3f source, char fl[256])
+{
+    soundelement.source = source;
+    strncpy(soundelement.soundname, fl, 256);
+
+    newsound = true;
+}
+
+void * sound_handler(void *arg)
+{
+    int sd;
+
+    sd = *((int*)arg);
+
+    while (!mute && !s.interrupt)
+    {
+        if (newsound)
+        {
+            printf("Playing %s \n", soundelement.soundname);
+            playthissound_(soundelement.source, soundelement.soundname);
+            newsound = false;
+        }
+
+        usleep(100);
+    }
+}
+
+
 void initSound()
 {
     //SoundTexture* so = new SoundTexture();
@@ -27,6 +64,19 @@ void initSound()
     //so = new SoundTexture();
     //so->init("sounds/gunshot.wav");
     //soundtextures["gunshot"] = so;
+
+    pthread_t th;
+
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+
+    int sd=29;
+
+    // @NOTE: If you create the thread too quickly, the sd value is replaced by accept when two connections arrive simultaneously.
+    //        and that means that one socket identifier is lost and the client will hang.
+    pthread_create(&th, &attr, &sound_handler, (void*)&sd);
+    usleep(3000);  
 
 }
 
@@ -68,7 +118,7 @@ void playthissound(char fl[256])
 
 }
 
-void playthissound(Vec3f source, char fl[256])
+void playthissound_(Vec3f source, char fl[256])
 {
     // @NOTE: Use the camera location to determine if the sound should be reproduced or not
     //   and with which intensity.
