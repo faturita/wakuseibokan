@@ -5,11 +5,14 @@
 
 #include <unordered_map>
 
+#include <assert.h>
+
 #include "soundtexture.h"
 
 #include "sounds.h"
 
 #include "../camera.h"
+#include "../profiling.h"
 
 
 extern  Camera camera;
@@ -18,7 +21,7 @@ extern bool mute;
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
 SoundTexture s;
 
-struct soundorder {
+struct SoundOrder {
     Vec3f source;
     char soundname[256];
 } soundelement ;
@@ -45,7 +48,6 @@ void * sound_handler(void *arg)
     {
         if (newsound)
         {
-            printf("Playing %s \n", soundelement.soundname);
             playthissound_(soundelement.source, soundelement.soundname);
             newsound = false;
         }
@@ -54,7 +56,9 @@ void * sound_handler(void *arg)
     }
 }
 
-
+// @NOTE: Stk is very tricky, particularly in linux.  So I have found that I cannot work on two buffers at the same time and I needed to serialize the access.
+//   But this also makes the system so much slower, so it is just better to use a separate thread to handle the sound.
+//   This way works much better and there is really no penalty in performance.
 void initSound()
 {
     //SoundTexture* so = new SoundTexture();
@@ -73,8 +77,6 @@ void initSound()
 
     int sd=29;
 
-    // @NOTE: If you create the thread too quickly, the sd value is replaced by accept when two connections arrive simultaneously.
-    //        and that means that one socket identifier is lost and the client will hang.
     pthread_create(&th, &attr, &sound_handler, (void*)&sd);
     usleep(3000);  
 
@@ -88,15 +90,6 @@ void clearSound()
         s.close();
     }
 }
-
-void playsound(char *filename)
-{
-    // @FIXME: This is extremly risky !!!
-    char temp[200];
-    sprintf(temp, "%s %s &",PLAYSOUNDCOMMAND, filename);
-    system(temp);
-}
-
 
 void playthissound(char fl[256])
 {
@@ -113,7 +106,7 @@ void playthissound(char fl[256])
             s.play();
         }
     }  catch (StkError) {
-
+        dout << "Sound error reported, but ignored." << std::endl;
     }
 
 }
@@ -141,7 +134,7 @@ void playthissound_(Vec3f source, char fl[256])
             }
         }
     }  catch (StkError) {
-
+        dout << "Sound error reported, but ignored." << std::endl;
     }
 
 }

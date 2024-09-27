@@ -257,13 +257,6 @@ void drawHUD()
 	drawString(0,-120,1,str,0.2f);
 
 
-
-
-
-
-
-
-
     if (controller.isTeletype())
     {
         sprintf(str, ">>>%s",controller.str.c_str());
