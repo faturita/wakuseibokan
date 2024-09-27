@@ -257,13 +257,6 @@ void drawHUD()
 	drawString(0,-120,1,str,0.2f);
 
 
-
-
-
-
-
-
-
     if (controller.isTeletype())
     {
         sprintf(str, ">>>%s",controller.str.c_str());
@@ -764,15 +757,19 @@ void drawScene() {
 
         camera.fw = forward;
 
-        Vec3f f = forward.normalize();
-        f = f * controller.registers.thrust;
+        // @NOTE: #131 only allows the camera to move independently when controlling both factions
+        if (controller.faction == BOTH_FACTION)
+        {
+            Vec3f f = forward.normalize();
+            f = f * controller.registers.thrust;
 
-        pos = pos + f;
-
-        if (camera.dx!=0) {
-            pos[2]+=controller.registers.pitch;
-            pos[1]+=controller.registers.precesion;
-            pos[0]+=controller.registers.roll;
+            pos = pos + f;
+    
+            if (camera.dx!=0) {
+                pos[2]+=controller.registers.pitch;
+                pos[1]+=controller.registers.precesion;
+                pos[0]+=controller.registers.roll;
+            }
         }
     }
     
@@ -964,7 +961,7 @@ void handleResize(int w, int h) {
 	glLoadIdentity();
 
     // @NOTE: Changing zNear helps to avoid as much as possible island z-fighting.
-    //    However putting a value greater than 3.0 wrec havoc the sky which is bounded by this.
+    //    However putting a value greater than 3.0 wreak havoc the sky which is bounded by this.
     //    https://stackoverflow.com/questions/3410096/setting-near-plane-in-opengl
     gluPerspective(45.0, (float)w / (float)h, 3.0, camera.pos[2]+ horizon /**+ yyy**/);
 }
@@ -974,7 +971,7 @@ static bool didODEInit=false;
 
 // Go through all the elements that appear each time on the trackrecord.
 // Those who are new, create them.
-// Those wo are already there, update them.
+// Those who are already there, update them.
 // Those who are no longer there, destroy them.
 void replayupdate(int value)
 {

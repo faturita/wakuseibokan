@@ -5,11 +5,14 @@
 
 #include <unordered_map>
 
+#include <assert.h>
+
 #include "soundtexture.h"
 
 #include "sounds.h"
 
 #include "../camera.h"
+#include "../profiling.h"
 
 
 extern  Camera camera;
@@ -18,6 +21,44 @@ extern bool mute;
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
 SoundTexture s;
 
+struct SoundOrder {
+    Vec3f source;
+    char soundname[256];
+} soundelement ;
+
+bool newsound = false;
+
+void playthissound_(Vec3f source, char fl[256]);
+
+void playthissound(Vec3f source, char fl[256])
+{
+    soundelement.source = source;
+    strncpy(soundelement.soundname, fl, 256);
+
+    newsound = true;
+}
+
+void * sound_handler(void *arg)
+{
+    int sd;
+
+    sd = *((int*)arg);
+
+    while (!mute && !s.interrupt)
+    {
+        if (newsound)
+        {
+            playthissound_(soundelement.source, soundelement.soundname);
+            newsound = false;
+        }
+
+        usleep(100);
+    }
+}
+
+// @NOTE: Stk is very tricky, particularly in linux.  So I have found that I cannot work on two buffers at the same time and I needed to serialize the access.
+//   But this also makes the system so much slower, so it is just better to use a separate thread to handle the sound.
+//   This way works much better and there is really no penalty in performance.
 void initSound()
 {
     //SoundTexture* so = new SoundTexture();
@@ -27,6 +68,17 @@ void initSound()
     //so = new SoundTexture();
     //so->init("sounds/gunshot.wav");
     //soundtextures["gunshot"] = so;
+
+    pthread_t th;
+
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+
+    int sd=29;
+
+    pthread_create(&th, &attr, &sound_handler, (void*)&sd);
+    usleep(3000);  
 
 }
 
@@ -38,15 +90,6 @@ void clearSound()
         s.close();
     }
 }
-
-void playsound(char *filename)
-{
-    // @FIXME: This is extremly risky !!!
-    char temp[200];
-    sprintf(temp, "%s %s &",PLAYSOUNDCOMMAND, filename);
-    system(temp);
-}
-
 
 void playthissound(char fl[256])
 {
@@ -63,12 +106,12 @@ void playthissound(char fl[256])
             s.play();
         }
     }  catch (StkError) {
-
+        dout << "Sound error reported, but ignored." << std::endl;
     }
 
 }
 
-void playthissound(Vec3f source, char fl[256])
+void playthissound_(Vec3f source, char fl[256])
 {
     // @NOTE: Use the camera location to determine if the sound should be reproduced or not
     //   and with which intensity.
@@ -91,7 +134,7 @@ void playthissound(Vec3f source, char fl[256])
             }
         }
     }  catch (StkError) {
-
+        dout << "Sound error reported, but ignored." << std::endl;
     }
 
 }
