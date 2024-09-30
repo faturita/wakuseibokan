@@ -29,6 +29,44 @@ float REQUIRED_FUEL;
 
 float RANGE[] = {40000.0, 20000.0, 6000.0};
 
+class AirDefenseQAction : public QAction
+{
+    void apply(int faction)
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
+
+            Vehicle *v = NULL;
+            if (enemies.size()>0)
+            {
+                v = entities[enemies[0]];
+            }
+
+            if (v)
+            {
+                Vec3f Po = b->getPos();
+                Vec3f Pf = v->getPos();
+                Vec3f T = Pf-Po;
+
+                for (size_t i: enemies)
+                {
+                    if (entities[i]->getType() == CARRIER)
+                    {
+                        b->disableAuto();
+                        b->setThrottle(0.0);
+                        b->setDestination(b->getPos()-T.normalize()*1000);
+                        b->enableAuto();
+                    }
+                }
+            }
+        }
+    }
+};
+
+
 class DockingQAction : public QAction
 {   
 public:
@@ -611,13 +649,13 @@ public:
         {
             BoxIsland *is =findNearestIsland(b->getPos());
 
-            std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
+            //std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
 
             if (is && (is->getPos()-b->getPos()).magnitude()<range)
             {
                 Structure *sc = is->getCommandCenter();
 
-                std::cout << sc << std::endl;
+                //std::cout << sc << std::endl;
 
                 if (!sc)
                 {
@@ -651,7 +689,7 @@ public:
         {
             BoxIsland *is =findNearestIsland(b->getPos());
 
-            std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
+            //std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
 
             if (is && (is->getPos()-b->getPos()).magnitude()<range)
             {
@@ -941,6 +979,421 @@ public:
     }
 };
 
+class DefCon : public Condition
+{   
+public:
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return false;
+
+        // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
+        std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
+
+        Vehicle *v = NULL;
+        if (enemies.size()>0)
+        {
+            v = entities[enemies[0]];
+        }
+
+        if (v)
+        {
+            Vec3f Po = b->getPos();
+            Vec3f Pf = v->getPos();
+            Vec3f T = Pf-Po;
+
+            for (size_t i: enemies)
+            {
+                if (entities[i]->getType() == CARRIER)
+                {
+                    b->disableAuto();
+                    b->setThrottle(0.0);
+                }
+            }
+
+            if (b->getHealth()<500.0)
+            {
+                // @NOTE: The idea is to perfom an evasive action and move the carrier away tangential to the island encircle.
+                BoxIsland *is = findNearestIsland(b->getPos());
+                Vec3f target = is->getPos() - Po;
+                target = target.normalize();
+                target = target.cross(Vec3f(0.0,1.0,0.0));
+                b->setDestination( Po + target * 10000.0);
+                b->enableAuto();
+
+            }
+
+            float distance = T.magnitude();
+
+            Vec3f F = b->getForward();
+            F = F.normalize();
+            T = T.normalize();
+            float e = _acos( T.dot(F) );
+            float signn = T.cross(F)[1];
+
+            if(Beluga* lb = dynamic_cast<Beluga*>(b))
+            {
+                if (distance>500 && lb->getWeapons().size()>0 && entities[lb->getWeapons()[0]] != NULL)
+                {
+
+                    if (Pf[1]>50.0 || (Pf[1]<50.0 && signn<0))
+                    {
+
+                        CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+
+                        if (t) {
+                            Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                            if (action)
+                            {
+                                entities.push_at_the_back(action, action->getGeom());
+                            }
+                        }
+                    }
+
+
+                    if (Pf[1]<50.0 && signn<0 && e>PI/6.0)
+                    {
+
+                        CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[3]];
+
+                        if (at) {
+                            Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                            if (action)
+                            {
+                                ((Gunshot*)action)->setOrigin(b->getBodyID());
+                                entities.push_at_the_back(action, action->getGeom());
+                            }
+                        }
+                    }
+
+                    if (Pf[1]>50.0 || (Pf[1]<50.0 && signn>0))
+                    {
+                        CarrierTurret* t2 = (CarrierTurret*)entities[lb->getWeapons()[1]];
+
+                        if (t2)
+                        {
+                            Vehicle *action = t2->aimAndFire(world, space, v->getPos());
+
+                            if (action)
+                            {
+                                entities.push_at_the_back(action, action->getGeom());
+                            }
+                        }
+                    }
+
+                    if (Pf[1]<50.0 && signn>0 && e>PI/6.0)
+                    {
+
+                        CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[2]];
+
+                        if (at) {
+                            Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                            if (action)
+                            {
+                                ((Gunshot*)action)->setOrigin(b->getBodyID());
+                                entities.push_at_the_back(action, action->getGeom());
+                            }
+                        }
+                    }
+
+                    CarrierLauncher* ct = (CarrierLauncher*)entities[lb->getWeapons()[4]];
+
+                    if (ct) {
+
+                        Vec3f firingloc = ct->getPos();
+                        float elevation = -5;
+                        float azimuth = getAzimuth(v->getPos()-firingloc);
+                        ct->setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+                        Vehicle *action = NULL;
+
+                        if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
+                        {
+                            ct->water();
+                            action = ct->fire(0,world, space);
+                        } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
+                            ct->ground();
+                            action = ct->fire(0,world, space);
+                        } else {
+                            ct->air();
+                            action = ct->fire(0,world, space);
+                        }
+
+                        if (action)
+                        {
+                            entities.push_at_the_back(action, action->getGeom());
+                            action->goTo(v->getPos());
+                            action->enableAuto();
+
+                            // @FIXME: This is to avoid the carrier being damaged by missiles.
+                            ((Gunshot*)action)->setOrigin(lb->getBodyID());
+
+
+                            auto lambda = [](dGeomID sender,dGeomID recv) {
+
+                                Vehicle *snd = entities.find(sender);
+                                Vehicle *rec = entities.find(recv);
+
+                                if (snd != NULL && rec != NULL)
+                                {
+                                    //printf ("Updating....\n");
+                                    rec->setDestination(snd->getPos());
+                                    return false;
+                                }
+                                else
+                                {
+                                    //printf ("End");
+                                    return false;
+                                }
+
+
+                            };
+
+                            TrackRecord val;
+                            std::get<0>(val) = v->getGeom();
+                            std::get<1>(val) = action->getGeom();
+                            std::get<2>(val) = lambda;
+                            track.push_back(val);
+                        }
+                    }
+
+
+
+
+                }
+            }
+            else if(Balaenidae* lb = dynamic_cast<Balaenidae*>(b))
+            {
+
+                if (distance>500 && lb->getWeapons().size()>0 && entities[lb->getWeapons()[0]] != NULL)
+                {
+
+
+                    CarrierTurret* t = (CarrierTurret*)entities[lb->getWeapons()[0]];
+                    if (t)
+                    {
+                        Vehicle *action = t->aimAndFire(world, space, v->getPos());
+
+                        if (action)
+                        {
+                            entities.push_at_the_back(action, action->getGeom());
+                        }
+                    }
+
+                    if (Pf[1]<50.0 && e<PI/6.0)
+                    {
+                        CarrierArtillery* at = (CarrierArtillery*)entities[lb->getWeapons()[1]];
+
+                        if (at) {
+                            Vehicle *action = at->aimAndFire(world, space, v->getPos());
+
+                            if (action)
+                            {
+                                ((Gunshot*)action)->setOrigin(b->getBodyID());
+                                entities.push_at_the_back(action, action->getGeom());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class EngageDefCon : public Condition
+{
+    TSequencer T;
+
+    void start()
+    {
+        T[0] = 1;
+        T[1] = 1;
+    }
+
+    void tick()
+    {
+        T = T + T.sign() * 1;
+    }
+
+    public:
+    bool runNavalDefense(int faction)
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return false;
+
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
+
+        std::cout << "Enemy found at " << v->getPos() << std::endl;
+
+        if (v) 
+        {
+            // @FIXME Check why this is actually working with the faulty function findWalrusByOrder
+            Walrus *w1 = findWalrusByOrder(faction,1);
+
+            if (!w1)
+            {
+                T[1] = 1;
+                std::cout << "Spawn ! " << std::endl;
+                w1 = spawnWalrus(space,world,b);
+                w1->enableAuto();
+            }
+
+            for(int i=1;i<5;i++)
+            {
+                Walrus *w1 = findWalrusByOrder(faction,i);
+
+                if (w1) continue;
+
+                if (T[1]==100)
+                {
+                    T[1] = 1;
+                    dout << "Spawn ! " << std::endl;
+                    w1 = spawnWalrus(space,world,b);
+                    w1->enableAuto();
+                }
+            }
+            if (T[1]==300)
+                for(int i=1;i<5;i++)
+                {
+                    Walrus *w = findWalrusByOrder(faction,i);
+                    if (w) {w->attack(v->getPos());}
+                }
+        }
+        else
+        {
+            for(int i=1;i<5;i++)
+            {
+                Walrus *w = findWalrusByOrder(faction,i);
+                if (w) w->goTo(b->getPos());
+
+            }
+        }
+
+        return false;
+
+    }
+    bool runAirDefense(int faction)
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return false;
+
+        Vehicle *v = findNearestEnemyVehicle(faction,b->getPos(),DEFENSE_RANGE);
+
+        if (v) {
+            Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+
+            if (m)
+            {
+                m->doHold(m->getPos(),350);
+            }
+            T[0] = 1;
+            return false;
+        }
+
+        Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+
+        if (!m)
+        {
+            size_t idx;
+            Manta *m = spawnManta(space,world,b,idx);
+            m->setOrder(DEFEND_CARRIER);
+            T[0] = 1;
+        }
+
+
+        if (T[0]==300)
+        {
+            launchManta(b);
+        }
+
+        if (T[0]==400)
+        {
+            Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+
+            if (m && v)
+            {
+                m->dogfight(v->getPos());
+                m->enableAuto();
+            }
+        }
+        if (T[0]>405)
+        {
+            Manta *m = findMantaByOrder(faction, DEFEND_CARRIER);
+
+            if (m && v)
+            {
+                m->dogfight(v->getPos());
+            } 
+        }   
+        return false;     
+    }
+
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return false;
+
+        tick();
+
+        // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
+        std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
+
+        Vehicle *v = NULL;
+        if (enemies.size()>0)
+        {
+            v = entities[enemies[0]];
+        }
+
+        if (v && (v->getType() == CARRIER || v->getType() == WALRUS))
+        {
+            Walrus *w1 = findWalrusByOrder(faction,1);
+
+            if (!w1)
+            {
+                T[1] = 1;
+                std::cout << "Spawn ! " << std::endl;
+                w1 = spawnWalrus(space,world,b);
+                w1->enableAuto();
+            }
+
+            for(int i=1;i<5;i++)
+            {
+                Walrus *w1 = findWalrusByOrder(faction,i);
+
+                if (w1) continue;
+
+                if (T[1]==100)
+                {
+                    T[1] = 1;
+                    dout << "Spawn ! " << std::endl;
+                    w1 = spawnWalrus(space,world,b);
+                    w1->enableAuto();
+                }
+            }
+            if (T[1]==500)
+                for(int i=1;i<5;i++)
+                {
+                    Walrus *w = findWalrusByOrder(faction,i);
+                    w->enableAuto();
+                    if (w) {w->attack(v->getPos());}
+                }
+        }
+
+        if (v && v->getType() == MANTA)
+        {
+            return runAirDefense(faction);
+        }    
+    }
+};
 
 Player::Player(int faction)
 {
@@ -949,6 +1402,7 @@ Player::Player(int faction)
 
     for(int i=0;i<25;i++) qactions[i] = new QAction();
     for(int i=0;i<25;i++) transitions[i] = new Transition(State::IDLE,State::IDLE,new Condition());
+    for(int i=0;i<25;i++) interruptions[i] = new Interruption(State::IDLE,new Condition());
 
     transitions[0] = new Transition(State::IDLE,State::DOCKING,new NotEnoughFuelForNextOperation());            // Power < REQUIRED_FUEL
     transitions[1] = new Transition(State::DOCKING,State::DOCKED,new DockedCondition());                        // SailingStatus::DOCKED
@@ -966,6 +1420,8 @@ Player::Player(int faction)
     transitions[13] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());       // <10000.0, command center
     transitions[14] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());                       // No units around
 
+    interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
+    interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around
 
     qactions[(int)State::IDLE] = new ResetQAction();
     qactions[(int)State::DOCKING] = new DockingQAction();
@@ -976,6 +1432,8 @@ Player::Player(int faction)
     qactions[(int)State::RENDEZVOUS] = new RendezvousQAction();
     qactions[(int)State::BALLISTICATTACK] = new BallisticAttackQAction();
     qactions[(int)State::AIRBORNEATTACK] = new AirborneAttackQAction();
+
+    qactions[(int)State::AIRDEFENSE] = new QAction();
 
 
     state = State::IDLE;
@@ -992,6 +1450,9 @@ void Player::playFaction(unsigned long timer)
     State stateprime;
     // Check for enemies nearby and shift strategy if they are present.
     //state = interruption->apply(state,faction,timeevent,timer);
+
+    state = interruptions[0]->transit(faction,state);
+    state = interruptions[1]->transit(faction,state);
 
     if (timer % 1000 == 0)
         std::cout << "Status:" << (int)state << std::endl;

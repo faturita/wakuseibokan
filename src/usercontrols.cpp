@@ -390,7 +390,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 else
                     entityid = std::to_string((int)controller.controllingid);
 
-                std::cout << "Command-" << command << " map to " << entityid << std::endl;
+                dout << "Command-" << command << " map to " << entityid << std::endl;
 
                 int keycontrol = atoi(command.c_str());
 

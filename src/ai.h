@@ -87,7 +87,8 @@ enum class State {
     INVADEISLAND=6,
     RENDEZVOUS=7,
     BALLISTICATTACK=8,
-    AIRBORNEATTACK=9
+    AIRBORNEATTACK=9,
+    AIRDEFENSE=10
 };
 
 
@@ -195,6 +196,7 @@ private:
 public:
     Transition *transitions[25];
     QAction *qactions[25];
+    Interruption *interruptions[25];
     Player(int faction);
     void playFaction(unsigned long timer);
     State getCurrentState();

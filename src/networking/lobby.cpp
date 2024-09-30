@@ -13,6 +13,7 @@
 #include <cstring>
 #include <iostream>
 
+#include "../profiling.h"
 #include "lobby.h"
 
 // LobbyConnection contains the socket fd and addr of the game clients (acting as servers to receive the model information).
@@ -235,7 +236,7 @@ int getlocalip(char buf[256])
         std::cerr << "Could not inet_ntop\n";
         return 0;
     } else {
-        std::cout << "Local ip address: " << buf << "\n";
+        dout << "Local ip address: " << buf << "\n";
     }
 
     return 1;
