@@ -358,5 +358,6 @@ More info
 * Flow Dynamics Engine https://github.com/BlainMaguire/3dfluid?tab=readme-ov-file
 * https://www.nature.com/articles/s41586-024-07886-z
 * https://math.hws.edu/graphicsbook/c4/s2.html
+* https://github.com/2Retr0/GodotOceanWaves
 
 
