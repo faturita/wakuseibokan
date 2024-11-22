@@ -36,6 +36,8 @@ public:
     EntityTypeId virtual getTypeId();
 
     void virtual setNameByNumber(int number);
+
+    void setTexture(GLuint texture);
 };
 
 #endif // OTTER_H

@@ -48,7 +48,7 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glRotatef(90.0, 0.0f, 1.0, 0.0f);
 
-        _model->setTexture(textures["sky"]);
+        //_model->setTexture(textures["sky"]);
         _model->draw();
 
 
@@ -64,7 +64,7 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
         // Rotate the turret cannon so that it is aligned properly.
         glRotatef(90.0f,0.0f,1.0f,0.0f);
 
-        _topModel->setTexture(textures["sky"]);
+        //_topModel->setTexture(textures["sky"]);
         _topModel->draw();
 
         glPopMatrix();
@@ -73,6 +73,12 @@ void Otter::drawModel(float yRot, float xRot, float x, float y, float z)
     {
         CLog::Write(CLog::Debug,"Model is null.\n");
     }
+}
+
+void Otter::setTexture(GLuint texture)
+{
+    _model->setTexture(texture);
+    _topModel->setTexture(texture);
 }
 
 void Otter::embody(dWorldID world, dSpaceID space)

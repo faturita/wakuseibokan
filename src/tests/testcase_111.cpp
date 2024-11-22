@@ -54,6 +54,8 @@ extern int testing;
 extern  Camera camera;
 extern int  aiplayer;
 
+extern std::unordered_map<std::string, GLuint> textures;
+
 typedef struct sockaddr SA;
 
 TestCase_111::TestCase_111()
@@ -75,6 +77,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     _otter->setNameByNumber(1);
     _otter->setStatus(SailingStatus::SAILING);
     _otter->setIsland(nemesis);
+    _otter->setTexture(textures["sky"]);
 
     Vec3f dimensions(5.0f,4.0f,10.0f);
 
@@ -160,6 +163,7 @@ void TestCase_111::addTank2(BoxIsland *nemesis)
     _otter->setNameByNumber(2);
     _otter->setStatus(SailingStatus::SAILING);
     _otter->setIsland(nemesis);
+    _otter->setTexture(textures["metal"]);
 
     Vec3f dimensions(5.0f,4.0f,10.0f);
 

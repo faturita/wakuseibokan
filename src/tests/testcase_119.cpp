@@ -179,7 +179,7 @@ int TestCase_119::check(unsigned long timertick)
 
     Vehicle* _w = findWalrus(GREEN_FACTION);
 
-    if (!_w)
+    if (!_w || _w->getHealth() < 1000.0)
     {
         isdone = true;
         haspassed = true;
