@@ -884,7 +884,7 @@ void initWorldModelling()
 	Vec3f pos;
 	pos = _manta.getPos();
 	body[0] = dBodyCreate(world);
-	printf ("%10.8f, %10.8f, %10.8f\n", pos[0],pos[1],pos[2]);
+	//printf ("%10.8f, %10.8f, %10.8f\n", pos[0],pos[1],pos[2]);
 	dBodySetPosition(body[0],pos[0],pos[1],pos[2]);
 	dMassSetBox(&m,1,SIDE,SIDE,SIDE);
 	dMassAdjust(&m, MASS*1);
