@@ -7,6 +7,8 @@ import sys
 import math
 import numpy as np
 
+DEFAULT_HEATUP = 75 # #change if value too high or low
+
 class Command:
     def __init__(self, ip='127.0.0.1', controlport=4501):
         self.ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -14,7 +16,7 @@ class Command:
 
         self.command = 0
 
-        self.heatup = 100
+        self.__heatup = 100
 
     def __str__(self):
         return ''
@@ -24,6 +26,10 @@ class Command:
     
     def fire(self):
         self.command = 11
+
+    @property
+    def heatup(self):
+        return self.__heatup
 
     def send_command(self,timer, controllingid, thrust, steering, turretdeclination, turretbearing):
         spawnid=0
@@ -42,6 +48,11 @@ class Command:
         # Steering controls the direction of the tank. >0 is right, <0 is left.
         # turretdeclination is the pitch movement, the control of the turret. >0 is up, <0 is down, 90 is straight up.
         # TurretBearing is the rotation of the turret. >0 is right, <0 is left.
+
+        #check if the tank is overheated to prevent firing if heatup is not 0
+        if (self.__heatup > 0 and self.command == 11):
+            self.command = 0
+
 
         # This is the structure fron CommandOrder
         data=pack("iffffffiLiiifffi?i",
@@ -64,8 +75,13 @@ class Command:
 
         sent = self.ctrlsock.sendto(data, self.ctrl_server_address)
 
-        if (self.heatup > 0):
-            self.heatup -= 1
+        if (self.__heatup > 0):
+            self.__heatup -= 1
+
+        if (self.command == 11):
+            self.__heatup = DEFAULT_HEATUP  
+
+
         self.command = 0
     
 class Recorder:
