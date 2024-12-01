@@ -17,6 +17,7 @@
 
 
 #include "../container.h"
+#include "../networking/telemetry.h"
 
 #include "../terrain/Terrain.h"
 
@@ -53,6 +54,8 @@ extern dSpaceID space;
 extern int testing;
 extern  Camera camera;
 extern int  aiplayer;
+extern int controlmap[];
+extern bool episodesmode;
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -63,10 +66,10 @@ TestCase_111::TestCase_111()
 
 }
 
-void TestCase_111::addTank1(BoxIsland *nemesis)
+size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber)
 {
     // 6,3,12
-    Otter *_otter = new Otter(GREEN_FACTION);
+    Otter *_otter = new Otter(faction);
     _otter->init();
     dSpaceID car_space = _otter->embody_in_space(world, space);
 
@@ -74,7 +77,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     _otter->setPos(p);
     _otter->stop();
     _otter->setSignal(4);
-    _otter->setNameByNumber(1);
+    _otter->setNameByNumber(walusnumber);
     _otter->setStatus(SailingStatus::SAILING);
     _otter->setIsland(nemesis);
     _otter->setTexture(textures["sky"]);
@@ -85,7 +88,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
 
 
 
-    Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    Wheel * _fr= new Wheel(faction, 0.001, 30.0);
     _fr->init();
     _fr->embody(world, car_space);
     _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
@@ -94,7 +97,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     entities.push_back(_fr, _fr->getGeom());
 
 
-    Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    Wheel * _fl= new Wheel(faction, 0.001, 30.0);
     _fl->init();
     _fl->embody(world, car_space);
     _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
@@ -103,7 +106,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     entities.push_back(_fl, _fl->getGeom());
 
 
-    Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    Wheel * _br= new Wheel(faction, 0.001, 30.0);
     _br->init();
     _br->embody(world, car_space);
     _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
@@ -112,7 +115,7 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     entities.push_back(_br, _br->getGeom());
 
 
-    Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    Wheel * _bl= new Wheel(faction, 0.001, 30.0);
     _bl->init();
     _bl->embody(world, car_space);
     _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
@@ -145,142 +148,41 @@ void TestCase_111::addTank1(BoxIsland *nemesis)
     bl->setPos(p);
     br->setPos(p);
 
-    // To allow resets.
-    controller.controllingid = id;
+    return id;
 }
 
-void TestCase_111::addTank2(BoxIsland *nemesis)
-{
-    // 6,3,12
-    Otter *_otter = new Otter(BLUE_FACTION);
-    _otter->init();
-    dSpaceID car_space = _otter->embody_in_space(world, space);
-
-    Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
-    _otter->setPos(p);
-    _otter->stop();
-    _otter->setSignal(4);
-    _otter->setNameByNumber(2);
-    _otter->setStatus(SailingStatus::SAILING);
-    _otter->setIsland(nemesis);
-    _otter->setTexture(textures["metal"]);
-
-    Vec3f dimensions(5.0f,4.0f,10.0f);
-
-    entities.push_back(_otter, _otter->getGeom());
-
-
-
-    Wheel * _fr= new Wheel(BLUE_FACTION, 0.001, 30.0);
-    _fr->init();
-    _fr->embody(world, car_space);
-    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
-    _fr->stop();
-
-    entities.push_back(_fr, _fr->getGeom());
-
-
-    Wheel * _fl= new Wheel(BLUE_FACTION, 0.001, 30.0);
-    _fl->init();
-    _fl->embody(world, car_space);
-    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
-    _fl->stop();
-
-    entities.push_back(_fl, _fl->getGeom());
-
-
-    Wheel * _br= new Wheel(BLUE_FACTION, 0.001, 30.0);
-    _br->init();
-    _br->embody(world, car_space);
-    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
-    _br->stop();
-
-    entities.push_back(_br, _br->getGeom());
-
-
-    Wheel * _bl= new Wheel(BLUE_FACTION, 0.001, 30.0);
-    _bl->init();
-    _bl->embody(world, car_space);
-    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
-    _bl->stop();
-
-    entities.push_back(_bl, _bl->getGeom());
-
-    _otter->addWheels(_fl, _fr, _bl, _br);
-
-    _fl->setSteering(true);
-    _fr->setSteering(true);
-
-    dMatrix3 Re2;
-    dRSetIdentity(Re2);
-    //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
-    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0 )*100 , ( (int)PI/2.0)/10.0 )/100.0    );
-    dBodySetRotation(_otter->getBodyID(),Re2);
-
-    //_otter->goTo(Vec3f(0,0,340));
-    _otter->enableAuto();
-    _otter->enableTelemetry();
-
-    Wheel *l,*r,*bl,*br;
-    _otter->setPos(p);
-    _otter->getWheels(l,r,bl,br);
-    l->setPos(p);
-    r->setPos(p);
-    bl->setPos(p);
-    br->setPos(p);
-}
 
 void TestCase_111::reset(BoxIsland *nemesis)
 {
-    addTank1(nemesis);
-    addTank2(nemesis);
+    size_t val ;
+    for(int i=0;i<iendpoints;i++)
+    {
+        val= addTank(nemesis, i+1, i+1);controlmap[i] = val;
+        healthes.push_back(1000);
+        powers.push_back(1000);
+        distances.push_back(0);
+    }
+
+    controller.controllingid = val;
 }
 
 void TestCase_111::init()
 {
+    iendpoints=pickendpoint();
 
-    sockfd1 = socket(AF_INET, SOCK_DGRAM, 0);
-    fcntl(sockfd1, F_SETFL, O_NONBLOCK);
+    for(int i=0;i<iendpoints;i++)
+    {
+        sockadders.push_back(socketaddr());
+        sockadders[i].sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+        fcntl(sockadders[i].sockfd, F_SETFL, O_NONBLOCK);
 
-    bzero(&servaddr1, sizeof(servaddr1));
-    servaddr1.sin_family = AF_INET;
-    servaddr1.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr1.sin_port = htons(4501);
+        bzero(&sockadders[i].servaddr, sizeof(sockadders[i].servaddr));
+        sockadders[i].servaddr.sin_family = AF_INET;
+        sockadders[i].servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+        sockadders[i].servaddr.sin_port = htons(4501+i);
 
-    bind(sockfd1, (SA *) &servaddr1, sizeof(servaddr1));
-
-
-    sockfd2 = socket(AF_INET, SOCK_DGRAM, 0);
-    fcntl(sockfd2, F_SETFL, O_NONBLOCK);
-
-    bzero(&servaddr2, sizeof(servaddr2));
-    servaddr2.sin_family = AF_INET;
-    servaddr2.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr2.sin_port = htons(4502);
-
-    bind(sockfd2, (SA *) &servaddr2, sizeof(servaddr2));
-
-    /**
-    socklen_t len;
-    ControlStructure mesg;
-
-    SA pcliaddr;
-
-    socklen_t clilen=sizeof(cliaddr);
-    int n;
-
-    for (;;) {
-        len = clilen;
-        n = recvfrom(sockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
-
-        if (n!=-1)
-        {
-            sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
-
-            printf("%d:roll %10.2f thrust %10.2f\n", mesg.id, mesg.roll, mesg.thrust);
-        }
+        bind(sockadders[i].sockfd, (SA *) &sockadders[i].servaddr, sizeof(sockadders[i].servaddr));
     }
-    **/
 
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Atom");
@@ -293,28 +195,54 @@ void TestCase_111::init()
 
 }
 
-float distancegreen, distanceblue;
-float powergreen, powerblue;
-float healthgreen, healthblue;
+void TestCase_111::cleanall()
+{
+    for(int i=0;i<iendpoints;i++)
+    {
+        Vehicle *_b=NULL;
+        size_t p;
+
+        _b = findWalrusByFactionAndNumber(p, i+1, i+1);
+
+        if (_b)
+        {
+            _b->damage(100000);
+        }
+        distances[i] = 0;
+    }
+    timer = 0;
+    dout << "Cleaning up sceneario to start it over again." << std::endl;
+    BoxIsland *nemesis = findNearestIsland(Vec3f(0,0,0));
+    reset(nemesis);
+}
 
 void TestCase_111::checkBeforeDone(unsigned long timertick)
 {
-    float efficiencygreen = (powergreen/healthblue);
-    float efficiencyblue = (powerblue/healthgreen);
-    printf("GREEN 1 : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", healthgreen, powergreen, efficiencygreen, distancegreen/timertick);
-    printf("BLUE  2 : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", healthblue, powerblue, efficiencyblue, distanceblue/timertick);
+    for(int i=0;i<iendpoints;i++)    
+    {
+        float efficiency = (powers[i]/healthes[i]);
+        float distance = distances[i];
+        float health = healthes[i];
+        float power = powers[i];
+
+        printf("Faction: %d, Walrus %d : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", i+1, i+1, health, power, efficiency, distance);
+    }   
 }
 
 int TestCase_111::check(unsigned long timertick)
 {
     if (timertick ==1)
     {
-        Vehicle* _b1 = findWalrus(GREEN_FACTION);
-        _b1->enableAuto();
-        _b1->setStatus(ROLLING);
-        Vehicle* _b2 = findWalrus(BLUE_FACTION);
-        _b2->enableAuto();
-        _b2->setStatus(ROLLING);
+        for(int i=0;i<iendpoints;i++)    
+        {
+            size_t p;
+            Vehicle* _b = findWalrusByFactionAndNumber(p, i+1, i+1);
+            if (_b)
+            {
+                _b->enableAuto();
+                _b->setStatus(ROLLING);
+            }
+        }
     }
 
 //    //usleep(1000000.0);
@@ -322,172 +250,95 @@ int TestCase_111::check(unsigned long timertick)
     if (timertick >= 1)
     {
 
-        socklen_t len;
-        ControlStructure mesg1, mesg2;
-        SA pcliaddr1, pcliaddr2;
-
-        socklen_t clilen1=sizeof(cliaddr1);
-        int n1, n2;
-
-        len = clilen1;
-        n1 = recvfrom(sockfd1, &mesg1, sizeof(mesg1), 0, &pcliaddr1, &len);
-
-
-        socklen_t clilen2=sizeof(cliaddr2);
-
-        len = clilen2;
-        n2 = recvfrom(sockfd2, &mesg2, sizeof(mesg2), 0, &pcliaddr2, &len);
-
-        if (n1!=-1)
+        for(int i=0;i<iendpoints;i++)
         {
-            //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg1.controllingid, (timer-mesg1.sourcetimer), mesg1.registers.roll, mesg1.registers.thrust);
+            socklen_t len;
+            ControlStructure mesg;
+            SA pcliaddr;
+            struct sockaddr_in cliaddr;
 
-            Vehicle *_b=NULL;
+            socklen_t clilen=sizeof(cliaddr);
+            int n;
+            len = clilen;
+            n = recvfrom(sockadders[i].sockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
 
-            if (mesg1.controllingid == 1)
-                _b = findWalrus(GREEN_FACTION);
-            else if (mesg1.controllingid == 2)
-                _b = findWalrus(BLUE_FACTION);
+            //printf("Received %d %d bytes from %s:%d\n",socks[i], n, inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
-            if ((timer-mesg1.sourcetimer)>30000)
+            if (n!=-1)
             {
-                printf("Received Command Message is too old, IGNORED !!!\n");
-            }
-            else if (_b)
-            {
-                Controller co;
-                co.controllingid = mesg1.controllingid;
-                co.faction = mesg1.faction;
-                co.registers = mesg1.registers;
-                //co.push(mesg.order);
+                Vehicle *_b=NULL;
+                size_t p;
 
-                _b->doControl(co);
+                _b = findWalrusByFactionAndNumber(p, mesg.faction, mesg.controllingid);
 
-                if (mesg1.order.command == Command::JoinOrder)
+                //printf("Received Command Message from %d:%d\n", mesg.faction, mesg.controllingid);
+
+                if ((timer-mesg.sourcetimer)>30000)
                 {
-                    timer = 0;
-                    Vehicle* _b1 = findWalrus(GREEN_FACTION);
-                    _b1->damage(100000);
-                    Vehicle* _b2 = findWalrus(BLUE_FACTION);
-                    _b2->damage(100000);
-                    dout << "Cleaning up sceneario to start it over again." << std::endl;
-                    distanceblue = 0;
-                    distancegreen = 0;
-                    BoxIsland *nemesis = findNearestIsland(_b->getPos());
-                    reset(nemesis);
-                }
-
-
-                if (mesg1.order.command == Command::FireOrder && _b->getPower()>0)
+                    //printf("Received Command Message is too old, IGNORED !!!\n");
+                } 
+                else if (_b)
                 {
-                    Vehicle *action = _b->fire(0,world, space);
+                    Controller co;
+                    co.controllingid = mesg.controllingid;
+                    co.faction = mesg.faction;
+                    co.registers = mesg.registers;
+                    //co.push(mesg.order);
 
-                    if (action != NULL)
+                    _b->doControl(co);
+
+
+                    if (mesg.order.command == Command::FireOrder && _b->getPower()>0)
                     {
-                        entities.push_back(action, action->getGeom());
-                        gunshot(_b->getPos());
-                    }
-                    _b->setPower(_b->getPower()-1);
-                }
+                        Vehicle *action = _b->fire(0,world, space);
 
-            }
+                        if (action != NULL)
+                        {
+                            entities.push_back(action, action->getGeom());
+                            gunshot(_b->getPos());
+                        }
+                        _b->setPower(_b->getPower()-1);
+
+                    }   
+                }
+            } 
         }
 
-        if (n2!=-1)
+        for(int i=0;i<iendpoints;i++)    
         {
-            //sendto(sockfd, &mesg, n, 0, &pcliaddr, len);
-
-            //printf("[%d] Delay %lu - roll:  %10.2f thrust %10.2f\n",mesg2.controllingid, (timer-mesg2.sourcetimer), mesg2.registers.roll, mesg2.registers.thrust);
-            Vehicle *_b=NULL;
-
-            if (mesg2.controllingid == 1)
-                _b = findWalrus(GREEN_FACTION);
-            else if (mesg2.controllingid == 2)
-                _b = findWalrus(BLUE_FACTION);
-
-            if ((timer-mesg2.sourcetimer)>30000)
+            size_t p;
+            Vehicle* _b = findWalrusByFactionAndNumber(p, i+1, i+1);
+            if (_b)
             {
-                printf("Message IGNORED !!!");
-            }
-            else if (_b)
-            {
-                Controller co;
-                co.controllingid = mesg2.controllingid;
-                co.faction = mesg2.faction;
-                co.registers = mesg2.registers;
-                //co.push(mesg.order);
+                distances[i] += _b->getSpeed();
+                healthes[i] = clipped(_b->getHealth(),1,1000);
+                powers[i] = _b->getPower();
 
-                _b->doControl(co);
-
-
-                if (mesg2.order.command == Command::FireOrder && _b->getPower()>0)
+                if (_b && (_b->getStatus() == SailingStatus::SAILING || _b->getStatus() == SailingStatus::OFFSHORING))
                 {
-                    Vehicle *action = _b->fire(0,world, space);
-
-                    if (action != NULL)
-                    {
-                        entities.push_back(action, action->getGeom());
-                        gunshot(_b->getPos());
-
-                    }
-                    _b->setPower(_b->getPower()-1);
+                    _b->damage(1);
                 }
-
+            }
+            else
+            {
+                if (endtimer == 0)
+                    endtimer = timertick + 300;
             }
         }
-
-        Vehicle *_b1 = findWalrus(GREEN_FACTION);
-
-        Vehicle *_b2 = findWalrus(BLUE_FACTION);
-
-        if (_b1 && _b2)
-        {
-            distancegreen += _b1->getSpeed();
-            healthgreen = clipped(_b1->getHealth(),1,1000);
-            powergreen = _b1->getPower();
-        }
-
-        if (_b1 && _b2)
-        {
-            distanceblue += _b2->getSpeed();
-            healthblue = clipped(_b2->getHealth(),1,1000);
-            powerblue = _b2->getPower();
-        }
-
-
-
-        if (_b1 && (_b1->getStatus() == SailingStatus::SAILING || _b1->getStatus() == SailingStatus::OFFSHORING))
-        {
-            _b1->damage(1);
-        }
-
-        if (_b2 && (_b2->getStatus() == SailingStatus::SAILING || _b2->getStatus() == SailingStatus::OFFSHORING))
-        {
-            _b2->damage(1);
-
-        }
-
-        if (!_b1 && endtimer==0)
-        {
-            endtimer = timertick + 300;
-            whowon=2;
-        }
-
-        if (!_b2 && endtimer==0)
-        {
-            endtimer = timertick + 300;
-            whowon = 1;
-        }
-
-
     }
 
     if (timertick > endtimer && endtimer!=0)
     {
-        isdone = true;
-        haspassed = true;
-        printf("Walrus %d WON.\n", whowon);
         checkBeforeDone(timertick);
+        if (!episodesmode)
+        {
+            isdone = true;
+            haspassed = true;
+        }
+        else
+        {
+            cleanall();
+        }
     }
 
 
@@ -498,26 +349,17 @@ int TestCase_111::check(unsigned long timertick)
         haspassed = false;
         message = std::string("Match is over.");
 
-        Vehicle *_b1 = findWalrus(GREEN_FACTION);
-
-        Vehicle *_b2 = findWalrus(BLUE_FACTION);
-
-        if (!_b1)
-        {
-            printf("Walrus 2 WON.\n");
-        }
-
-        if (!_b2)
-        {
-            printf("Walrus 1 WON.\n");
-        }
-
         checkBeforeDone(timertick);
 
     }
 
     return 0;
 }
+
+
+
+
+
 
 int TestCase_111::number()
 {
@@ -527,7 +369,7 @@ int TestCase_111::number()
 
 std::string TestCase_111::title()
 {
-    return std::string("Combat. Two walruses fighting each other.");
+    return std::string("Combat.  Walruses fighting each other.");
 }
 
 

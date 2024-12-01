@@ -42,7 +42,7 @@ class Command:
         weapon=0
         yaw=0
         bank=0
-        faction=1
+        faction=controllingid
 
         # Thrust is the speed of the tank. >0 is forward, <0 is backwards.
         # Steering controls the direction of the tank. >0 is right, <0 is left.

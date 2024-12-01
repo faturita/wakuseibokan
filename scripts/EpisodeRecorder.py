@@ -27,16 +27,12 @@ class Controller:
         # UDP Telemetry port on port 4500
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         tankparam = int(tankparam)
-        port = 4601
-        if (tankparam == 1):
-            port = 4601
-        elif (tankparam == 2):
-            port = 4602
+        port = 4600 + tankparam
         self.server_address = ('0.0.0.0', port)
         print ('Starting up on %s port %s' % self.server_address)
 
         self.sock.bind(self.server_address)
-        self.sock.settimeout(5)
+        self.sock.settimeout(10)
 
         self.length = 84
         self.unpackcode = 'Lififfffffffffffffff'
@@ -44,6 +40,8 @@ class Controller:
         self.recorder = Recorder()
 
         self.tank = tankparam
+        
+        self.mytimer = 0
 
     def read(self):
         data, address = self.sock.recvfrom(self.length)
@@ -59,10 +57,7 @@ class Controller:
         return None
     
     def run(self):
-        if (self.tank == 1):
-            command = Command('192.168.0.100', 4501)
-        elif (self.tank == 2):
-            command = Command('192.168.0.100', 4502)
+        command = Command('127.0.0.1', 4500 + self.tank)
 
         shouldrun = True
         while (shouldrun):
@@ -83,8 +78,14 @@ class Controller:
                     myvalues = tank2values
                     othervalues = tank1values
 
+
+                if (int(myvalues[td['timer']])<self.mytimer):
+                    #self.recorder.newepisode()
+                    print("New Episode")
+                    self.mytimer = int(myvalues[td['timer']])-1
+                    
                 #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['bearing']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['bearing']]}")              
-                print (f"Time: {myvalues[td['timer']]} Health: {myvalues[td['health']]}")
+                #print (f"Time: {myvalues[td['timer']]} Health: {myvalues[td['health']]}")
                 self.recorder.recordvalues(myvalues,othervalues)
 
 
@@ -92,14 +93,14 @@ class Controller:
 
                 polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
 
-                print(polardistance)
+                #print(polardistance)
 
                 thrust = 0.0
                 turretbearing = 0.0
                 turretdecl = 0.0
                 steering=0.0
 
-                if polardistance < 1700:
+                if polardistance < 17000:
                     thrust = 10.0
                     steering = 0
 
@@ -108,15 +109,15 @@ class Controller:
                 #   This will set the variable command.command to 11 and will fire the weapon on the simulator.
                 #   This will fire only once, because the alue will be reset the next time.
 
-                if (int(myvalues[td['timer']]) == 1000):
-                    # This allow RESETS of the simulation
-                    command.command = 13
-                    #shouldrun = False
+                #if (int(myvalues[td['timer']]) == 1000):
+                    # Do something that you want at one specific time moment
 
                 command.send_command(myvalues[td['timer']],self.tank,thrust,
                                      steering,
                                      turretdecl,
-                                     turretbearing)             
+                                     turretbearing)    
+                
+                self.mytimer+=1         
                 
             #except socket.timeout:
             #    print("Episode Completed")

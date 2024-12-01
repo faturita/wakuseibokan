@@ -135,6 +135,7 @@ extern int gamemode;
 extern int tracemode;
 extern int peermode;
 bool profilemode;
+bool episodesmode;
 
 extern int controlmap[];
 
@@ -1826,6 +1827,12 @@ int main(int argc, char** argv) {
     {
         fpsfile.open ("fps.dat");
         profilemode = true;
+    }
+
+    episodesmode = false;
+    if (isPresentCommandLineParameter(argc,argv,"-episodes"))
+    {
+        episodesmode = true;
     }
 
 

@@ -74,10 +74,29 @@ Connection addNewTelemetryListener(char ip[], int port)
     return connection;
 }
 
+int pickendpoint()
+{
+    char filename[256];
+    sprintf(filename,"%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
+    PropertyStore ps(filename);
+
+    //ps.Set("client","127.0.0.1");
+
+    //ps.Save();
+
+    ps.Load();
+
+    char *endpoints = ps.Get("endpoints");
+
+    int iendpoints = atoi(endpoints);
+
+    return iendpoints;
+}
+
 void inittelemetry()
 {
     // @NOTE: The info is being read from a configuration file.
-    // (who has joined the game)
+    // (telemetry is independent of the multiplayer game server)
     //connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
 
     char filename[256];
@@ -98,8 +117,8 @@ void inittelemetry()
     {
         char telkey[256];
         char ipkey[256];
-        sprintf(telkey,"endpoint#%d",i+1);
-        sprintf(ipkey,"port#%d", i+1);
+        sprintf(telkey,"endpoint@%d",i+1);
+        sprintf(ipkey,"port@%d", i+1);
         char *telemetryendpoint = ps.Get(telkey);
         char *portendpoint = ps.Get(ipkey);
         int portnumber = atoi(portendpoint);

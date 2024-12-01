@@ -24,17 +24,24 @@
 
 #include "testcase.h"
 
+struct socketaddr
+{
+    struct sockaddr_in servaddr, cliaddr;
+    int sockfd;
+};
+
 class TestCase_111 : public TestCase
 {
 private:
-    struct sockaddr_in servaddr1, cliaddr1;
-    int sockfd1;
-
-    struct sockaddr_in servaddr2, cliaddr2;
-    int sockfd2;
-
     unsigned long endtimer;
     int whowon;
+    int iendpoints;
+
+    std::vector<float> healthes;
+    std::vector<float> powers;
+    std::vector<float> distances;
+    std::vector<struct socketaddr> sockadders;
+
 
     void checkBeforeDone(unsigned long timertick);
 
@@ -47,9 +54,9 @@ public:
     bool done();
     bool passed();
     std::string failedMessage();
-    void addTank1(BoxIsland *island);
-    void addTank2(BoxIsland *island);
+    size_t addTank(BoxIsland *island, int faction, int walusnumber);
     void reset(BoxIsland *island);
+    void cleanall();
 };
 
 
