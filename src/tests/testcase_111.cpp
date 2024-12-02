@@ -81,6 +81,9 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber)
     _otter->setStatus(SailingStatus::SAILING);
     _otter->setIsland(nemesis);
     _otter->setTexture(textures["sky"]);
+    _otter->enable_heatup = true;
+    //_otter->no_damping_on_bullets = true;
+    //_otter->firepower = 600.0;
 
     Vec3f dimensions(5.0f,4.0f,10.0f);
 
@@ -296,9 +299,8 @@ int TestCase_111::check(unsigned long timertick)
                         {
                             entities.push_back(action, action->getGeom());
                             gunshot(_b->getPos());
+                            _b->setPower(_b->getPower()-1);
                         }
-                        _b->setPower(_b->getPower()-1);
-
                     }   
                 }
             } 

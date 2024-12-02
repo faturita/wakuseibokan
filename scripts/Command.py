@@ -52,8 +52,8 @@ class Command:
         #check if the tank is overheated to prevent firing if heatup is not 0
         if (self.__heatup > 0 and self.command == 11):
             self.command = 0
-
-
+            
+        
         # This is the structure fron CommandOrder
         data=pack("iffffffiLiiifffi?i",
             controllingid,
@@ -86,6 +86,9 @@ class Command:
     
 class Recorder:
     def __init__(self):
+        self.newepisode()
+        
+    def newepisode(self):
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
         self.f = open('./data/episode.'+st+'.dat', 'w')

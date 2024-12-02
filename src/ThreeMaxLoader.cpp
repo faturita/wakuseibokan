@@ -51,7 +51,7 @@ void draw3DSModel(obj_type object, float x, float y, float z, float scale)
 
     glBegin(GL_TRIANGLES); // glBegin and glEnd delimit the vertices that define a primitive (in our case triangles)
 
-    CLog::Write(CLog::Debug,"%d\n",object.polygons_qty);
+    //CLog::Write(CLog::Debug,"%d\n",object.polygons_qty);
 
     for (l_index=0;l_index<object.polygons_qty;l_index++)
     {

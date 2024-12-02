@@ -604,11 +604,13 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
         dBodySetLinearDamping(action->getBodyID(),0);
 
     // Recoil (excellent for the simulation, cumbersome for playing...)
-    Ft = Ft.normalize();  Ft=Ft * 0.2;
-
-    //dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
+    //   Ft = Ft.normalize();  Ft=Ft * 0.2;
+    //   dBodyAddRelForceAtPos(me,-Ft[0],-Ft[1],-Ft[2], 0.0, firingpos[1], 0.0);
+    
     artilleryshot(getPos());
-    //setTtl(200);
+    
+    if (enable_heatup)
+        setTtl(200);
 
     // I can set power or something here.
     return (Vehicle*)action;

@@ -80,7 +80,7 @@ class Controller:
 
 
                 if (int(myvalues[td['timer']])<self.mytimer):
-                    #self.recorder.newepisode()
+                    self.recorder.newepisode()
                     print("New Episode")
                     self.mytimer = int(myvalues[td['timer']])-1
                     
@@ -105,7 +105,7 @@ class Controller:
                     steering = 0
 
                 # If you want to FIRE the weapon no do this:
-                # command.fire()
+                #command.fire()
                 #   This will set the variable command.command to 11 and will fire the weapon on the simulator.
                 #   This will fire only once, because the alue will be reset the next time.
 
