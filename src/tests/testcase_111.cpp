@@ -223,12 +223,12 @@ void TestCase_111::checkBeforeDone(unsigned long timertick)
 {
     for(int i=0;i<iendpoints;i++)    
     {
-        float efficiency = (powers[i]/healthes[i]);
         float distance = distances[i];
         float health = healthes[i];
         float power = powers[i];
 
-        printf("Faction: %d, Walrus %d : Health:%8.2f, Power: %8.2f, Efficiency: %8.2f, Travelled Distance: %8.2f\n", i+1, i+1, health, power, efficiency, distance);
+        // ODE Simulation wraps one real time step in 20 ticks.
+        printf("Faction: %d, Walrus %d : Health:%8.2f, Power: %8.2f, Travelled Distance: %8.2f\n", i+1, i+1, health, power, distance/20.0);
     }   
 }
 

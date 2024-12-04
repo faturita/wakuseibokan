@@ -593,7 +593,7 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
 
     //dout << d << std::endl;
 
-    dout << "Firing height:" << position[1] << "-" << Ft << " - Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
+    //dout << "Firing height:" << position[1] << "-" << Ft << " - Elevation:" << elevation << " Azimuth:" << azimuth << std::endl;
 
     dBodySetLinearVel(action->getBodyID(),Ft[0],Ft[1],Ft[2]);
     dBodySetRotation(action->getBodyID(),Re);
@@ -610,7 +610,7 @@ Vehicle* AdvancedWalrus::fire(int weapon, dWorldID world, dSpaceID space)
     artilleryshot(getPos());
     
     if (enable_heatup)
-        setTtl(200);
+        setTtl(20);
 
     // I can set power or something here.
     return (Vehicle*)action;
