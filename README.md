@@ -132,6 +132,22 @@ to run the following command before executing the simulator or configure it into
 export LD_LIBRARY_PATH=/usr/local/lib/
 ``` 
 
+Install on WSL on Windows 11
+----------------------------
+
+Install WSL2 on Windows 11
+
+Create a 22.04 ubuntu WSL2 box and run the following commands.
+Configure the box as **networkingMode=mirrored** to share the same networking address space as the windows host computer.  This means that for any external computer the IP and port of any process running on the wsl2 box will be shared with the host computer.
+
+Ubuntu: 22.04
+```bash
+  sudo apt-get update
+  sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev g++ libtool automake make net-tools
+```
+
+Follow the exact same procedures to compile and run the application on Ubuntu.
+
 Ubuntu Packages
 ---------------
 **Tested with Ubuntu 20.02.4**
