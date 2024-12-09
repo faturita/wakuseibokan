@@ -60,6 +60,13 @@
 #include "structures/CommandCenter.h"
 #include "structures/Turret.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <limits.h>
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
+
 Camera camera;
 
 extern dWorldID world;
@@ -129,8 +136,11 @@ void processMouse(int button, int state, int x, int y) {
             if (buttonState != 1)
             {
                 buttonState = 1;
+                
 #if __linux
                 glutSetCursor(GLUT_CURSOR_NONE);
+#elif __APPLE__
+                CGDisplayHideCursor (kCGNullDirectDisplay); 
 #endif
             }
             else
@@ -138,6 +148,8 @@ void processMouse(int button, int state, int x, int y) {
                 buttonState = 0;
 #if __linux
                 glutSetCursor(GLUT_CURSOR_INHERIT);
+#elif __APPLE__
+                CGDisplayShowCursor (kCGNullDirectDisplay);
 #endif
             }
 

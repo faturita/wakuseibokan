@@ -21,7 +21,7 @@ TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
 ifeq ($(shell uname),Darwin)
-	LIBS = -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation 
+	LIBS = -framework ApplicationServices -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation 
 else
 	LIBS = -L/usr/local/lib -I/usr/local/include   -L/usr/lib/x86_64-linux-gnu/ -lGL -lGLU -lglut  $(ODEFL) -pthread -lbsd -lstk
 endif
