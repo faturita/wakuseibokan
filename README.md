@@ -376,5 +376,6 @@ More info
 * https://math.hws.edu/graphicsbook/c4/s2.html
 * https://github.com/2Retr0/GodotOceanWaves
 * https://github.com/nasa/trick
+* https://www.pydy.org/
 
 
