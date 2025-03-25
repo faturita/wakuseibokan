@@ -377,5 +377,6 @@ More info
 * https://github.com/2Retr0/GodotOceanWaves
 * https://github.com/nasa/trick
 * https://www.pydy.org/
+* https://www.sciencedirect.com/science/article/pii/S0141118725001117
 
 
