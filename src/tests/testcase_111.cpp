@@ -66,7 +66,7 @@ TestCase_111::TestCase_111()
 
 }
 
-size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber)
+size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GLuint textureId)
 {
     // 6,3,12
     Otter *_otter = new Otter(faction);
@@ -80,10 +80,10 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber)
     _otter->setNameByNumber(walusnumber);
     _otter->setStatus(SailingStatus::SAILING);
     _otter->setIsland(nemesis);
-    _otter->setTexture(textures["sky"]);
+    _otter->setTexture(textureId);
     _otter->enable_heatup = true;
     //_otter->no_damping_on_bullets = true;
-    //_otter->firepower = 600.0;
+    //_otter->firepower = 100.0;
 
     Vec3f dimensions(5.0f,4.0f,10.0f);
 
@@ -157,10 +157,11 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber)
 
 void TestCase_111::reset(BoxIsland *nemesis)
 {
+    GLuint textureId[] = { textures["sky"], textures["metal"], textures["sea"], textures["land"], textures["road"] };
     size_t val ;
     for(int i=0;i<iendpoints;i++)
     {
-        val= addTank(nemesis, i+1, i+1);controlmap[i] = val;
+        val= addTank(nemesis, i+1, i+1, textureId[i]);controlmap[i] = val;
         healthes.push_back(1000);
         powers.push_back(1000);
         distances.push_back(0);

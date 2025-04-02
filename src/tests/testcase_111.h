@@ -54,7 +54,7 @@ public:
     bool done();
     bool passed();
     std::string failedMessage();
-    size_t addTank(BoxIsland *island, int faction, int walusnumber);
+    size_t addTank(BoxIsland *island, int faction, int walusnumber, GLuint textureId);
     void reset(BoxIsland *island);
     void cleanall();
 };
