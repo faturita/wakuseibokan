@@ -375,5 +375,8 @@ More info
 * https://www.nature.com/articles/s41586-024-07886-z
 * https://math.hws.edu/graphicsbook/c4/s2.html
 * https://github.com/2Retr0/GodotOceanWaves
+* https://github.com/nasa/trick
+* https://www.pydy.org/
+* https://www.sciencedirect.com/science/article/pii/S0141118725001117
 
 
