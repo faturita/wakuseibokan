@@ -378,5 +378,6 @@ More info
 * https://github.com/nasa/trick
 * https://www.pydy.org/
 * https://www.sciencedirect.com/science/article/pii/S0141118725001117
+* https://developer.nvidia.com/isaac/sim
 
 
