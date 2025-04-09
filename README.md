@@ -115,8 +115,8 @@ First you need to copy the stk file from dependencies into the parent directory 
 to compile this sound library.
 
 ```bash
-cp dependencies/stk.tgz ../../
-cd ../../
+cp dependencies/stk.tgz ../
+cd ..
 tar xvzf stk.tgz
 cd stk
 make clean
@@ -238,8 +238,8 @@ The scenario 111 is the tank battleground.  To compile everything do:
 
 ```bash
 cd wakuseibokan
-cp dependencies/stk.tgz ../../
-cd ../../
+cp dependencies/stk.tgz ../
+cd ..
 tar xvzf stk.tgz
 cd stk
 make clean
@@ -247,12 +247,12 @@ make clean
 make 
 sudo make install
 cd ..
-cp dependencies/ode.tgz ../../
-cd ../../
+cp dependencies/ode.tgz ../
+cd ..
 tar xvzf ode.tgz
 cd ode
- ./configure --disable-asserts
- make clean && make && sudo make install
+./configure --disable-asserts
+make clean && make && sudo make install
 cd ..
 cd wakuseibokan
 ```

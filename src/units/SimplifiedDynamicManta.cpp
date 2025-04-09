@@ -92,7 +92,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     // When in range, Aim with flipping increasing speed, shooting with all you have.
     // If starts to trail behind go 2
     // Fly away and restarts going to 1.
-    dout << "DF:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    //dout << "DF:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     // @NOTE: Someone will give me, all the time, current target position.
     Vec3f target = destination;
@@ -100,7 +100,7 @@ void SimplifiedDynamicManta::doControlDogFight()
         default:case 0:// Approach
         {
             doControlControl2(target,10000, 720);
-            dout << (destination-getPos()).magnitude() << std::endl;
+            //dout << (destination-getPos()).magnitude() << std::endl;
             if ((destination-getPos()).magnitude()<9000)
                 flyingstate = 1;
         }
@@ -157,7 +157,7 @@ void SimplifiedDynamicManta::doControlDogFight()
 void SimplifiedDynamicManta::doControlAttack()
 {
 
-    dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    //dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     Vec3f target = destination;
     switch (flyingstate) {
@@ -243,7 +243,7 @@ void SimplifiedDynamicManta::doControlForced(Vec3f target)
     setForward(T);
     release(T);
 
-    dout << "Number:" << getName() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
+    //dout << "Number:" << getName() << "-Azimuth:" << getAzimuth(getForward()) << "- Declination: " << getDeclination(getForward())  << "- Destination:" << T.magnitude() << std::endl;
 
     c.registers.thrust = 400/(10.0);
     c.registers.pitch = pitch;
@@ -401,7 +401,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
 
     Vec3f T = (target - Po);
 
-    CLog::Write(CLog::Debug,"T: %10.3f\t\t", T.magnitude());dout << target << std::endl;
+    //CLog::Write(CLog::Debug,"T: %10.3f\t\t", T.magnitude());dout << target << std::endl;
 
 
     if (!(dst_status != DestinationStatus::REACHED && (T.magnitude()>threshold && map(T).magnitude()>threshold)))
@@ -421,7 +421,7 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
     float e3 = sp3 - height;
 
 
-    printf( "E1: %10.5f\n" , e1 );
+    //printf( "E1: %10.5f\n" , e1 );
 
 
     // Set the sign of e1 in relation to rolling encoding.
@@ -554,7 +554,7 @@ void SimplifiedDynamicManta::doControlControl(Vec3f target, float thrust)
     float error2 =  Kp2 * (e2)        + Ki2 * (In[1]) + Kd2 * (  (e2)-et2);
     float error3 =  Kp3 * (e3)        + Ki3 * (In[1]) + Kd3 * (  (e3)-et3);
 
-    dout << "Azimuth:" << getAzimuth(getForward()) << "/" << error1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+    //dout << "Azimuth:" << getAzimuth(getForward()) << "/" << error1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
 
     float roll = -error1;
     float pitch = -error2 + error3*0;
@@ -630,7 +630,7 @@ void SimplifiedDynamicManta::land(Vec3f landplace, Vec3f placelattitude)
     w4[1] = 190;
     w5[1] = 180;
 
-    dout << w1 << w2 << w3 << w4 << std::endl;
+    //dout << w1 << w2 << w3 << w4 << std::endl;
 
     clearWaypoints();
 
@@ -958,7 +958,7 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 
     Cn = 0.0000f + 0.5f * beta + caileron * aileron + 0.07 * rudder;
 
-    printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\t", Cd, CL, Cy, Cm, Cl,Cn);
+    //printf ("Cd=%10.8f, CL=%10.8f,Cy=%10.8f,Cm=%10.8f,Cl=%10.8f,Cn=%10.8f\t", Cd, CL, Cy, Cm, Cl,Cn);
 }
 
 /**void SimplifiedDynamicManta::land()

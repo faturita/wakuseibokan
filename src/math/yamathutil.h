@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include "vec3f.h"
+#include <cstdint>
 
 #ifndef PI
 #define PI 3.1415926536
