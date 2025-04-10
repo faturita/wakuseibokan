@@ -143,7 +143,10 @@ Configure the box as **networkingMode=mirrored** to share the same networking ad
 Ubuntu: 22.04
 ```bash
   sudo apt-get update
-  sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev g++ libtool automake make net-tools
+  sudo apt-get upgrade
+  sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev 
+  sudo apt-get install git make g++ gcc libtool automake net-tools
+  sudo apt-get install python3-pip
 ```
 
 Follow the exact same procedures to compile and run the application on Ubuntu.
@@ -162,7 +165,7 @@ Ubuntu Packages
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev
-sudo apt-get install git make gcc g++
+sudo apt-get install git make g++ gcc libtool automake net-tools
 sudo apt-get install python3-pip
  ```
  

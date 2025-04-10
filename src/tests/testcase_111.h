@@ -24,6 +24,8 @@
 
 #include "testcase.h"
 
+#define DEFAULT_MATCH_DURATION 5000
+
 struct socketaddr
 {
     struct sockaddr_in servaddr, cliaddr;
@@ -33,7 +35,7 @@ struct socketaddr
 class TestCase_111 : public TestCase
 {
 private:
-    unsigned long endtimer;
+    unsigned long endtimer = DEFAULT_MATCH_DURATION;
     int whowon;
     int iendpoints;
 

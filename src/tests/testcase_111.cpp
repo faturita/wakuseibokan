@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sstream>
 
 
 #include "../container.h"
@@ -73,7 +74,37 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
     _otter->init();
     dSpaceID car_space = _otter->embody_in_space(world, space);
 
-    Vec3f p = Vec3f(getRandomInteger(-1400,1400),10.0f,getRandomInteger(-1400,1400));
+    // Check if the file initlocations.txt exists, if it does open it and read the locations for this particular walrusnumber
+    // If it does not exist, create a random location for the walrus
+
+    std::ifstream initlocations("conf/initlocations.txt");
+    std::string line;
+    
+    int wnumber = 0;
+    int x = getRandomInteger(-1400,1400);
+    int z = getRandomInteger(-1400,1400);
+    float ibearing = (float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0;
+    if (initlocations.is_open())
+    {
+        while (std::getline(initlocations, line))
+        {
+            int xx,zz;
+            float ibb;
+            std::istringstream iss(line);
+            iss >> wnumber >> xx  >> zz >> ibb;
+            if (wnumber == walusnumber)
+            {
+                x = xx;
+                z = zz;
+                ibearing = ibb;
+                break;
+            }
+        }
+    }
+    initlocations.close();
+
+
+    Vec3f p = Vec3f(x,10.0f,z);
     _otter->setPos(p);
     _otter->stop();
     _otter->setSignal(4);
@@ -135,7 +166,9 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
     dRSetIdentity(Re2);
     //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI/4.0);
 
-    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
+    //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
+
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float) -ibearing*PI/180.0);
 
     dBodySetRotation(_otter->getBodyID(),Re2);
 
@@ -324,7 +357,7 @@ int TestCase_111::check(unsigned long timertick)
             }
             else
             {
-                if (endtimer == 0)
+                if (endtimer == 0 || endtimer == DEFAULT_MATCH_DURATION)
                     endtimer = timertick + 300;
             }
         }
@@ -337,23 +370,17 @@ int TestCase_111::check(unsigned long timertick)
         {
             isdone = true;
             haspassed = true;
+
+            if (endtimer == DEFAULT_MATCH_DURATION)
+            {
+                message = std::string("Match is over.");
+                haspassed = false;
+            }
         }
         else
         {
             cleanall();
         }
-    }
-
-
-    // Only 5 mimutes duration
-    if (timertick > 5000)
-    {
-        isdone = true;
-        haspassed = false;
-        message = std::string("Match is over.");
-
-        checkBeforeDone(timertick);
-
     }
 
     return 0;
