@@ -21,6 +21,7 @@ import numpy as np
 
 from Command import Command
 from Command import Recorder
+from Fps import Fps
 
 class Controller:
     def __init__(self, tankparam):
@@ -42,13 +43,14 @@ class Controller:
         self.tank = tankparam
         
         self.mytimer = 0
+        
+        self.fps = Fps()
+        self.fps.tic()
 
     def read(self):
         data, address = self.sock.recvfrom(self.length)
 
-        #print(f"Fps: {fps.fps}")
-
-        # Take care of the latency
+        # @NOTE Take care of the latency
         if len(data)>0 and len(data) == self.length:
             # is  a valid message struct
             new_values = unpack(self.unpackcode,data)
@@ -78,7 +80,9 @@ class Controller:
                     myvalues = tank2values
                     othervalues = tank1values
 
-
+                self.fps.steptoc() 
+                print(f"Fps: {self.fps.fps}")
+                
                 if (int(myvalues[td['timer']])<self.mytimer):
                     self.recorder.newepisode()
                     print("New Episode")
@@ -104,10 +108,10 @@ class Controller:
                     thrust = 10.0
                     steering = 0
 
-                # If you want to FIRE the weapon no do this:
+                # If you want to FIRE the weapon do this:
                 #command.fire()
                 #   This will set the variable command.command to 11 and will fire the weapon on the simulator.
-                #   This will fire only once, because the alue will be reset the next time.
+                #   This will fire only once, because the value command.command is set to zero after firing (to avoid mistakenly firing too much)
 
                 #if (int(myvalues[td['timer']]) == 1000):
                     # Do something that you want at one specific time moment

@@ -56,7 +56,7 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
     bit=0
     weapon=0
 
-    # This is the structure fron CommandOrder
+    # This is the structure fron CommandOrder (for sending messages to the Engine)
     data=pack("iffffffiLiiifffi?i",
         controllingid,
         thrust,     # Forward or backward
@@ -79,37 +79,9 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
 
     return
 
-data1 = 4
-data2 = 2
-data3 = 3
-
-min = -400
-max = 400
-
-# Telemetry length and package form.
+# Telemetry length and package form (for receiving messages from the engine)
 length = 84
 unpackcode = 'Liiiffffffffffffffff'
-
-if (len(sys.argv)>=2):
-    print ("Reading which data to shown")
-    try:
-        data1 = int(sys.argv[1])
-        data2 = int(sys.argv[2])
-        data3 = int(sys.argv[3])
-    except:
-        data1 = telemetrydirs[sys.argv[1]]
-        data2 = telemetrydirs[sys.argv[2]]
-        data3 = telemetrydirs[sys.argv[3]]
-        pass
-
-if (len(sys.argv)>=5):
-    min = int(sys.argv[4])
-    max = int(sys.argv[5])
-
-if (len(sys.argv)>=7):
-    length = int(sys.argv[6])
-    unpackcode = sys.argv[7]
-
 
 
 # UDP Telemetry port on port 4500
@@ -142,17 +114,23 @@ fps.tic()
 # Which tank I AM.
 tank=1
 
-while True:
-    # read
-    fps.steptoc()
-    data, address = sock.recvfrom(length)
+previoustimer = 0
 
-    print(f"Fps: {fps.fps}")
+while True:
+    
+    # Blocking call
+    data, address = sock.recvfrom(length)
 
     # Take care of the latency
     if len(data)>0 and len(data) == length:
         # is  a valid message struct
         new_values = unpack(unpackcode,data)
+        
+        # read
+        if new_values[td['timer']] != previoustimer:
+            previoustimer = new_values[td['timer']]
+            fps.steptoc()    
+            print(f"Fps: {fps.fps}")    
 
         # The
         if int(new_values[td['number']]) == tank:
