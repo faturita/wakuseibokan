@@ -146,7 +146,7 @@ while True:
 
             polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
 
-            print(polardistance);
+            print(f"Time: {new_values[td['timer']]} Polar Distance: {polardistance}")
 
             if polardistance < 1700:
                 thrust = 10.0
