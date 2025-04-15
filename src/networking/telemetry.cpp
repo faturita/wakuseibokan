@@ -23,11 +23,12 @@
 
 extern unsigned long timer;
 
+#pragma pack(push, 1)
 struct ModelRecord {
-    unsigned long recordtimer;
-    int number;
+    uint32_t recordtimer;
+    int32_t number;
     float health;
-    int power;
+    int32_t power;
     float bearing;
 
     float pos1;
@@ -45,8 +46,8 @@ struct ModelRecord {
     float r10;
     float r11;
     float r12;
-
 };
+#pragma pack(pop)
 
 struct Connection
 {

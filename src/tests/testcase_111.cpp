@@ -193,6 +193,9 @@ void TestCase_111::reset(BoxIsland *nemesis)
 {
     GLuint textureId[] = { textures["sky"], textures["metal"], textures["sea"], textures["land"], textures["road"] };
     size_t val ;
+
+    assert(iendpoints <= 5 && iendpoints > 0 || !"Do not support more than 5 walruses.");
+
     for(int i=0;i<iendpoints;i++)
     {
         val= addTank(nemesis, i+1, i+1, textureId[i]);controlmap[i] = val;

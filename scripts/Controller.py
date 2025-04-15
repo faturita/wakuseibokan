@@ -80,8 +80,8 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
     return
 
 # Telemetry length and package form (for receiving messages from the engine)
-length = 84
-unpackcode = 'Liiiffffffffffffffff'
+length = 80
+unpackcode = '<Lififfffffffffffffff'
 
 
 # UDP Telemetry port on port 4500

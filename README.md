@@ -135,10 +135,17 @@ export LD_LIBRARY_PATH=/usr/local/lib/
 Install on WSL on Windows 11
 ----------------------------
 
-Install WSL2 on Windows 11
+* Install WSL2 on Windows 11
+* Create a 22.04 ubuntu WSL2 box:  wsl install Ubuntu-22.04
+* When the image is created a new file will appear on the windows home directory **.wslconfig**
 
-Create a 22.04 ubuntu WSL2 box and run the following commands.
-Configure the box as **networkingMode=mirrored** to share the same networking address space as the windows host computer.  This means that for any external computer the IP and port of any process running on the wsl2 box will be shared with the host computer.
+```bash
+ [wsl2]
+ networkingMode=NAT
+```
+The NAT configuration allows both the WSL box and the host computer to see each other in a private network.  By running **ipconfig** on the host computer the IP marked as Hyper-V is the IP address on the host computer for the WSL.  On the other hand the WSL ip can be obtained from the box by running **ifconfig**.
+
+On the other hand, configure the box as **networkingMode=mirrored** to share the same networking address space as the windows host computer.  This means that for any external computer the IP and port of any process running on the wsl2 box will be shared with the host computer.
 
 Ubuntu: 22.04
 ```bash
