@@ -12,4 +12,7 @@ testcase
 test
 scripts/__pycache__/
 scripts/data/*.dat
+messageboard.dat
 .vscode/*
+.idea
+data
