@@ -1,169 +1,125 @@
 '''
-
-UDP Telemetry Receiver and controller.
-
-This script receives the information from the simulator (the telemetry)
-picks only the data that corresponds to one of the tanks, and sends
-a command to the simulator to control the tank.
-
+This script defines a Controller class that receives telemetry from a tank simulation,
+logs sensor data, and sends basic commands to control a tank's behavior.
 '''
 
+import socket
+from struct import *
+import datetime, time
+import sys
+import math
 import numpy as np
 
-import time
-import datetime
-from struct import *
-
-import sys, select
-
-import socket
-
 from TelemetryDictionary import telemetrydirs as td
-
-import math
-
+from Command import Command
+from Command import Recorder
 from Fps import Fps
 
-# This is the port where the simulator is waiting for commands
-# The structure is given in ../commandorder.h/CommandOrder
-ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-ip = '127.0.0.1'
-controlport = 4501
+class Controller:
+    def __init__(self, tankparam):
+        # Create a UDP socket for receiving telemetry
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        tankparam = int(tankparam)
+        port = 4600 + tankparam  # Listening port based on tank number
+        self.server_address = ('0.0.0.0', port)
+        print ('Starting up on %s port %s' % self.server_address)
 
+        # Bind the socket to the chosen address and set a timeout
+        self.sock.bind(self.server_address)
+        self.sock.settimeout(10)
 
-ctrl_server_address = (ip, controlport)
+        # Telemetry packet length and unpacking format
+        self.length = 80
+        self.unpackcode = '<Lififfffffffffffffff'
 
+        self.recorder = Recorder()  # Initialize recorder to store episodes
 
-def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank, faction):
+        self.tank = tankparam
+        self.mytimer = 0
+        self.fps = Fps()
+        self.fps.tic()  # Start FPS timer
 
-#    controllingid=1
-#    thrust=10.0
-#    roll=1.0
-#    pitch=0.0
-#    yaw=0.0
-#    precesion=0.0
-#    bank=0.0
-#    faction=1
-#    #timer=1
+    def read(self):
+        # Receive telemetry data and unpack it if it's the correct length
+        data, address = self.sock.recvfrom(self.length)
+        if len(data) > 0 and len(data) == self.length:
+            return unpack(self.unpackcode, data)
+        return None
 
-    command = 0
-    spawnid=0
-    typeofisland=0
-    x=0.0
-    y=0.0
-    z=0.0
-    target=0
-    bit=0
-    weapon=0
+    def run(self):
+        # Initialize command sender to simulator with specific control port
+        command = Command('192.168.122.219', 4500 + self.tank)  # Replace with the your server IP
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
+        f = open(f'./data/sensor.{st}.dat', 'w')  # Log file for sensor data
 
-    # This is the structure fron CommandOrder (for sending messages to the Engine)
-    data=pack("iffffffiLiiifffi?i",
-        controllingid,
-        thrust,     # Forward or backward
-        roll,
-        pitch,      # Left or right turn
-        yaw,
-        precesion,
-        bank,
-        faction,
-        timer,
-        command,    # 0 or 11
-        spawnid,
-        typeofisland,
-        x,y,z,
-        target,
-        bit,
-        weapon)
+        shouldrun = True
+        while shouldrun:
+            try:
+                # Read both tanks' telemetry packets
+                tank1values = self.read()
+                if int(tank1values[td['number']]) != 1:
+                    continue
 
-    sent = ctrlsock.sendto(data, ctrl_server_address)
+                tank2values = self.read()
+                if int(tank2values[td['number']]) != 2:
+                    continue
 
-    return
+                # Determine which tank is "ours"
+                if self.tank == 1:
+                    myvalues = tank1values
+                    othervalues = tank2values
+                else:
+                    myvalues = tank2values
+                    othervalues = tank1values
 
-# Telemetry length and package form (for receiving messages from the engine)
-length = 80
-unpackcode = '<Lififfffffffffffffff'
+                # Update FPS and print to console
+                self.fps.steptoc()
+                print(f"Fps: {self.fps.fps}")
 
+                # Detect if a new episode has started
+                if int(myvalues[td['timer']]) < self.mytimer:
+                    self.recorder.newepisode()
+                    print("New Episode")
+                    self.mytimer = int(myvalues[td['timer']]) - 1
 
-# UDP Telemetry port on port 4500
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('0.0.0.0', 4601)
-print ('Starting up on %s port %s' % server_address)
+                # Record values for both tanks
+                self.recorder.recordvalues(myvalues, othervalues)
 
-sock.bind(server_address)
+                # Write select telemetry values to file
+                f.write(','.join([str(myvalues[0]), str(myvalues[1]), str(myvalues[2]),
+                                  str(myvalues[3]), str(myvalues[4]), str(myvalues[6])]) + '\n')
+                f.flush()
 
-def gimmesomething(ser):
-    while True:
-        line = ser.readline()
-        if (len(line)>0):
-            break
-    return line
+                # Calculate distance from origin and print it
+                vec2d = (float(myvalues[td['x']]), float(myvalues[td['z']]))
+                polardistance = math.sqrt(vec2d[0] ** 2 + vec2d[1] ** 2)
+                print(f"Time: {myvalues[td['timer']]} Polar Distance: {polardistance}")
 
+                # Basic control logic: move forward if close enough
+                thrust = 10.0 if polardistance < 1700 else 0.0
+                steering = 0.0
+                turretdecl = 0.0
+                turretbearing = 0.0
 
-# Sensor Recording
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
-f = open('./data/sensor.'+st+'.dat', 'w')
+                # Send command to simulator
+                command.send_command(myvalues[td['timer']], self.tank, thrust,
+                                     steering, turretdecl, turretbearing)
 
-x = []
-y = []
-z = []
+                self.mytimer += 1
 
-fps = Fps()
-fps.tic()
+            except socket.timeout:
+                # If timeout, end the episode
+                print("Episode Completed")
+                break
 
-# Which tank I AM.
-tank=1
+        f.close()
+        print('Everything successfully closed.')
 
-previoustimer = 0
-
-while True:
-    
-    # Blocking call
-    data, address = sock.recvfrom(length)
-
-    # Take care of the latency
-    if len(data)>0 and len(data) == length:
-        # is  a valid message struct
-        new_values = unpack(unpackcode,data)
-        
-        # read
-        if new_values[td['timer']] != previoustimer:
-            previoustimer = new_values[td['timer']]
-            fps.steptoc()    
-            print(f"Fps: {fps.fps}")    
-
-        # The
-        if int(new_values[td['number']]) == tank:
-
-            f.write( str(new_values[0]) + ',' + str(new_values[1]) + ',' + str(new_values[2]) +  ',' + str(new_values[3]) + ',' + str(new_values[4]) + ',' + str(new_values[6]) + '\n')
-            f.flush();
-
-            x.append( float(new_values[td['bearing']]))
-            y.append( float(new_values[td['x']]))
-            z.append( float(new_values[td['z']]))
-
-            vec2d = (float(new_values[td['x']]), float(new_values[td['z']]))
-
-            polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
-
-            print(f"Time: {new_values[td['timer']]} Polar Distance: {polardistance}")
-
-            if polardistance < 1700:
-                thrust = 10.0
-            else:
-                thrust = 0.0
-
-            roll = 0.0
-            pitch = 0.0
-            yaw = 0.0
-            precesion = 0.0
-            bank = 0.0
-
-            # Analyze the data to determine what to do.
-            # Do something
-            send_command(new_values[td["timer"]], tank, thrust, roll, pitch, yaw, precesion, bank, 1)
-
-
-f.close()
-
-print ('Everything successfully closed.')
+# Entry point for the script
+# To run: python Controller.py [tank_number]
+# Example: python Controller.py 1
+# TIP: You can open two terminals and run python Controller.py 1 in one, and python Controller.py 2 in the other.
+if __name__ == '__main__':
+    controller = Controller(sys.argv[1])
+    controller.run()
