@@ -234,6 +234,19 @@ void TestCase_111::init()
 
     reset(nemesis);
 
+    // Set up the camera view
+
+    Vec3f pos(-1000,10,0);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = -90;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI;
+    controller.faction = BOTH_FACTION;    
+
 }
 
 void TestCase_111::cleanall()
