@@ -48,7 +48,7 @@ class Controller:
 
     def run(self):
         # Initialize command sender to simulator with specific control port
-        command = Command('192.168.122.219', 4500 + self.tank)  # Replace with the your server IP
+        command = Command('127.0.0.1', 4500 + self.tank)  # Replace with the your server IP
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
         f = open(f'./data/sensor.{st}.dat', 'w')  # Log file for sensor data
@@ -121,5 +121,10 @@ class Controller:
 # Example: python Controller.py 1
 # TIP: You can open two terminals and run python Controller.py 1 in one, and python Controller.py 2 in the other.
 if __name__ == '__main__':
+    
+    if len(sys.argv) < 2:
+        print("Usage: python Controller.py [tank_number]")
+        sys.exit(1)
+    
     controller = Controller(sys.argv[1])
     controller.run()
