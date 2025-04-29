@@ -34,10 +34,10 @@ def send_command(timer):
 
     controllingid=1
     thrust=10.0
-    roll=1.0
-    pitch=10.0
+    steering=1.0
+    turretdeclination=10.0
     yaw=0.0
-    precesion=0.0
+    turretbearing=0.0
     bank=0.0
     faction=1
     #timer=1
@@ -49,27 +49,25 @@ def send_command(timer):
     y=0.0
     z=0.0
     target=0
-    bit=0
     weapon=0
 
     # This is the structure fron CommandOrder
-    data=pack("iffffffiLiiifffi?i",
+    data=pack("<i6fiiiifffiiI",         
         controllingid,
         thrust,
-        roll,
-        pitch,
+        steering,
+        turretdeclination,
         yaw,
-        precesion,
+        turretbearing,
         bank,
         faction,
-        timer,
-        command,
+        command,    # 0 or 11
         spawnid,
         typeofisland,
         x,y,z,
         target,
-        bit,
-        weapon)
+        weapon,
+        timer)
 
     sent = ctrlsock.sendto(data, ctrl_server_address)
 

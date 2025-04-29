@@ -26,7 +26,7 @@ import socket
 
 
 ip = '0.0.0.0'
-port = 4500
+port = 4501
 
 if (len(sys.argv)>=2):
     ip = sys.argv[1]
@@ -41,8 +41,8 @@ sock.bind(server_address)
 
 # This is the length and format of the struct ModelRecord that is sent by the server.
 # Check https://docs.python.org/3/library/struct.html
-length = 84
-unpackcode = 'Liiiffffffffffffffff'
+length = 68
+unpackcode = '<i6fiiiifffiiI'
 
 address = ''
 while True:
@@ -50,10 +50,10 @@ while True:
 
     data, address = sock.recvfrom(length)
 
-    print (f'Data Received:{data}')
+    print (f'Data Received:{data} Length {len(data)} (Struct size {calcsize(unpackcode)}) from {address}')
 
     new_values = unpack(unpackcode,data)
 
-    print(new_values[5])
+    print(f"Timer {new_values[16]}")
 
 print ('Everything successfully closed.')
