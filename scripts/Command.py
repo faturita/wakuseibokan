@@ -74,7 +74,7 @@ class Command:
             timer)
         
         # Check the size of the struct due to cross-platform compatibility issues.
-        #print(calcsize("<i6fiiiifffiiI"))
+        #print(calcsize("<i6fiiiifffiiI"))   This  must be 68 to be cross platform.
 
         sent = self.ctrlsock.sendto(data, self.ctrl_server_address)
 
