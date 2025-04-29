@@ -1,11 +1,10 @@
 '''
-UDP Telemetry Receiving and Episode Recording
+Seek and Destroying Script
 
 This script receives the information from the simulator (the telemetry)
-picks only the data that corresponds to one of the tanks, and sends
-a command to the simulator to control the tank.
-
-This code is used to register many episodes from the game and to create a database.
+identify where the other tank is located, the bearing and the distance, 
+and sends the command to the tank to move its trajectory to redirect towards
+the other tank for shooting it when it is close enough.
 
 Real time Data Science
 
