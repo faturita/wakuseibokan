@@ -64,6 +64,13 @@ typedef struct sockaddr SA;
 
 TestCase_111::TestCase_111()
 {
+    //std::cout << "sizeof(ControlStructure2): " << sizeof(ControlStructure2) << std::endl;
+
+    //std::cout << "Offsets:\n";
+    //std::cout << "controllingid: " << offsetof(ControlStructure2, controllingid) << "\n";
+    //std::cout << "registers: " << offsetof(ControlStructure2, registers) << "\n";
+    //std::cout << "faction: " << offsetof(ControlStructure2, faction) << "\n";
+    //std::cout << "sourcetimer: " << offsetof(ControlStructure2, sourcetimer) << "\n";
 
 }
 
@@ -307,19 +314,23 @@ int TestCase_111::check(unsigned long timertick)
         for(int i=0;i<iendpoints;i++)
         {
             socklen_t len;
-            ControlStructure mesg;
+            ControlStructure2 mesg;
             SA pcliaddr;
             struct sockaddr_in cliaddr;
 
             socklen_t clilen=sizeof(cliaddr);
             int n;
             len = clilen;
-            n = recvfrom(sockadders[i].sockfd, &mesg, sizeof(mesg), 0, &pcliaddr, &len);
+            n = recvfrom(sockadders[i].sockfd, &mesg, sizeof(ControlStructure2), 0, &pcliaddr, &len);
 
-            //printf("Received %d %d bytes from %s:%d\n",socks[i], n, inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+            //printf("Received %d %d bytes from %s:%d\n",sizeof(ControlStructure2), n, inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+
+
 
             if (n!=-1)
             {
+                //printf("Delay %ld %d\n",timer-mesg.sourcetimer, mesg.command);
+
                 Vehicle *_b=NULL;
                 size_t p;
 
@@ -336,13 +347,20 @@ int TestCase_111::check(unsigned long timertick)
                     Controller co;
                     co.controllingid = mesg.controllingid;
                     co.faction = mesg.faction;
-                    co.registers = mesg.registers;
+
+                    co.registers.thrust = mesg.registers.thrust;
+                    co.registers.roll = mesg.registers.roll;
+                    co.registers.pitch = mesg.registers.pitch;
+                    co.registers.yaw = mesg.registers.yaw;
+                    co.registers.precesion = mesg.registers.precesion;
+                    co.registers.bank = mesg.registers.bank;
+
                     //co.push(mesg.order);
 
                     _b->doControl(co);
 
 
-                    if (mesg.order.command == Command::FireOrder && _b->getPower()>0)
+                    if (mesg.command == 11 && _b->getPower()>0)
                     {
                         Vehicle *action = _b->fire(0,world, space);
 

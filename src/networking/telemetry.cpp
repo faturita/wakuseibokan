@@ -29,7 +29,7 @@ struct ModelRecord {
     int32_t number;
     float health;
     int32_t power;
-    float bearing;
+    float bearing; 
 
     float pos1;
     float pos2;

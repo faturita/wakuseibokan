@@ -22,6 +22,7 @@ import numpy as np
 from Command import Command
 from Command import Recorder
 from Fps import Fps
+import Configuration
 
 class Controller:
     def __init__(self, tankparam):
@@ -59,7 +60,7 @@ class Controller:
         return None
     
     def run(self):
-        command = Command('127.0.0.1', 4500 + self.tank)
+        command = Command(Configuration.ip, 4500 + self.tank)
 
         shouldrun = True
         while (shouldrun):
@@ -81,7 +82,7 @@ class Controller:
                     othervalues = tank1values
 
                 self.fps.steptoc() 
-                print(f"Fps: {self.fps.fps}")
+                #print(f"Fps: {self.fps.fps}")
                 
                 if (int(myvalues[td['timer']])<self.mytimer):
                     self.recorder.newepisode()

@@ -56,7 +56,7 @@ class Command:
             
         
         # This is the structure fron CommandOrder
-        data=pack("iffffffiLiiifffi?i",
+        data=pack("<i6fiiiifffiiI",         
             controllingid,
             thrust,
             steering,
@@ -65,14 +65,16 @@ class Command:
             turretbearing,
             bank,
             faction,
-            timer,
             self.command,    # 0 or 11
             spawnid,
             typeofisland,
             x,y,z,
             target,
-            bit,
-            weapon)
+            weapon,
+            timer)
+        
+        # Check the size of the struct due to cross-platform compatibility issues.
+        #print(calcsize("<i6fiiiifffiiI"))
 
         sent = self.ctrlsock.sendto(data, self.ctrl_server_address)
 

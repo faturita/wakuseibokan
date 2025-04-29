@@ -77,5 +77,43 @@ struct ControlStructure {
 };
 
 
+#pragma pack(push, 1)
+
+struct controlregister2
+{
+    // R+,F-
+    float thrust=0;
+
+    // ModAngleX
+    float roll=0;
+
+    // ModAngleY
+    float pitch=0;
+
+    // ModAngleZ
+    float yaw=0;
+
+    // ModAngleP
+    float precesion=0;
+
+    float bank=0;
+};
+
+struct ControlStructure2 {
+    int32_t controllingid;
+    struct controlregister2 registers;
+    int32_t faction;
+    int32_t command;
+    int32_t spawnid;
+    int32_t typeofisland;
+    float x;
+    float y;
+    float z;
+    int32_t target_type;
+    int32_t weapon;
+    uint32_t sourcetimer;
+};
+#pragma pack(pop)
+
 
 #endif // COMMANDORDER_H
