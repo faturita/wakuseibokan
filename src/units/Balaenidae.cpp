@@ -569,6 +569,7 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
         _walrus->stop();
         _walrus->setNameByNumber(number);
         _walrus->setStatus(SailingStatus::SAILING);
+        _walrus->setTexture(textures["sky"]);
         dBodyAddRelForce(me,10.0f,0.0f,0.0f);
         v = (Vehicle*)_walrus;
 
