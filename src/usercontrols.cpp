@@ -347,7 +347,10 @@ void switchControl(size_t id)
     // Release mouse
 #if __linux
     glutSetCursor(GLUT_CURSOR_CROSSHAIR);  // https://www.opengl.org/resources/libraries/glut/spec3/node28.html
+#elif __APPLE__
+    CGDisplayShowCursor (kCGNullDirectDisplay);
 #endif
+
     buttonState = 0;
 }
 
