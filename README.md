@@ -389,5 +389,7 @@ More info
 * https://www.pydy.org/
 * https://www.sciencedirect.com/science/article/pii/S0141118725001117
 * https://developer.nvidia.com/isaac/sim
+* https://engine-programming.github.io/
+* https://github.com/gfx-rs/wgpu
 
 
