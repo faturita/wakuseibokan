@@ -148,3 +148,25 @@ void Dock::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
     position = position - 200*fwd + Up;
     fwd = orig-position;
 }
+
+bool Dock::noCargoShip()
+{
+    return getTtl() == 0;
+}
+
+bool Dock::cargoShipReady()
+{
+    if (getTtl() < 0)
+    {
+        setTtl(0);
+        return true;
+    }
+    return false;
+}
+
+void Dock::buildCargoShip()
+{
+    setTtl(getRandomInteger(1200, 2000)); // Build a cargo ship in 100 to 200 ticks.
+    CLog::Write(CLog::Debug,"Dock %s is building a cargo ship.\n",getName().c_str());
+}
+

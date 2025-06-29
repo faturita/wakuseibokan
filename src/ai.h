@@ -3,7 +3,7 @@
 
 #include "engine.h"
 
-#define DEFENSE_RANGE   8000
+#define DEFENSE_RANGE   5000
 #define IN_RANGE        30000
 
 class TSequencer {

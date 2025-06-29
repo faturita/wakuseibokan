@@ -112,7 +112,7 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
     initlocations.close();
 
 
-    Vec3f p = Vec3f(x,10.0f,z);
+    Vec3f p = Vec3f(x,10.0f,z); 
     _otter->setPos(p);
     _otter->stop();
     _otter->setSignal(4);

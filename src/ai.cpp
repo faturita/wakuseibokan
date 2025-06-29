@@ -719,8 +719,8 @@ public:
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
-            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
-            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos(),250 kmf);
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction,250 kmf);
 
 
             dout << freeis << std::endl;
@@ -763,8 +763,8 @@ public:
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
-            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
-            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos(),250 kmf);
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction,250 kmf);
 
             if (!freeis && !enemyis)
                 return false;
@@ -798,8 +798,8 @@ public:
 
         if (b)
         {
-            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos());
-            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction);
+            BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos(),250 kmf);
+            BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction,250 kmf);
 
             Vec3f destination;
 

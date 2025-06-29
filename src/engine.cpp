@@ -1120,7 +1120,7 @@ BoxIsland* findNearestIsland(Vec3f Po)
 }
 
 
-BoxIsland* findNearestEmptyIsland(Vec3f Po)
+BoxIsland* findNearestEmptyIsland(Vec3f Po, float maxDistance)
 {
     int nearesti = -1;
     float closest = 0;
@@ -1133,7 +1133,7 @@ BoxIsland* findNearestEmptyIsland(Vec3f Po)
 
         if (!d )
         {
-            if ( ((l-Po).magnitude()<closest || closest ==0) ) {
+            if ( ((l-Po).magnitude()<closest || closest ==0) && (l-Po).magnitude()<maxDistance) {
                 closest = (l-Po).magnitude();
                 nearesti = i;
             }
@@ -1815,12 +1815,20 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                     if (!ca)
                     {
-                        Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
-                        ca->setOrder(i);
-                        if (ca)
+                        if (d->noCargoShip())
                         {
-                            size_t idx = entities.push_back(ca, ca->getGeom());
-                            ca->ready();
+                            d->buildCargoShip(); // Build a new cargo ship if it is not there.
+                        }
+                        
+                        if (d->cargoShipReady())
+                        {
+                            Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
+                            ca->setOrder(i);
+                            if (ca)
+                            {
+                                size_t idx = entities.push_back(ca, ca->getGeom());
+                                ca->ready();
+                            }
                         }
                     }
                 }
