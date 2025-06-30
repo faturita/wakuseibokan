@@ -579,14 +579,14 @@ void drawHUD()
         glEnd();
 
 
-
+        // @NOTE: Thrust gauge indicator.
         int thrust = (int)controller.registers.thrust/10;
 
         glBegin(GL_TRIANGLES);
 
-        glVertex3f(x-280, thrust + y-90  , 0);
-        glVertex3f(x-300, thrust + y-95  , 0);
-        glVertex3f(x-280, thrust + y-100  , 0);
+        glVertex3f(x-280, thrust + y+5  , 0);
+        glVertex3f(x-300, thrust + y-0  , 0);
+        glVertex3f(x-280, thrust + y-5  , 0);
 
         glEnd();
 

@@ -181,11 +181,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 Vehicle* CarrierLauncher::fire(int weapon, dWorldID world, dSpaceID space)
 {
 
-
-    printf("CarrierLauncher::fire(%d - %d)\n", autostatus, weapon);
-
     if (autostatus != AutoStatus::IDLE) {
-        CLog::Write(CLog::Error, "CarrierLauncher::fire called with autostatus IDLE.\n");
         switch( autostatus ) {
             case AutoStatus::GROUND:
                 weapon = 1;
@@ -201,6 +197,7 @@ Vehicle* CarrierLauncher::fire(int weapon, dWorldID world, dSpaceID space)
     }
 
     // @NOTE: we are using the autostatus to determine if we consider or not the weapon type.
+    CLog::Write(CLog::Error, "CarrierLauncher::Fire %d.\n", weapon);
     switch (weapon) {
     case 1:return fireGround(world,space);
         break;
