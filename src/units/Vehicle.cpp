@@ -879,7 +879,7 @@ bool Vehicle::VERIFY(Vec3f newpos, dBodyID who)
     }
 
     
-    if (getPos()[1]<3.0)
+    if (getPos()[1]<3.0 && getType() != NAVALCONTROLABLEACTION)
     {
         // @NOTE: The counter should come from something related to the ocean
         static int counter = 0;

@@ -429,7 +429,7 @@ void drawHUD()
             {
                 Vehicle *v=entities[i];
 
-                if (v && (v->getType() == CONTROLABLEACTION )
+                if (v && (v->getType() == CONTROLABLEACTION || v->getType() == NAVALCONTROLABLEACTION )
                         && v->getFaction()!=friendlyfaction)
                 {
                     Vec3f enemy = v->getPos() - meLoc;enemy[1]=0;
@@ -1109,7 +1109,7 @@ void replayupdate(int value)
             // Delete the entries that fulfill the delete condition.
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i)) {
 
-                if ( ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) &&
+                if ( ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == NAVALCONTROLABLEACTION || entities[i]->getType() == CONTROLABLEACTION) &&
                         entities[i]->getTtl()<=0) ||
                     (entities[i]->getHealth()<=0)
                     )
@@ -1332,7 +1332,10 @@ void inline processCommandOrders()
 
                     // @FIXME: At this point I need to notify the controller that the fire action was executed,
                     //   which can be used to switch to control a missile or to make a sound.
-                    if (controllerindex == 0 && action != NULL && action->getType() == VehicleTypes::CONTROLABLEACTION)
+                    if (controllerindex == 0 && action != NULL && 
+                        ( action->getType() == VehicleTypes::CONTROLABLEACTION
+                        || action->getType() == VehicleTypes::NAVALCONTROLABLEACTION) )
+
                     {
                         Vec3f target(co.parameters.x,co.parameters.y,co.parameters.z);
 
@@ -1503,6 +1506,7 @@ void update(int value)
             // @NOTE: This is a guardrail to avoid too many bullets moving around that turn the game unplayable.
             if (fps<10 && ( (entities[i]->getType() == VehicleTypes::EXPLOTABLEACTION) ||
             (entities[i]->getType() == VehicleTypes::CONTROLABLEACTION) ||
+            (entities[i]->getType() == VehicleTypes::NAVALCONTROLABLEACTION) ||
             (entities[i]->getTypeId() == EntityTypeId::TDebris) ) )
             {
                 entities[i]->damage(100);
@@ -1528,7 +1532,7 @@ void update(int value)
             for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
             {
                 //CLog::Write(CLog::Debug,"Type and ttl: %d %p Valid %d\n",entities[i]->getType(), entities[i],entities.isValid(i));
-                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == CONTROLABLEACTION) &&
+                if ((entities[i]->getType()==ACTION || entities[i]->getType()==RAY || entities[i]->getType() == NAVALCONTROLABLEACTION || entities[i]->getType() == CONTROLABLEACTION) &&
                         entities[i]->getTtl()<=0)
                 {
                     if (controller.controllingid == i)

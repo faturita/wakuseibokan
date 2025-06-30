@@ -7006,17 +7006,21 @@ void checktest72(unsigned long timer)
     }
 }
 
+Torpedo * findTorpedo(int FACTION)
+{
+    for (size_t i = entities.first(); entities.hasMore(i); i = entities.next(i))
+    {
+        Vehicle *v = entities[i];
+        if (v->getType() == NAVALCONTROLABLEACTION && v->getFaction() == FACTION)
+        {
+            return (Torpedo*)v;
+        }
+    }
+    return NULL;
+}
+
 void test73()
 {
-
-    Torpedo *t = new Torpedo(GREEN_FACTION);
-    t->init();
-    t->embody(world, space);
-    t->setPos(0.0,20.0f,0.0f);
-    t->stop();
-
-    entities.push_back(t, t->getGeom());
-
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -7025,6 +7029,14 @@ void test73()
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
+
+    Torpedo *t = new Torpedo(BLUE_FACTION);
+    t->init();
+    t->embody(world, space);
+    t->setPos(0.0,0.5f,0.0f);
+    t->stop();
+
+    entities.push_back(t, t->getGeom());
 
 }
 
@@ -7040,16 +7052,16 @@ void checktest73(unsigned long timer)
         messages.insert(messages.begin(), mg);
     }
 
-    if (timer == 100)
+    if (timer == 200)
     {
         Vehicle *b = findCarrier(GREEN_FACTION);
-        Torpedo *t = (Torpedo*) entities[1];
+        Torpedo *t = findTorpedo(BLUE_FACTION);
 
         t->goTo(b->getPos());
         t->enableAuto();
     }
 
-    if (timer == 3000)
+    if (timer == 10000)
     {
         Vehicle *t = findCarrier(GREEN_FACTION);
 
@@ -7073,7 +7085,7 @@ void checktest73(unsigned long timer)
 void test74()
 {
 
-    Torpedo *t = new Torpedo(GREEN_FACTION);
+    Torpedo *t = new Torpedo(BLUE_FACTION);
     t->init();
     t->embody(world, space);
     t->setPos(0.0,20.0f,0.0f);
@@ -7125,10 +7137,10 @@ void checktest74(unsigned long timer)
     {
         Vehicle *b = findWalrus(GREEN_FACTION);
 
-        if (entities.isValid(0))
-        {
-            Torpedo *t = (Torpedo*) entities[1];
+        Torpedo *t = findTorpedo(BLUE_FACTION);
 
+        if (t)
+        {
             t->goTo(b->getPos());
             t->enableAuto();
         }
@@ -7139,13 +7151,15 @@ void checktest74(unsigned long timer)
         Vehicle *b = findWalrus(GREEN_FACTION);
 
         if (b)
-            if (entities.isValid(0))
-            {
-                Torpedo *t = (Torpedo*) entities[1];
+        {
+            Torpedo *t = findTorpedo(BLUE_FACTION);
 
+            if (t)
+            {
                 t->goTo(b->getPos());
                 t->enableAuto();
             }
+        }
     }
 
 

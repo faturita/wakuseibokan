@@ -485,12 +485,12 @@ bool  isWalrus(Vehicle* vehicle)
 
 bool  isAction(dGeomID body)
 {
-    return isType(body, ACTION) || isType(body, VehicleTypes::CONTROLABLEACTION) || isType(body, VehicleTypes::EXPLOTABLEACTION);
+    return isType(body, ACTION) || isType(body, VehicleTypes::NAVALCONTROLABLEACTION) || isType(body, VehicleTypes::CONTROLABLEACTION) || isType(body, VehicleTypes::EXPLOTABLEACTION);
 }
 
 bool  isAction(Vehicle* vehicle)
 {
-    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION) || isType(vehicle, VehicleTypes::EXPLOTABLEACTION);
+    return isType(vehicle, ACTION) || isType(vehicle, VehicleTypes::NAVALCONTROLABLEACTION) || isType(vehicle, VehicleTypes::CONTROLABLEACTION) || isType(vehicle, VehicleTypes::EXPLOTABLEACTION);
 }
 
 // SYNC
@@ -1038,7 +1038,7 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
         }
 
         if (v &&
-                ( (types.size() == 0 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (bMatch) )
+                ( (types.size() == 0 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != NAVALCONTROLABLEACTION && v->getType() != RAY) || (bMatch) )
                 && v->getFaction()==friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
@@ -1059,7 +1059,7 @@ std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3
     {
         Vehicle *v=entities[i];
         if (v &&
-                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != NAVALCONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
                 && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
@@ -1079,7 +1079,7 @@ Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float th
     {
         Vehicle *v=entities[i];
         if (v &&
-                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
+                ( (type == -1 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != NAVALCONTROLABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != RAY) || (v->getType() == type) )
                 && v->getFaction()!=friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
@@ -1670,7 +1670,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                             action->goTo(target->getPos());
                             action->enableAuto();
 
-                            if (action->getType()==CONTROLABLEACTION)
+                            if (action->getType()==CONTROLABLEACTION || action->getType()==NAVALCONTROLABLEACTION)
                             {
                                 // @NOTE: Uncomment me if you want to see where the missile is going (it is automatically controlled).
                                 //switchControl(l);

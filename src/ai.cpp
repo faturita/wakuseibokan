@@ -1455,7 +1455,7 @@ void Player::playFaction(unsigned long timer)
     state = interruptions[1]->transit(faction,state);
 
     if (timer % 1000 == 0)
-        std::cout << "Status:" << (int)state << std::endl;
+        std::cout << "Faction:" << faction << "-" << "Status:" << (int)state << std::endl;
 
     // Fire the action according to the state.
     qactions[(int)state]->apply(faction);

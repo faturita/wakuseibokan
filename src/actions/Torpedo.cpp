@@ -119,12 +119,11 @@ void Torpedo::doDynamics(dBodyID body)
 
     float attitude = _acos(upInBody.dot(Up))*180.0/PI;
 
+    //antigravity(body);
+
 
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
-        //dBodyAddRelForce (body,0, 0,getThrottle());
-
-        //dBodyAddRelTorque(body, 0, -xRotAngle*0.1, 0);
         Vec3f p(0.0, 0.0, getThrottle());
 
         p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
@@ -162,7 +161,7 @@ void Torpedo::embody(dBodyID myBodySelf)
 
 int Torpedo::getType()
 {
-    return CONTROLABLEACTION;
+    return NAVALCONTROLABLEACTION;
 }
 
 void Torpedo::release(Vec3f orientation)

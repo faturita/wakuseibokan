@@ -32,7 +32,7 @@ void CarrierLauncher::init()
 
     setName("Launcher");
 
-    autostatus = AutoStatus::WATER;
+    autostatus = AutoStatus::IDLE;
 
     setForward(Vec3f(0,0,1));
 }
@@ -172,7 +172,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
 
-    setTtl(1000);
+    setTtl(100);
 
     // I can set power or something here.
     return (Vehicle*)action;
@@ -181,13 +181,32 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
 Vehicle* CarrierLauncher::fire(int weapon, dWorldID world, dSpaceID space)
 {
 
-    // @FIXME Check here if it is not better to use weapon instaed of the status.
-    switch (autostatus) {
-    case AutoStatus::GROUND:return fireGround(world,space);
+
+    printf("CarrierLauncher::fire(%d - %d)\n", autostatus, weapon);
+
+    if (autostatus != AutoStatus::IDLE) {
+        CLog::Write(CLog::Error, "CarrierLauncher::fire called with autostatus IDLE.\n");
+        switch( autostatus ) {
+            case AutoStatus::GROUND:
+                weapon = 1;
+                break;
+            case AutoStatus::AIR:
+                weapon = 2;
+                break;
+            case AutoStatus::WATER:
+                weapon = 3;
+                break;
+            default:break;
+        }
+    }
+
+    // @NOTE: we are using the autostatus to determine if we consider or not the weapon type.
+    switch (weapon) {
+    case 1:return fireGround(world,space);
         break;
-    case AutoStatus::AIR:return fireAir(world, space);
+    case 2:return fireAir(world, space);
         break;
-    case AutoStatus::WATER:return fireWater(world, space);
+    case 3:return fireWater(world, space);
         break;
     }
 
@@ -238,12 +257,14 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
 
     fw = fw.normalize();
     orig = position;
-    position = position + 50.0f*fw;
+    position = position + 600.0f*fw;
     fw = -orig+position;
 
-    position[1] =1.0;
+    position[1] =.50;
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
+
+    //action->inert = true; 
 
 
     dMatrix3 R,R2;
@@ -269,7 +290,7 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
     dBodySetQuaternion(action->getBodyID(),q3);
     dBodyAddRelForce(action->getBodyID(),0,0,60);
 
-    setTtl(1000);
+    setTtl(100);
 
     // I can set power or something here.
     return (Vehicle*)action;
@@ -325,7 +346,7 @@ Vehicle* CarrierLauncher::fireGround(dWorldID world, dSpaceID space)
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
 
-    setTtl(1000);
+    setTtl(100);
 
     // I can set power or something here.
     return (Vehicle*)action;
