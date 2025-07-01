@@ -1870,6 +1870,7 @@ int main(int argc, char** argv) {
         setupControllerClient(getCommandLineParameter(argc,argv,"-ip"));
     }
 
+    checkIslands();
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 

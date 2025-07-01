@@ -1391,7 +1391,8 @@ class EngageDefCon : public Condition
         if (v && v->getType() == MANTA)
         {
             return runAirDefense(faction);
-        }    
+        } 
+        return false;   
     }
 };
 

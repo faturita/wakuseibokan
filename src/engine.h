@@ -76,7 +76,9 @@ enum CommLink { NO_LINK=2, SHORT_RANGE=3, LONG_RANGE=4};
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom);
-
+std::vector<std::vector<int>> createIslandGraphMST();
+std::vector<int> getShortestIslandPathMST(int startIdx, int endIdx);
+void checkIslands();
 void gVehicle(Vehicle* &v1, Vehicle* &v2,Structure* &s1, Structure* &s2, dGeomID g1, dGeomID g2);
 
 void deleteEntity(size_t i);

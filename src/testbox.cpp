@@ -7594,6 +7594,34 @@ void checktest80(unsigned long timer)
     printf("UUID: %s\n", uuid.c_str());
 
 
+    std::vector<std::vector<int>> mst = createIslandGraphMST();
+
+    for (size_t i = 0; i < mst.size(); ++i) {
+        std::cout << "Island " << i << " (" << islands[i]->getName() << ") is connected to: ";
+        for (int neighbor : mst[i]) {
+            std::cout << neighbor << " (" << islands[neighbor]->getName() << ") " << (islands[neighbor]->getPos() - islands[i]->getPos()).magnitude();
+        }
+        std::cout << std::endl;
+    }
+
+
+
+    int start = 0; // index of starting island
+    int end = 4;   // index of destination island
+
+    std::vector<int> path = getShortestIslandPathMST(start, end);
+
+    if (!path.empty()) {
+        std::cout << "Shortest path: ";
+        for (int idx : path) {
+            std::cout << idx << " (" << islands[idx]->getName() << ") ";
+        }
+        std::cout << std::endl;
+    } else {
+        std::cout << "No path found!" << std::endl;
+    }
+
+
     if (clast.command == Command::None)
     {
         printf("Test Passed\n");
@@ -8259,7 +8287,7 @@ void initWorldModelling(int testcase)
     case 77:test77();break;                         // Visually Testing Radar HUD with enemy units
     case 78:test78();break;                         // Testing Manta bombing an island.
     case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
-    case 80:test80();break;                         // Check multiple controllers and the command order.
+    case 80:initIslands();break;                         // Check multiple controllers and the command order.
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water

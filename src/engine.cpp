@@ -3,10 +3,13 @@
 #include <map>
 #include <sstream>
 
-#ifdef __linux
+
+#include <vector>
+#include <limits>
+#include <utility> // for std::pair
+#include <queue>
+#include <limits>
 #include <functional>
-#elif __APPLE__
-#endif
 
 
 extern  Controller controller;
@@ -22,6 +25,131 @@ extern std::vector<Message> messages;
 extern std::unordered_map<std::string, GLuint> textures;
 
 extern unsigned long timer;
+
+
+
+
+// Assuming islands is std::vector<BoxIsland*>
+std::vector<std::vector<int>> createIslandGraphMST() {
+    int n = islands.size();
+    std::vector<std::vector<int>> adj(n); // adjacency list for MST
+    if (n == 0) return adj;
+
+    std::vector<bool> inMST(n, false);
+    std::vector<float> minDist(n, std::numeric_limits<float>::max());
+    std::vector<int> parent(n, -1);
+
+    minDist[0] = 0.0f;
+
+    for (int count = 0; count < n - 1; ++count) {
+        // Find the vertex not in MST with the smallest distance
+        float min = std::numeric_limits<float>::max();
+        int u = -1;
+        for (int v = 0; v < n; ++v) {
+            if (!inMST[v] && minDist[v] < min) {
+                min = minDist[v];
+                u = v;
+            }
+        }
+        if (u == -1) break; // Disconnected graph
+
+        inMST[u] = true;
+
+        // Update distances to the rest
+        for (int v = 0; v < n; ++v) {
+            if (!inMST[v]) {
+                float dist = (islands[u]->getPos() - islands[v]->getPos()).magnitude();
+                if (dist < minDist[v]) {
+                    minDist[v] = dist;
+                    parent[v] = u;
+                }
+            }
+        }
+    }
+
+    // Build adjacency list from parent array
+    for (int v = 1; v < n; ++v) {
+        if (parent[v] != -1) {
+            adj[v].push_back(parent[v]);
+            adj[parent[v]].push_back(v);
+        }
+    }
+    return adj;
+}
+
+
+
+
+
+// mstAdj is the adjacency list from createIslandGraphMST
+std::vector<int> getShortestIslandPathMST(int startIdx, int endIdx) {
+    const std::vector<std::vector<int>>& mstAdj = createIslandGraphMST();
+    int n = islands.size();
+    std::vector<float> dist(n, std::numeric_limits<float>::max());
+    std::vector<int> prev(n, -1);
+    using Pair = std::pair<float, int>; // (distance, index)
+    std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair>> pq;
+
+    dist[startIdx] = 0.0f;
+    pq.push({0.0f, startIdx});
+
+    while (!pq.empty()) {
+        float d = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
+
+        if (u == endIdx) break;
+        if (d > dist[u]) continue;
+
+        for (int v : mstAdj[u]) {
+            float weight = (islands[u]->getPos() - islands[v]->getPos()).magnitude();
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                prev[v] = u;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    // Reconstruct path
+    std::vector<int> path;
+    for (int at = endIdx; at != -1; at = prev[at])
+        path.push_back(at);
+    std::reverse(path.begin(), path.end());
+
+    if (path.front() != startIdx) return {};
+    return path;
+}
+
+void checkIslands() {
+
+    std::vector<std::vector<int>> mst = createIslandGraphMST();
+
+    for (size_t i = 0; i < mst.size(); ++i) {
+        std::cout << "Island " << i << " (" << islands[i]->getName() << ") is connected to: ";
+        for (int neighbor : mst[i]) {
+            std::cout << neighbor << " (" << islands[neighbor]->getName() << ") " << (islands[neighbor]->getPos() - islands[i]->getPos()).magnitude();
+        }
+        std::cout << std::endl;
+    }
+
+
+
+    int start = 0; // index of starting island
+    int end = 4;   // index of destination island
+
+    std::vector<int> path = getShortestIslandPathMST(start, end);
+
+    if (!path.empty()) {
+        std::cout << "Shortest path: ";
+        for (int idx : path) {
+            std::cout << idx << " (" << islands[idx]->getName() << ") ";
+        }
+        std::cout << std::endl;
+    } else {
+        std::cout << "No path found!" << std::endl;
+    }
+}
 
 // SYNC
 Vehicle* gVehicle(dGeomID geom)
