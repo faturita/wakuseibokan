@@ -7025,7 +7025,7 @@ void test73()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setPos(0.0f,10.5f,-4000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
@@ -7097,7 +7097,7 @@ void test74()
     AdvancedWalrus *_b = new AdvancedWalrus(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-4000.0f);
+    _b->setPos(0.0f,20.5f,2000.0f);
     _b->setSignal(4);
     _b->setNameByNumber(1);
     _b->stop();
@@ -7125,15 +7125,15 @@ void checktest74(unsigned long timer)
         messages.insert(messages.begin(), mg);
     }
 
-    if (timer == 80)
+    if (timer == 400)
     {
         Vehicle *b = findWalrus(GREEN_FACTION);
 
-        b->goTo(Vec3f(0, 0.0, -9000.0));
+        b->goTo(Vec3f(0, 0.0, 9000.0));
         b->enableAuto();
     }
 
-    if (timer == 100)
+    if (timer == 500)
     {
         Vehicle *b = findWalrus(GREEN_FACTION);
 
@@ -8145,7 +8145,7 @@ void test88()
 
 void checktest88(unsigned long timer)
 {
-    if (timer>500000)
+    if (timer>20000)
     {
         BoxIsland *nemesis = islands[0];
 
@@ -8155,7 +8155,7 @@ void checktest88(unsigned long timer)
         }
 
     }
-    if (timer == 1500000)
+    if (timer == 30000)
     {
         testFailed();
     }
@@ -8287,7 +8287,7 @@ void initWorldModelling(int testcase)
     case 77:test77();break;                         // Visually Testing Radar HUD with enemy units
     case 78:test78();break;                         // Testing Manta bombing an island.
     case 79:test79();break;                         // Visually checking smoke coming out of a missile thruster.
-    case 80:initIslands();break;                         // Check multiple controllers and the command order.
+    case 80:initIslands();break;                    // Check multiple controllers and the command order.
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water

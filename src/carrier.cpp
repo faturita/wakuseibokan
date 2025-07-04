@@ -1504,7 +1504,7 @@ void update(int value)
             }
 
             // @NOTE: This is a guardrail to avoid too many bullets moving around that turn the game unplayable.
-            if (fps<10 && ( (entities[i]->getType() == VehicleTypes::EXPLOTABLEACTION) ||
+            if (fps>0 && fps<10 && ( (entities[i]->getType() == VehicleTypes::EXPLOTABLEACTION) ||
             (entities[i]->getType() == VehicleTypes::CONTROLABLEACTION) ||
             (entities[i]->getType() == VehicleTypes::NAVALCONTROLABLEACTION) ||
             (entities[i]->getTypeId() == EntityTypeId::TDebris) ) )
@@ -1870,7 +1870,7 @@ int main(int argc, char** argv) {
         setupControllerClient(getCommandLineParameter(argc,argv,"-ip"));
     }
 
-    checkIslands();
+    //checkIslands();
 
     //unsigned long *a = (unsigned long*)dBodyGetData(vehicles[2]->getBodyID());
 

@@ -124,7 +124,7 @@ void Torpedo::doDynamics(dBodyID body)
 
     if (VERIFY(pos,me) && !Vehicle::inert)
     {
-        Vec3f p(0.0, 0.0, getThrottle());
+        Vec3f p(0.0, 0.0, getThrottle()*1.2);
 
         p = toVectorInFixedSystem(p[0],p[1],p[2],-xRotAngle*0.1, 0.0);
 
