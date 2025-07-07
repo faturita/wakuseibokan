@@ -135,8 +135,8 @@ Vec3f operator*(float scale, const Vec3f &v) {
 }
 
 ostream &operator<<(ostream &output, const Vec3f &v) {
-	cout << '(' << v[0] << v[1] << ", " << v[2] << ')';
-	return output;
+    output << '(' << v[0] << ", " << v[1] << ", " << v[2] << ')';
+    return output;
 }
 
 istream &operator>>(istream &input, Vec3f &v) {

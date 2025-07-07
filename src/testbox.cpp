@@ -3944,8 +3944,9 @@ void test42()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->setPos(0.0f,20.5f,-36000.0f);
     _b->stop();
+    _b->enableAuto();
 
     entities.push_back(_b, _b->getGeom());
 
@@ -3955,6 +3956,7 @@ void test42()
     _bg->setPos(-2400.0f,20.5f,-12000.0f);
     //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
+    _bg->enableAuto();
 
     entities.push_back(_bg, _bg->getGeom());
 
@@ -3976,6 +3978,22 @@ void test42()
 
 void checktest42(unsigned long timer)
 {
+    // Units spawned in this test will be controlled directly by carrier defenses.
+    Vehicle *b = findCarrier(GREEN_FACTION);
+    Vehicle *l = findCarrier(BLUE_FACTION);
+
+    if (b && l && timer == 100)
+    {
+        b->stop();
+        l->stop();
+    }
+
+    if (b && l && timer == 500)
+    {
+        b->goTo(Vec3f(-2400.0f,20.5f,-16000.0f));
+        b->enableAuto();
+    }
+
 
 }
 
@@ -4002,7 +4020,6 @@ void test43()
     _bg->init();
     _bg->embody(world,space);
     _bg->setPos(-2400.0f,20.5f,-12000.0f);
-    //_bg->setPos(0.0f + 0.0 kmf,20.5f,-6000.0f + 0.0 kmf);
     _bg->stop();
 
     entities.push_back(_bg,_bg->getGeom());
@@ -4029,7 +4046,14 @@ void checktest43(unsigned long timer)
     Vehicle *b = findCarrier(GREEN_FACTION);
     Vehicle *l = findCarrier(BLUE_FACTION);
 
-    if (timer == 100)
+    if (b && l && timer == 100)
+    {
+        b->stop();
+        l->stop();
+    }
+
+
+    if (timer == 300)
     {
         size_t idx=0;
         spawnManta(space,world,b,idx);
