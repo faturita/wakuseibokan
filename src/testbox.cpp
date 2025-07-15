@@ -288,6 +288,21 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isDock(s1) && docked(v2, s1->island)) {}
                 if (isDock(s2) && docked(v1, s2->island)) {}
             } else
+            if (isSubType(v1,VehicleSubTypes::CARGOSHIP) &&  isCarrier(v2) || (isSubType(v2,VehicleSubTypes::CARGOSHIP) && isCarrier(v1)))
+            {
+                // CargoShip landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                //printf("4\n");
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+
+                if (isSubType(v1,VehicleSubTypes::CARGOSHIP) && docked(v1, v2)) {}
+                if (isSubType(v2,VehicleSubTypes::CARGOSHIP) && docked(v2, v1)) {}
+
+            } else
             if  (isRunway(s1) || isRunway(s2))
             {
                 // Manta landing on Runways.
@@ -8186,6 +8201,140 @@ void checktest88(unsigned long timer)
 }
 
 
+void test89()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+    cg->setOrder(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    _b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(0);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+
+    //@FIXME: I need to include a way here to instruct cargoships to go find a carrier, dock into it and refuel it/refill it.
+    // The docking operation for cargoships and carriers requires the carrier to be ready for docking.
+    _b->readyForDock();
+
+    cg->setCargo(CargoTypes::POWERFUEL,1000);
+    cg->setAutoStatus(AutoStatus::DOCKING);
+    cg->setDestination(_b->getPos()-_b->getForward().normalize()*200);
+    cg->enableAuto();
+}
+
+void checktest89(unsigned long timer)
+{
+
+    if (timer==3000)
+    {
+        Vehicle *b = findWalrusByOrder(GREEN_FACTION,1);
+
+        if (b)
+        {
+            if (b->getStatus() == SailingStatus::DOCKED)
+            {
+                refuel(b);
+            }
+        }
+    }
+
+    if (timer==3100)
+    {
+        Vehicle *b = findWalrusByOrder(GREEN_FACTION,1);
+
+        if (b)
+        {
+            if (b->getStatus() == SailingStatus::DOCKED)
+            {
+                departure(b);
+            }
+        }
+    }
+
+    if (timer == 5000)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        if (b)
+        {
+            
+            if (b->getPower() > 0)
+            {
+                printf("Test Passed\n");
+                endWorldModelling();
+                exit(1);
+            } else {
+                printf("Test Failed\n");
+                endWorldModelling();
+                exit(0);
+            }
+        }
+
+    }
+
+    if (timer == 150000)
+    {
+        printf("Test Failed\n");
+        endWorldModelling();
+        exit(0);
+
+    }
+}
+
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -8320,6 +8469,7 @@ void initWorldModelling(int testcase)
     case 86:test86();break;                         // Check CargoShip travelling to the other side of the island.
     case 87:test87();break;                         // Check Carrier AI arriving to an island where there is already a cargos ship.
     case 88:test88();break;                         // Check Carrier attacking an island.
+    case 89:test89();break;                         // Check Cargo Ship docking on a stranded empty-fueled Carrier.
     default:initIslands();test1();break;
     }
 
@@ -8425,6 +8575,7 @@ void worldStep(int value)
     case 86:checktest86(timer);break;
     case 87:checktest87(timer);break;
     case 88:checktest88(timer);break;
+    case 89:checktest89(timer);break;
     default: break;
     }
 

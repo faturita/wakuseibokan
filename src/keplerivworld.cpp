@@ -245,6 +245,21 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 if (isDock(s1) && docked(v2, s1->island)) {}
                 if (isDock(s2) && docked(v1, s2->island)) {}
             } else
+            if (isSubType(v1,VehicleSubTypes::CARGOSHIP) &&  isCarrier(v2) || (isSubType(v2,VehicleSubTypes::CARGOSHIP) && isCarrier(v1)))
+            {
+                // CargoShip landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                //printf("4\n");
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+
+                if (isSubType(v1,VehicleSubTypes::CARGOSHIP) && docked(v1, v2)) {}
+                if (isSubType(v2,VehicleSubTypes::CARGOSHIP) && docked(v2, v1)) {}
+
+            } else
             if  (isRunway(s1) || isRunway(s2))
             {
                 // Manta landing on Runways.

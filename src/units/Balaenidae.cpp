@@ -749,3 +749,8 @@ float Balaenidae::getEnergyConsumption()
 {
     return 0.000004;
 }
+
+void Balaenidae::readyForDock()
+{
+    status = SailingStatus::INDOCKING;    
+}

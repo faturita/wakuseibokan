@@ -604,14 +604,22 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 controller.push(co);
             }
-            else
-            if (controller.str.find("dock") != std::string::npos)
+            else //@FIXME: Improve the command line parser
+            if (controller.str.find("dock") != std::string::npos && controller.str.length() == 4)
             {
                 CommandOrder co;
                 co.command = Command::DockOrder;
 
                 controller.push(co);
             }
+            else 
+            if (controller.str.find("readyfordocking") != std::string::npos)
+            {
+                CommandOrder co;
+                co.command = Command::ReadyForDockingOrder;
+
+                controller.push(co);
+            } 
             else 
             if (controller.str.find("refuel") != std::string::npos)
             {

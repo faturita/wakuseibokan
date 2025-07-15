@@ -21,7 +21,8 @@ enum class Command {
     RefillOrder,
     UnfillOrder,
     CollectOrder,
-    DockOrder};
+    DockOrder,
+    ReadyForDockingOrder};
 
 
 enum TargetType {

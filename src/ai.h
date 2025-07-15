@@ -84,11 +84,12 @@ enum class State {
     DOCKED=3,
     APPROACHFREEISLAND=4,
     APPROACHENEMYISLAND=5,
-    INVADEISLAND=6,
-    RENDEZVOUS=7,
-    BALLISTICATTACK=8,
-    AIRBORNEATTACK=9,
-    AIRDEFENSE=10
+    APPROACHFRIENDLYISLAND=6,
+    INVADEISLAND=7,
+    RENDEZVOUS=8,
+    BALLISTICATTACK=9,
+    AIRBORNEATTACK=10,
+    AIRDEFENSE=11
 };
 
 
@@ -199,6 +200,7 @@ public:
     Interruption *interruptions[25];
     Player(int faction);
     void playFaction(unsigned long timer);
+    void playStrategy(unsigned long timer);
     State getCurrentState();
 };
 

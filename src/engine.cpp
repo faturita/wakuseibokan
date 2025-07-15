@@ -378,6 +378,30 @@ bool docked(Vehicle *boat, Island *island)
     return false;
 }
 
+// SYNC. Cargoship docking on a carrier to resupply fuel and power.
+bool docked(Vehicle *boat, Vehicle *c)
+{
+    if (boat && c && c->getStatus() == SailingStatus::INDOCKING && boat->getStatus() != SailingStatus::DOCKED)
+    {
+        {
+            boat->stop();
+            boat->setStatus(SailingStatus::DOCKED);
+
+            c->stop();
+            c->setStatus(SailingStatus::DOCKED);
+
+            char str[256];
+            Message mg;
+            mg.faction = boat->getFaction();
+            sprintf(str, "%s has docked on Carrier %s.", boat->getName().c_str(), c->getName().c_str());
+            mg.msg = std::string(str);mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool landed(Vehicle *manta, Island *island)
 {
     if (manta && island && manta->getType() == MANTA)
@@ -2385,7 +2409,7 @@ void departure(Vehicle *f)
     types.push_back(VehicleTypes::WALRUS);
     types.push_back(VehicleTypes::CARRIER);
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
@@ -2419,6 +2443,11 @@ void departure(Vehicle *f)
         sprintf(msg, "%s has departured.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
+
+        if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+        {
+            f->setStatus(SailingStatus::SAILING);  // If the docker is a cargoshop, then it should be sailing again. 
+        }
     }
 
     return;    
@@ -2449,6 +2478,7 @@ void unfill(Vehicle *f)
     } 
 }
 
+// Vehicle f is used to refill a nearby vehicle
 void refill(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2463,7 +2493,7 @@ void refill(Vehicle *f)
         types.push_back(VehicleTypes::CARRIER);
     }
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
@@ -2586,6 +2616,7 @@ void collect(Vehicle *v)
 
 }
 
+// Vehicle f is used to refuel a nearest vehicle
 void refuel(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2600,7 +2631,7 @@ void refuel(Vehicle *f)
         types.push_back(VehicleTypes::CARRIER);
     }
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
@@ -2621,6 +2652,7 @@ void refuel(Vehicle *f)
         sprintf(msg, "%s has been recharged.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
+
     }
 
     return;    

@@ -102,6 +102,9 @@ bool landed(Vehicle *manta, Island *island);
 bool docked(Vehicle *boat, Island *island);
 
 // SYNC
+bool docked(Vehicle *boat, Vehicle *c);
+
+// SYNC
 bool isMineFire(Vehicle* vehicle, Gunshot *g);
 
 
