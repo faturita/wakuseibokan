@@ -1330,6 +1330,32 @@ Antenna* findAntennaFromIsland(BoxIsland *is)
 }
 
 
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float thresholdmin, float thresholdmax)
+{
+    int chosen = -1;
+    float closest = 0;
+    for(size_t i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if ((!d && empty) || (d && !empty && (d->getFaction()==friendlyfaction || friendlyfaction == -1)) )
+        {
+            if ( ((l-Po).magnitude()<closest || closest ==0)  && (l-Po).magnitude()<thresholdmax && (l-Po).magnitude()>thresholdmin) {
+                closest = (l-Po).magnitude();
+                chosen = i;
+            }
+        }
+    }
+
+    if (chosen<0)
+        return NULL;
+
+    return islands[chosen];
+}
+
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
     int nearesti = -1;

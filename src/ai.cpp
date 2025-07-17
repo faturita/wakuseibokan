@@ -227,7 +227,7 @@ class ApproachFriendlyIslandQAction : public QAction
 
                     vector = vector.normalize();
 
-                    Vec3f finaldestiny = getRandomCircularSpot(is->getPos(),2500.0);
+                    Vec3f finaldestiny = getRandomCircularSpot(is->getPos()+Vec3f(3500.0f * vector),150.0);
 
                     b->goTo(finaldestiny);
                     b->enableAuto();
@@ -985,7 +985,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        //dout << "CarrierHasArrived  " << (int)b->getAutoStatus() << std::endl;
+        //std::cout << "CarrierHasArrived  " << (int)b->getAutoStatus() << "."  << (int)b->dst_status << std::endl;
 
         if (b && b->arrived())
         {
@@ -1557,7 +1557,7 @@ void Player::playStrategy(unsigned long timer)
 
         BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos(),250 kmf);
         BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction,250 kmf);
-        BoxIsland *friendlyis =  findNearestFriendlyIsland(b->getPos(),false,faction,250 kmf);
+        BoxIsland *friendlyis =  findNearestFriendlyIsland(b->getPos(),false,faction,10 kmf, 250 kmf);
 
         if (freeis && !enemyis && !friendlyis)
         {

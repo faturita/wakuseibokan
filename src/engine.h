@@ -222,6 +222,7 @@ BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float thresholdmin, float thresholdmax);
 int countNumberOfIslands(int faction);
 
 Antenna* findAntennaFromIsland(BoxIsland *is);
