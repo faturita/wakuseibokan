@@ -1617,8 +1617,8 @@ void Player::playStrategy(unsigned long timer)
             BoxIsland *destiny = findNearestEmptyIsland(b->getPos());
 
             if (!destiny) {
-                std::cout << "No empty island found. Will attack enemy islands." << std::endl;
-                destiny = findNearestEnemyIsland(b->getPos(), 3000 kmf);
+                std::cout << "No empty island found. Attack enemy islands." << std::endl;
+                destiny = findNearestEnemyIsland(b->getPos(), false, faction, 3000 kmf);
             }
 
 
