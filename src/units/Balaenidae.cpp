@@ -157,7 +157,7 @@ void Balaenidae::doControlDocking()
 
     float roundederror = 100;
 
-    dout << "Running docking control." << std::endl;
+    //dout << "Running docking control." << std::endl;
 
     if (getStatus() != SailingStatus::DOCKED || T.magnitude()<roundederror)
     {
@@ -226,7 +226,7 @@ void Balaenidae::doControlDocking()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
         /**
@@ -379,7 +379,7 @@ void Balaenidae::doControlDestination(bool notifyfinish)
 
         float signn = T.cross(F) [1];
 
-        CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f, %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
         /**

@@ -42,6 +42,25 @@ std::map<int, NextOperation> nextOperationPerFaction;
 
 float RANGE[] = {40000.0, 20000.0, 6000.0};
 
+std::string getStateMachineName(State state)
+{
+    switch (state)
+    {
+        case State::IDLE: return "IDLE";
+        case State::DOCKING: return "DOCKING";
+        case State::DOCKED: return "DOCKED";
+        case State::APPROACHFREEISLAND: return "APPROACHFREEISLAND";
+        case State::APPROACHENEMYISLAND: return "APPROACHENEMYISLAND";
+        case State::APPROACHFRIENDLYISLAND: return "APPROACHFRIENDLYISLAND";
+        case State::INVADEISLAND: return "INVADEISLAND";
+        case State::RENDEZVOUS: return "RENDEZVOUS";
+        case State::BALLISTICATTACK: return "BALLISTICATTACK";
+        case State::AIRBORNEATTACK: return "AIRBORNEATTACK";
+        case State::AIRDEFENSE: return "AIRDEFENSE";
+        default: return "UNKNOWN";
+    }
+}
+
 class AirDefenseQAction : public QAction
 {
     void apply(int faction)
@@ -1527,7 +1546,7 @@ void Player::playFaction(unsigned long timer)
     state = interruptions[1]->transit(faction,state);
 
     if (timer % 1000 == 0)
-        std::cout << "Faction:" << faction << "-" << "Status:" << (int)state << std::endl;
+        std::cout << "Faction:" << faction << "-" << "Status:" << getStateMachineName(state) << "(" << (int)state << ")" << std::endl;
 
     // Fire the action according to the state.
     qactions[(int)state]->apply(faction);
@@ -1546,6 +1565,8 @@ void Player::playFaction(unsigned long timer)
     }
 }
 
+std::vector<std::vector<int>> mst ;
+
 void Player::playStrategy(unsigned long timer)
 {
     // @NOTE: Each carrier check the whole graph of islands and decide based on where the carrier is,
@@ -1555,43 +1576,83 @@ void Player::playStrategy(unsigned long timer)
     {
         Vehicle *b = findCarrier(faction);
 
-        BoxIsland *freeis   =    findNearestEmptyIsland(b->getPos(),250 kmf);
-        BoxIsland *enemyis  =    findNearestEnemyIsland(b->getPos(),false, faction,250 kmf);
-        BoxIsland *friendlyis =  findNearestFriendlyIsland(b->getPos(),false,faction,10 kmf, 250 kmf);
 
-        if (freeis && !enemyis && !friendlyis)
-        {
-            nextOperationPerFaction[faction].nextIsland = freeis;
+        if (!b)
+            return;
+
+
+        size_t start = findIndexOfNearestIsland(b->getPos());   // Where I am
+        BoxIsland *is = islands[start];
+
+        assert(is != NULL || !"The nearest island is NULL. This should not happen.");
+
+        if (!(is->getCommandCenter()) || (is->getCommandCenter()->getFaction() != faction))
+        { 
+            nextOperationPerFaction[faction].nextIsland = is; // Not free
+
         }
-
-        if (enemyis && !freeis && !friendlyis)
+        else
         {
-            nextOperationPerFaction[faction].nextIsland = enemyis;
-        }
+            // Closest island is friendly, decide where to go next.  Here is the strategy.
 
-        if (friendlyis && !freeis && !enemyis)
-        {
-            nextOperationPerFaction[faction].nextIsland = friendlyis;
-        }
-
-        if (freeis && enemyis && !friendlyis)
-        {
-            if ((freeis->getPos()-b->getPos()).magnitude() < (enemyis->getPos()-b->getPos()).magnitude())
+            if (mst.size() == 0)
             {
-                nextOperationPerFaction[faction].nextIsland = freeis;
-            } else {
-                nextOperationPerFaction[faction].nextIsland = enemyis;
+                // Create the minimum spanning tree of the islands.
+                // This is done only once.
+                dout << "Creating MST..." << std::endl;
+                mst = createIslandGraphMST();
+
+                for (size_t i = 0; i < mst.size(); ++i) {
+                    std::cout << "Island " << i << " (" << islands[i]->getName() << ") is connected to: ";
+                    for (int neighbor : mst[i]) {
+                        std::cout << " [" << neighbor << "]" << " (" << islands[neighbor]->getName() << ") " << (islands[neighbor]->getPos() - islands[i]->getPos()).magnitude();
+                    }
+                    std::cout << std::endl;
+                }
             }
-        }
+            
 
-        if (freeis && !enemyis && friendlyis)
-        {
-            nextOperationPerFaction[faction].nextIsland = freeis;
-        }
+            size_t end = start;  // Default to the current island if no empty island is found
+            // Find index of nearest EMPTY island
+            BoxIsland *destiny = findNearestEmptyIsland(b->getPos());
 
+            if (!destiny) {
+                std::cout << "No empty island found. Will attack enemy islands." << std::endl;
+                destiny = findNearestEnemyIsland(b->getPos(), 3000 kmf);
+            }
+
+
+            // @FIXME: destiny can be null when all the islands are taken.
+            //.  Pick free (it will attack enemy islands in the middle)
+            //.  Start attacking enemy islands purposedly
+            //.  Find the enemy carrier and destroy it.
+
+
+            for(size_t i = 0; i < islands.size(); ++i) {
+                if (islands[i] == destiny) {
+                    std::cout << "Nearest empty island is: " << destiny->getName() << " at index " << i << std::endl;
+                    end = i;  // Update the destination index
+                }
+            }
+
+            std::vector<int> path = getShortestIslandPathMST(start, end);
+
+            if (!path.empty()) {
+                std::cout << "Shortest path: ";
+                for (int idx : path) {
+                    std::cout << idx << " (" << islands[idx]->getName() << ") ";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cout << "No path found!" << std::endl;
+                assert(false || !"No path found. Island is unreachable.");
+            }
+
+            nextOperationPerFaction[faction].nextIsland = islands[path[1]];  // Set the second island in the path as the next operation target (0 is where I am)
+        }
         if (nextOperationPerFaction[faction].nextIsland && faction == GREEN_FACTION )
             std::cout << "Faction:" << faction << "-" << "Next Operation:" << nextOperationPerFaction[faction].nextIsland->getName() << std::endl;
-
     }
+
 }
 

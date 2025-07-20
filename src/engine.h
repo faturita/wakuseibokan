@@ -216,6 +216,7 @@ Manta* taxiManta(Vehicle *v);
 Turtle* spawnTurtle(Vec3f pos, float angle, int faction, int number, int signal, dSpaceID space, dWorldID world);
 
 BoxIsland* findNearestIsland(Vec3f Po);
+size_t findIndexOfNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po, float threshold=100000 kmf);
 BoxIsland* findIslandByName(std::string islandname);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);

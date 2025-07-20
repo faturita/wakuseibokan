@@ -216,7 +216,7 @@ void Torpedo::doControl()
             runonce { stop(); }
         }
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", distance, e, signn, c.registers.thrust);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", distance, e, signn, c.registers.thrust);
 
 
     } else {

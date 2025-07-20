@@ -227,7 +227,7 @@ bool stranded(Vehicle *carrier, Island *island)
         b->damage(100);
         b->setControlRegisters(controller.registers);
         b->setStatus(SailingStatus::OFFSHORING);
-        b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
+        //b->disableAuto();  // Better to disable the disengagement of force field.  Force field is disabled for destiny island.
         char str[256];
         Message mg;
         mg.faction = b->getFaction();
@@ -1271,6 +1271,27 @@ BoxIsland* findNearestIsland(Vec3f Po)
     return islands[nearesti];
 }
 
+size_t findIndexOfNearestIsland(Vec3f Po)
+{
+    int nearesti = -1;
+    float closest = 0;
+    for(size_t i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        if ((l-Po).magnitude()<closest || closest ==0) {
+            closest = (l-Po).magnitude();
+            nearesti = i;
+        }
+    }
+
+    if (nearesti<0)
+        return 0;
+
+    return nearesti;
+}
+
 
 BoxIsland* findNearestEmptyIsland(Vec3f Po, float maxDistance)
 {
@@ -1450,6 +1471,7 @@ void list()
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         CLog::Write(CLog::Debug,"[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
+        CLog::Write(CLog::Debug,"[%d]: Status: %d, Faction: %d, Name: %s\n", i, entities[i]->getStatus(), entities[i]->getFaction(), entities[i]->getName().c_str());
     }
 }
 
@@ -2245,11 +2267,11 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         int effectivecargo = 0;
                         for(size_t shareid=0;shareid<shares.size();shareid++)
                         {
-                            CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                            //CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
                             effectivecargo += entities[shares[shareid]]->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
                         }
                         w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
-                        CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
+                        //CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
                     }
                 }
             }
@@ -2629,11 +2651,11 @@ void collect(Vehicle *v)
                 float fcargoshare = ((float)cargo / 1);
                 int effectivecargo = 0;
 
-                CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                //CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
                 effectivecargo += v->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
 
                 w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
-                CLog::Write(CLog::Debug,"Sharing %d from Island \n", effectivecargo);
+                //CLog::Write(CLog::Debug,"Sharing %d from Island \n", effectivecargo);
             }
         }
 
