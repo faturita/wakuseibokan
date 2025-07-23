@@ -1201,7 +1201,35 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
 
     return enemies;
 }
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes, Vec3f l, float threshold)
+{
+    std::vector<size_t> friendlys;
+    float closest = threshold;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
 
+        bool bMatch = false;
+        for (int j=0;j<subtypes.size();j++)
+        {
+            if (v->getSubType() == subtypes[j])
+            {
+                bMatch = true;
+                break;
+            }
+        }
+
+        if (v && (bMatch)  && v->getFaction()==friendlyfaction)   // Fix this.
+        {
+            if ((v->getPos()-l).magnitude()<closest) 
+            {
+                friendlys.push_back(i);
+            }
+        }
+    }
+
+    return friendlys;
+}
 
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
 {
@@ -2447,6 +2475,7 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
+// Order the docked unit to depart from the carrier or dock.
 void departure(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2459,6 +2488,7 @@ void departure(Vehicle *f)
 
     if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
+        // @NOTE: This could be an issue when there are more than one.
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
         {
@@ -2472,11 +2502,17 @@ void departure(Vehicle *f)
         m->ready();
         dBodyID body = m->getBodyID();
 
-        Vec3f dDir = f->getForward();
+        Vec3f dDir;
+        
+        if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+            dDir = f->getPos().normalize()- m->getPos().normalize();
+        else
+            dDir = f->getForward();
+
         dDir = dDir.normalize();
 
         if (m->getSubType() == VehicleSubTypes::CARGOSHIP || m->getType() == VehicleTypes::CARRIER)
-            dDir = dDir * -200000.0f;     
+            dDir = dDir * -300000.0f;     
         else
             dDir = dDir * -10000.0f;    
 

@@ -1292,6 +1292,112 @@ public:
     }
 };
 
+class RefuelCon : public Condition
+{
+    TSequencer T;
+
+    void start()
+    {
+        T[0] = 1;
+        T[1] = 1;
+    }
+
+    void tick()
+    {
+        T = T + T.sign() * 1;
+    }
+
+    public:
+    bool findAndOrderNearestCargoShip(int faction, Dock *dock)
+    {
+        Beluga *b = (Beluga*)findCarrier(faction);
+
+        if (!b) return false;
+
+        std::vector<VehicleSubTypes> types;
+        types.push_back(VehicleSubTypes::CARGOSHIP);
+
+        // Find the nearest cargoship
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, b->getPos(), 300 kmf);
+
+        CargoShip *cg = NULL;
+        if (vehicles.size()>0)
+        {
+            cg = (CargoShip*)entities[vehicles[0]];
+            std::cout << "Found cargo ship: " << cg->getName() << std::endl;
+        } 
+
+        cg->setAutoStatus(AutoStatus::DOCKING);
+        cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+        cg->enableAuto();
+
+        b->readyForDock();
+
+        return true;
+
+    }
+    bool sendCargoShipToRefill(int faction)
+    {
+        // CargoShip *cg = NULL;
+        // if (vehicles.size()>0)
+        // {
+        //     cg = (CargoShip*)entities[vehicles[0]];
+        // } 
+
+        // cg->setCargo(CargoTypes::POWERFUEL,1000);
+        // cg->setAutoStatus(AutoStatus::DOCKING);
+        // cg->setDestination(b->getPos()-b->getForward().normalize()*200);
+        // cg->enableAuto();
+        // cg->setOrder(10);
+        return false;     
+    }
+
+    bool sendCargoShipToStrandedCarrier(int faction)
+    {
+
+
+        return false;
+    }
+
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (!b) return false;
+
+        tick();
+
+        // The idea is to verify if the carrier is stranded around somewhere far from the closer island
+        // and it has no fuel to get back to the island.
+        // So the plan is to find the closest cargoship, send it to dock to its closes island, to be "refilled"
+        // and then to take the cargo ship to the carrier dock with it and refuel it.
+
+        if (b->getPower() <= 0)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos());
+
+            if (!is) return false;
+
+            Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+
+            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0 && b->getStatus() != SailingStatus::DOCKED)
+            {
+                //dout << "RefuelCon: Carrier is stranded, sending cargo ship to refuel it." << std::endl;
+
+                if (T[0] == 200)
+                {
+                    return findAndOrderNearestCargoShip(faction,(Dock *)s);
+                }
+                else sendCargoShipToStrandedCarrier(faction, (Dock *)s);
+            }
+
+
+        }
+        return false;   
+    }
+};
+
+
 class EngageDefCon : public Condition
 {
     TSequencer T;
@@ -1482,6 +1588,7 @@ class EngageDefCon : public Condition
     }
 };
 
+
 Player::Player(int faction)
 {
     Player::faction = faction;
@@ -1512,6 +1619,7 @@ Player::Player(int faction)
 
     interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
     interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around
+    interruptions[2] = new Interruption(State::REFUEL,new RefuelCon());                       // Empty fuel
 
     qactions[(int)State::IDLE] = new ResetQAction();
     qactions[(int)State::DOCKING] = new DockingQAction();
@@ -1525,6 +1633,7 @@ Player::Player(int faction)
     qactions[(int)State::AIRBORNEATTACK] = new AirborneAttackQAction();
 
     qactions[(int)State::AIRDEFENSE] = new QAction();
+    qactions[(int)State::REFUEL] = new QAction();
 
 
     state = State::IDLE;
@@ -1542,8 +1651,8 @@ void Player::playFaction(unsigned long timer)
     // Check for enemies nearby and shift strategy if they are present.
     //state = interruption->apply(state,faction,timeevent,timer);
 
-    state = interruptions[0]->transit(faction,state);
-    state = interruptions[1]->transit(faction,state);
+    for(int i=0;i<25;i++)
+        state = interruptions[i]->transit(faction,state);
 
     if (timer % 1000 == 0)
         std::cout << "Faction:" << faction << "-" << "Status:" << getStateMachineName(state) << "(" << (int)state << ")" << std::endl;

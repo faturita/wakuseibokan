@@ -236,6 +236,7 @@ Vehicle* findCarrier(int faction);
 Vehicle* findCarrier(size_t &index, int faction);
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
 std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes, Vec3f l, float threshold);
 
 void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
 void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);

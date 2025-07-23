@@ -89,7 +89,8 @@ enum class State {
     RENDEZVOUS=8,
     BALLISTICATTACK=9,
     AIRBORNEATTACK=10,
-    AIRDEFENSE=11
+    AIRDEFENSE=11,
+    REFUEL=12
 };
 
 

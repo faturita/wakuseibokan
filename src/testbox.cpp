@@ -8407,6 +8407,77 @@ void checktest90(unsigned long timer)
     }
 }
 
+void test91()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
+
+    islands.push_back(nemesis);
+
+
+    BoxIsland *thermopilae = new BoxIsland(&entities);
+    thermopilae->setName("Thermopilae");
+    thermopilae->setLocation(100 kmf,-1.0,  100 kmf);
+    thermopilae->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(thermopilae);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(8000.0f,20.5f,0.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+    CargoShip *cg = new CargoShip(GREEN_FACTION);
+    cg->init();
+    cg->embody(world,space);
+    cg->setPos(0.0f,20.5f,-10000.0f);
+    cg->stop();
+    cg->setOrder(1);
+
+    entities.push_back(cg, cg->getGeom());
+
+
+    Structure *runway = new Runway(GREEN_FACTION);
+    Structure *dock = new Dock(GREEN_FACTION);
+
+    //runway->setCargo(CargoTypes::POWERFUEL,1000);
+    //dock->setCargo(CargoTypes::POWERFUEL,1000);
+    //_b->setCargo(CargoTypes::POWERFUEL,1000);
+
+    _b->setPower(0);
+    dock->setCargo(CargoTypes::POWERFUEL,1000);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(runway           ,         0.0f,    -650.0f,-PI/4,world);
+    Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
+
+    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+
+    Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    aiplayer = GREEN_AI; 
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest91(unsigned long timer)
+{
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -8543,6 +8614,7 @@ void initWorldModelling(int testcase)
     case 88:test88();break;                         // Check Carrier attacking an island.
     case 89:test89();break;                         // Check Cargo Ship docking on a stranded empty-fueled Carrier.
     case 90:test90();break;                         // Check Moving to a friendly island to reach then an empty island.
+    case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
     default:initIslands();test1();break;
     }
 
@@ -8650,6 +8722,7 @@ void worldStep(int value)
     case 88:checktest88(timer);break;
     case 89:checktest89(timer);break;
     case 90:checktest90(timer);break;
+    case 91:checktest91(timer);break;
     default: break;
     }
 
