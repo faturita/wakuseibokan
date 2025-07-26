@@ -183,9 +183,19 @@ public:
     {
         if (c->evaluate(faction))
         {
+
+            if (current != sprime)
+                s = current;  // Save the current state to return to it later.
+
             return sprime;
+        } else {
+            if (current == sprime)
+            {
+                return s; // Return to the previous state.
+            } else {
+                return current; // Stay in the current state.
+            }
         }
-        return current;
     }   
 };    
 
