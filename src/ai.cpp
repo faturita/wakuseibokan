@@ -57,6 +57,7 @@ std::string getStateMachineName(State state)
         case State::BALLISTICATTACK: return "BALLISTICATTACK";
         case State::AIRBORNEATTACK: return "AIRBORNEATTACK";
         case State::AIRDEFENSE: return "AIRDEFENSE";
+        case State::REFUEL: return "REFUELEMERGENCY";
         default: return "UNKNOWN";
     }
 }
@@ -177,6 +178,147 @@ public:
                 }
             }
         }
+    }
+};
+
+
+class RefuelStrandedCarrierQAction : public QAction
+{   
+    TSequencer T;
+
+    void start() 
+    {
+        T[0] = 1;
+        T[1] = 0;
+
+        std::cout << "RefuelStrandedCarrierQAction started." << std::endl;
+
+    }
+
+    void tick()
+    {
+        T = T + T.sign() * 1;
+    }
+
+    bool findAndOrderNearestCargoShip(int faction, Beluga *b, Dock *dock)
+    {
+        std::vector<VehicleSubTypes> types;
+        types.push_back(VehicleSubTypes::CARGOSHIP);
+
+        //std::cout << "RefuelStrandedCarrierQAction: " << T[0] << std::endl;
+
+        if (T[0] == 200)
+        {
+            // Find the nearest cargoship
+            std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, b->getPos(), 300 kmf);
+
+            CargoShip *cg = NULL;
+            if (vehicles.size()>0)
+            {
+                cg = (CargoShip*)entities[vehicles[0]];
+                std::cout << "Found cargo ship: " << cg->getName() << std::endl;
+            } 
+
+            cg->setAutoStatus(AutoStatus::DOCKING);
+            cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+            cg->enableAuto();
+            cg->setOrder(10);  //@FIXME: Set an order number that means to refill the carrier.
+
+            b->readyForDock();
+
+            T[1] = 0;
+
+        }
+
+        return true;
+
+    }
+    bool sendCargoShipToStrandedCarrier(int faction, Beluga *b, Dock *dock)
+    {
+        Walrus *w = findWalrusByOrder2(faction, 10);
+
+        CargoShip *cg = (CargoShip*) w;
+
+        if (w && w->getStatus() == SailingStatus::DOCKED && T[1] == 0)
+        {
+            std::cout << "Cargo ship is docked, undocking it." << std::endl;
+            T[1] = 1;
+        }
+
+        if (cg && T[1] == 200)
+        {
+            refill(dock);
+        }
+
+        if (cg && T[1] == 400)
+        {
+            departure(dock);
+        }
+
+        if (cg && T[1] == 600)
+        {
+            std::cout << "Cargo ship is ready to go." << std::endl;
+            cg->setStatus(SailingStatus::SAILING);
+            cg->setAutoStatus(AutoStatus::DOCKING);
+            cg->setDestination(b->getPos()-(b->getForward().normalize()*200));
+            cg->enableAuto();
+            cg->setOrder(10);         
+        }
+
+        return false;     
+    }
+    bool refuelCarrier(int faction, Vehicle *b)
+    {
+        if (b->getType() == CARRIER)
+        {
+            dout << "Refueling carrier." << std::endl;
+
+            if (b->getStatus() == SailingStatus::DOCKED && T[2] == 0)
+            {
+                Walrus *w = findWalrusByOrder2(faction, 10);
+
+                CargoShip *cg = (CargoShip*) w;
+
+                refuel(cg);
+                T[2] = 1;
+            }
+
+            if (T[2] == 100)
+            {
+                Walrus *w = findWalrusByOrder2(faction, 10);
+
+                CargoShip *cg = (CargoShip*) w;
+
+                departure(cg);
+                dout << "Carrier refueled." << std::endl;
+            }
+
+        }
+        return false;
+    }
+    void apply(int faction)
+    {
+        tick();
+
+        Vehicle *b = findCarrier(faction);
+
+        if (b && b->getPower() <= 0)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos());
+
+            Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+
+            // This is the condition that triggers the refuel condition.
+            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
+            {
+                //dout << "RefuelCon: Carrier is stranded, sending cargo ship to refuel it." << std::endl;
+                findAndOrderNearestCargoShip(faction,(Beluga *)b,(Dock *)s);
+                sendCargoShipToStrandedCarrier(faction,(Beluga *)b, (Dock *)s);
+                refuelCarrier(faction, b);
+
+            } 
+        }
+
     }
 };
 
@@ -1294,78 +1436,13 @@ public:
 
 class RefuelCon : public Condition
 {
-    TSequencer T;
-
-    void start()
-    {
-        T[0] = 1;
-        T[1] = 1;
-    }
-
-    void tick()
-    {
-        T = T + T.sign() * 1;
-    }
-
     public:
-    bool findAndOrderNearestCargoShip(int faction, Dock *dock)
-    {
-        Beluga *b = (Beluga*)findCarrier(faction);
-
-        if (!b) return false;
-
-        std::vector<VehicleSubTypes> types;
-        types.push_back(VehicleSubTypes::CARGOSHIP);
-
-        // Find the nearest cargoship
-        std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, b->getPos(), 300 kmf);
-
-        CargoShip *cg = NULL;
-        if (vehicles.size()>0)
-        {
-            cg = (CargoShip*)entities[vehicles[0]];
-            std::cout << "Found cargo ship: " << cg->getName() << std::endl;
-        } 
-
-        cg->setAutoStatus(AutoStatus::DOCKING);
-        cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
-        cg->enableAuto();
-
-        b->readyForDock();
-
-        return true;
-
-    }
-    bool sendCargoShipToRefill(int faction)
-    {
-        // CargoShip *cg = NULL;
-        // if (vehicles.size()>0)
-        // {
-        //     cg = (CargoShip*)entities[vehicles[0]];
-        // } 
-
-        // cg->setCargo(CargoTypes::POWERFUEL,1000);
-        // cg->setAutoStatus(AutoStatus::DOCKING);
-        // cg->setDestination(b->getPos()-b->getForward().normalize()*200);
-        // cg->enableAuto();
-        // cg->setOrder(10);
-        return false;     
-    }
-
-    bool sendCargoShipToStrandedCarrier(int faction)
-    {
-
-
-        return false;
-    }
 
     bool evaluate(int faction) override
     {
         Vehicle *b = findCarrier(faction);
 
         if (!b) return false;
-
-        tick();
 
         // The idea is to verify if the carrier is stranded around somewhere far from the closer island
         // and it has no fuel to get back to the island.
@@ -1380,17 +1457,11 @@ class RefuelCon : public Condition
 
             Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
 
-            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0 && b->getStatus() != SailingStatus::DOCKED)
+            // This is the condition that triggers the refuel condition.
+            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
             {
-                //dout << "RefuelCon: Carrier is stranded, sending cargo ship to refuel it." << std::endl;
-
-                if (T[0] == 200)
-                {
-                    return findAndOrderNearestCargoShip(faction,(Dock *)s);
-                }
-                else sendCargoShipToStrandedCarrier(faction, (Dock *)s);
+                return true;
             }
-
 
         }
         return false;   
@@ -1633,7 +1704,7 @@ Player::Player(int faction)
     qactions[(int)State::AIRBORNEATTACK] = new AirborneAttackQAction();
 
     qactions[(int)State::AIRDEFENSE] = new QAction();
-    qactions[(int)State::REFUEL] = new QAction();
+    qactions[(int)State::REFUEL] = new RefuelStrandedCarrierQAction();
 
 
     state = State::IDLE;
@@ -1652,7 +1723,15 @@ void Player::playFaction(unsigned long timer)
     //state = interruption->apply(state,faction,timeevent,timer);
 
     for(int i=0;i<25;i++)
-        state = interruptions[i]->transit(faction,state);
+    {
+        stateprime = interruptions[i]->transit(faction,state);
+        if (stateprime != state)
+        {
+            state = stateprime;
+            qactions[(int)state]->start();
+            break;
+        }
+    }
 
     if (timer % 1000 == 0)
         std::cout << "Faction:" << faction << "-" << "Status:" << getStateMachineName(state) << "(" << (int)state << ")" << std::endl;

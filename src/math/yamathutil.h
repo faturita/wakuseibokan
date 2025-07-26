@@ -37,6 +37,7 @@ float clipmin(float val, float defval);
 float clipmax(float val, float defval);
 float clipped(float val, float min, float max);
 float sgn(float val);
+float signzero(float val);   // returns 1 if positive, -1 if negative and 0 if zero
 float _acos(float val);
 
 float max(float val1, float val2);

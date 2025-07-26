@@ -62,7 +62,7 @@ public:
         TSequencer T2;
         for(int i=0;i<length;i++)
         {
-            T2.set(i,sgn(T[i]));
+            T2.set(i,signzero(T[i]));
         }
         return T2;
     }
@@ -177,6 +177,8 @@ public:
         this->sprime = sprime;
         this->c = c;
     }
+
+    // When interruptions return true, the current state is interrupted and the new state is returned.
     State virtual transit(int faction, const State current )
     {
         if (c->evaluate(faction))
