@@ -642,6 +642,11 @@ struct controlregister Vehicle::getControlRegisters()
     return registers;
 }
 
+void Vehicle::resetControlRegisters()
+{
+    memset(&registers,0,sizeof(struct controlregister));
+}
+
 /**
  * This is the key binding between ODE and OpenGL to make this engine work.
  * Get the speed.

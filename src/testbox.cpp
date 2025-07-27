@@ -154,6 +154,9 @@ int peermode;
 extern bool wincondition;
 
 extern std::unordered_map<std::string, GLuint> textures;
+
+extern std::vector<TrackRecord>   track;
+
 /**
  * Collision detection function.
  *
@@ -3787,6 +3790,33 @@ void checktest39(unsigned long timer)
         // FIXME 50 meters before from my point of view, along the difference vector.
         w->attack(v->getPos());
         w->enableAuto();
+
+        auto lambda = [](dGeomID sender,dGeomID recv) {
+
+            Vehicle *snd = entities.find(sender);
+            Vehicle *rec = entities.find(recv);
+
+            if (snd != NULL && rec != NULL)
+            {
+                //printf ("Updating....\n");
+                rec->attack(snd->getPos());
+                return true;
+            }
+            else
+            {
+                //printf ("End");
+                rec->setAutoStatus(AutoStatus::IDLE);  // Clean orders, the target has been destroyed.
+                rec->resetControlRegisters();
+                return false;
+            }
+        };
+
+
+        TrackRecord val;
+        std::get<0>(val) = v->getGeom();
+        std::get<1>(val) = w->getGeom();
+        std::get<2>(val) = lambda;
+        track.push_back(val);
 
 
     }

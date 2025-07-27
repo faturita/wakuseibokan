@@ -484,11 +484,12 @@ void AdvancedWalrus::doControlAttack()
         float azimuth=getAzimuth(aim);
         float declination=getDeclination(aim);
 
-        struct controlregister c;
-        c = getControlRegisters();
-        c.precesion = azimuth;
-        c.pitch = declination;
-        setControlRegisters(c);
+        //struct controlregister c;
+        //c = getControlRegisters();
+        c.registers.precesion = azimuth;
+        c.registers.pitch = declination;
+        c.registers.thrust = 0.0f; // Stop the walrus.
+        //setControlRegisters(c);
 
         Vehicle *action = fire(0,world,space);
 
