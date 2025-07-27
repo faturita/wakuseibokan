@@ -807,7 +807,7 @@ void SimplifiedDynamicManta::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f\n", distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f\n", distance, e, signn);
 
         if (abs(e)>=0.5f)
         {

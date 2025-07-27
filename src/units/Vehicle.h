@@ -154,7 +154,7 @@ enum class WEAPONS { GUNSHOT=1, MISSILE=2, BOMB=3 };
 
 enum CargoTypes { POWERFUEL=0 };
 
-enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING, DOCKED};
+enum SailingStatus { SAILING=0, ROLLING, OFFSHORING, INSHORING, INDOCKING, DOCKED};
 
 class Vehicle : Observable
 {

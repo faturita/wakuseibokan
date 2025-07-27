@@ -316,7 +316,7 @@ void CargoShip::doControlDocking()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
         /**
@@ -455,7 +455,7 @@ void CargoShip::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
         if (abs(e)>=0.5f && c.registers.thrust>300.0f)

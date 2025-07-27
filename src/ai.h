@@ -62,7 +62,7 @@ public:
         TSequencer T2;
         for(int i=0;i<length;i++)
         {
-            T2.set(i,sgn(T[i]));
+            T2.set(i,signzero(T[i]));
         }
         return T2;
     }
@@ -84,11 +84,13 @@ enum class State {
     DOCKED=3,
     APPROACHFREEISLAND=4,
     APPROACHENEMYISLAND=5,
-    INVADEISLAND=6,
-    RENDEZVOUS=7,
-    BALLISTICATTACK=8,
-    AIRBORNEATTACK=9,
-    AIRDEFENSE=10
+    APPROACHFRIENDLYISLAND=6,
+    INVADEISLAND=7,
+    RENDEZVOUS=8,
+    BALLISTICATTACK=9,
+    AIRBORNEATTACK=10,
+    AIRDEFENSE=11,
+    REFUEL=12
 };
 
 
@@ -175,13 +177,25 @@ public:
         this->sprime = sprime;
         this->c = c;
     }
+
+    // When interruptions return true, the current state is interrupted and the new state is returned.
     State virtual transit(int faction, const State current )
     {
         if (c->evaluate(faction))
         {
+
+            if (current != sprime)
+                s = current;  // Save the current state to return to it later.
+
             return sprime;
+        } else {
+            if (current == sprime)
+            {
+                return s; // Return to the previous state.
+            } else {
+                return current; // Stay in the current state.
+            }
         }
-        return current;
     }   
 };    
 
@@ -199,6 +213,7 @@ public:
     Interruption *interruptions[25];
     Player(int faction);
     void playFaction(unsigned long timer);
+    void playStrategy(unsigned long timer);
     State getCurrentState();
 };
 

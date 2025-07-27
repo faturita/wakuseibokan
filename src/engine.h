@@ -102,6 +102,9 @@ bool landed(Vehicle *manta, Island *island);
 bool docked(Vehicle *boat, Island *island);
 
 // SYNC
+bool docked(Vehicle *boat, Vehicle *c);
+
+// SYNC
 bool isMineFire(Vehicle* vehicle, Gunshot *g);
 
 
@@ -213,12 +216,14 @@ Manta* taxiManta(Vehicle *v);
 Turtle* spawnTurtle(Vec3f pos, float angle, int faction, int number, int signal, dSpaceID space, dWorldID world);
 
 BoxIsland* findNearestIsland(Vec3f Po);
+size_t findIndexOfNearestIsland(Vec3f Po);
 BoxIsland* findNearestEmptyIsland(Vec3f Po, float threshold=100000 kmf);
 BoxIsland* findIslandByName(std::string islandname);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction);
 BoxIsland* findNearestEnemyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold);
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float thresholdmin, float thresholdmax);
 int countNumberOfIslands(int faction);
 
 Antenna* findAntennaFromIsland(BoxIsland *is);
@@ -231,6 +236,7 @@ Vehicle* findCarrier(int faction);
 Vehicle* findCarrier(size_t &index, int faction);
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
 std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, int type, Vec3f l, float threshold);
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes, Vec3f l, float threshold);
 
 void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);
 void captureIsland(BoxIsland *island, int faction, int typeofisland, dSpaceID space, dWorldID world);

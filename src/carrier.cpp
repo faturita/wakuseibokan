@@ -1191,6 +1191,21 @@ void inline processCommandOrders()
             } else if (co.command == Command::RefuelOrder)
             {
                 refuel(entities[ctroler->controllingid]);
+            } else if (co.command == Command::ReadyForDockingOrder)
+            {
+                Vehicle *v = entities[ctroler->controllingid];
+
+                if (v->getType() == CARRIER)
+                {
+                    Balaenidae *b = (Balaenidae*) v;
+                    b->readyForDock();
+                    char msg[256];
+                    Message mg;
+                    mg.faction = v->getFaction();
+                    sprintf(msg, "%s is waiting and ready for docking.",v->getName().c_str());
+                    mg.msg = std::string(msg); mg.timer = timer;
+                    messages.insert(messages.begin(), mg);
+                }
             } else if (co.command == Command::CollectOrder)
             {
                 collect(entities[ctroler->controllingid]);
@@ -1423,9 +1438,9 @@ void update(int value)
         static Player pb(BLUE_FACTION);
 
         if (aiplayer == BLUE_AI || aiplayer == BOTH_AI)
-            pb.playFaction(timer);
+            {pb.playStrategy(timer);pb.playFaction(timer);}
         if (aiplayer == GREEN_AI || aiplayer == BOTH_AI)
-            pg.playFaction(timer);
+            {pg.playStrategy(timer);pg.playFaction(timer);}
 
 
         // 1: Read the information from the sockets containing the controller information that is being sent from

@@ -40,6 +40,7 @@ public:
     void doDynamics(dBodyID body);
 
     void offshore(Vec3f d);
+    void readyForDock();
 
     Vehicle* spawn(dWorldID  world,dSpaceID space,int type, int number);
 

@@ -318,7 +318,7 @@ void Walrus::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
 
 
         /**

@@ -227,7 +227,7 @@ bool stranded(Vehicle *carrier, Island *island)
         b->damage(100);
         b->setControlRegisters(controller.registers);
         b->setStatus(SailingStatus::OFFSHORING);
-        b->disableAuto();  // Check the controller for the enemy aircraft.  Force field is disabled for destiny island.
+        //b->disableAuto();  // Better to disable the disengagement of force field.  Force field is disabled for destiny island.
         char str[256];
         Message mg;
         mg.faction = b->getFaction();
@@ -370,6 +370,30 @@ bool docked(Vehicle *boat, Island *island)
             Message mg;
             mg.faction = boat->getFaction();
             sprintf(str, "%s has docked on Island %s.", boat->getName().c_str(), island->getName().c_str());
+            mg.msg = std::string(str);mg.timer = timer;
+            messages.insert(messages.begin(), mg);
+            return true;
+        }
+    }
+    return false;
+}
+
+// SYNC. Cargoship docking on a carrier to resupply fuel and power.
+bool docked(Vehicle *boat, Vehicle *c)
+{
+    if (boat && c && c->getStatus() == SailingStatus::INDOCKING && boat->getStatus() != SailingStatus::DOCKED)
+    {
+        {
+            boat->stop();
+            boat->setStatus(SailingStatus::DOCKED);
+
+            c->stop();
+            c->setStatus(SailingStatus::DOCKED);
+
+            char str[256];
+            Message mg;
+            mg.faction = boat->getFaction();
+            sprintf(str, "%s has docked on Carrier %s.", boat->getName().c_str(), c->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             return true;
@@ -1177,7 +1201,40 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
 
     return enemies;
 }
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes, Vec3f l, float threshold)
+{
+    std::vector<size_t> friendlys;
+    float closest = threshold;
+    int nearest = -1;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
 
+        bool bMatch = false;
+        for (int j=0;j<subtypes.size();j++)
+        {
+            if (v->getSubType() == subtypes[j])
+            {
+                bMatch = true;
+                break;
+            }
+        }
+
+        if (v && (bMatch)  && v->getFaction()==friendlyfaction)   // Fix this.
+        {
+            if ((v->getPos()-l).magnitude()<closest) 
+            {
+                nearest = i;
+                closest = (v->getPos()-l).magnitude();
+            }
+        }
+    }
+
+    if (nearest >= 0)
+        friendlys.push_back(nearest);
+
+    return friendlys;
+}
 
 std::vector<size_t> findNearestEnemyVehicles(int friendlyfaction, int type, Vec3f l, float threshold)
 {
@@ -1247,6 +1304,27 @@ BoxIsland* findNearestIsland(Vec3f Po)
     return islands[nearesti];
 }
 
+size_t findIndexOfNearestIsland(Vec3f Po)
+{
+    int nearesti = -1;
+    float closest = 0;
+    for(size_t i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        if ((l-Po).magnitude()<closest || closest ==0) {
+            closest = (l-Po).magnitude();
+            nearesti = i;
+        }
+    }
+
+    if (nearesti<0)
+        return 0;
+
+    return nearesti;
+}
+
 
 BoxIsland* findNearestEmptyIsland(Vec3f Po, float maxDistance)
 {
@@ -1305,6 +1383,32 @@ Antenna* findAntennaFromIsland(BoxIsland *is)
     return NULL;
 }
 
+
+BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float thresholdmin, float thresholdmax)
+{
+    int chosen = -1;
+    float closest = 0;
+    for(size_t i=0;i<islands.size();i++)
+    {
+        BoxIsland *b = islands[i];
+        Vec3f l(b->getX(),0.0f,b->getZ());
+
+        Structure *d = b->getCommandCenter();
+
+        if ((!d && empty) || (d && !empty && (d->getFaction()==friendlyfaction || friendlyfaction == -1)) )
+        {
+            if ( ((l-Po).magnitude()<closest || closest ==0)  && (l-Po).magnitude()<thresholdmax && (l-Po).magnitude()>thresholdmin) {
+                closest = (l-Po).magnitude();
+                chosen = i;
+            }
+        }
+    }
+
+    if (chosen<0)
+        return NULL;
+
+    return islands[chosen];
+}
 
 BoxIsland* findNearestFriendlyIsland(Vec3f Po, bool empty, int friendlyfaction, float threshold)
 {
@@ -1400,6 +1504,7 @@ void list()
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         CLog::Write(CLog::Debug,"[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
+        CLog::Write(CLog::Debug,"[%d]: Status: %d, Faction: %d, Name: %s\n", i, entities[i]->getStatus(), entities[i]->getFaction(), entities[i]->getName().c_str());
     }
 }
 
@@ -2195,11 +2300,11 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         int effectivecargo = 0;
                         for(size_t shareid=0;shareid<shares.size();shareid++)
                         {
-                            CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                            //CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
                             effectivecargo += entities[shares[shareid]]->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
                         }
                         w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
-                        CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
+                        //CLog::Write(CLog::Debug,"Sharing %d from Windmill \n", effectivecargo);
                     }
                 }
             }
@@ -2375,6 +2480,7 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
+// Order the docked unit to depart from the carrier or dock.
 void departure(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2385,8 +2491,9 @@ void departure(Vehicle *f)
     types.push_back(VehicleTypes::WALRUS);
     types.push_back(VehicleTypes::CARRIER);
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
+        // @NOTE: This could be an issue when there are more than one.
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
         {
@@ -2400,11 +2507,17 @@ void departure(Vehicle *f)
         m->ready();
         dBodyID body = m->getBodyID();
 
-        Vec3f dDir = f->getForward();
+        Vec3f dDir;
+        
+        if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+            dDir = f->getPos().normalize()- m->getPos().normalize();
+        else
+            dDir = f->getForward();
+
         dDir = dDir.normalize();
 
         if (m->getSubType() == VehicleSubTypes::CARGOSHIP || m->getType() == VehicleTypes::CARRIER)
-            dDir = dDir * -200000.0f;     
+            dDir = dDir * -300000.0f;     
         else
             dDir = dDir * -10000.0f;    
 
@@ -2419,6 +2532,11 @@ void departure(Vehicle *f)
         sprintf(msg, "%s has departured.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
+
+        if (f->getSubType() == VehicleSubTypes::CARGOSHIP)
+        {
+            f->setStatus(SailingStatus::SAILING);  // If the docker is a cargoshop, then it should be sailing again. 
+        }
     }
 
     return;    
@@ -2449,6 +2567,7 @@ void unfill(Vehicle *f)
     } 
 }
 
+// Vehicle f is used to refill a nearby vehicle
 void refill(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2463,7 +2582,7 @@ void refill(Vehicle *f)
         types.push_back(VehicleTypes::CARRIER);
     }
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
@@ -2573,11 +2692,11 @@ void collect(Vehicle *v)
                 float fcargoshare = ((float)cargo / 1);
                 int effectivecargo = 0;
 
-                CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
+                //CLog::Write(CLog::Debug,"Sharing %d \n", (int)fcargoshare);
                 effectivecargo += v->addCargo(CargoTypes::POWERFUEL,(int)fcargoshare);
 
                 w->removeCargo(CargoTypes::POWERFUEL, effectivecargo);
-                CLog::Write(CLog::Debug,"Sharing %d from Island \n", effectivecargo);
+                //CLog::Write(CLog::Debug,"Sharing %d from Island \n", effectivecargo);
             }
         }
 
@@ -2586,6 +2705,7 @@ void collect(Vehicle *v)
 
 }
 
+// Vehicle f is used to refuel a nearest vehicle
 void refuel(Vehicle *f)
 {
     Vehicle *m = NULL;
@@ -2600,7 +2720,7 @@ void refuel(Vehicle *f)
         types.push_back(VehicleTypes::CARRIER);
     }
 
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK)
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
         if (vehicles.size()>0)
@@ -2621,6 +2741,7 @@ void refuel(Vehicle *f)
         sprintf(msg, "%s has been recharged.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
+
     }
 
     return;    
