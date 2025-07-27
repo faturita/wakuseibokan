@@ -1205,6 +1205,7 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
 {
     std::vector<size_t> friendlys;
     float closest = threshold;
+    int nearest = -1;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         Vehicle *v=entities[i];
@@ -1223,10 +1224,14 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
         {
             if ((v->getPos()-l).magnitude()<closest) 
             {
-                friendlys.push_back(i);
+                nearest = i;
+                closest = (v->getPos()-l).magnitude();
             }
         }
     }
+
+    if (nearest >= 0)
+        friendlys.push_back(nearest);
 
     return friendlys;
 }

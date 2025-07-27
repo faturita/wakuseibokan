@@ -200,7 +200,7 @@ class RefuelStrandedCarrierQAction : public QAction
         T = T + T.sign() * 1;
     }
 
-    bool findAndOrderNearestCargoShip(int faction, Beluga *b, Dock *dock)
+    bool findAndOrderNearestCargoShip(int faction, Balaenidae *b, Dock *dock)
     {
         std::vector<VehicleSubTypes> types;
         types.push_back(VehicleSubTypes::CARGOSHIP);
@@ -209,8 +209,8 @@ class RefuelStrandedCarrierQAction : public QAction
 
         if (T[0] == 200)
         {
-            // Find the nearest cargoship
-            std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, b->getPos(), 300 kmf);
+            // Find the nearest cargoship (from the nearest dock)
+            std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, dock->getPos(), 300 kmf);
 
             CargoShip *cg = NULL;
             if (vehicles.size()>0)
@@ -233,7 +233,7 @@ class RefuelStrandedCarrierQAction : public QAction
         return true;
 
     }
-    bool sendCargoShipToStrandedCarrier(int faction, Beluga *b, Dock *dock)
+    bool sendCargoShipToStrandedCarrier(int faction, Balaenidae *b, Dock *dock)
     {
         Walrus *w = findWalrusByOrder2(faction, 10);
 
@@ -291,6 +291,8 @@ class RefuelStrandedCarrierQAction : public QAction
 
                 departure(cg);
                 dout << "Carrier refueled." << std::endl;
+
+                cg->setOrder(0); // Reset the order of the cargo ship.
             }
 
         }
@@ -312,8 +314,8 @@ class RefuelStrandedCarrierQAction : public QAction
             if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
             {
                 //dout << "RefuelCon: Carrier is stranded, sending cargo ship to refuel it." << std::endl;
-                findAndOrderNearestCargoShip(faction,(Beluga *)b,(Dock *)s);
-                sendCargoShipToStrandedCarrier(faction,(Beluga *)b, (Dock *)s);
+                findAndOrderNearestCargoShip(faction,(Balaenidae *)b,(Dock *)s);
+                sendCargoShipToStrandedCarrier(faction,(Balaenidae *)b, (Dock *)s);
                 refuelCarrier(faction, b);
 
             } 
@@ -609,6 +611,8 @@ class BallisticAttackQAction : public QAction
 
             if (T[0] == 100)
             {
+                b->stop();
+                b->setAutoStatus(AutoStatus::IDLE);
                 Missile *a = (Missile*) b->fire(0,world, space);
 
                 size_t i = CONTROLLING_NONE;
@@ -1680,13 +1684,14 @@ Player::Player(int faction)
     transitions[8] = new Transition(State::IDLE,State::APPROACHFRIENDLYISLAND,new ClosestFarAwayIslandIsFriendly());  
     
     transitions[9] = new Transition(State::APPROACHFREEISLAND,State::INVADEISLAND,new CarrierHasArrivedToFreeIsland());     // arrived(), dst_status == REACHED
-    transitions[10] = new Transition(State::APPROACHENEMYISLAND,State::BALLISTICATTACK,new CarrierHasArrivedToEnemyIsland(RANGE[1]));    // arrived(), dst_status == REACHED
-    transitions[11] = new Transition(State::APPROACHFRIENDLYISLAND,State::IDLE,new CarrierHasArrivedToFriendlyIsland());       // arrived(), dst_status == REACHED
-    transitions[12] = new Transition(State::BALLISTICATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1])); 
-    transitions[13] = new Transition(State::BALLISTICATTACK,State::AIRBORNEATTACK, new UnitsDeployedForAttack());                  // No enemies around
-    transitions[14] = new Transition(State::AIRBORNEATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1]));                  // No enemies around
-    transitions[15] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());       // <10000.0, command center
-    transitions[16] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());                       // No units around
+    transitions[10] = new Transition(State::APPROACHFREEISLAND,State::BALLISTICATTACK,new ClosestIslandIsEnemy(RANGE[1])); 
+    transitions[11] = new Transition(State::APPROACHENEMYISLAND,State::BALLISTICATTACK,new CarrierHasArrivedToEnemyIsland(RANGE[1]));    // arrived(), dst_status == REACHED
+    transitions[12] = new Transition(State::APPROACHFRIENDLYISLAND,State::IDLE,new CarrierHasArrivedToFriendlyIsland());       // arrived(), dst_status == REACHED
+    transitions[13] = new Transition(State::BALLISTICATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1])); 
+    transitions[14] = new Transition(State::BALLISTICATTACK,State::AIRBORNEATTACK, new UnitsDeployedForAttack());                  // No enemies around
+    transitions[15] = new Transition(State::AIRBORNEATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1]));                  // No enemies around
+    transitions[16] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());       // <10000.0, command center
+    transitions[17] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());                       // No units around
 
     interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
     interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around

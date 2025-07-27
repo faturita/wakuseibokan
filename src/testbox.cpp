@@ -2017,6 +2017,7 @@ void test21()
     _walrus->embody(world, space);
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setNameByNumber(1);
 
     entities.push_back(_walrus, _walrus->getGeom());
 
@@ -2074,6 +2075,7 @@ void test22()
     _walrus->embody(world, space);
     _walrus->setPos(-450 kmf+500.0f, -1.0, 300 kmf - 3000.0f);
     _walrus->setStatus(SailingStatus::SAILING);
+    _walrus->setNameByNumber(1);
 
     entities.push_back(_walrus, _walrus->getGeom());
 

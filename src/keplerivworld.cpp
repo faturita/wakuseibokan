@@ -526,12 +526,12 @@ void inline initIslands()
         kerama->buildTerrainModel(space,filereader("terrain/gaijin.bmp"));
 
         BoxIsland *tristan = new BoxIsland(&entities);
-        tristan->setName("Tristan da Cunha");
+        tristan->setName("Tristan-da-Cunha");
         tristan->setLocation(250 kmf, -1.0, 10 kmf);
         tristan->buildTerrainModel(space,filereader("terrain/tristan.bmp"));
 
         BoxIsland *sentinel = new BoxIsland(&entities);
-        sentinel->setName("North Sentinel");
+        sentinel->setName("North-Sentinel");
         sentinel->setLocation(150 kmf, -1.0, 390 kmf);
         sentinel->buildTerrainModel(space,filereader("terrain/sentinel.bmp"));
 
