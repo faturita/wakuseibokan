@@ -29,7 +29,7 @@ public:
     void doControlControl(Vec3f target, float thrust);
     void doControlForced(Vec3f target);
     void doControlFlipping(Vec3f target, float thust);
-    void doControlControl2(Vec3f target, float thrust, float sp_height, float threshold=1000);
+    void doControlControl2(Vec3f target, float thrust, float sp_height, float threshold=1000, bool stopOnReached=true);
     void doControlWaypoint(float threshold=1000);
     void doHold(Vec3f target, float thrust);
 

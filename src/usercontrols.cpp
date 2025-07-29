@@ -179,7 +179,7 @@ void processMouse(int button, int state, int x, int y) {
                 if (specialKey == GLUT_ACTIVE_SHIFT && commandmode == ATTACK_MODE)
                 {
                     Vec3f target = setLocationOnMap(x,y);
-                    Vehicle *s = findNearestEnemyVehicle(entities[controller.controllingid]->getFaction(),target,2000);
+                    Vehicle *s = findNearestEnemyVehicle(entities[controller.controllingid]->getFaction(),target,6000);
 
                     if (s)
                     {
@@ -190,7 +190,6 @@ void processMouse(int button, int state, int x, int y) {
                         co.parameters.z = s->getPos()[2];
 
                         controller.push(co);
-
                     }
 
                     CLog::Write(CLog::Debug,"Attack set to (%10.2f,%10.2f,%10.2f)\n", target[0],target[1],target[2]);

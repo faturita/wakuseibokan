@@ -3787,38 +3787,7 @@ void checktest39(unsigned long timer)
 
         Vehicle *v = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),8000);
 
-        // FIXME 50 meters before from my point of view, along the difference vector.
-        w->attack(v->getPos());
-        w->enableAuto();
-
-        auto lambda = [](dGeomID sender,dGeomID recv) {
-
-            Vehicle *snd = entities.find(sender);
-            Vehicle *rec = entities.find(recv);
-
-            if (snd != NULL && rec != NULL)
-            {
-                //printf ("Updating....\n");
-                rec->attack(snd->getPos());
-                return true;
-            }
-            else
-            {
-                //printf ("End");
-                rec->setAutoStatus(AutoStatus::IDLE);  // Clean orders, the target has been destroyed.
-                rec->resetControlRegisters();
-                return false;
-            }
-        };
-
-
-        TrackRecord val;
-        std::get<0>(val) = v->getGeom();
-        std::get<1>(val) = w->getGeom();
-        std::get<2>(val) = lambda;
-        track.push_back(val);
-
-
+        attackVehicle(w,v);
     }
 
     if (timer==9000)

@@ -1165,9 +1165,13 @@ void inline processCommandOrders()
             } else if (co.command == Command::AttackOrder)
             {
                 Vec3f pos(co.parameters.x,co.parameters.y, co.parameters.z);
+                Vehicle *v = findNearestEnemyVehicle(entities[ctroler->controllingid]->getFaction(),pos,6000);
 
-                entities[ctroler->controllingid]->attack(pos);
-                entities[ctroler->controllingid]->enableAuto();
+                removeVehicleFromTracking(entities[ctroler->controllingid]);
+
+                attackVehicle(entities[ctroler->controllingid],v);
+
+
             } else if (co.command == Command::DestinationOrder)
             {
                 Vec3f target(co.parameters.x,co.parameters.y, co.parameters.z);
@@ -1376,6 +1380,7 @@ void inline processCommandOrders()
                                 else
                                 {
                                     //printf ("End");
+                                    //. @FIXME: Destroy the unit that is chasing
                                     return false;
                                 }
 
