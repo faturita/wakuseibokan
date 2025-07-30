@@ -521,11 +521,11 @@ void removeVehicleFromTracking(Vehicle *ctroler)
     }
 }
 
-void attackVehicle(Vehicle *w, Vehicle *v)
+void attackVehicle(Vehicle *attacker, Vehicle *target)
 {
     // @NOTE: Order the unit w to attack the vehicle v, and follow the target position continuously.
-    w->attack(v->getPos());
-    w->enableAuto();
+    attacker->attack(target->getPos());
+    attacker->enableAuto();
 
     // Check all the alternatives:
     // 1. If the v is a structure, do not update the position (it is not a vehicle hence it is not moving).
@@ -557,8 +557,8 @@ void attackVehicle(Vehicle *w, Vehicle *v)
 
 
     TrackRecord val;
-    std::get<0>(val) = v->getGeom();
-    std::get<1>(val) = w->getGeom();
+    std::get<0>(val) = target->getGeom();
+    std::get<1>(val) = attacker->getGeom();
     std::get<2>(val) = lambda;
     track.push_back(val);
 }

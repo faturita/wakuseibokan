@@ -1343,11 +1343,12 @@ public:
 
                         Vehicle *action = NULL;
 
-                        if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
-                        {
-                            ct->water();
-                            action = ct->fire(0,world, space);
-                        } else if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
+                        //if (v->getType() == WALRUS && signn<0 && e>PI/6.0)
+                        //{
+                        //    ct->water();
+                        //    action = ct->fire(0,world, space);
+                        //} else 
+                        if (v->getType() == COLLISIONABLE || v->getType() == CONTROL || v->getType() == CARRIER)   {
                             ct->ground();
                             action = ct->fire(0,world, space);
                         } else {
@@ -1379,6 +1380,10 @@ public:
                                 else
                                 {
                                     //printf ("End");
+                                    if (rec != NULL)
+                                    {
+                                        rec->damage(1000.0);
+                                    }
                                     return false;
                                 }
 
@@ -1489,7 +1494,7 @@ class EngageDefCon : public Condition
     }
 
     public:
-    bool runNavalDefense(int faction)
+    bool runNasssssvalDefense(int faction)
     {
         Vehicle *b = findCarrier(faction);
 
@@ -1521,7 +1526,7 @@ class EngageDefCon : public Condition
                 if (T[1]==100)
                 {
                     T[1] = 1;
-                    dout << "Spawn ! " << std::endl;
+                    std::cout << "Spawn ! " << std::endl;
                     w1 = spawnWalrus(space,world,b);
                     w1->enableAuto();
                 }
@@ -1530,13 +1535,17 @@ class EngageDefCon : public Condition
                 for(int i=1;i<5;i++)
                 {
                     Walrus *w = findWalrusByOrder(faction,i);
-                    if (w) {w->attack(v->getPos());}
+                    if (w) {
+                        removeVehicleFromTracking(w);
+                        attackVehicle(w,v);
+                    }
                 }
         }
         else
         {
             for(int i=1;i<5;i++)
             {
+                // @NOTE: GoBack order for all the walruses.
                 Walrus *w = findWalrusByOrder(faction,i);
                 if (w) w->goTo(b->getPos());
 
@@ -1611,6 +1620,7 @@ class EngageDefCon : public Condition
 
         tick();
 
+        // @NOTE: Once a vehicle gets fixed to an enemy, it will stay with it until the enemy is destroyed.
         // @NOTE: Currently allows only to defend from only one vehicle around at the same time.
         std::vector<size_t> enemies = findNearestEnemyVehicles(faction,-1, b->getPos(),DEFENSE_RANGE);
 
@@ -1651,7 +1661,10 @@ class EngageDefCon : public Condition
                 {
                     Walrus *w = findWalrusByOrder(faction,i);
                     w->enableAuto();
-                    if (w) {w->attack(v->getPos());}
+                    if (w) {
+                        removeVehicleFromTracking(w);
+                        attackVehicle(w,v);
+                    }
                 }
         }
 

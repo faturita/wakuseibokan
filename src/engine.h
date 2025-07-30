@@ -229,7 +229,7 @@ int countNumberOfIslands(int faction);
 Antenna* findAntennaFromIsland(BoxIsland *is);
 Structure* findStructureFromIsland(BoxIsland *is, int subtype);
 
-void attackVehicle(Vehicle *w, Vehicle *v);
+void attackVehicle(Vehicle *attacker, Vehicle *target);
 void removeVehicleFromTracking(Vehicle *ctroler);
 
 Vehicle* findNearestEnemyVehicle(int friendlyfaction,int type, Vec3f l, float threshold);
