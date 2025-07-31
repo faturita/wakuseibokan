@@ -143,7 +143,7 @@ Vehicle* Beluga::spawn(dWorldID  world,dSpaceID space,int type, int number)
     {
         Walrus *_walrus = new Walrus(getFaction());
         _walrus->init();
-        _walrus->setNameByNumber(number);
+        _walrus->setNameByNumber(number); 
         _walrus->embody(world,space);
         Vec3f p;
         p = getForward().normalize()*(getDimensions()[2]/2.0+30.0);

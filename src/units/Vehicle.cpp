@@ -827,6 +827,15 @@ void Vehicle::setAttitude(Vec3f attit)
 
 }
 
+std::vector<Vec3f> Vehicle::getVertices()
+{
+    std::vector<Vec3f> vertices;
+
+    vertices.push_back(getPos());
+
+    return vertices;
+}
+
 Vec3f Vehicle::getAttitude()
 {
     return Vehicle::attitude;

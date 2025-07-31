@@ -396,6 +396,8 @@ public:
     // State Machine for handling destinations.
     DestinationStatus dst_status;
 
+    std::vector<Vec3f> getVertices();
+
 };
 
 #endif /* VEHICLE_H_ */

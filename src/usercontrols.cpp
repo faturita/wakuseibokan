@@ -728,7 +728,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     t = t.cross(up);
                     t = t.normalize();
 
-                    Vec3f target = b->getPos()+(b->getForward().normalize()*150);
+                    Vec3f target = b->getPos()-(b->getForward().normalize()*500);
 
                     CommandOrder co;
                     co.command = Command::DestinationOrder;

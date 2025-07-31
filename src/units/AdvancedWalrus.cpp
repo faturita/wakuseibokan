@@ -4,7 +4,7 @@
 #include "../profiling.h"
 
 #include "../actions/ArtilleryAmmo.h"
-
+#include "../math/geometry.h"
 #include "../engine.h"
 extern dWorldID world;
 extern dSpaceID space;
@@ -14,6 +14,7 @@ extern dSpaceID space;
 extern container<Vehicle*> entities;
 extern std::vector<BoxIsland*> islands;
 extern std::unordered_map<std::string, GLuint> textures;
+extern std::vector<Message> messages;
 
 AdvancedWalrus::AdvancedWalrus(int newfaction) : Walrus(newfaction)
 {
@@ -405,6 +406,126 @@ void AdvancedWalrus::doControl(struct controlregister conts)
     registers.thrust = getThrottle();
 }
 
+void AdvancedWalrus::doControlDestination()
+{
+    Controller c;
+
+    c.registers = registers;
+
+    Vec3f Po = getPos();
+    Po[1] = 0.0f; 
+
+    Vec3f Pf = destination;
+
+    Vec3f T = Pf - Po;
+
+    float roundederror = 100;
+
+    if (getStatus() == SailingStatus::ROLLING)
+        roundederror = 5;
+
+    if (T.magnitude()>100)
+    {
+        float distance = T.magnitude();
+
+        Vec3f F = getForward();
+
+        F = F.normalize();
+        T = T.normalize();
+
+
+        // Potential fields from the islands (to slow down Walrus)
+
+        c.registers.thrust = 1000.0f;
+
+        if (distance<10000.0f)
+        {
+            c.registers.thrust = 200.0f;
+        }
+
+        if (distance<2000.0f)
+        {
+            c.registers.thrust = 100.0f;
+        }
+
+        BoxIsland *b = findNearestIsland(Po);
+
+        float closest = 0;
+        if (b)
+        {
+            closest = (b->getPos() - Po).magnitude();
+            if (closest > 1600 && closest < 2400 && (getStatus() == SailingStatus::SAILING))
+            {
+                c.registers.thrust = 15.0f;
+            }
+        }
+
+        // Potential fields from its own Carrier
+        Vehicle *cd = findCarrier(getFaction());
+        float obstacle = 0;
+        if (cd)
+        {
+            std::vector<Vec3f> vertices = ((Balaenidae*)cd)->getVertices();
+            Vec3f cc = findClosestPointOnPolygon(Po, vertices, obstacle);
+            obstacle = (cc - Po).magnitude();   // cd->getPos();
+            if (obstacle < 200) // check the size
+            {
+                Vec3f l = cc;
+                Vec3f d = Po-l;
+
+                d = d.normalize();
+
+                T = T+d;
+                T = T.normalize();
+
+                c.registers.thrust = 15.0f;
+            }
+        }        
+
+        float e = _acos(  T.dot(F) );
+
+        float signn = T.cross(F) [1];
+
+
+        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f %10.3f\n", distance, closest, obstacle, e, signn);
+
+        if (abs(e)>=0.5f)
+        {
+            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
+            if (getStatus() == SailingStatus::SAILING) c.registers.thrust = 15.0f;
+        } else
+        if (abs(e)>=0.4f)
+        {
+            c.registers.roll = 2.0 * (signn>0?+1:-1) ;
+            if (getStatus() == SailingStatus::SAILING) c.registers.thrust = 15.0f;
+        } else
+        if (abs(e)>=0.2f)
+            c.registers.roll = 1.0 * (signn>0?+1:-1) ;
+        else {
+            c.registers.roll = 0.0f;
+        }
+
+
+    } else
+        if (dst_status != DestinationStatus::REACHED)
+        {
+            char str[256];
+            Message mg;
+            mg.faction = getFaction();
+            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            mg.msg = std::string(str);mg.timer = 0;
+            messages.insert(messages.begin(), mg);
+            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            dst_status = DestinationStatus::REACHED;
+            autostatus = AutoStatus::IDLE;
+            c.registers.thrust = 0.0f;
+            setThrottle(0.0);
+            c.registers.roll = 0.0f;
+        }
+
+    doControl(c);
+
+}
 
 void AdvancedWalrus::doControlAttack()
 {

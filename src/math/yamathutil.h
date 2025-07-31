@@ -48,6 +48,8 @@ Vec3f getRandomCircularSpot(Vec3f origin, float radius);
 int getRandomInteger(int min, int max);
 float getRandom(float min, float max, int resolution=2);
 
+Vec3f findClosestPointOnLineSegment(Vec3f p, Vec3f a, Vec3f b);
+
 typedef uint8_t crc;
 
 #define POLYNOMIAL 0xD8  /* 11011 followed by 0's */
