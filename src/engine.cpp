@@ -1980,6 +1980,10 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                                 else
                                 {
                                     //printf ("End");
+                                    if (rec != NULL)
+                                    {
+                                        rec->damage(1000.0);
+                                    }
                                     return false;
                                 }
 

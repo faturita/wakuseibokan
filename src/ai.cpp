@@ -1375,7 +1375,7 @@ public:
                                 {
                                     //printf ("Updating....\n");
                                     rec->setDestination(snd->getPos());
-                                    return false;
+                                    return true;
                                 }
                                 else
                                 {

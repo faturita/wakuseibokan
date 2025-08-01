@@ -8666,7 +8666,7 @@ void checktest92(unsigned long timer)
         aiplayer = BLUE_AI;
     }
 
-    if (timer==9000)
+    if (timer==20000)
     {
         Vehicle *b = findCarrier(BLUE_FACTION);
 
