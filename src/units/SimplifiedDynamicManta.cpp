@@ -99,7 +99,7 @@ void SimplifiedDynamicManta::doControlDogFight()
     switch (flyingstate) {
         default:case 0:// Approach
         {
-            doControlControl2(target,10000, 720);
+            doControlControl2(target,10000, 720, false);
             //dout << (destination-getPos()).magnitude() << std::endl;
             if ((destination-getPos()).magnitude()<9000)
                 flyingstate = 1;
@@ -141,7 +141,7 @@ void SimplifiedDynamicManta::doControlDogFight()
         flyingstate = 3;
         break;
     case 3:
-        doControlControl2(waypoint,10000, 720);
+        doControlControl2(waypoint,10000, 720, false);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 0;
         break;
@@ -196,7 +196,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 3;
         break;
     case 3:
-        doControlControl2(waypoint,10000, 720);
+        doControlControl2(waypoint,10000, 720, false);
         if (((waypoint-getPos()).magnitude()<5000))
                 flyingstate = 4;
         break;
@@ -206,7 +206,7 @@ void SimplifiedDynamicManta::doControlAttack()
         flyingstate = 5;
         break;
     case 5:
-        doControlControl2(waypoint,10000, 720);
+        doControlControl2(waypoint,10000, 720, false);
         if (((waypoint-getPos()).magnitude()<12000))
                 flyingstate = 0;
         break;
@@ -385,7 +385,7 @@ void SimplifiedDynamicManta::doHold(Vec3f target, float thrust)
 
 }
 
-void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float sp_height, float threshold)
+void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float sp_height, float threshold, bool stopOnReached)
 {
 
     Controller c;
@@ -406,8 +406,11 @@ void SimplifiedDynamicManta::doControlControl2(Vec3f target, float thrust, float
 
     if (!(dst_status != DestinationStatus::REACHED && (T.magnitude()>threshold && map(T).magnitude()>threshold)))
     {
-        doHold(target, thrust);
-        return;
+        if (stopOnReached)
+        {
+            doHold(target, thrust);
+            return;
+        }
     }
 
     if (map(T).magnitude()<3500) thrust = 400.0;

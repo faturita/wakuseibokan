@@ -55,6 +55,8 @@ public:
     virtual EntityTypeId getTypeId();
 
     float virtual getEnergyConsumption();
+
+    std::vector<Vec3f> getVertices();
 };
 
 #endif // BALAENIDAE_H

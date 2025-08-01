@@ -172,7 +172,7 @@ Vehicle* CarrierLauncher::fireAir(dWorldID world, dSpaceID space)
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);
 
-    setTtl(100);
+    setTtl(1000);
 
     // I can set power or something here.
     return (Vehicle*)action;
@@ -287,7 +287,7 @@ Vehicle* CarrierLauncher::fireWater(dWorldID world, dSpaceID space)
     dBodySetQuaternion(action->getBodyID(),q3);
     dBodyAddRelForce(action->getBodyID(),0,0,60);
 
-    setTtl(100);
+    setTtl(1000);
 
     // I can set power or something here.
     return (Vehicle*)action;

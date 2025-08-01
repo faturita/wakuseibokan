@@ -37,6 +37,8 @@ public:
     void doControlAttack();
     void doControlDocking();
 
+    void doControlDestination();
+
     Vec3f getFiringPort();
     void  getViewPort(Vec3f &Up, Vec3f &position, Vec3f &forward);
 

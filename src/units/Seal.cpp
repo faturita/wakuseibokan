@@ -1,10 +1,3 @@
-/*
- * Seal.cpp
- *
- *  Created on: Jan 16, 2011
- *      Author: faturita
- */
-
 #include "Seal.h"
 #include "../md2model.h"
 #include "../actions/Gunshot.h"

@@ -154,6 +154,9 @@ int peermode;
 extern bool wincondition;
 
 extern std::unordered_map<std::string, GLuint> textures;
+
+extern std::vector<TrackRecord>   track;
+
 /**
  * Collision detection function.
  *
@@ -3784,11 +3787,8 @@ void checktest39(unsigned long timer)
 
         Vehicle *v = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),8000);
 
-        // FIXME 50 meters before from my point of view, along the difference vector.
-        w->attack(v->getPos());
-        w->enableAuto();
-
-
+        // This keeps track of the enemy position and continuously update that information on the attacker vehicle.
+        attackVehicle(w,v);
     }
 
     if (timer==9000)
@@ -3858,6 +3858,7 @@ void test40()
 void checktest40(unsigned long timer)
 {
     static int number = 0;
+
     if (timer==500)
     {
         // Detect enemy carrier
@@ -3871,9 +3872,8 @@ void checktest40(unsigned long timer)
 
         Vehicle *v = findNearestEnemyVehicle(BLUE_FACTION,w->getPos(),8000);
 
-        // FIXME 50 meters before from my point of view, along the difference vector.
-        w->attack(v->getPos());
-        w->enableAuto();
+        // This keeps track of the enemy position and continuously update that information on the attacker vehicle.
+        attackVehicle(w,v);
 
     }
 
@@ -3940,11 +3940,50 @@ void test41()
     Vec3f pos(0.0,1.32, - 60);
     camera.setPos(pos);
 
-    aiplayer = GREEN_FACTION;
+    aiplayer = GREEN_AI;
 }
 
 void checktest41(unsigned long timer)
 {
+
+    if (timer == 100)
+    {
+        Vehicle *carrier = findCarrier(BLUE_FACTION);
+
+        carrier->stop();
+    }
+
+    if (timer == 700)
+    {
+        Vehicle *carrier = findCarrier(BLUE_FACTION);
+        Vehicle *target = findCarrier(GREEN_FACTION);
+
+        Vec3f direction = target->getPos()- carrier->getPos();
+        direction = direction.normalize();
+
+        carrier->goTo(target->getPos() + direction * 5000.0f);
+        carrier->enableAuto();
+    }
+
+    if (timer==15000)
+    {
+        Vehicle *b = findCarrier(BLUE_FACTION);
+
+        if (!b)
+        {
+            printf("Test Ok!.\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: Enemy vehicle is not destroyed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
+    }
+
 
 }
 
@@ -3961,7 +4000,7 @@ void test42()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-36000.0f);
+    _b->setPos(5000.0f,20.5f,-12000.0f);
     _b->stop();
     _b->enableAuto();
 
@@ -3977,14 +4016,14 @@ void test42()
 
     entities.push_back(_bg, _bg->getGeom());
 
-    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
-    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,0,world);
-    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,0,world);
-    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,0,world);
-    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,0,world);
-    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
-    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
-    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+    //Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
+    //Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,0,world);
+    //Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,0,world);
+    //Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,0,world);
+    //Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,0,world);
+    //Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    //Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
+    //Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
 
 
     Vec3f pos(0.0,1.32, - 60);
@@ -4009,6 +4048,26 @@ void checktest42(unsigned long timer)
     {
         b->goTo(Vec3f(-2400.0f,20.5f,-16000.0f));
         b->enableAuto();
+    }
+
+    if (timer==15000)
+    {
+        Vehicle *b = findCarrier(BLUE_FACTION);
+        Vehicle *c = findCarrier(GREEN_FACTION);
+
+        if ( (!b || (b->getHealth() < 1000.0f)) || (!c || (c->getHealth() < 1000.0f)) )
+        {
+            printf("Test Ok!.\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: For some reason carriers are untouched.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
     }
 
 
@@ -8480,6 +8539,154 @@ void checktest91(unsigned long timer)
 
 }
 
+void test92()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    Beluga *_bg = new Beluga(BLUE_FACTION);
+    _bg->init();
+    dSpaceID carrier_space_beluga = _bg->embody_in_space(world, space);
+    _bg->embody(world,space);
+    // @NOTE Let the carriers fight against each other.
+    _bg->setPos(-4000.0f,20.5f,-12000.0f);
+    _bg->stop();
+
+    entities.push_back(_bg, _bg->getGeom());
+
+
+    CarrierTurret * _bl= new CarrierTurret(BLUE_FACTION);
+    _bl->init();
+    _bl->embody(world, carrier_space_beluga);
+    _bl->attachTo(world,_bg, +30.0f, 20.0f - 3, +204.0f);
+    _bl->stop();
+
+    _bg->addWeapon(entities.push_back(_bl, _bl->getGeom()));
+
+    CarrierTurret * _br= new CarrierTurret(BLUE_FACTION);
+    _br->init();
+    _br->embody(world, carrier_space_beluga);
+    _br->attachTo(world,_bg, -45.0f, 20.0f - 3, +204.0f);
+    _br->stop();
+
+    _bg->addWeapon(entities.push_back(_br, _br->getGeom()));
+
+
+    CarrierArtillery * _wr= new CarrierArtillery(BLUE_FACTION);
+    _wr->init();
+    _wr->embody(world, carrier_space_beluga);
+    _wr->attachTo(world,_bg, -40.0, 27.0f+5, -230.0f);
+    _wr->stop();
+
+    _bg->addWeapon(entities.push_back(_wr, _wr->getGeom()));
+
+    CarrierArtillery * _wl= new CarrierArtillery(BLUE_FACTION);
+    _wl->init();
+    _wl->embody(world, carrier_space_beluga);
+    _wl->attachTo(world,_bg, +40.0, 27.0f+2, -230.0f);
+    _wl->stop();
+
+    _bg->addWeapon(entities.push_back(_wl, _wl->getGeom()));
+
+    CarrierLauncher * _cf= new CarrierLauncher(BLUE_FACTION);
+    _cf->init();
+    _cf->embody(world, carrier_space_beluga);
+    _cf->attachTo(world,_bg, +40.0, 27.0f+2, 0.0);
+    _cf->stop();
+
+    _bg->addWeapon(entities.push_back(_cf, _cf->getGeom()));
+
+    dMatrix3 Re2;
+    dRSetIdentity(Re2);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,-PI);
+    dBodySetRotation(_bg->getBodyID(),Re2);
+
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
+    Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,0,world);
+    Structure *t3 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)      ,         0.0f,    650.0f,0,world);
+    Structure *t4 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,       100.0f,    -650.0f,0,world);
+    Structure *t5 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,        20.0f,    80.0f,0,world);
+    Structure *t6 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -60.0f,    -80.0f,0,world);
+    Structure *t7 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         0.0f,    120.0f,0,world);
+    Structure *t8 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
+
+
+    Vec3f pos(0.0,1.32, - 60);
+    camera.setPos(pos);
+
+    //aiplayer = BLUE_AI;
+}
+
+void checktest92(unsigned long timer)
+{
+    static int number = 0;
+
+    if (timer == 100)
+    {
+        // Spawn a Manta from the carrier.
+        Vehicle *b = findCarrier(BLUE_FACTION);
+
+        if (b) b->stop();
+    }
+
+
+
+    if (timer==500)
+    {
+        // Detect enemy carrier
+        // Move towards it
+        // Aim and shoot
+
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        AdvancedWalrus* w = (AdvancedWalrus*)spawnWalrus(space,world,b);
+        number = w->getNumber();
+
+        Vehicle *v = findNearestEnemyVehicle(GREEN_FACTION,w->getPos(),8000);
+
+        // This keeps track of the enemy position and continuously update that information on the attacker vehicle.
+        attackVehicle(w,v);
+    }
+
+    if (timer==1000)
+    {
+        aiplayer = BLUE_AI;
+    }
+
+    if (timer==20000)
+    {
+        Vehicle *b = findCarrier(BLUE_FACTION);
+
+        if (!b)
+        {
+            printf("Test Ok!.\n");
+            endWorldModelling();
+            exit(1);
+        }
+        else
+        {
+            printf("Test failed: Enemy vehicle is not destroyed.\n");
+            endWorldModelling();
+            exit(0);
+        }
+
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -8566,7 +8773,7 @@ void initWorldModelling(int testcase)
     case 38:test38();break;                         // Carrier attacks an island and tries to conquer it.
     case 39:test39();break;                         // Walrus attack enemy carrier trying to destroy it.
     case 40:test40();break;                         // Different walrus attack enemy carrier trying to destroy it.
-    case 41:test41();break;                         // Carrier detects enemy automatically, stops what it is doing and attacks it.
+    case 41:test41();break;                         // Carrier detects enemy carrier automatically and send walrus to attack it.
     case 42:test42();break;                         // Carrier is attacked by Manta and activates defenses.
     case 43:test43();break;                         // Basic Dogfight.  Manta is flying and is attacked by an enemy manta.
     case 44:test44();break;                         // Manta attacks incoming walruses.
@@ -8617,6 +8824,7 @@ void initWorldModelling(int testcase)
     case 89:test89();break;                         // Check Cargo Ship docking on a stranded empty-fueled Carrier.
     case 90:test90();break;                         // Check Moving to a friendly island to reach then an empty island.
     case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
+    case 92:test92();break;                         // Carrier defending from an attacking walrus (with all its weapons).
     default:initIslands();test1();break;
     }
 
@@ -8725,6 +8933,7 @@ void worldStep(int value)
     case 89:checktest89(timer);break;
     case 90:checktest90(timer);break;
     case 91:checktest91(timer);break;
+    case 92:checktest92(timer);break;
     default: break;
     }
 

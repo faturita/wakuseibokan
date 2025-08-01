@@ -303,3 +303,42 @@ crcSlow(uint8_t const message[], int nBytes)
 
 }   /* crcSlow() */
 
+/**
+ * @brief Finds the closest point on a 2D line segment to a given point.
+ * @param p The point to check against.
+ * @param a The starting vertex of the line segment.
+ * @param b The ending vertex of the line segment.
+ * @return The closest point on the segment [a, b] to point p.
+ */
+Vec3f findClosestPointOnLineSegment(Vec3f p, Vec3f a, Vec3f b)
+{
+    // Project vectors onto a 2D plane (X, Z) by ignoring Y.
+    p[1] = 0;
+    a[1]= 0;
+    b[1]= 0;
+
+    Vec3f ap = p - a;
+    Vec3f ab = b - a;
+
+    float ab_len_sq = ab.magnitudeSquared();
+    if (ab_len_sq < 1e-6f) // Check if a and b are the same point
+    {
+        return a;
+    }
+
+    // Project vector ap onto ab to find the normalized distance 't'
+    float t = ap.dot(ab) / ab_len_sq;
+
+    // Clamp 't' to the range [0, 1] to stay on the segment
+    if (t < 0.0f)
+    {
+        return a; // Closest point is the start of the segment
+    }
+    if (t > 1.0f)
+    {
+        return b; // Closest point is the end of the segment
+    }
+
+    // The closest point is along the segment
+    return a + ab * t;
+}

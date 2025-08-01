@@ -26,7 +26,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 
 extern unsigned long timer;
 
-
+extern std::vector<TrackRecord>   track;
 
 
 // Assuming islands is std::vector<BoxIsland*>
@@ -504,6 +504,63 @@ bool hit(Structure* structure, Gunshot *g)
         return true;
     }
     return false;
+}
+void removeVehicleFromTracking(Vehicle *ctroler)
+{
+    // Remove the vehicle from the tracking list.
+    for (auto it = track.begin(); it != track.end(); )
+    {
+        if (std::get<1>(*it) == ctroler->getGeom())
+        {
+            it = track.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+void attackVehicle(Vehicle *attacker, Vehicle *target)
+{
+    // @NOTE: Order the unit w to attack the vehicle v, and follow the target position continuously.
+    attacker->attack(target->getPos());
+    attacker->enableAuto();
+
+    // Check all the alternatives:
+    // 1. If the v is a structure, do not update the position (it is not a vehicle hence it is not moving).
+    // 2. If they are both mantas, then dogfight the attack.
+
+    auto lambda = [](dGeomID sender,dGeomID recv) {
+
+        Vehicle *snd = entities.find(sender);
+        Vehicle *rec = entities.find(recv);
+
+
+        if (snd != NULL && rec != NULL && rec->getAutoStatus() == AutoStatus::ATTACK)
+        {
+            //printf ("Updating....\n");
+            rec->attack(snd->getPos());
+            return true;
+        }
+        else
+        {
+            //printf ("End");
+            if (rec)
+            {
+                rec->setAutoStatus(AutoStatus::IDLE);  // Clean orders, the target has been destroyed.
+                rec->resetControlRegisters();
+            }
+            return false;
+        }
+    };
+
+
+    TrackRecord val;
+    std::get<0>(val) = target->getGeom();
+    std::get<1>(val) = attacker->getGeom();
+    std::get<2>(val) = lambda;
+    track.push_back(val);
 }
 
 // SYNC
@@ -1581,8 +1638,6 @@ void commLink(int faction, dSpaceID space, dWorldID world)
     }
 }
 
-extern std::vector<TrackRecord>   track;
-
 void trackTargets()
 {
     // @NOTE: Going in reverse order because if the element is deleted from track, the indexes of all the other elements change too.
@@ -1645,6 +1700,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                                 // RTTI Stuff
                                 if(Runway* lb = dynamic_cast<Runway*>(entities[str[i]]))
                                 {
+                                    assert( m->getFaction() == sc->getFaction() );
                                     landManta(lb, m) ;
                                 }
                             }
@@ -1924,6 +1980,10 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                                 else
                                 {
                                     //printf ("End");
+                                    if (rec != NULL)
+                                    {
+                                        rec->damage(1000.0);
+                                    }
                                     return false;
                                 }
 

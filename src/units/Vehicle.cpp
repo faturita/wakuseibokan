@@ -642,6 +642,11 @@ struct controlregister Vehicle::getControlRegisters()
     return registers;
 }
 
+void Vehicle::resetControlRegisters()
+{
+    memset(&registers,0,sizeof(struct controlregister));
+}
+
 /**
  * This is the key binding between ODE and OpenGL to make this engine work.
  * Get the speed.
@@ -820,6 +825,15 @@ void Vehicle::setAttitude(Vec3f attit)
 {
     Vehicle::attitude = attit;
 
+}
+
+std::vector<Vec3f> Vehicle::getVertices()
+{
+    std::vector<Vec3f> vertices;
+
+    vertices.push_back(getPos());
+
+    return vertices;
 }
 
 Vec3f Vehicle::getAttitude()
