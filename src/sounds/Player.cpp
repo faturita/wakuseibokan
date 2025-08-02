@@ -7,6 +7,10 @@
 
 #include "Player.h"
 
+
+int inchannels = 2; // Default to stereo
+RtAudio dac;
+
 // The audio callback is now extremely simple!
 int tick_c( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
@@ -19,12 +23,19 @@ int tick_c( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
     for (unsigned int i = 0; i < nBufferFrames; i++) {
         stk::StkFloat sample = so->tick();
 
-        for(int channel = 0; channel < so->channels; ++channel) {
+        for(int channel = 0; channel < inchannels; ++channel) {
             *samples++ = sample * so->amplitude;
         }
 
     }
-    return 0; // Return 0 for success
+    if ( so->isDone() || so->interrupt) {
+        so->done = true;
+        //if (so->dac.isStreamRunning() || so->dac.isStreamOpen())
+            //try {so->dac.closeStream();} catch (StkError &) {}
+        return 1;
+    }
+    else
+        return 0;   // Return 0 for success
 }
 
 void Player::init(char fl[256]) {
@@ -39,6 +50,12 @@ void Player::init(char fl[256]) {
     rate *= 1.0;
     file.setRate(rate);
     file.ignoreSampleRateChange();
+
+    // Find out how many channels we have.
+    channels = file.channelsOut();
+
+    interrupt = false;
+    done = false;
 }
 
 stk::StkFloat Player::tick()  {
@@ -50,28 +67,25 @@ bool Player::isDone() const {
 }
 
 
-void Player::play() 
+void play(Player* p) 
 {
-    // Find out how many channels we have.
-    channels = file.channelsOut();
-
     if (dac.isStreamRunning() || dac.isStreamOpen())
         dac.closeStream();
 
     // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
     RtAudio::StreamParameters parameters;
     parameters.deviceId = dac.getDefaultOutputDevice();
-    parameters.nChannels = ( channels == 1 ) ? 2 : channels; //  Play mono files as stereo.
+    parameters.nChannels = ( inchannels == 1 ) ? 2 : inchannels; //  Play mono files as stereo.
     RtAudioFormat format = ( sizeof(stk::StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
     unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
 
     try {
-      dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), &bufferFrames, &tick_c, (void *)this );
+      dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), &bufferFrames, &tick_c, (void *)p );
     }
     catch ( RtAudioError &error ) {
       error.printMessage();
       printf("Error opening the stream.  Now set to done.");
-      done = true;
+      p->done = true;
       return;
     }
 
@@ -83,15 +97,14 @@ void Player::play()
       printf("Error starting the stream.");
     }
 
-    std::cout << "Playing sound:" << std::endl;
-    done = false;
+    p->done = false;
 }
 
-void Player::close()
+void close(Player *p)
 {
     // Block waiting until callback signals done.
-    //while ( !done )
-    //  stk::Stk::sleep( 100 );
+    while ( !p->done )
+      stk::Stk::sleep( 100 );
 
     // By returning a non-zero value in the callback above, the stream
     // is automatically stopped.  But we should still close it.

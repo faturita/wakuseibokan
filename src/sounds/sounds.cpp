@@ -51,7 +51,6 @@ void * sound_handler(void *arg)
     {
         if (newsound)
         {
-            s.done = false;
             playthissound_(soundelement.source, soundelement.soundname);
             newsound = false;
         }
@@ -65,14 +64,6 @@ void * sound_handler(void *arg)
 //   This way works much better and there is really no penalty in performance.
 void initSound()
 {
-    //SoundTexture* so = new SoundTexture();
-    //so->init("sounds/takeoff.wav");
-    //soundtextures["takeoff"] = so;
-
-    //so = new SoundTexture();
-    //so->init("sounds/gunshot.wav");
-    //soundtextures["gunshot"] = so;
-
     pthread_t th;
 
     pthread_attr_t  attr;
@@ -91,7 +82,7 @@ void clearSound()
     if (!mute)
     {
         s.interrupt = true;
-        s.close();
+        close(&s);
     }
 }
 
@@ -107,7 +98,7 @@ void playthissound(char fl[256])
             //static SoundTexture s;
             s.init(fl);
             s.amplitude = 1.0;
-            s.play();
+            play(&s);
         }
     }  catch (StkError) {
         dout << "Sound error reported, but ignored." << std::endl;
@@ -120,26 +111,21 @@ void playthissound_(Vec3f source, char fl[256])
     // @NOTE: Use the camera location to determine if the sound should be reproduced or not
     //   and with which intensity.
     try {
-        std::cout << "Playfdsafdsafing sound: " << fl << std::endl;
         if (!mute) {
             Vec3f dist = source - camera.pos;
-
-            std::cout << "fdsaasd sound: " << fl << std::endl;
 
             if (dist.magnitude()<SOUND_DISTANCE_LIMIT || true)
             {
                 StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
                 amplitude = 1.0;
-                //while (!s.done)
-                //{
-                //    std::cout << "Waiting for sound to finish: " << fl << std::endl;
-                //    s.interrupt = true;
-                //    Stk::sleep( 0 );
-                //}
-                std::cout << "Playing sound: " << fl << std::endl;
+                while (!s.done)
+                {
+                    s.interrupt = true;
+                    Stk::sleep( 0 );
+                }
                 s.init(fl);
                 s.amplitude = amplitude;
-                s.play();
+                play(&s);
             }
         }
     }  catch (StkError) {
