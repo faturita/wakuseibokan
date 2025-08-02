@@ -8,7 +8,7 @@
 #include <assert.h>
 
 #include "soundtexture.h"
-
+#include "Player.h"
 #include "sounds.h"
 
 #include "../camera.h"
@@ -19,7 +19,10 @@ extern  Camera camera;
 extern bool mute;
 
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
-SoundTexture s;
+//SoundTexture s;
+
+
+Player s;
 
 struct SoundOrder {
     Vec3f source;
@@ -48,6 +51,7 @@ void * sound_handler(void *arg)
     {
         if (newsound)
         {
+            s.done = false;
             playthissound_(soundelement.source, soundelement.soundname);
             newsound = false;
         }
@@ -116,18 +120,23 @@ void playthissound_(Vec3f source, char fl[256])
     // @NOTE: Use the camera location to determine if the sound should be reproduced or not
     //   and with which intensity.
     try {
+        std::cout << "Playfdsafdsafing sound: " << fl << std::endl;
         if (!mute) {
             Vec3f dist = source - camera.pos;
-            if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
+
+            std::cout << "fdsaasd sound: " << fl << std::endl;
+
+            if (dist.magnitude()<SOUND_DISTANCE_LIMIT || true)
             {
                 StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
                 amplitude = 1.0;
-                while (!s.done)
-                {
-                    s.interrupt = true;
-                    Stk::sleep( 0 );
-                }
-                //static SoundTexture s;
+                //while (!s.done)
+                //{
+                //    std::cout << "Waiting for sound to finish: " << fl << std::endl;
+                //    s.interrupt = true;
+                //    Stk::sleep( 0 );
+                //}
+                std::cout << "Playing sound: " << fl << std::endl;
                 s.init(fl);
                 s.amplitude = amplitude;
                 s.play();
@@ -137,20 +146,6 @@ void playthissound_(Vec3f source, char fl[256])
         dout << "Sound error reported, but ignored." << std::endl;
     }
 
-}
-
-
-
-
-void firesound(int times)
-{
-    for(int i=0;i<times;i++)
-        printf ("%c", 7);
-
-extern bool mute;
-
-//std::unordered_map<std::string, SoundTexture*> soundtextures;
-SoundTexture s;
 }
 
 void bullethit(Vec3f source)
