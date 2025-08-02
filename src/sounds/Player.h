@@ -7,16 +7,9 @@
 
 class Player : public SoundSource {
 private:
-    
+    stk::FileWvIn file;
 public:
     int channels = 2; // Default to stereo
-    stk::FileWvIn file;
-    stk::StkFloat amplitude = 1.0;
-
-    // Done is the flag that indicates that the sound processing pipeline has been finished.
-    // Interrupt is used to stop the sound processing pipeline (that will trigger the done flag).
-    bool done = true;
-    bool interrupt = false;
 
     void init(char fl[256]) ;
 

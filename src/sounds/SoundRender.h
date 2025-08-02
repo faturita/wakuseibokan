@@ -4,9 +4,8 @@
 #include "stk/FileWvIn.h"
 #include "stk/RtAudio.h"
 #include "SoundSource.h"
-#include "Player.h"
 
-void play(Player* p);
-void close(Player *p);
+void play(SoundSource* p);
+void close(SoundSource *p);
 
 #endif // SOUNDRENDER_H

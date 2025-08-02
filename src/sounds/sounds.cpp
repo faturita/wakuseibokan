@@ -22,7 +22,6 @@ extern bool mute;
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
 //SoundTexture s;
 
-
 Player s;
 
 struct SoundOrder {

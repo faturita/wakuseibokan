@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "Player.h"
+#include "SoundSource.h"
 
 
 int inchannels = 2; // Default to stereo
@@ -19,7 +19,7 @@ int tick_c( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 {
     stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
 
-    Player *so = (Player*) userData;
+    SoundSource *so = (SoundSource*) userData;
 
     // Fill the audio buffer with samples from our engine's tick() method
     for (unsigned int i = 0; i < nBufferFrames; i++) {
@@ -44,7 +44,7 @@ int tick_c( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 
 
 
-void play(Player* p) 
+void play(SoundSource* p) 
 {
     if (dac.isStreamRunning() || dac.isStreamOpen())
         dac.closeStream();
@@ -77,7 +77,7 @@ void play(Player* p)
     p->done = false;
 }
 
-void close(Player *p)
+void close(SoundSource *p)
 {
     // Block waiting until callback signals done.
     while ( !p->done )
