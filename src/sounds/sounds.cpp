@@ -9,6 +9,7 @@
 
 #include "soundtexture.h"
 #include "Player.h"
+#include "SoundRender.h"
 #include "sounds.h"
 
 #include "../camera.h"

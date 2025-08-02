@@ -25,7 +25,4 @@ public:
     bool isDone() const override ;
 };
 
-void play(Player* p);
-void close(Player *p);
-
 #endif // PLAYER_H
