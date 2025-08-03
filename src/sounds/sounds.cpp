@@ -62,9 +62,9 @@ void * sound_handler(void *arg)
     }
 }
 
-// @NOTE: Stk is very tricky, particularly in linux.  So I have found that I cannot work on two buffers at the same time and I needed to serialize the access.
-//   But this also makes the system so much slower, so it is just better to use a separate thread to handle the sound.
-//   This way works much better and there is really no penalty in performance.
+// @NOTE: Stk is very tricky, particularly in linux.  It is known (I didn't) that you need to serialize all the access with just one 
+// DAC. Then if you want to play a sound, you need to stop the current one, and then start the new one OR create a mixture of the two sounds.
+// So, current approach does both things.  It creates a separated thread to serialize the access to the DAC and mixes sound within the same DAC.
 void initSound()
 {
     pthread_t th;
@@ -127,19 +127,19 @@ void playthissound_(Vec3f source, char fl[256])
 
 }
 
-void planestarted(Vec3f pos)
-{
-    s.enableBackground(true);
-}
 
-void planestopped(Vec3f pos)
+void setflyingengine(Vec3f source, float speed)
 {
-    s.enableBackground(false);
-}
+    if (!mute)
+    {
+        Vec3f dist = source - camera.pos;
 
-void planesetspeed(float speed)
-{
-    s.setVehicleSpeed(speed);
+        if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
+        {
+            stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+            s.setFlyingVehicleSpeed(speed);
+        }
+    }
 }
 
 

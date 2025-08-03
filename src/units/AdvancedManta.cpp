@@ -26,8 +26,6 @@ void AdvancedManta::init()
     setForward(0,0,1);
 
     status = 0;
-
-    planestarted(getPos());
 }
 
 
@@ -91,8 +89,6 @@ void AdvancedManta::embody(dWorldID world, dSpaceID space)
     //geom = dCreateSphere( space, 2.64f);
     geom = dCreateBox( space, width, height, length);
     dGeomSetBody(geom, me);
-
-        planestarted(getPos());
 }
 
 void AdvancedManta::embody(dBodyID myBodySelf)

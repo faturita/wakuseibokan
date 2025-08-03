@@ -19,7 +19,7 @@ public:
     SoundGenerator() ;
     // Set the sound source to be played
     void setPlayerSource(char* filename);
-    void setVehicleSpeed(float speed);
+    void setFlyingVehicleSpeed(float speed);
     stk::StkFloat tick() override ;
 
     bool isDone() const override ;

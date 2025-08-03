@@ -13,6 +13,7 @@
 class MantaSoundTexture : public SoundSource {
     private:
     bool enabled = false; // Flag to enable/disable the sound texture
+    int ttl = 0;
 public:
     stk::Noise noise;
     stk::BiQuad filter;
@@ -23,11 +24,9 @@ public:
 
     MantaSoundTexture() ;
 
-    // NEW HELPER FUNCTION to calculate and set filter coefficients
     void calculateLowPassCoefficients(stk::StkFloat cutoff_hz, stk::StkFloat Q = 0.707) ;
 
     void setSpeed(float speed) ;
-    // The tick function remains correct
     stk::StkFloat tick() ;
     bool isDone() const ;
 

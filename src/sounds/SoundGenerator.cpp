@@ -24,8 +24,8 @@ void SoundGenerator::setPlayerSource(char* filename) {
     file.ignoreSampleRateChange();
 }
 
-void SoundGenerator::setVehicleSpeed(float speed) {
-    mantaSound.setSpeed(speed); // Example speed setting
+void SoundGenerator::setFlyingVehicleSpeed(float speed) {
+    mantaSound.setSpeed(speed); 
 }
 
 stk::StkFloat SoundGenerator::tick()  {

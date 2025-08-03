@@ -1066,7 +1066,7 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
         // Get speed, alpha and beta.
         speed = linearVel.magnitude();
 
-        planesetspeed(speed);
+        setflyingengine(getPos(),speed);
 
         // Wind Frame angles.
         Manta::alpha = Manta::beta = 0;

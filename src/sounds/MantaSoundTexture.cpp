@@ -41,9 +41,8 @@ float mapSpeedToFilterCutoff(float speed) {
 
 
 
-// Corrected constructor name
 MantaSoundTexture::MantaSoundTexture() {
-    // Set the global sample rate for all STK objects
+    // Set the global sample rate for all STK objects @FIXME: This should be set once globally, not per instance.
     stk::Stk::setSampleRate(44100.0);
 }
 
@@ -69,6 +68,7 @@ void MantaSoundTexture::calculateLowPassCoefficients(stk::StkFloat cutoff_hz, st
 
 void MantaSoundTexture::setSpeed(float speed) {
     whine.setFrequency(getFrequencyForSpeed(speed)); 
+    ttl = 10000;enabled = true; // Enable the sound texture when speed is set
     // Use the new mapping for a better sound
     calculateLowPassCoefficients(mapSpeedToFilterCutoff(speed));
 }
@@ -76,6 +76,12 @@ void MantaSoundTexture::setSpeed(float speed) {
 stk::StkFloat MantaSoundTexture::tick() {
     stk::StkFloat noise_sample = filter.tick(noise.tick());
     stk::StkFloat whine_sample = whine.tick();
+
+    ttl--;
+    if (ttl <= 0) {
+        enabled = false; // Disable the sound texture after ttl expires.  This makes background sound for stuff that is just close.
+    }
+
     return (noise_sample * noise_gain) + (whine_sample * whine_gain);
 }
 
