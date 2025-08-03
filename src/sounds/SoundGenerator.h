@@ -2,9 +2,9 @@
 #ifndef SOUNDGENERATOR_H
 #define SOUNDGENERATOR_H
 
-
+#include "stk/FileWvIn.h"
+#include "stk/RtAudio.h"
 #include "SoundSource.h"
-#include "Player.h"
 #include "MantaSoundTexture.h"
 
 class SoundGenerator : public SoundSource {
