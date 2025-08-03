@@ -31,6 +31,9 @@ stk::StkFloat Mixer::tick() {
 
     // Tick all sources and add their output together
     for (SoundSource* src : sources) {
+        if (src || src->isDone()) {
+            continue; // Skip sources that are done
+        }
         mixed_sample += src->tick();
     }
 
@@ -39,6 +42,7 @@ stk::StkFloat Mixer::tick() {
         std::remove_if(sources.begin(), sources.end(), [](SoundSource* s) {
             if (s->isDone()) {
                 delete s; // Free the memory
+                std::cout << "Removed finished sound source." << std::endl;
                 return true;
             }
             return false;
@@ -47,8 +51,8 @@ stk::StkFloat Mixer::tick() {
     );
 
     // Basic hard clipping to prevent distortion. More advanced limiting could be used here.
-    if (mixed_sample > 1.0) mixed_sample = 1.0;
-    if (mixed_sample < -1.0) mixed_sample = -1.0;
+    //if (mixed_sample > 1.0) mixed_sample = 1.0;
+    //if (mixed_sample < -1.0) mixed_sample = -1.0;
 
     return mixed_sample;
 }

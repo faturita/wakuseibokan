@@ -49,6 +49,8 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
     Manta::param[0] = 0.9;
     Manta::param[1] = 2;
     Manta::param[3] = 0;
+
+    planestarted(getPos());
 }
 
 void SimplifiedDynamicManta::doControl()

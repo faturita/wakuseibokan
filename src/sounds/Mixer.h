@@ -4,7 +4,7 @@
 
 #include "SoundSource.h"
 
-class Mixer {
+class Mixer : public SoundSource {
 private:
     std::vector<SoundSource*> sources;
     std::mutex sourceMutex; // To protect the vector from race conditions

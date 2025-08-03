@@ -10,6 +10,8 @@
 #include "soundtexture.h"
 #include "Player.h"
 #include "SoundRender.h"
+#include "MantaSoundTexture.h"
+#include "SoundMixer.h"
 #include "sounds.h"
 
 #include "../camera.h"
@@ -22,7 +24,12 @@ extern bool mute;
 //std::unordered_map<std::string, SoundTexture*> soundtextures;
 //SoundTexture s;
 
-Player s;
+//Player s;
+
+//MantaSoundTexture s;
+
+SoundMixer s;
+
 
 struct SoundOrder {
     Vec3f source;
@@ -47,7 +54,7 @@ void * sound_handler(void *arg)
 
     sd = *((int*)arg);
 
-    while (!mute && !s.interrupt)
+    while (!mute && !s.isInterrupted())
     {
         if (newsound)
         {
@@ -81,7 +88,7 @@ void clearSound()
 {
     if (!mute)
     {
-        s.interrupt = true;
+        s.interrupt();
         close(&s);
     }
 }
@@ -90,13 +97,12 @@ void playthissound(char fl[256])
 {
     try {
         if (!mute) {
-            while (!s.done)
+            while (!s.isFinished())
             {
-                s.interrupt = true;
+                s.interrupt();
                 Stk::sleep( 0 );
             }
-            //static SoundTexture s;
-            s.init(fl);
+            s.setPlayerSource(fl);
             s.amplitude = 1.0;
             play(&s);
         }
@@ -118,13 +124,13 @@ void playthissound_(Vec3f source, char fl[256])
             {
                 StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
                 amplitude = 1.0;
-                while (!s.done)
+                while (!s.isFinished())
                 {
-                    s.interrupt = true;
+                    s.interrupt();
                     Stk::sleep( 0 );
                 }
-                s.init(fl);
-                s.amplitude = amplitude;
+                s.setPlayerSource(fl);
+                s.amplitude = 1.0;
                 play(&s);
             }
         }
@@ -133,6 +139,17 @@ void playthissound_(Vec3f source, char fl[256])
     }
 
 }
+
+void planestarted(Vec3f pos)
+{
+    s.setEnabled(true);
+}
+
+void planestopped(Vec3f pos)
+{
+    s.setEnabled(false);
+}
+
 
 void bullethit(Vec3f source)
 {

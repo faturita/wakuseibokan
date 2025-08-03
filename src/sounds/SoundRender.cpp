@@ -32,8 +32,8 @@ int tick_c( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
         }
 
     }
-    if ( so->isDone() || so->interrupt) {
-        so->done = true;
+    if ( so->isDone() || so->isInterrupted() ) {
+        so->finish();
         //if (so->dac.isStreamRunning() || so->dac.isStreamOpen())
             //try {so->dac.closeStream();} catch (StkError &) {}
         return 1;
@@ -62,7 +62,7 @@ void play(SoundSource* p)
     catch ( RtAudioError &error ) {
       error.printMessage();
       printf("Error opening the stream.  Now set to done.");
-      p->done = true;
+      p->finish();
       return;
     }
 
@@ -74,13 +74,13 @@ void play(SoundSource* p)
       printf("Error starting the stream.");
     }
 
-    p->done = false;
+    p->started();
 }
 
 void close(SoundSource *p)
 {
     // Block waiting until callback signals done.
-    while ( !p->done )
+    while ( !p->isFinished())
       stk::Stk::sleep( 100 );
 
     // By returning a non-zero value in the callback above, the stream

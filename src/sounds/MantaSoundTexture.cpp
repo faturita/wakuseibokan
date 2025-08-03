@@ -39,22 +39,6 @@ float mapSpeedToFilterCutoff(float speed) {
     return cutoff_start + ratio * (cutoff_end - cutoff_start);
 }
 
-// The audio callback function that STK will use to get audio samples.
-int audioCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-                  double streamTime, RtAudioStreamStatus status, void *userData)
-{
-    // Cast the generic user data pointer back to our specific class type
-    MantaSoundTexture *engine = (MantaSoundTexture *)userData;
-    stk::StkFloat *samples = (stk::StkFloat *)outputBuffer;
-
-    // Fill the audio buffer with samples from our engine's tick() method
-    for (unsigned int i = 0; i < nBufferFrames; i++) {
-        *samples++ = engine->tick();
-    }
-    return 0; // Return 0 for success
-}
-
-
 
 
 // Corrected constructor name
@@ -95,57 +79,12 @@ stk::StkFloat MantaSoundTexture::tick() {
     return (noise_sample * noise_gain) + (whine_sample * whine_gain);
 }
 
-// The engine sound is never "done"
 bool MantaSoundTexture::isDone() const  
 { 
-    return false; 
+    return enabled == false; 
 }
 
-
-// Prepares the audio stream. The filename is ignored for procedural audio.
-void MantaSoundTexture::init(char filename[256]) 
-{
-    if (dac.isStreamOpen()) return;
-
-    RtAudio::StreamParameters parameters;
-    parameters.deviceId = dac.getDefaultOutputDevice();
-    parameters.nChannels = 2; // Mono
-    unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
-
-    try {
-        dac.openStream(&parameters, NULL, RTAUDIO_FLOAT64,
-                        stk::Stk::sampleRate(), &bufferFrames,
-                        &audioCallback, (void *)this); // Pass a pointer to this object
-    } catch (stk::StkError &e) {
-        e.printMessage();
-    }
-}
-
-// Starts the audio stream playback.
-void MantaSoundTexture::play() 
-{
-    try {
-        if (dac.isStreamOpen() && !dac.isStreamRunning()) {
-            dac.startStream();
-        }
-    } catch (stk::StkError &e) {
-        e.printMessage();
-    }
-}
-
-// Stops and closes the audio stream.
-void MantaSoundTexture::close() 
-{
-    try {
-        if (dac.isStreamOpen()) {
-            dac.stopStream();
-            dac.closeStream();
-        }
-    } catch (stk::StkError &e) {
-        e.printMessage();
-    }
-    
-    // Call the base class method if it has cleanup tasks
-    SoundTexture::close();
+void MantaSoundTexture::setEnabled(bool enable) {
+    enabled = enable;
 }
 

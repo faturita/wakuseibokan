@@ -23,8 +23,8 @@ void Player::init(char fl[256]) {
     // Find out how many input channels we have.
     channels = file.channelsOut();
 
-    interrupt = false;  // Reset the interrupt flag
-    done = false;       // Reset the done flag
+    // Reset the interrupt and done flags.
+    started();
 }
 
 stk::StkFloat Player::tick()  {
