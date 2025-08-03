@@ -203,6 +203,8 @@ void AdvancedWalrus::doDynamics(dBodyID body)
 
     speed = vec3fV.magnitude();
 
+    setsailingengine(getPos(), speed);
+
     doAmphibious(body);
 
     dVector3 result;

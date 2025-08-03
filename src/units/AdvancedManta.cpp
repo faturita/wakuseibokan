@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include "../ThreeMaxLoader.h"
+#include "../sounds/sounds.h"
 #include "AdvancedManta.h"
 
 extern std::unordered_map<std::string, GLuint> textures;

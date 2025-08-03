@@ -7,8 +7,12 @@
 
 #include <assert.h>
 
-#include "soundtexture.h"
+#include "stk/Stk.h"
+#include "stk/FileWvIn.h"
+#include "stk/RtAudio.h"
 
+#include "SoundGenerator.h"
+#include "SoundRender.h"
 #include "sounds.h"
 
 #include "../camera.h"
@@ -18,8 +22,7 @@
 extern  Camera camera;
 extern bool mute;
 
-//std::unordered_map<std::string, SoundTexture*> soundtextures;
-SoundTexture s;
+SoundGenerator s;
 
 struct SoundOrder {
     Vec3f source;
@@ -29,6 +32,7 @@ struct SoundOrder {
 bool newsound = false;
 
 void playthissound_(Vec3f source, char fl[256]);
+void initsoundsystem_();
 
 void playthissound(Vec3f source, char fl[256])
 {
@@ -44,7 +48,9 @@ void * sound_handler(void *arg)
 
     sd = *((int*)arg);
 
-    while (!mute && !s.interrupt)
+    initsoundsystem_();
+
+    while (!mute && !s.isInterrupted())
     {
         if (newsound)
         {
@@ -56,19 +62,11 @@ void * sound_handler(void *arg)
     }
 }
 
-// @NOTE: Stk is very tricky, particularly in linux.  So I have found that I cannot work on two buffers at the same time and I needed to serialize the access.
-//   But this also makes the system so much slower, so it is just better to use a separate thread to handle the sound.
-//   This way works much better and there is really no penalty in performance.
+// @NOTE: Stk is very tricky, particularly in linux.  It is known (I didn't) that you need to serialize all the access with just one 
+// DAC. Then if you want to play a sound, you need to stop the current one, and then start the new one OR create a mixture of the two sounds.
+// So, current approach does both things.  It creates a separated thread to serialize the access to the DAC and mixes sound within the same DAC.
 void initSound()
 {
-    //SoundTexture* so = new SoundTexture();
-    //so->init("sounds/takeoff.wav");
-    //soundtextures["takeoff"] = so;
-
-    //so = new SoundTexture();
-    //so->init("sounds/gunshot.wav");
-    //soundtextures["gunshot"] = so;
-
     pthread_t th;
 
     pthread_attr_t  attr;
@@ -86,29 +84,26 @@ void clearSound()
 {
     if (!mute)
     {
-        s.interrupt = true;
-        s.close();
+        s.interrupt();
+        close(&s);
     }
 }
 
-void playthissound(char fl[256])
+
+void initsoundsystem_()
 {
     try {
         if (!mute) {
-            while (!s.done)
-            {
-                s.interrupt = true;
-                Stk::sleep( 0 );
+                while (!s.isFinished())
+                {
+                    s.interrupt();
+                    stk::Stk::sleep( 0 );
+                }
+                play(&s);
             }
-            //static SoundTexture s;
-            s.init(fl);
-            s.amplitude = 1.0;
-            s.play();
-        }
-    }  catch (StkError) {
-        dout << "Sound error reported, but ignored." << std::endl;
-    }
-
+        }  catch (stk::StkError) {
+            dout << "Sound error reported, but ignored." << std::endl;
+        }    
 }
 
 void playthissound_(Vec3f source, char fl[256])
@@ -118,40 +113,49 @@ void playthissound_(Vec3f source, char fl[256])
     try {
         if (!mute) {
             Vec3f dist = source - camera.pos;
+
             if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
             {
-                StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
-                amplitude = 1.0;
-                while (!s.done)
-                {
-                    s.interrupt = true;
-                    Stk::sleep( 0 );
-                }
-                //static SoundTexture s;
-                s.init(fl);
-                s.amplitude = amplitude;
-                s.play();
+                stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+                amplitude = 1.0;   // @FIXME: This is a hack to make the sound always play at full volume.
+                s.setPlayerSource(fl);
             }
         }
-    }  catch (StkError) {
+    }  catch (stk::StkError) {
         dout << "Sound error reported, but ignored." << std::endl;
     }
 
 }
 
 
-
-
-void firesound(int times)
+void setflyingengine(Vec3f source, float speed)
 {
-    for(int i=0;i<times;i++)
-        printf ("%c", 7);
+    if (!mute)
+    {
+        Vec3f dist = source - camera.pos;
 
-extern bool mute;
-
-//std::unordered_map<std::string, SoundTexture*> soundtextures;
-SoundTexture s;
+        if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
+        {
+            stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+            s.setFlyingVehicleSpeed(speed);
+        }
+    }
 }
+
+void setsailingengine(Vec3f source, float speed)
+{
+    if (!mute)
+    {
+        Vec3f dist = source - camera.pos;
+
+        if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
+        {
+            stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+            s.setSailingVehicleSpeed(speed);
+        }
+    }
+}
+
 
 void bullethit(Vec3f source)
 {
@@ -221,5 +225,5 @@ void droneflying(Vec3f source)
 
 void intro()
 {
-    playthissound( "sounds/intro.wav");
+    playthissound(Vec3f(0,0,0), "sounds/intro.wav");
 }
