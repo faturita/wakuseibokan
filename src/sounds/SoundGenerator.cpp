@@ -28,6 +28,10 @@ void SoundGenerator::setFlyingVehicleSpeed(float speed) {
     mantaSound.setSpeed(speed); 
 }
 
+void SoundGenerator::setSailingVehicleSpeed(float speed) {
+    walrusSound.setSpeed(speed);
+}
+
 stk::StkFloat SoundGenerator::tick()  {
     stk::StkFloat playerSample = 0.0;
 
@@ -37,6 +41,10 @@ stk::StkFloat SoundGenerator::tick()  {
 
     if (mantaSound.isEnabled()) {
         playerSample += mantaSound.tick() * 0.1;
+    }
+
+    if (walrusSound.isEnabled()) {
+        playerSample += walrusSound.tick() * 0.1;
     }
 
     return playerSample;
@@ -49,4 +57,5 @@ bool SoundGenerator::isDone() const  {
 void SoundGenerator::enableBackground(bool enable) {
     std::cout << "SoundGenerator: enableBackground called with " << (enable ? "true" : "false") << std::endl;
     mantaSound.setEnabled(enable);
+    walrusSound.setEnabled(enable);
 }

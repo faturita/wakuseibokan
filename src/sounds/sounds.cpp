@@ -142,6 +142,20 @@ void setflyingengine(Vec3f source, float speed)
     }
 }
 
+void setsailingengine(Vec3f source, float speed)
+{
+    if (!mute)
+    {
+        Vec3f dist = source - camera.pos;
+
+        if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
+        {
+            stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+            s.setSailingVehicleSpeed(speed);
+        }
+    }
+}
+
 
 void bullethit(Vec3f source)
 {

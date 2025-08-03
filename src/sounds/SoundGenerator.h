@@ -6,12 +6,14 @@
 #include "stk/RtAudio.h"
 #include "SoundSource.h"
 #include "MantaSoundTexture.h"
+#include "WalrusSoundTexture.h"
 
 class SoundGenerator : public SoundSource {
 private:
 
     stk::FileWvIn file;
     MantaSoundTexture mantaSound;
+    WalrusSoundTexture walrusSound;
 
 
 public:
@@ -20,6 +22,7 @@ public:
     // Set the sound source to be played
     void setPlayerSource(char* filename);
     void setFlyingVehicleSpeed(float speed);
+    void setSailingVehicleSpeed(float speed);
     stk::StkFloat tick() override ;
 
     bool isDone() const override ;
