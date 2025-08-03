@@ -35,6 +35,8 @@ void radarbeep(Vec3f source);
 void intro();
 
 void planestarted(Vec3f source);
+void planesetspeed(float speed);
+void planestopped(Vec3f pos);
 
 
 #endif // SOUNDS_H

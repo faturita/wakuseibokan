@@ -33,6 +33,8 @@ public:
 
     void setEnabled(bool enable) ;
 
+    bool isEnabled() ;
+
 };
 
 #endif // MANTASOUNDTEXTURE_H

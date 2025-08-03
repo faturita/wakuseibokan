@@ -7,11 +7,12 @@
 
 #include <assert.h>
 
-#include "soundtexture.h"
-#include "Player.h"
+#include "stk/Stk.h"
+#include "stk/FileWvIn.h"
+#include "stk/RtAudio.h"
+
+#include "SoundGenerator.h"
 #include "SoundRender.h"
-#include "MantaSoundTexture.h"
-#include "SoundMixer.h"
 #include "sounds.h"
 
 #include "../camera.h"
@@ -21,15 +22,7 @@
 extern  Camera camera;
 extern bool mute;
 
-//std::unordered_map<std::string, SoundTexture*> soundtextures;
-//SoundTexture s;
-
-//Player s;
-
-//MantaSoundTexture s;
-
-SoundMixer s;
-
+SoundGenerator s;
 
 struct SoundOrder {
     Vec3f source;
@@ -39,6 +32,7 @@ struct SoundOrder {
 bool newsound = false;
 
 void playthissound_(Vec3f source, char fl[256]);
+void initsoundsystem_();
 
 void playthissound(Vec3f source, char fl[256])
 {
@@ -53,6 +47,8 @@ void * sound_handler(void *arg)
     int sd;
 
     sd = *((int*)arg);
+
+    initsoundsystem_();
 
     while (!mute && !s.isInterrupted())
     {
@@ -93,23 +89,21 @@ void clearSound()
     }
 }
 
-void playthissound(char fl[256])
+
+void initsoundsystem_()
 {
     try {
         if (!mute) {
-            while (!s.isFinished())
-            {
-                s.interrupt();
-                Stk::sleep( 0 );
+                while (!s.isFinished())
+                {
+                    s.interrupt();
+                    stk::Stk::sleep( 0 );
+                }
+                play(&s);
             }
-            s.setPlayerSource(fl);
-            s.amplitude = 1.0;
-            play(&s);
-        }
-    }  catch (StkError) {
-        dout << "Sound error reported, but ignored." << std::endl;
-    }
-
+        }  catch (stk::StkError) {
+            dout << "Sound error reported, but ignored." << std::endl;
+        }    
 }
 
 void playthissound_(Vec3f source, char fl[256])
@@ -120,21 +114,14 @@ void playthissound_(Vec3f source, char fl[256])
         if (!mute) {
             Vec3f dist = source - camera.pos;
 
-            if (dist.magnitude()<SOUND_DISTANCE_LIMIT || true)
+            if (dist.magnitude()<SOUND_DISTANCE_LIMIT)
             {
-                StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
-                amplitude = 1.0;
-                while (!s.isFinished())
-                {
-                    s.interrupt();
-                    Stk::sleep( 0 );
-                }
+                stk::StkFloat amplitude = SOUND_DISTANCE_LIMIT-dist.magnitude() / SOUND_DISTANCE_LIMIT;
+                amplitude = 1.0;   // @FIXME: This is a hack to make the sound always play at full volume.
                 s.setPlayerSource(fl);
-                s.amplitude = 1.0;
-                play(&s);
             }
         }
-    }  catch (StkError) {
+    }  catch (stk::StkError) {
         dout << "Sound error reported, but ignored." << std::endl;
     }
 
@@ -142,12 +129,17 @@ void playthissound_(Vec3f source, char fl[256])
 
 void planestarted(Vec3f pos)
 {
-    s.setEnabled(true);
+    s.enableBackground(true);
 }
 
 void planestopped(Vec3f pos)
 {
-    s.setEnabled(false);
+    s.enableBackground(false);
+}
+
+void planesetspeed(float speed)
+{
+    s.setVehicleSpeed(speed);
 }
 
 
@@ -219,5 +211,5 @@ void droneflying(Vec3f source)
 
 void intro()
 {
-    playthissound( "sounds/intro.wav");
+    playthissound(Vec3f(0,0,0), "sounds/intro.wav");
 }

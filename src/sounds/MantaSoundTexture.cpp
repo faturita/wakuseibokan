@@ -88,3 +88,6 @@ void MantaSoundTexture::setEnabled(bool enable) {
     enabled = enable;
 }
 
+bool MantaSoundTexture::isEnabled() {
+    return enabled;
+}

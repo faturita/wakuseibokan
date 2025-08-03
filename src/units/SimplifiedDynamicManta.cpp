@@ -49,8 +49,6 @@ void SimplifiedDynamicManta::embody(dBodyID myBodySelf)
     Manta::param[0] = 0.9;
     Manta::param[1] = 2;
     Manta::param[3] = 0;
-
-    planestarted(getPos());
 }
 
 void SimplifiedDynamicManta::doControl()
@@ -1067,6 +1065,8 @@ void SimplifiedDynamicManta::doDynamics(dBodyID body)
 
         // Get speed, alpha and beta.
         speed = linearVel.magnitude();
+
+        planesetspeed(speed);
 
         // Wind Frame angles.
         Manta::alpha = Manta::beta = 0;
