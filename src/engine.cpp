@@ -224,8 +224,10 @@ bool stranded(Vehicle *carrier, Island *island)
         b->offshore(offshoreDirection);
         controller.reset();
         b->stop();
-        b->damage(100);
+        b->damage(1000);
         b->setControlRegisters(controller.registers);
+        b->resetControlRegisters();
+        b->setThrottle(0.0f);
         b->setStatus(SailingStatus::OFFSHORING);
         //b->disableAuto();  // Better to disable the disengagement of force field.  Force field is disabled for destiny island.
         char str[256];

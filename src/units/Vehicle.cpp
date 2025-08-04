@@ -285,9 +285,6 @@ void Vehicle::clean()
 
     // This works for all multiobject objects
 
-
-
-
 }
 
 dSpaceID Vehicle::myspace()
