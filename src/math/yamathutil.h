@@ -25,6 +25,8 @@
 #define RAD_TO_DEG (180.0/M_PI)
 #define DEG_TO_RAD (M_PI/180.0)
 
+#define ASRADS(x) ((x) * DEG_TO_RAD)
+
 Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float yAngle, float xAngle);
 void UnitarizeNormal(float vector[3]);
 void Normalize(float v[3][3], float out[3][3]);

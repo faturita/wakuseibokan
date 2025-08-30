@@ -8,7 +8,7 @@
 #include <string.h>
 
 // Comment the following define to allow quick suppression of all debug printfs or couts.
-#define DEBUG 1
+//#define DEBUG 1
 
 extern std::ostream &dout;
 

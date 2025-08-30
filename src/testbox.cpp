@@ -8687,6 +8687,53 @@ void checktest92(unsigned long timer)
 
 }
 
+void test93()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/vulcano.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-3000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 2.0f);
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 3.0);
+    islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION),world,3.9f);
+
+    Structure *runway = new Runway(GREEN_FACTION);
+
+    std::cout << "Runway length: " << runway->getLength() << std::endl;
+
+    islands[0]->addRectangularStructureOnFlatTerrain(runway,world, 360,10,100);
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(0.0f,1700.5f,-3000);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 38;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = GREEN_AI;
+}
+
+void checktest93(unsigned long timer)
+{
+    static int number = 0;
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -8819,12 +8866,13 @@ void initWorldModelling(int testcase)
     case 84:test84();break;                         // Check Energy production in windmills.
     case 85:test85();break;                         // Check CargoShip docking on the other side of the island.
     case 86:test86();break;                         // Check CargoShip travelling to the other side of the island.
-    case 87:test87();break;                         // Check Carrier AI arriving to an island where there is already a cargos ship.
+    case 87:test87();break;                         // Check Carrier AI arriving to an island, sending the walrus.
     case 88:test88();break;                         // Check Carrier attacking an island.
     case 89:test89();break;                         // Check Cargo Ship docking on a stranded empty-fueled Carrier.
     case 90:test90();break;                         // Check Moving to a friendly island to reach then an empty island.
     case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
     case 92:test92();break;                         // Carrier defending from an attacking walrus (with all its weapons).
+    case 93:test93();break;                         // Carrier send a walrus to capture an island.
     default:initIslands();test1();break;
     }
 
@@ -8934,6 +8982,7 @@ void worldStep(int value)
     case 90:checktest90(timer);break;
     case 91:checktest91(timer);break;
     case 92:checktest92(timer);break;
+    case 93:checktest93(timer);break;
     default: break;
     }
 

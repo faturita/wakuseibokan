@@ -220,3 +220,7 @@ void Structure::deserialize(TickRecord tick)
     Vehicle::deserialize(tick);
 }
 
+float Structure::getLength()
+{
+    return Structure::length;
+}

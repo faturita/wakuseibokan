@@ -8,6 +8,10 @@ extern std::unordered_map<std::string, GLuint> textures;
 Runway::Runway(int faction)
 {
     setFaction(faction);
+
+    Structure::height=2;
+    Structure::length=1000;
+    Structure::width=20;
 }
 
 void Runway::init()
@@ -18,10 +22,6 @@ void Runway::init()
     {
 
     }
-
-    Structure::height=2;
-    Structure::length=1000;
-    Structure::width=20;
 
     setName("Runway");
 

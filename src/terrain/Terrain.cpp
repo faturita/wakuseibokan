@@ -182,7 +182,7 @@ Terrain* loadTerrain(const char* filename, float height)
 
             // @NOTE:  Heightmap color 0 is FIXME
             //if (color == 1) h =  height * (((unsigned char)0 / 255.0f) - 0.5f);
-            //if (color == 0) h =  -70.0f;
+            if (color == 0) h =  -70.0f;
             t->setHeight(x, y, h+height/2.0);
             //CLog::Write(CLog::Debug,"%4d,%4d,%10.5f\n", x,y,h+height/2.0);
         }
@@ -442,8 +442,6 @@ Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
 }
 
 
-
-
 /**
  * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinates.  After that start
  * from the center and try to find the closed height to the desired one.  As all the islands fit into the 36x36, there should be one height that matches.
@@ -461,50 +459,60 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
     float z = 0;
     float angle = 0;
 
-    float t = (rand() % 360 + 1);
+    float minHeightDifference;
+    float minradius;
+    float t;
 
-    t = t * PI/180.0f;
-    float adjusted = t * 4.0/(2.0*PI);
-    int rounded = round(adjusted);
-    adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
-
-    int minradius = 2500;
-    float mindistance = 60;
-
-    for(int radius = 2500;radius>0;radius--)
+    for(int tries = 0; tries < 10; tries++)
     {
-        x = cos(t);
-        z = sin(t);
+        // @NOTE: This is a random angle in radians.
+        // It is used to determine the position in polar coordinates.
 
-        x = x * radius;
-        z = z * radius;
+        t = (rand() % 360 + 1);
 
-        if (x>1799) x = 1799;
-        if (x<-1799) x = -1799;
-        if (z>1799) z = 1799;
-        if (z<-1799) z = -1799;
+        t = t * PI/180.0f;
+        float adjusted = t * 4.0/(2.0*PI);
+        int rounded = round(adjusted);
+        adjusted = rounded * (2.0*PI)/4.0 + PI/2.0;
 
-        assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
+        minradius = 2500;
+        minHeightDifference = 60;
 
-        // @FIXME Put this line in a different function and use it from there.  Repeated code here.
-        heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
-
-        //dout << heightOffset << std::endl;
-
-        if (  abs(heightOffset-desiredHeight)<0.5 )
+        for(int radius = 2500;radius>0;radius--)
         {
-            return addStructure(structure,x,z,-t+3*(PI/2), world);
-        }
+            x = cos(t);
+            z = sin(t);
 
-        if ( abs(heightOffset-desiredHeight)<mindistance )
-        {
-            minradius = radius;
-            mindistance = abs(heightOffset-desiredHeight);
-        }
+            x = x * radius;
+            z = z * radius;
 
+            x = clipped(x, -1799, 1799);
+            z = clipped(z, -1799, 1799);
+
+            assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
+
+            // @FIXME Put this line in a different function and use it from there.  Repeated code here.
+            heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+            float heightDifference = abs(heightOffset - desiredHeight);
+
+            if (  heightDifference<0.5 )
+            {
+                std::cout << "Best available height found: " << (desiredHeight + heightDifference)
+                        << " (Difference: " << heightDifference << ") at (" << x << ", " << z << ")" << std::endl;
+                return addStructure(structure,x,z,-t+3*(PI/2), world);
+            }
+
+            if ( heightDifference<minHeightDifference )
+            {
+                minradius = radius;
+                minHeightDifference = heightDifference;
+            }
+
+        }
     }
 
-    if (mindistance < 60)
+    if (minHeightDifference < 60)
     {
         x = cos(t);
         z = sin(t);
@@ -517,6 +525,8 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
         if (z>1799) z = 1799;
         if (z<-1799) z = -1799;
 
+        std::cout << "Not so good available height found: " << (desiredHeight + minHeightDifference)
+                        << " (Difference: " << minHeightDifference << ") at (" << x << ", " << z << ")" << std::endl;
         return addStructure(structure,x,z,-t+3*(PI/2), world);
     }
 
@@ -526,7 +536,132 @@ Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID
 #endif
 
     // @NOTE Give up.
+    std::cout << "Really bad height found: " << (desiredHeight + minHeightDifference)
+                        << " (Difference: " << minHeightDifference << ") at (" << x << ", " << z << ")" << std::endl;
     return addStructure(structure,x,z,-t+3*(PI/2), world);
+}
+
+Vec3f computeMainDirection(const std::vector<Vec3f>& points) {
+    if (points.empty()) return {0,0,0};
+
+    // Step 1: compute centroid
+    Vec3f centroid(0,0,0);
+    for (const auto& p : points) centroid += p;
+    centroid = centroid * (1.0f / points.size());
+
+    // Step 2: compute covariance matrix in XZ plane
+    float sum_xx = 0, sum_xz = 0, sum_zz = 0;
+    for (const auto& p : points) {
+        float dx = p[0] - centroid[0];
+        float dz = p[2] - centroid[2];
+        sum_xx += dx * dx;
+        sum_xz += dx * dz;
+        sum_zz += dz * dz;
+    }
+
+    // Covariance matrix:
+    // [ sum_xx , sum_xz ]
+    // [ sum_xz , sum_zz ]
+
+    // Step 3: largest eigenvector (analytical 2x2 solution)
+    float trace = sum_xx + sum_zz;
+    float det   = sum_xx * sum_zz - sum_xz * sum_xz;
+    float term  = std::sqrt((trace * trace) / 4.0f - det);
+
+    float lambda1 = trace / 2.0f + term;
+    //float lambda2 = trace / 2.0f - term; // not needed, but is the minor axis
+
+    Vec3f dir;
+    if (std::fabs(sum_xz) > 1e-6f) {
+        dir = {lambda1 - sum_zz, 0, sum_xz};
+    } else {
+        dir = (sum_xx >= sum_zz) ? Vec3f{1,0,0} : Vec3f{0,0,1};
+    }
+
+    return dir.normalize();
+}
+/**
+ * @brief BoxIsland::addRectangularStructureOnFlatTerrain
+ *
+ * Adds a rectangular structure, like a runway, to the island terrain. The function
+ * searches for a location where the structure's length can be placed with minimal
+ * height variation, preventing it from clipping into or floating above the terrain.
+ *
+ * It iterates through random positions and angles, and for each candidate spot,
+ * it checks multiple points along the length of the structure to ensure a
+ * relatively flat surface. The final placement height is determined by the average
+ * height of the terrain at the chosen location.
+ *
+ * @param structure The Structure object to be placed. Must have a valid 'length' attribute.
+ * @param world The dWorldID for the physics engine.
+ * @param searchRadius The maximum radius from the center to search for a location.
+ * @param searchTries The number of random starting positions to attempt.
+ * @param angleTries The number of angle orientations to check for each position.
+ * @return A pointer to the placed Structure if successful, or NULL if no suitable location is found.
+ */
+Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries)
+{
+
+    assert ( structure != NULL || structure->getLength() > 0 || !"Structure is null or has no length. Weird...." );
+
+    std::vector<int> hist(250, 0);
+
+    std::vector<std::vector<Vec3f>> heights(250);
+
+    for (int x=-1799; x<=1799; x+=TERRAIN_SCALE)
+    {
+        for (int z=-1799; z<=1799; z+=TERRAIN_SCALE)
+        {
+            float h = _landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+            if (h>0 && (int)h != 3)
+            {
+                hist[(int)h]++; 
+                heights[(int)h].emplace_back(Vec3f(x, h, z));
+            }
+
+        }
+    }
+
+    // Good, now find the max height
+    // use std function to find a max in an array
+    auto count = *std::max_element(hist.begin(), hist.end());
+
+    int height = std::distance(hist.begin(), std::max_element(hist.begin(), hist.end()));
+
+    std::cout << "Found " << count << " of spots with height " << height << std::endl;
+
+    for (const auto& pos : heights[height])
+    {
+        std::cout << " - Position: " << pos << std::endl;
+    }
+
+    // Pick randomly one from the list.
+    int pos = getRandomInteger(0, heights[height].size()-1);
+
+    Vec3f selected = heights[height][pos];
+
+    float x = selected[0];
+    float z = selected[2];
+
+    float t = 45;  // The structure orientation is positive rotation towards west with 0 aligned to north.
+
+    // The heightmap is vertically mirrored.
+
+    t = ASRADS(getRandomInteger(0,360));
+
+    //int radius = getRandomInteger(0,2500);
+
+    //radius = 100;
+
+    //x = cos(t) * radius;
+    //z = sin(t) * radius;
+
+    x = clipped(x, -1799, 1799);
+    z = clipped(z, -1799, 1799);
+
+    return addStructure(structure,x,z,-t+3*(PI/2), world);
+
 }
 
 

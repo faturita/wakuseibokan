@@ -36,6 +36,8 @@ public:
     void  doDynamics(dBodyID);
     void  doDynamics();
 
+    float getLength();
+
     int getType();
     int virtual getSubType();
     EntityTypeId virtual getTypeId();

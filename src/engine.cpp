@@ -2265,7 +2265,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 break;
                             case VehicleSubTypes::RUNWAY:
                                 s = new Runway(c->getFaction());
-                                island->addStructure(s,world);
+                                island->addRectangularStructureOnFlatTerrain(s,world, 360,10,100);
                                 break;
                             case VehicleSubTypes::LASERTURRET:
                                 s = new LaserTurret(c->getFaction());
@@ -2286,7 +2286,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 break;
                             case VehicleSubTypes::DOCK:
                                 s = new Dock(c->getFaction());
-                                island->addStructureAtDesiredHeight(s,world,0);
+                                island->addStructureAtDesiredHeight(s,world,COAST_HEIGHT);
                                 break;
                             case VehicleSubTypes::ANTENNA:
                                 s = new Antenna(c->getFaction());
