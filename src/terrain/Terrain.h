@@ -21,6 +21,8 @@
 #define HFIELD_WSTEP			60			// Vertex count along edge >= 2
 #define HFIELD_DSTEP			60
 
+#define COAST_HEIGHT			3.9         // Height of the coast just above sea level (docks should be placed here)
+
 
 //Represents a terrain, by storing a set of heights and normals at 2D locations
 class Terrain {
@@ -225,6 +227,7 @@ public:
     Structure* addStructure(Structure* structure,  dWorldID world);
     Structure* addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight);
     Structure* attachStructure(Structure* structure, size_t structureId, float x, float y, float z, float angle, dWorldID world);
+    Structure* addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries);
 
     float getX();
     float getZ();

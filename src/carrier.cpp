@@ -814,17 +814,29 @@ void drawScene() {
     glPushAttrib(GL_CURRENT_BIT);
     drawArrow(3);
     glPopAttrib();
-    
-    // Go with the floor (the sea)
-    glPushAttrib(GL_CURRENT_BIT);
-    drawFloor(relPos[0],relPos[1],relPos[2]);
-    glPopAttrib();
-
 
     // Draw islands.  All of them are drawn.  This has a very effect of seeing the islands from the distance.
     for (size_t i=0; i<islands.size(); i++) {
         (islands[i]->draw(offset));
     }
+    
+    // Enable polygon offset for water
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    // The two parameters are scale and units:
+    //   scale: multiplies by the polygon's slope (try 1.0f to start)
+    //   units: constant depth offset (try 1.0f or 2.0f)
+    glPolygonOffset(2.0f, 2.0f);  // I want to hide the sea floor under the polygons of the terrain.
+
+    // Go with the floor (the sea)
+    glPushAttrib(GL_CURRENT_BIT);
+    drawFloor(relPos[0],relPos[1],relPos[2]);
+    glPopAttrib();
+
+    // Disable it so it doesn't affect other geometry
+    glDisable(GL_POLYGON_OFFSET_FILL);
+
+
+
 
     // @NOTE: You can test quickly any 3ds model, by openning it up here and drawing it.
     //draw3DSModel("units/walrus.3ds",1200.0+100,15.0,700.0+300.0,3,_textureBox);
@@ -924,8 +936,7 @@ void initRendering() {
     
 	// Do not show hidden faces.
     glEnable(GL_DEPTH_TEST);
-    
-    
+
     // Enable wireframes
     if (wireframes) glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     
@@ -1754,6 +1765,9 @@ int main(int argc, char** argv) {
     version = glGetString (GL_VERSION);
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported: %s\n", version);
+    GLint depthBits;
+    glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+    printf("Depth buffer: %d bits\n", depthBits);
 
     if (isPresentCommandLineParameter(argc,argv,"-free"))
         aiplayer = FREE_AI;

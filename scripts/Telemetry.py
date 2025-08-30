@@ -16,7 +16,7 @@ import sys, select
 
 import socket
 
-from TelemetryDictionary import telemetrydirs
+from TelemetryDictionary import telemetrydirs as td
 
 data1 = 1
 data2 = 2
@@ -25,38 +25,42 @@ data3 = 3
 min = -10
 max = 200
 
-length = 60
-unpackcode = 'fffffffffffffff'
+length = 80
+unpackcode = '<Lififfffffffffffffff'
+tankparam = 1
 
-if (len(sys.argv)>=2):
+if (len(sys.argv)<2):
+    print('Provide the tank number')
+    quit()
+
+tankparam = int(sys.argv[1])
+
+if (len(sys.argv)>=3):
     print ("Reading which data to shown")
     try:
-        data1 = int(sys.argv[1])
-        data2 = int(sys.argv[2])
-        data3 = int(sys.argv[3])
+        data1 = int(sys.argv[2])
+        data2 = int(sys.argv[3])
+        data3 = int(sys.argv[4])
     except:
-        data1 = telemetrydirs[sys.argv[1]]
-        data2 = telemetrydirs[sys.argv[2]]
-        data3 = telemetrydirs[sys.argv[3]]
+        data1 = td[sys.argv[2]]
+        data2 = td[sys.argv[3]]
+        data3 = td[sys.argv[4]]
 
-if (len(sys.argv)>=5):
-    min = int(sys.argv[4])
-    max = int(sys.argv[5])
+if (len(sys.argv)>=6):
+    min = int(sys.argv[5])
+    max = int(sys.argv[6])
 
-if (len(sys.argv)>=7):
-    length = int(sys.argv[6])
-    unpackcode = sys.argv[7]
+if (len(sys.argv)>=8):
+    length = int(sys.argv[7])
+    unpackcode = sys.argv[8]
 
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+tankparam = int(tankparam)
+port = 4600 + tankparam  # Listening port based on tank number
+server_address = ('0.0.0.0', port)
+print ('Starting up on %s port %s' % server_address)
 
-serialconnected = False
-
-if (not serialconnected):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = ('0.0.0.0', 4500)
-    print ('Starting up on %s port %s' % server_address)
-
-    sock.bind(server_address)
-
+sock.bind(server_address)
 
 def gimmesomething(ser):
     while True:
@@ -70,27 +74,6 @@ def gimmesomething(ser):
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
 f = open('./data/sensor.'+st+'.dat', 'w')
-
-
-if (serialconnected):
-
-    ser = serial.Serial(port='/dev/cu.usbmodem1421', baudrate=9600, timeout=0)
-
-    f = open('sensor.dat', 'w')
-
-    ser.write('X')
-    time.sleep(6)
-
-    buf = ser.readline()
-    print (str(buf))
-
-    buf = ser.readline()
-    print (str(buf))
-
-    buf = ser.readline()
-    print (str(buf))
-
-    ser.write('S')
 
 # You probably won't need this if you're embedding things in a tkinter plot...
 plt.ion()
@@ -116,61 +99,70 @@ plotx = []
 
 counter = 0
 
+shouldrun = True
 
 
-if (serialconnected):
-   ser.write('A7180')
-address = ''
-while True:
-  # read
-  if (serialconnected):
-      ser.write('S')
-      ser.write('P')
-      myByte = ser.read(1)
-  else:
-      myByte = 'S'
+def read():
+    # Receive telemetry data and unpack it if it's the correct length
+    dataframe, address = sock.recvfrom(length)
+    if len(dataframe) > 0 and len(dataframe) == length:
+        return unpack(unpackcode, dataframe)
+    return None
 
-  if myByte == 'S':
-      if (serialconnected):
-         data = ser.read(length) # 24
-         myByte = ser.read(1)
-      else:
-         data, address = sock.recvfrom(length) # 44+26
-         myByte = 'E'
+while shouldrun:
 
-      if myByte == 'E' and len(data)>0 and len(data) == length:
-          # is  a valid message struct
-          new_values = unpack(unpackcode,data)
-          f.write( str(new_values[data1]) + ' ' + str(new_values[data2]) + ' ' + str(new_values[data3]) + '\n')
+    try:
+        
+        # Read both tanks' telemetry packets
+        tank1values = read()
+        if int(tank1values[td['number']]) != 1:
+            continue
 
-          x.append( float(new_values[data1]))
-          y.append( float(new_values[data2]))
-          z.append( float(new_values[data3]))
+        tank2values = read()
+        if int(tank2values[td['number']]) != 2:
+            continue
 
-          plotx.append( plcounter )
+        # Determine which tank is "ours"
+        if tankparam == 1:
+            myvalues = tank1values
+            othervalues = tank2values
+        else:
+            myvalues = tank2values
+            othervalues = tank1values
 
-          line1.set_ydata(x)
-          line2.set_ydata(y)
-          line3.set_ydata(z)
+        f.write( str(myvalues[data1]) + ' ' + str(myvalues[data2]) + ' ' + str(myvalues[data3]) + '\n')
 
-          line1.set_xdata(plotx)
-          line2.set_xdata(plotx)
-          line3.set_xdata(plotx)
+        x.append( float(myvalues[data1]))
+        y.append( float(myvalues[data2]))
+        z.append( float(myvalues[data3]))
 
-          fig.canvas.draw()
-          plt.pause(0.0000000001)
+        plotx.append( plcounter )
 
-          plcounter = plcounter+1
+        line1.set_ydata(x)
+        line2.set_ydata(y)
+        line3.set_ydata(z)
 
-          if plcounter > 500:
-              plcounter = 0
-              plotx[:] = []
-              x[:] = []
-              y[:] = []
-              z[:] = []
+        line1.set_xdata(plotx)
+        line2.set_xdata(plotx)
+        line3.set_xdata(plotx)
+
+        fig.canvas.draw()
+        plt.pause(0.0000000001)
+
+        plcounter = plcounter+1
+
+        if plcounter > 500:
+            plcounter = 0
+            plotx[:] = []
+            x[:] = []
+            y[:] = []
+            z[:] = []
+    except socket.timeout:
+        # If timeout, end the episode
+        print("Episode Completed")
+        shouldrun = False
+        break
 
 
 f.close()
-if (serialconnected):
-   ser.close()
 print ('Everything successfully closed.')
