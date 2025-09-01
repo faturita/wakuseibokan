@@ -242,13 +242,12 @@ void TestCase_111::init()
     reset(nemesis);
 
     // Set up the camera view
-
-    Vec3f pos(-1000,10,0);
+    Vec3f pos(0.0f,1700.5f,-3000);
     camera.setPos(pos);
     camera.dy = 0;
     camera.dz = 0;
-    camera.xAngle = -90;
-    camera.yAngle = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 38;
     controller.controllingid = CONTROLLING_NONE;
 
     aiplayer = FREE_AI;
@@ -358,6 +357,7 @@ int TestCase_111::check(unsigned long timertick)
                     //co.push(mesg.order);
 
                     _b->doControl(co);
+                    _b->setUpdateTime(timer);
 
 
                     if (mesg.command == 11 && _b->getPower()>0)

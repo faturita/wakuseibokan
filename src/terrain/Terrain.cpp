@@ -580,25 +580,47 @@ Vec3f computeMainDirection(const std::vector<Vec3f>& points) {
 
     return dir.normalize();
 }
-/**
- * @brief BoxIsland::addRectangularStructureOnFlatTerrain
- *
- * Adds a rectangular structure, like a runway, to the island terrain. The function
- * searches for a location where the structure's length can be placed with minimal
- * height variation, preventing it from clipping into or floating above the terrain.
- *
- * It iterates through random positions and angles, and for each candidate spot,
- * it checks multiple points along the length of the structure to ensure a
- * relatively flat surface. The final placement height is determined by the average
- * height of the terrain at the chosen location.
- *
- * @param structure The Structure object to be placed. Must have a valid 'length' attribute.
- * @param world The dWorldID for the physics engine.
- * @param searchRadius The maximum radius from the center to search for a location.
- * @param searchTries The number of random starting positions to attempt.
- * @param angleTries The number of angle orientations to check for each position.
- * @return A pointer to the placed Structure if successful, or NULL if no suitable location is found.
- */
+
+float BoxIsland::findHighestPointAlongPath(dWorldID world, float centerX, float centerZ, float angleRad, float length, float step)
+{
+    // Start with a very low height, or the height at the center point.
+    float maxHeight = _landmass->getHeight((int)(centerX / TERRAIN_SCALE) + TERRAIN_SCALE / 2, (int)(centerZ / TERRAIN_SCALE) + TERRAIN_SCALE / 2);
+
+    // X is positive to the West
+    // Z is positive to the North
+    // Angles goes clockwise starting from the West which is zero.
+    float dirX = cos(angleRad);
+    float dirZ = sin(angleRad);
+
+    float halfLength = length / 2.0f;
+
+    // Iterate from one end of the runway to the other.
+    for (float d = -halfLength; d <= halfLength; d += step)
+    {
+        // Calculate the sample point's coordinates.
+        float sampleX = centerX + d * dirX;
+        float sampleZ = centerZ + d * dirZ;
+
+        sampleX = clipped(sampleX, -1799, 1799);
+        sampleZ = clipped(sampleZ, -1799, 1799);
+
+        //addStructure(new Structure(), sampleX, sampleZ, 0, world);
+
+        // Get the height at the sample point, using the same indexing logic as your main function.
+        // This ensures consistency in how the heightmap is queried.
+        float currentHeight = _landmass->getHeight((int)(sampleX / TERRAIN_SCALE) + TERRAIN_SCALE / 2, (int)(sampleZ / TERRAIN_SCALE) + TERRAIN_SCALE / 2);
+
+        // Update the maximum height if the current point is higher.
+        if (currentHeight > maxHeight)
+        {
+            maxHeight = currentHeight;
+        }
+    }
+
+    return maxHeight;
+}
+
+
 Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries)
 {
 
@@ -644,23 +666,21 @@ Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure,
     float x = selected[0];
     float z = selected[2];
 
-    float t = 45;  // The structure orientation is positive rotation towards west with 0 aligned to north.
+    float t = 32;  // The structure orientation is positive rotation towards west with 0 aligned to north.
+    t = ASRADS(t);
 
     // The heightmap is vertically mirrored.
-
     t = ASRADS(getRandomInteger(0,360));
 
-    //int radius = getRandomInteger(0,2500);
 
-    //radius = 100;
+    float placementHeight = findHighestPointAlongPath(world,x, z, t, structure->getLength(), TERRAIN_SCALE);
 
-    //x = cos(t) * radius;
-    //z = sin(t) * radius;
+    std::cout << "Highest point in " << selected << " is " << placementHeight << std::endl;
 
     x = clipped(x, -1799, 1799);
     z = clipped(z, -1799, 1799);
 
-    return addStructure(structure,x,z,-t+3*(PI/2), world);
+    return addStructure(structure,x,placementHeight,z,-t+3*(PI/2), world);
 
 }
 
@@ -721,10 +741,16 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
 Structure* BoxIsland::addStructure(Structure* structure, float x, float z, float angle, dWorldID world)
 {
     // This should be half the height of the structure. @FIXME
-    float heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+    float height = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+    return addStructure(structure, x, height + 0, z, angle, world);
+}
+Structure* BoxIsland::addStructure(Structure* structure, float x, float placementHeight, float z, float angle, dWorldID world)
+{
+
     structure->init();
     structure->embody(world,islandspace);
-    structure->setPos(X+x,heightOffset,Z+z);
+    structure->setPos(X+x,placementHeight,Z+z);
     structure->rotate(angle);
     structure->onIsland(this);
 

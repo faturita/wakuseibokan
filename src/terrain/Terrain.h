@@ -223,11 +223,13 @@ public:
 
     dGeomID getGeom();
 
+	Structure* addStructure(Structure* structure, float x, float offsetHeight, float z, float angle, dWorldID world);
     Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
     Structure* addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight);
     Structure* attachStructure(Structure* structure, size_t structureId, float x, float y, float z, float angle, dWorldID world);
     Structure* addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries);
+    float findHighestPointAlongPath(dWorldID world, float centerX, float centerZ, float angleRad, float length, float step);
 
     float getX();
     float getZ();
