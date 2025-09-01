@@ -101,8 +101,8 @@ class Controller:
         self.sock.bind(self.server_address)
         self.sock.settimeout(5)
 
-        self.length = 80
-        self.unpackcode = '<Lififfffffffffffffff'
+        self.length = 84
+        self.unpackcode = '<LLififfffffffffffffff'
 
         self.recorder = Recorder()
 

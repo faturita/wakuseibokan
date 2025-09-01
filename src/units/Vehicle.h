@@ -171,7 +171,7 @@ private:
     int statuschangedelay=0;
     int finaldelayedstatus = SailingStatus::SAILING;
 
-
+    unsigned long lastUpdateTimer = 0;
 
 protected:
     Vec3f pos;
@@ -290,6 +290,8 @@ public:
     void virtual doControl(Controller);
     void virtual doControl(struct controlregister);
     void virtual doControl();
+
+    void setUpdateTime(unsigned long t);
     
     void virtual embody(dBodyID myBodySelf);
     void antigravity(dBodyID myBodySelf);

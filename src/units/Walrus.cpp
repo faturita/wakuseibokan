@@ -381,7 +381,6 @@ void Walrus::doControl(struct controlregister conts)
     if (getThrottle()>=10 && getThrottle()<=20 and !didit)
     {
         didit = true;
-        smallenginestart(pos);
     } else if (getThrottle()==0)
         didit = false;
     

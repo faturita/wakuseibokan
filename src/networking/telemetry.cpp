@@ -26,6 +26,7 @@ extern unsigned long timer;
 #pragma pack(push, 1)
 struct ModelRecord {
     uint32_t recordtimer;
+    uint32_t lastUpdateTimer;
     int32_t number;
     float health;
     int32_t power;
@@ -136,11 +137,12 @@ void inittelemetry()
 }
 
 
-void telemetryme(int number, float health, int power, float bearing, float *dBodyPosition, float *dBodyRotation)
+void telemetryme(unsigned long lastUpdateTimer, int number, float health, int power, float bearing, float *dBodyPosition, float *dBodyRotation)
 {
     ModelRecord logstructure;
 
     logstructure.recordtimer = timer;
+    logstructure.lastUpdateTimer = lastUpdateTimer;
     logstructure.number = number;
     logstructure.health = health;
     logstructure.power = power;

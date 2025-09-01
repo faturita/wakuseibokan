@@ -644,6 +644,11 @@ void Vehicle::resetControlRegisters()
     memset(&registers,0,sizeof(struct controlregister));
 }
 
+void Vehicle::setUpdateTime(unsigned long t)
+{
+    lastUpdateTimer = t;
+}
+
 /**
  * This is the key binding between ODE and OpenGL to make this engine work.
  * Get the speed.
@@ -722,7 +727,7 @@ void Vehicle::wrapDynamics(dBodyID body)
 //        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
 //        dout << s << std::endl;
 
-        telemetryme(number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
+        telemetryme(lastUpdateTimer,number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
     }
 
 
@@ -1112,3 +1117,5 @@ void Vehicle::deserialize(TickRecord record)
     setCargo(0, record.cargo[0]);
 
 }
+
+

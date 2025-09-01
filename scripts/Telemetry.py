@@ -11,6 +11,7 @@ import serial
 import time
 import datetime
 from struct import *
+from Fps import Fps
 
 import sys, select
 
@@ -25,8 +26,8 @@ data3 = 3
 min = -10
 max = 200
 
-length = 80
-unpackcode = '<Lififfffffffffffffff'
+length = 84
+unpackcode = '<LLififfffffffffffffff'
 tankparam = 1
 
 if (len(sys.argv)<2):
@@ -100,7 +101,8 @@ plotx = []
 counter = 0
 
 shouldrun = True
-
+fps = Fps()
+fps.tic()  # Start FPS timer
 
 def read():
     # Receive telemetry data and unpack it if it's the correct length
@@ -129,7 +131,9 @@ while shouldrun:
         else:
             myvalues = tank2values
             othervalues = tank1values
-
+            
+        fps.steptoc()
+        print(f"Fps: {fps.fps}")
         f.write( str(myvalues[data1]) + ' ' + str(myvalues[data2]) + ' ' + str(myvalues[data3]) + '\n')
 
         x.append( float(myvalues[data1]))

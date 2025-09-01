@@ -32,17 +32,11 @@ class Command:
         return self.__heatup
 
     def send_command(self,timer, controllingid, thrust, steering, turretdeclination, turretbearing):
-        spawnid=0
-        typeofisland=0
-        x=0.0
-        y=0.0
-        z=0.0
-        target=0
-        bit=0
-        weapon=0
-        yaw=0
-        bank=0
-        faction=controllingid
+        
+        roll, pitch, precesion = steering, turretdeclination, turretbearing
+        yaw, bank, spawnid, typeofisland, x, y, z, target, bit, weapon = 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0
+        faction = controllingid
+        #command = 11 if fire else 0
 
         # Thrust is the speed of the tank. >0 is forward, <0 is backwards.
         # Steering controls the direction of the tank. >0 is right, <0 is left.
@@ -55,23 +49,23 @@ class Command:
         #    self.command = 0
             
         
-        # This is the structure fron CommandOrder
-        data=pack("<i6fiiiifffiiI",         
-            controllingid,
-            thrust,
-            steering,
-            turretdeclination,
-            yaw,
-            turretbearing,
-            bank,
-            faction,
-            self.command,    # 0 or 11
-            spawnid,
-            typeofisland,
-            x,y,z,
-            target,
-            weapon,
-            timer)
+        # Resumen de la estructura de los comandos de órdenes en general
+        data=pack("<i6fiiiifffiiI",
+            controllingid,  # (Int)      Es el número de tanque
+            thrust,         # (Float)    Potencia: Positivos adelante, negativos para marcha atrás
+            roll,           # (Float)    Steering: Positivos a la derecha, negativos a la izquierda
+            pitch,          # (Float)    TurretDeclination: 0 es horizontal adelante, 90 es arriba (ojo que da toda la vuelta)
+            yaw,            # (Float)    (no usado en el tanque)
+            precesion,      # (Float)    TurretBearing: Positivos hacia la derecha, negativos hacia la izquierda
+            bank,           # (Float)    (no usado en el tanque)
+            faction,        # (Int)      Es el número de equipo/jugador
+            self.command,   # (Int)      0 no hace nada, 11 dispara (si no disparó hace poco)
+            spawnid,        # (Int)      (no usado en el tanque)
+            typeofisland,   # (Int)      (no usado en el tanque)
+            x,y,z,          # (Floats)   (no usados en el tanque)
+            target,         # (Float)    (no usado en el tanque)
+            weapon,         # (Int)      (no usado en el tanque)
+            timer)          # (Long)     Es la referencia de tiempo
         
         # Check the size of the struct due to cross-platform compatibility issues.
         #print(calcsize("<i6fiiiifffiiI"))   This  must be 68 to be cross platform.
