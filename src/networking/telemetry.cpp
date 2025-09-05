@@ -164,7 +164,6 @@ void telemetryme(unsigned long lastUpdateTimer, int number, float health, int po
     logstructure.r11 = dBodyRotation[10];
     logstructure.r12 = dBodyRotation[11];
 
-
     for (size_t i=0; i<connections.size(); i++) {
         // @NOTE: The socket must be already connected at this point.
         sendto(connections[i].sockfd, &logstructure, sizeof(logstructure), 0, (SA *)&connections[i].servaddr, sizeof(connections[i].servaddr));

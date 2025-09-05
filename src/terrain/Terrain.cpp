@@ -655,7 +655,7 @@ Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure,
 
     for (const auto& pos : heights[height])
     {
-        std::cout << " - Position: " << pos << std::endl;
+        //std::cout << " - Position: " << pos << std::endl;
     }
 
     // Pick randomly one from the list.

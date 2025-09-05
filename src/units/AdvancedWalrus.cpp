@@ -470,14 +470,28 @@ void AdvancedWalrus::doControlDestination()
             std::vector<Vec3f> vertices = ((Balaenidae*)cd)->getVertices();
             Vec3f cc = findClosestPointOnPolygon(Po, vertices, obstacle);
             obstacle = (cc - Po).magnitude();   // cd->getPos();
+
+            if (obstacle < 50)
+            {
+                if (((Po-getForward()*10)-cd->getPos()).magnitude() > ((Po-getForward())-cd->getPos()).magnitude())
+                {
+                    //dBodyAddRelForce(me, 0, 0, -1000);
+                    c.registers.thrust = -15.0f;
+                    //((Balaenidae*)cd)->offshore(Vec3f(0,0,0.1));
+                    doControl(c);
+                    return;
+                }
+            }
+
             if (obstacle < 200) // check the size
             {
-                Vec3f l = cc;
+                Vec3f l = cd->getPos();
                 Vec3f d = Po-l;
 
                 d = d.normalize();
 
                 T = T+d;
+
                 T = T.normalize();
 
                 c.registers.thrust = 15.0f;
