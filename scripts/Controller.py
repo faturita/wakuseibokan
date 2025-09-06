@@ -30,8 +30,8 @@ class Controller:
         self.sock.settimeout(10)
 
         # Telemetry packet length and unpacking format
-        self.length = 80
-        self.unpackcode = '<Lififfffffffffffffff'
+        self.length = 84
+        self.unpackcode = '<LLififfffffffffffffff'
 
         self.recorder = Recorder()  # Initialize recorder to store episodes
 
