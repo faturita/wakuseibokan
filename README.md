@@ -258,6 +258,7 @@ make clean
 make 
 sudo make install
 cd ..
+cd wakuseibokan
 cp dependencies/ode.tgz ../
 cd ..
 tar xvzf ode.tgz
