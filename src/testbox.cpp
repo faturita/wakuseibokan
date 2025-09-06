@@ -8734,6 +8734,251 @@ void checktest93(unsigned long timer)
 
 }
 
+void test94()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(5000.0f,20.5f,-5000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+        // 6,3,12
+    Otter *_otter = new Otter(GREEN_FACTION);
+    _otter->init();
+    dSpaceID car_space = _otter->embody_in_space(world, space);
+    _otter->setPos(6000.0f,70.0f,-5000);
+    _otter->stop();
+    _otter->setSignal(4);
+    _otter->setNameByNumber(1);
+    _otter->setStatus(SailingStatus::SAILING);
+
+    Vec3f dimensions(5.0f,4.0f,10.0f);
+
+    entities.push_back(_otter, _otter->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _otter->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(6000.0f,20.5f,-10300);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest94(unsigned long timer)
+{
+    if (timer == 200)
+    {
+        Vehicle *b = entities[2];
+
+        b->setAutoStatus(AutoStatus::DESTINATION);
+        b->setDestination(Vec3f(-7000.0,0,-5000.0));
+        b->enableAuto();
+    }
+
+    if (timer>5000000)
+    {
+        BoxIsland *nemesis = islands[0];
+
+        if (nemesis->getStructures().size() > 0)
+        {
+            testSucceeded();
+        }
+
+    }
+    if (timer == 1500000)
+    {
+        testFailed();
+    }
+}
+
+
+void test95()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+
+    islands.push_back(nemesis);
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(5000.0f,5.5f,-5000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+
+        // 6,3,12
+    Otter *_otter = new Otter(GREEN_FACTION);
+    _otter->init();
+    dSpaceID car_space = _otter->embody_in_space(world, space);
+    _otter->setPos(6000.0f,70.0f,0);
+    _otter->stop();
+    _otter->setSignal(4);
+    _otter->setNameByNumber(1);
+    _otter->setStatus(SailingStatus::SAILING);
+
+    Vec3f dimensions(5.0f,4.0f,10.0f);
+
+    entities.push_back(_otter, _otter->getGeom());
+
+
+
+    Wheel * _fr= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fr->init();
+    _fr->embody(world, car_space);
+    _fr->attachTo(world,_otter,4.9f, -3.0, 5.8);
+    _fr->stop();
+
+    entities.push_back(_fr, _fr->getGeom());
+
+
+    Wheel * _fl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _fl->init();
+    _fl->embody(world, car_space);
+    _fl->attachTo(world,_otter, -4.9f, -3.0, 5.8);
+    _fl->stop();
+
+    entities.push_back(_fl, _fl->getGeom());
+
+
+    Wheel * _br= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _br->init();
+    _br->embody(world, car_space);
+    _br->attachTo(world,_otter, 4.9f, -3.0, -5.8);
+    _br->stop();
+
+    entities.push_back(_br, _br->getGeom());
+
+
+    Wheel * _bl= new Wheel(GREEN_FACTION, 0.001, 30.0);
+    _bl->init();
+    _bl->embody(world, car_space);
+    _bl->attachTo(world,_otter, -4.9f, -3.0, -5.8);
+    _bl->stop();
+
+    entities.push_back(_bl, _bl->getGeom());
+
+    _otter->addWheels(_fl, _fr, _bl, _br);
+
+    _fl->setSteering(true);
+    _fr->setSteering(true);
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(6000.0f,20.5f,-10300);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest95(unsigned long timer)
+{
+    if (timer == 200)
+    {
+        // @FIXME:  This is not working
+        Walrus *w = (Walrus*) entities[2];
+        Vehicle *b = findCarrier(w->getFaction());
+        Vec3f t = b->getPos() - w->getPos();
+        t = t.normalize();
+
+        Vec3f up = Vec3f(0,1,0);
+
+        t = t.cross(up);
+        t = t.normalize();
+
+        Vec3f target = b->getPos()-(b->getForward().normalize()*500);
+        w->setAutoStatus(AutoStatus::DESTINATION);
+        w->setDestination(target);
+        w->enableAuto();
+    }
+
+    if (timer>5000000)
+    {
+        BoxIsland *nemesis = islands[0];
+
+        if (nemesis->getStructures().size() > 0)
+        {
+            testSucceeded();
+        }
+
+    }
+    if (timer == 1500000)
+    {
+        testFailed();
+    }
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -8863,7 +9108,7 @@ void initWorldModelling(int testcase)
     case 81:test81();break;                         // Test AdvancedWalrus landing on a bumpy island.
     case 82:test82();break;                         // Test island boundary and dock position.
     case 83:test83();break;                         // Check walrus flow dynamics on water
-    case 84:test84();break;                         // Check Energy production in windmills.
+    case 84:test84();break;                         // Set carrier to move through different waypoints.
     case 85:test85();break;                         // Check CargoShip docking on the other side of the island.
     case 86:test86();break;                         // Check CargoShip travelling to the other side of the island.
     case 87:test87();break;                         // Check Carrier AI arriving to an island, sending the walrus.
@@ -8873,6 +9118,8 @@ void initWorldModelling(int testcase)
     case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
     case 92:test92();break;                         // Carrier defending from an attacking walrus (with all its weapons).
     case 93:test93();break;                         // Carrier send a walrus to capture an island.
+    case 94:test94();break;                         // Test carrier force field for walruses
+    case 95:test95();break;                         // Test walruses going back to carrier rear.
     default:initIslands();test1();break;
     }
 
@@ -8983,6 +9230,8 @@ void worldStep(int value)
     case 91:checktest91(timer);break;
     case 92:checktest92(timer);break;
     case 93:checktest93(timer);break;
+    case 94:checktest94(timer);break;
+    case 95:checktest95(timer);break;
     default: break;
     }
 

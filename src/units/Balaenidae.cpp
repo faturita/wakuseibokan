@@ -759,11 +759,28 @@ std::vector<Vec3f> Balaenidae::getVertices()
 {
     std::vector<Vec3f> vertices;
 
-    vertices.push_back(getPos()+Vec3f(-50.0f, 0.0f, -250.0f));
-    vertices.push_back(getPos()+Vec3f(50.0f, 0.0f, -250.0f));
+    Vec3f direction = getForward().normalize();
 
-    vertices.push_back(getPos()+Vec3f(-50.0f, 0.0f, 250.0f));
-    vertices.push_back(getPos()+Vec3f(50.0f, 0.0f, 250.0f));
+    Vec3f upperleft = Vec3f(-50.0f, 0.0f, -250.0f);
+    Vec3f upperright = Vec3f(50.0f, 0.0f, -250.0f);
+    Vec3f lowerleft = Vec3f(-50.0f, 0.0f, 250.0f);
+    Vec3f lowerright = Vec3f(50.0f, 0.0f, 250.0f);
+
+    dReal result[3];
+    dBodyGetRelPointPos( me, upperleft[0], upperleft[1], upperleft[2], result);
+    upperleft = Vec3f(result[0], result[1], result[2]);
+    dBodyGetRelPointPos( me, upperright[0], upperright[1], upperright[2], result);
+    upperright = Vec3f(result[0], result[1], result[2]);
+    dBodyGetRelPointPos( me, lowerleft[0], lowerleft[1], lowerleft[2], result);
+    lowerleft = Vec3f(result[0], result[1], result[2]);
+    dBodyGetRelPointPos( me, lowerright[0], lowerright[1], lowerright[2], result);
+    lowerright = Vec3f(result[0], result[1], result[2]);
+
+    vertices.push_back(getPos());
+    vertices.push_back(upperleft);
+    vertices.push_back(upperright);
+    vertices.push_back(lowerleft);
+    vertices.push_back(lowerright);
 
     return vertices;
 }
