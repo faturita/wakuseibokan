@@ -247,6 +247,7 @@ There are several scenarios in the engine that are used for research and as test
 The scenario 111 is the tank battleground.  To compile everything do:
 
 ```bash
+git clone https://github.com/faturita/wakuseibokan.git
 cd wakuseibokan
 cp dependencies/stk.tgz ../
 cd ..
@@ -257,6 +258,7 @@ make clean
 make 
 sudo make install
 cd ..
+cd wakuseibokan
 cp dependencies/ode.tgz ../
 cd ..
 tar xvzf ode.tgz
