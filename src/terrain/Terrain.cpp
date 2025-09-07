@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <fstream>
+#include <algorithm>
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
