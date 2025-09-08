@@ -24,7 +24,6 @@ brew install libtool
 ```
 
 ```bash
-```bash
 git clone https://github.com/faturita/wakuseibokan.git
 cd wakuseibokan
 cp dependencies/stk.tgz ../
