@@ -35,7 +35,7 @@ make clean
 make 
 sudo make install
 cd ..
-git clone https://rramele@bitbucket.org/odedevs/ode.git
+git clone https://bitbucket.org/odedevs/ode.git
 cd ode
 rm -rf aclocal.m4 configure config.guess config.sub depcomp install-sh ltmain.sh missing
 autoreconf --install --force   
