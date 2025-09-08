@@ -108,54 +108,6 @@ echo "Installation complete."
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 </details>
 
-ODE
----
-
-
-You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
-Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
-
-```bash
-./bootstrap
-./configure --disable-asserts
-make
-sudo make install
-```
-
-
-
-Once these steps are completed you can compile ODE:
-
-```bash
- ./bootstrap
- ./configure --disable-asserts
- make clean && make && sudo make install
-```
-
-STK
----
-
-First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
-to compile this sound library.
-
-```bash
-cp dependencies/stk.tgz ../
-cd ..
-tar xvzf stk.tgz
-cd stk
-make clean
-./configure
-make 
-sudo make install
-```
-
-The STK libraries are going to be copied into /usr/local/lib/.  So you need
-to run the following command before executing the simulator or configure it intorc_bash or similar.
-
-```bash
-export LD_LIBRARY_PATH=/usr/local/lib/
-``` 
-
 Install on WSL on Windows 11
 ----------------------------
 
@@ -185,12 +137,6 @@ Follow the exact same procedures to compile and run the application on Ubuntu.
 Ubuntu Packages
 ---------------
 **Tested with Ubuntu 20.02.4**
-
- libbsd-dev  freeglut3-dev
- libasound2  libasound2-dev
-
-<details>
- <summary>Setting up a Ubuntu Dev Box</summary>
  
 ```bash
 sudo apt-get update
@@ -199,8 +145,71 @@ sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev
 sudo apt-get install git make g++ gcc libtool automake net-tools
 sudo apt-get install python3-pip
  ```
- 
- </details>
+
+
+```bash
+git clone https://github.com/faturita/wakuseibokan.git
+cd wakuseibokan
+cp dependencies/stk.tgz ../
+cd ..
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+cd ..
+cd wakuseibokan
+cp dependencies/ode.tgz ../
+cd ..
+tar xvzf ode.tgz
+cd ode
+./configure --disable-asserts
+make clean && make && sudo make install
+cd ..
+cd wakuseibokan
+make clean
+make
+make testcase TC=111
+```
+
+
+ODE
+---
+
+You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
+Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+
+```bash
+./bootstrap
+./configure --disable-asserts
+make
+sudo make install
+```
+
+STK
+---
+
+First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
+to compile this sound library.
+
+```bash
+cp dependencies/stk.tgz ../
+cd ..
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+```
+
+The STK libraries are going to be copied into /usr/local/lib/.  So you need
+to run the following command before executing the simulator or configure it intorc_bash or similar.
+
+```bash
+export LD_LIBRARY_PATH=/usr/local/lib/
+``` 
 
 # Compiling the game
 
