@@ -112,7 +112,12 @@ Install on WSL on Windows 11
 ----------------------------
 
 * Install WSL2 on Windows 11
-* Create a 22.04 ubuntu WSL2 box:  wsl install Ubuntu-22.04
+* Create a 22.04 ubuntu WSL2 box:
+
+```bash
+wsl install -d Ubuntu-22.04
+```
+
 * When the image is created a new file will appear on the windows home directory **.wslconfig**
 
 ```bash
@@ -123,20 +128,12 @@ The NAT configuration allows both the WSL box and the host computer to see each 
 
 On the other hand, configure the box as **networkingMode=mirrored** to share the same networking address space as the windows host computer.  This means that for any external computer the IP and port of any process running on the wsl2 box will be shared with the host computer.
 
-Ubuntu: 22.04
-```bash
-  sudo apt-get update
-  sudo apt-get upgrade
-  sudo apt-get install libbsd-dev freeglut3-dev libasound2 libasound2-dev 
-  sudo apt-get install git make g++ gcc libtool automake net-tools
-  sudo apt-get install python3-pip
-```
+Now, follow the same procedure for Ubuntu 22.04 the exact same procedures to compile and run the application on Ubuntu.
 
-Follow the exact same procedures to compile and run the application on Ubuntu.
-
-Ubuntu Packages
+Ubuntu 22.04
 ---------------
-**Tested with Ubuntu 20.02.4**
+
+Install the following packages
  
 ```bash
 sudo apt-get update
@@ -272,8 +269,8 @@ The map can be activated by pressing "@".  And the main view can be restored by 
  
 </details>
 
-
-# Scenarios
+Scenario
+--------
 
 There are several scenarios in the engine that are used for research and as test cases.
 
@@ -310,7 +307,8 @@ and then compile the scenario itself from the same directory.
  ./testcase -mute -nointro 
 ```
 
-It is possible to add -seed NN to set a seed number for the simulation.
+* Add -seed NN to set a seed number for the simulation.
+* Add --episodes to generate and repeat each episode.
 
 # Description
 
