@@ -15,21 +15,32 @@ Check [Videos](https://www.youtube.com/playlist?list=PLJHMIS4ekxNSLS422Nw7D2JlJW
 * STK: The Synthesis Toolkit in C++ (Audio Library)
 * OpenGL Version 2.1 (supported natively in Linux, Mac and Windows).
 
-ODE
----
-
-You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
-Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+Mac OS Installation
+-------------------
 
 ```bash
+brew install premake
+brew install libtool
+```
+
+```bash
+make maintaner-clean
+rm -rf aclocal.m4 configure config.guess config.sub depcomp install-sh ltmain.sh missing
+autoreconf --install --force   
+
+
 ./bootstrap
 ./configure --disable-asserts
 make
 sudo make install
 ```
 
+
 ODE 0.14 Compilation on Mac Sierra / Apple M2 Pro Ventura
 ----------------------------------------------------------
+
+<details>
+<summary>For older versions, you can run the following script</summary>
 
 * Run the following script to install automake tools for Mac
 
@@ -38,9 +49,6 @@ On newer OSX systems with brew installed, you can do
 ```bash
 brew install premake
 ```
-
-<details>
-<summary>For older versions, you can run the following script</summary>
  
 ```bash
 #!/bin/sh
@@ -99,6 +107,22 @@ echo "Installation complete."
 * Modify configure script and remove from the script "-sse .... mmx"
 * Modify LIBTOOLIZE variables from 'glibtoolize' to 'libtoolize'
 </details>
+
+ODE
+---
+
+
+You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
+Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
+
+```bash
+./bootstrap
+./configure --disable-asserts
+make
+sudo make install
+```
+
+
 
 Once these steps are completed you can compile ODE:
 
@@ -273,6 +297,7 @@ and then compile the scenario itself from the same directory.
 
 ```bash
  make testcase TC=111
+ export LD_LIBRARY_PATH=/usr/local/lib/
  ./testcase -mute -nointro 
 ```
 
