@@ -24,15 +24,29 @@ brew install libtool
 ```
 
 ```bash
-make maintaner-clean
+```bash
+git clone https://github.com/faturita/wakuseibokan.git
+cd wakuseibokan
+cp dependencies/stk.tgz ../
+cd ..
+tar xvzf stk.tgz
+cd stk
+make clean
+./configure
+make 
+sudo make install
+cd ..
+git clone https://rramele@bitbucket.org/odedevs/ode.git
+cd ode
 rm -rf aclocal.m4 configure config.guess config.sub depcomp install-sh ltmain.sh missing
 autoreconf --install --force   
-
-
-./bootstrap
 ./configure --disable-asserts
 make
 sudo make install
+cd ..
+cd wakuseibokan
+make clean
+make
 ```
 
 
