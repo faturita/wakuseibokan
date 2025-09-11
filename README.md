@@ -34,6 +34,7 @@ make clean
 ./configure
 make 
 sudo make install
+cp ./src/libstk-4.6.1.dylib ../wakuseibokan/
 cd ..
 git clone https://bitbucket.org/odedevs/ode.git
 cd ode
