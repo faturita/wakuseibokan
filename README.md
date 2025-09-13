@@ -129,7 +129,7 @@ Install on WSL on Windows 11
 * Create a 22.04 ubuntu WSL2 box:
 
 ```bash
-wsl install -d Ubuntu-22.04
+wsl --install -d Ubuntu-22.04
 ```
 
 * When the image is created a new file will appear on the windows home directory **.wslconfig**
