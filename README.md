@@ -189,7 +189,7 @@ ODE
 ---
 
 <details>
- <summary>How to play?</summary>
+ <summary>ODE Compilation</summary>
  
 You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
 Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
@@ -206,7 +206,7 @@ STK
 ---
 
 <details>
- <summary>How to play?</summary>
+ <summary>STK Compilation</summary>
  
 First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
 to compile this sound library.
