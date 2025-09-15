@@ -188,6 +188,9 @@ make testcase TC=111
 ODE
 ---
 
+<details>
+ <summary>How to play?</summary>
+ 
 You can either download it from ODE repository or copy the file in dependencies/ode.tgz back to the same directory level as this project.
 Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title=Manual:_Install_and_Use to install ODE on your Macbook.
 
@@ -197,10 +200,14 @@ Please this README or the guidelines in http://ode-wiki.org/wiki/index.php?title
 make
 sudo make install
 ```
+</details>
 
 STK
 ---
 
+<details>
+ <summary>How to play?</summary>
+ 
 First you need to copy the stk file from dependencies into the parent directory where you cloned wakuseiboukan.  Then you need
 to compile this sound library.
 
@@ -221,12 +228,8 @@ to run the following command before executing the simulator or configure it into
 ```bash
 export LD_LIBRARY_PATH=/usr/local/lib/
 ``` 
-
-# Compiling the game
-
- make
-
- # Running
+</details>
+# Running
 
 ```bash
  ./waku [-d] [-random] [-client] [-server] [-greenmode|-bluemode] [-aiplayergreen|-aiplayerblue|-aiboth] [-action|-strategy] [-loadgame savegames/file.w]
@@ -280,7 +283,6 @@ The map can be activated by pressing "@".  And the main view can be restored by 
 * 'medusa N': Control Medusa Defense Airplane number N
 * 'seal N': Control Seal Speeder Boat number N
 
- 
 </details>
 
 Scenario
@@ -288,32 +290,7 @@ Scenario
 
 There are several scenarios in the engine that are used for research and as test cases.
 
-The scenario 111 is the tank battleground.  To compile everything do:
-
-```bash
-git clone https://github.com/faturita/wakuseibokan.git
-cd wakuseibokan
-cp dependencies/stk.tgz ../
-cd ..
-tar xvzf stk.tgz
-cd stk
-make clean
-./configure
-make 
-sudo make install
-cd ..
-cd wakuseibokan
-cp dependencies/ode.tgz ../
-cd ..
-tar xvzf ode.tgz
-cd ode
-./configure --disable-asserts
-make clean && make && sudo make install
-cd ..
-cd wakuseibokan
-```
-
-and then compile the scenario itself from the same directory.
+The scenario 111 is the tank battleground.  Compile the whole game in your preferred platform and the run
 
 ```bash
  make testcase TC=111
