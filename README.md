@@ -439,5 +439,6 @@ More info
 * https://engine-programming.github.io/
 * https://github.com/gfx-rs/wgpu
 * https://wiki.libsdl.org/wiki/index
+* https://strudel.cc/
 
 

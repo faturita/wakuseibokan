@@ -8880,6 +8880,7 @@ void test95()
     _otter->stop();
     _otter->setSignal(4);
     _otter->setNameByNumber(1);
+    _otter->setTexture(textures["metal"]);
     _otter->setStatus(SailingStatus::SAILING);
 
     Vec3f dimensions(5.0f,4.0f,10.0f);

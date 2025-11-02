@@ -21,7 +21,7 @@ TESTSRCS = src/opengltemplate.cpp src/openglutils.cpp src/imageloader.cpp
 #g++ -lstk -I../stk/include/ -oplayaudio playaudio.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
 
 ifeq ($(shell uname),Darwin)
-	LIBS = -L. -framework ApplicationServices -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation 
+	LIBS = -Llib -framework ApplicationServices -framework OpenGL -framework GLUT $(ODEFL) -lstk -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation 
 else
 	LIBS = -L/usr/local/lib -I/usr/local/include   -L/usr/lib/x86_64-linux-gnu/ -lGL -lGLU -lglut  $(ODEFL) -pthread -lbsd -lstk
 endif
@@ -83,5 +83,8 @@ pack: version clean $(PROG)
 	tar cvzf waku_$(VERSION).tgz waku.tgz system/linux/install.sh
 
 	sed -i 's/\/\/#define DEBUG/#define DEBUG/' src/profiling.h
+
+packmac:  $(PROG)
+	tar cvzf waku.tgz testcase waku conf/ data/ images/ savegames/ scripts/Command.py scripts/Configuration.py scripts/Controller.py scripts/EpisodeRecorder.py scripts/Fps.py scripts/Receive.py scripts/Send.py scripts/Telemetry.py scripts/TelemetryDictionary.py sky/ sounds/ structures/ terrain/ units/ water/ libstk-4.6.1.dylib libode.a libode.la
 
 
