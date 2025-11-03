@@ -89,7 +89,7 @@ class Controller:
                     print("New Episode")
                     self.mytimer = int(myvalues[td['timer']])-1
                     
-                #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['bearing']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['bearing']]}")              
+                #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['azimuth']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['azimuth']]}")              
                 #print (f"Time: {myvalues[td['timer']]} Health: {myvalues[td['health']]}")
                 self.recorder.recordvalues(myvalues,othervalues)
 

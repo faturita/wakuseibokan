@@ -2,7 +2,7 @@
 Seek and Destroying Script
 
 This script receives the information from the simulator (the telemetry)
-identify where the other tank is located, the bearing and the distance, 
+identify where the other tank is located, the azimuth and the distance, 
 and sends the command to the tank to move its trajectory to redirect towards
 the other tank for shooting it when it is close enough.
 
@@ -79,9 +79,9 @@ def getContinuosAzimuthRadians(x1,z1,x2,z2):
 
 def aim(values1, values2):
     angle = getAzimuth(values1[td['x']], values1[td['z']], values2[td['x']], values2[td['z']])
-    bearing1 = values1[td['bearing']]
+    azimuth1 = values1[td['azimuth']]
 
-    angle2 = angle - bearing1
+    angle2 = angle - azimuth1
 
     return angle2
 
@@ -146,7 +146,7 @@ class Controller:
                     myvalues = tank2values
                     othervalues = tank1values
 
-                #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['bearing']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['bearing']]}")              
+                #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['azimuth']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['azimuth']]}")
                 #print (f"Health: {myvalues[td['health']]}")
                 self.recorder.recordvalues(myvalues,othervalues)
                 

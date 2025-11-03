@@ -312,7 +312,7 @@ public:
     void setControlRegisters(struct controlregister);
     void resetControlRegisters();
 
-    float getBearing();
+    float getForwardAzimuth();
     void goTo(Vec3f target);
     Vec3f getDestination() const;
 

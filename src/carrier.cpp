@@ -317,7 +317,7 @@ void drawHUD()
 
     f = (camera.fw.normalize())*30;
 
-    snprintf(str,7,  "%5.2f",camera.getBearing());
+    snprintf(str,7,  "%5.2f",camera.getAzimuth());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
 
     // Add typical noisy signal when the aircraft has lost their signal.
@@ -366,7 +366,7 @@ void drawHUD()
 
         drawCross(uc + camera.xAngle,lc + camera.yAngle);
 
-        // Bearing arrow
+        // Azimuth arrow
 
         int cx=1150, cy=350;
 

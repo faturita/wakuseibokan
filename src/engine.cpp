@@ -2234,7 +2234,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     }
 
 
-                    CLog::Write(CLog::Debug,"Structure %d prob %10.5f < %10.5f.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
+                    CLog::Write(CLog::Debug,"Build Structure %d ? Prob %10.5f < %10.5f likelihood.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
@@ -2286,7 +2286,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 break;
                             case VehicleSubTypes::DOCK:
                                 s = new Dock(c->getFaction());
-                                island->addStructureAtDesiredHeight(s,world,COAST_HEIGHT);
+                                island->addStructureAtCoast(s,world);
                                 break;
                             case VehicleSubTypes::ANTENNA:
                                 s = new Antenna(c->getFaction());

@@ -106,7 +106,7 @@ void AAM::rotateBody(dBodyID body)
 
     float x = getAzimuthRadians(getForward());
 
-    //dout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
+    //dout << "Azimuth:" << getForwardAzimuth() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
 
     //if (!Vehicle::inert)
         dBodySetQuaternion(body,q);

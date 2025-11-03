@@ -90,7 +90,7 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
     int wnumber = 0;
     int x = getRandomInteger(-1400,1400);
     int z = getRandomInteger(-1400,1400);
-    float ibearing = (float) -getRandomInteger(0, 360)*PI/180.0;
+    float iazimuth = (float) -getRandomInteger(0, 360)*PI/180.0;
 
     if (initlocations.is_open())
     {
@@ -104,7 +104,7 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
             {
                 x = xx;
                 z = zz;
-                ibearing = -ibb*PI/180.0;
+                iazimuth = -ibb*PI/180.0;
                 break;
             }
         }
@@ -176,7 +176,7 @@ size_t TestCase_111::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
 
     //dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float)getRandomInteger(  ( (int)-PI/2.0+PI )*100 , ( (int)PI/2.0)/10.0+PI )/100.0    );
 
-    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float) ibearing);
+    dRFromAxisAndAngle(Re2,0.0,1.0,0.0,(float) iazimuth);
 
     dBodySetRotation(_otter->getBodyID(),Re2);
 

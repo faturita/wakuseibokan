@@ -4,6 +4,7 @@
 #include "../profiling.h"
 
 #include "../actions/ArtilleryAmmo.h"
+#include "../math/yamathutil.h"
 #include "../math/geometry.h"
 #include "../engine.h"
 extern dWorldID world;

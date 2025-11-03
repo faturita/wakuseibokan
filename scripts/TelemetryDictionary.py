@@ -4,7 +4,7 @@ telemetrydirs = {
   'number':2,
   'health':3,
   'power':4,
-  'bearing':5,
+  'azimuth':5,
   'x':6,
   'y':7,
   'z':8,

@@ -30,7 +30,7 @@
 Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float yAngle, float xAngle);
 void UnitarizeNormal(float vector[3]);
 void Normalize(float v[3][3], float out[3][3]);
-float getAzimuth(Vec3f aim);
+float getAzimuth(Vec3f aim, float scalefactor=1.0f);
 float getAzimuthRadians(Vec3f orientation);
 float getContinuosAzimuthRadians(Vec3f aim);
 float getDeclination(Vec3f aim);

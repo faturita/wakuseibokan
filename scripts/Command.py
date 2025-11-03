@@ -110,12 +110,12 @@ class Recorder:
         self.record(tank1values[td['timer']],
                     tank1values[td['x']],
                     tank1values[td['z']],
-                    tank1values[td['bearing']],
+                    tank1values[td['azimuth']],
                     tank1values[td['health']],
                     tank1values[td['power']],
                     tank2values[td['x']],
                     tank2values[td['z']],
-                    tank2values[td['bearing']],
+                    tank2values[td['azimuth']],
                     tank2values[td['health']],
                     tank2values[td['power']])
 

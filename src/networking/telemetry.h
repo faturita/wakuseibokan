@@ -26,7 +26,7 @@ typedef struct sockaddr SA;
 
 char *Sock_ntop (const struct sockaddr *sa, socklen_t salen) ;
 
-void telemetryme(unsigned long lastUpdateTimer, int number, float health, int power, float bearing, float *dBodyPosition, float *dBodyRotation);
+void telemetryme(unsigned long lastUpdateTimer, int number, float health, int power, float azimuth, float *dBodyPosition, float *dBodyRotation);
 int pickendpoint();
 void inittelemetry();
 

@@ -934,7 +934,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsFree" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsFree" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)
@@ -963,7 +963,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsEnemy" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsEnemy" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)
@@ -993,7 +993,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsFriendly" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsFriendly" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)

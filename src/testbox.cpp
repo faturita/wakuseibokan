@@ -2614,13 +2614,13 @@ void checktest27(unsigned long timer)
     if (timer == 1000)
     {
         Manta *m = (Manta*)findManta(b->getFaction(),FlyingStatus::FLYING);
-        if ((b->getBearing()-(m->getBearing()))<5)
+        if ((b->getForwardAzimuth()-(m->getForwardAzimuth()))<5)
         {
             printf("Test passed OK!\n");
             endWorldModelling();
             exit(1);
         } else {
-            printf("Test failed: Manta bearing do not match carrier bearing.\n");
+            printf("Test failed: Manta azimuth do not match carrier azimuth.\n");
             endWorldModelling();
             exit(0);
         }
@@ -7738,9 +7738,10 @@ void checktest80(unsigned long timer)
 void test82()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
-    nemesis->setName("Nemesis");
+    nemesis->setName("Atolon");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    nemesis->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+    nemesis->preCalculateCoastlinePoints();
 
     islands.push_back(nemesis);
 

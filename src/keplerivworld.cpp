@@ -646,6 +646,7 @@ void inline initIslands()
     for(size_t j=0;j<islands.size();j++)
     {
         islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
     }
 
 }

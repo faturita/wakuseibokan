@@ -79,11 +79,15 @@ Vec3f toVectorInFixedSystem(float dx, float dy, float dz,float azimuth, float in
 /**
  * @brief getAzimuth This is the inverse operation of the one above.  Given a vector, it returns the azimuth of the given vector.
  * @param aim
+ * 
+ * Do not get confused with Bearing.  Bearing is described in quadrants (NE, SE, SW, NW) while azimuth is described in degrees from North clockwise.
+ * Like N70E is azimuth 70, while NW is azimuth 315.
+ * 
  * @return General azimuth, 0 is north, 90 east, 180 south and 270 west.
  */
-float getAzimuth(Vec3f aim)
+float getAzimuth(Vec3f aim, float scalefactor)
 {
-    aim = aim.normalize();
+    aim = (aim.normalize())*scalefactor;
 
     float val = atan2(aim[2], aim[0])*180.0/PI;
 

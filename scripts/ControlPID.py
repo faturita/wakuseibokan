@@ -87,8 +87,8 @@ class ControlPID(Controller):
                 
                 if (self.mytimer > 400):
                 
-                    setpoint = 212                   # Desired bearing
-                    pv = myvalues[td['bearing']]    # Process variable     
+                    setpoint = 212                  # Desired azimuth angle
+                    pv = myvalues[td['azimuth']]    # Process variable     
                     kp = 1.0                        # Proportional gain
                     ki = 0.001                      # Integral gain
                     kd = 0.05                       # Derivative gain
