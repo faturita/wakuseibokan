@@ -2088,12 +2088,14 @@ void buildAndRepair(dSpaceID space, dWorldID world)
     buildAndRepair(false, space, world);
 }
 
+// The first structure is always the command center.
+// The second structure is always the main dock.  The dock is required for the logistics of all the game.
 void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 {
     for (size_t i = 0; i < islands.size(); i++)
     {
         BoxIsland *island = islands[i];
-
+ 
         CommandCenter *c = findCommandCenter(island);
 
         // Find the main dock, and spawn just one CargoShip per island, assigning the dockid to the cargoship.
@@ -2102,9 +2104,10 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
         {
             if (str.size()>2)
             {
-                if (entities[str[1]]->getSubType() == VehicleSubTypes::DOCK)
+                Structure *s = findStructureFromIsland(island, VehicleSubTypes::DOCK);
+                if (s && s->getSubType() == VehicleSubTypes::DOCK)
                 {
-                    Dock *d = (Dock*)entities[str[1]];          // @FIXME: 1 is always the first and main dock
+                    Dock *d = (Dock*)s;          // @NOTE: Dock are mandatory but they can appear later if they are destroyed.
 
                     Vehicle *ca = findWalrusByOrder2(d->getFaction(), i);       // @NOTE: One per island !!! Island indexes are fixed.
 

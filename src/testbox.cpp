@@ -8697,6 +8697,12 @@ void test93()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -8706,9 +8712,11 @@ void test93()
 
     entities.push_back(_b, _b->getGeom());
 
+    islands[0]->addStructureAtCoast(new Dock(GREEN_FACTION),world);
     islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 2.0f);
     islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 3.0);
-    islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION),world,3.9f);
+    //islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION),world,3.9f);
+
 
     Structure *runway = new Runway(GREEN_FACTION);
 
@@ -9119,7 +9127,7 @@ void initWorldModelling(int testcase)
     case 90:test90();break;                         // Check Moving to a friendly island to reach then an empty island.
     case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
     case 92:test92();break;                         // Carrier defending from an attacking walrus (with all its weapons).
-    case 93:test93();break;                         // Carrier send a walrus to capture an island.
+    case 93:test93();break;                         // Test docks on islands with complex terrain.
     case 94:test94();break;                         // Test carrier force field for walruses
     case 95:test95();break;                         // Test walruses going back to carrier rear.
     default:initIslands();test1();break;
