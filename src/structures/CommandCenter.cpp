@@ -96,7 +96,7 @@ EntityTypeId CommandCenter::getTypeId()
 
 void CommandCenter::restart()
 {
-    setTtl(CommandCenter::BUILDING_TIME);
+    setTtl(CommandCenter::BUILDING_TIME + getRandomInteger(0,200));
 }
 
 void CommandCenter::setUnderAttack(bool isunderattack)

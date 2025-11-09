@@ -567,6 +567,16 @@ void Vehicle::setOrder(int value)
     order = value;
 }
 
+int Vehicle::getAssignedTo() const
+{
+    return assignmentId;
+}
+
+void Vehicle::setAssignedTo(int assignedTo)
+{
+    assignmentId = assignedTo;
+}
+
 bool Vehicle::isAutoStatusFree()
 {
     return autostatus == AutoStatus::IDLE;

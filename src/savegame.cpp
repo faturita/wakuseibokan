@@ -767,7 +767,9 @@ void loadgame(std::string filename)
 
                 v->setCargo(CargoTypes::POWERFUEL, cargofuel);
 
-                is->addStructure(v   ,       -is->getX()+f[0],    -is->getZ()+f[2],orientation,world);
+                // @NOTE: The height comes directly from the savegame instead of recalculating it.
+                //   The reason is because docks are pushed a little bit forward above the water where height is lower.
+                is->addStructure(v   ,       -is->getX()+f[0], f[1],   -is->getZ()+f[2],orientation,world);
 
             }
         }

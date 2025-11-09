@@ -207,6 +207,8 @@ protected:
     int status=0;
     int order=0;
 
+    int assignmentId = -1;
+
     void setTtl(int ttlvalue);
 
     void setFaction(int newfaction);
@@ -367,6 +369,8 @@ public:
     void setSignal(int value);
     int getOrder() const;
     void setOrder(int value);
+    void setAssignedTo(int assignedTo);
+    int getAssignedTo() const;
     AutoStatus getAutoStatus() const;
     bool isAutoStatusFree();
 

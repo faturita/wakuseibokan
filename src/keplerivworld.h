@@ -27,7 +27,7 @@
 void nearCallback (void *data, dGeomID o1, dGeomID o2);
 void _nearCallback (void *data, dGeomID o1, dGeomID o2);
 
-void setupWorldModelling();
+void setupWorldModelling(unsigned long seedvalue);
 void initWorldModelling();
 void initWorldModelling(int testcase);
 void worldStep(int value);

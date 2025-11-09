@@ -443,10 +443,10 @@ void initWorldModelling()
 {
     initWorldModelling(-1);
 }
-void setupWorldModelling()
+void setupWorldModelling(unsigned long seedvalue)
 {
     /* create world */
-    dRandSetSeed(1);
+    dRandSetSeed(seedvalue);
     dInitODE();
     //dInitODE2(dInitFlagManualThreadCleanup);
     //dAllocateODEDataForThread(dAllocateMaskAll);

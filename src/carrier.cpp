@@ -1712,17 +1712,19 @@ int main(int argc, char** argv) {
     CLog::SetLevel(CLog::None);
 #endif
 
+    int seedvalue = 0;
+
     if (isPresentCommandLineParameter(argc,argv,"-seed"))
     {
-        int seed = getDefaultedIntCommandLineParameter(argc,argv,"-seed",0);
-        srand( seed );
-        srand48(seed);
+        seedvalue = getDefaultedIntCommandLineParameter(argc,argv,"-seed",0);
     }
     else
     {
-        srand (time(NULL));
-        srand48(time(NULL));
+        seedvalue = time(NULL);
     }
+
+    srand( seedvalue );
+    srand48(seedvalue);
 
     if (isPresentCommandLineParameter(argc,argv,"-mute"))
         mute = true;
@@ -1834,7 +1836,7 @@ int main(int argc, char** argv) {
     initSound();
 
 
-    setupWorldModelling();
+    setupWorldModelling(seedvalue);
     initRendering();
 
     // Initialize ODE, create islands, structures and populate the world.

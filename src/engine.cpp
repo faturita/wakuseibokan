@@ -1230,9 +1230,38 @@ int findNextNumber(int faction, int type, int subtype)
     assert(!"No more available numbers !!!!!");
 }
 
+
+std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes,int assignedTo)
+{
+    std::vector<size_t> friendlys;
+    for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+    {
+        Vehicle *v=entities[i];
+
+        bool bMatch = false;
+        for (int j=0;j<subtypes.size();j++)
+        {
+            if (v->getSubType() == subtypes[j] && v->getAssignedTo() == assignedTo)
+            {
+                bMatch = true;
+                break;
+            }
+        }
+
+        if (v &&
+                ( (subtypes.size() == 0 && v->getType() != WEAPON && v->getType() != ACTION && v->getType() != EXPLOTABLEACTION && v->getType() != CONTROLABLEACTION && v->getType() != NAVALCONTROLABLEACTION && v->getType() != RAY) || (bMatch) )
+                && v->getFaction()==friendlyfaction)   // Fix this.
+        {
+            friendlys.push_back(i);
+        }
+    }
+
+    return friendlys;
+}
+
 std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleTypes> types, Vec3f l, float threshold)
 {
-    std::vector<size_t> enemies;
+    std::vector<size_t> friendlys;
     float closest = threshold;
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
@@ -1253,12 +1282,12 @@ std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector
                 && v->getFaction()==friendlyfaction)   // Fix this.
         {
             if ((v->getPos()-l).magnitude()<closest) {
-                enemies.push_back(i);
+                friendlys.push_back(i);
             }
         }
     }
 
-    return enemies;
+    return friendlys;
 }
 std::vector<size_t> findNearestFriendlyVehicles(int friendlyfaction, std::vector<VehicleSubTypes> subtypes, Vec3f l, float threshold)
 {
@@ -2088,6 +2117,21 @@ void buildAndRepair(dSpaceID space, dWorldID world)
     buildAndRepair(false, space, world);
 }
 
+Vehicle *findCargoShipAssignedToIsland(int faction, int assignedTo)
+{
+    Vehicle *ca = NULL;
+    std::vector<VehicleSubTypes> types;
+    types.push_back(VehicleSubTypes::CARGOSHIP);
+    std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, assignedTo);
+
+    if (vehicles.size()>0)
+    {
+        ca = entities[vehicles[0]];
+    }
+
+    return ca;
+}
+
 // The first structure is always the command center.
 // The second structure is always the main dock.  The dock is required for the logistics of all the game.
 void buildAndRepair(bool force, dSpaceID space, dWorldID world)
@@ -2100,6 +2144,20 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
         // Find the main dock, and spawn just one CargoShip per island, assigning the dockid to the cargoship.
         std::vector<size_t> str = island->getStructures();
+
+        if (!c)
+        {
+            // These are islands without command centers.  So let's check if there are any structures to degrade.
+            for(size_t j=0;j<str.size();j++)
+            {
+                if (entities.isValid(str[j]))
+                {
+                    Structure *s = (Structure*)entities[str[j]];
+                    s->damage(0.01f + getRandom(0.0f,0.1f));   // Degrade all structures slowly.
+                }
+            }
+        }
+
         if (c && c->getTtl()<=0 || force)
         {
             if (str.size()>2)
@@ -2107,9 +2165,11 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                 Structure *s = findStructureFromIsland(island, VehicleSubTypes::DOCK);
                 if (s && s->getSubType() == VehicleSubTypes::DOCK)
                 {
-                    Dock *d = (Dock*)s;          // @NOTE: Dock are mandatory but they can appear later if they are destroyed.
+                    Dock *d = (Dock*)s;          // @NOTE: Docks are mandatory but they can appear later if they are destroyed.
 
-                    Vehicle *ca = findWalrusByOrder2(d->getFaction(), i);       // @NOTE: One per island !!! Island indexes are fixed.
+                    Vehicle *ca = NULL;
+
+                    ca = findCargoShipAssignedToIsland(d->getFaction(), i);
 
                     if (!ca)
                     {
@@ -2121,7 +2181,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         if (d->cargoShipReady())
                         {
                             Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
-                            ca->setOrder(i);
+                            ca->setAssignedTo(i);  // Assigned to island index.
                             if (ca)
                             {
                                 size_t idx = entities.push_back(ca, ca->getGeom());
@@ -2134,8 +2194,8 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
         }
 
         // Go through all the structures, build new and repair the old ones.
-        if (c && (  (c->getIslandType() == ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<24) ||
-                    (c->getIslandType() != ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<14) ) )
+        if (c && (  (c->getIslandType() == ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<30) ||
+                    (c->getIslandType() != ISLANDTYPES::CAPITAL_ISLAND && island->getStructures().size()<18) ) )
         {
             if (c)
             {
@@ -2173,7 +2233,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WINDTURBINE;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
                     } else if (c->getIslandType() == ISLANDTYPES::DEFENSE_ISLAND)
                     {
-                        // Softmax, boltzman decay.
+                        // Defense island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::LASERTURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::TURRET;tp.chance = 0.9;islandstructs.push_back(tp);}
@@ -2219,7 +2279,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                     std::vector<size_t> strs = island->getStructures();
 
-                    // Search for any mandatory structure
+                    // Pick a random structure to build and overwrite it with any mandatory structure that is missing.
                     int which = (rand() % islandstructs.size());
                     for(size_t i=0;i<islandstructs.size();i++)
                     {
@@ -2315,6 +2375,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     }
 
 
+                    // @NOTE: Composite structures (none now)
                     if (8<=which && which<=10)
                     {
                         //Structure *s2 = new Hangar(c->getFaction());
@@ -2335,7 +2396,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
         //   dock where the carrier is actually located.  This is an optimal transport problem.  Literally.
 
 
-
+        // @NOTE: Logistics
         // Move naturally the fuel from wind turbines to docks and runways.
         if (c)
         {

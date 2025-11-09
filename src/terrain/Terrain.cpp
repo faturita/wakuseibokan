@@ -466,8 +466,14 @@ Structure* BoxIsland::addStructureAtCoast(Structure *structure, dWorldID world)
 
     t = t * PI/180.0f + PI/2.0f;    // Shift the value 90 degrees, because islands locations start in zero at West and are clockwise.
 
+    // One side of the dock should be inside the island, forwarding to the outward sea.
+    Vec3f structureOrientation = Vec3f( coastPoint[0],0,coastPoint[2] ).normalize();
+    structureOrientation = coastPoint + structureOrientation * 300.0f; // Move it forward 300m.
+
+    coastPoint = structureOrientation;
+
     printf("Coast point selected at (%10.5f, %10.5f) with angle %10.5f radians.\n", coastPoint[0], coastPoint[2], t);
-    return addStructure(structure, coastPoint[0], coastPoint[2], -t + 3 * (PI / 2), world);
+    return addStructure(structure, coastPoint[0], coastPoint[1], coastPoint[2], -t + 3 * (PI / 2), world);
 
 }
 
