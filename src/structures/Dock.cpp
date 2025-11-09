@@ -166,7 +166,7 @@ bool Dock::cargoShipReady()
 
 void Dock::buildCargoShip()
 {
-    setTtl(getRandomInteger(1200, 2000)); // Build a cargo ship in 100 to 200 ticks.
+    setTtl(getRandomInteger(2000, 4000)); // Build a cargo ship in 2000 to 4000 ticks.
     CLog::Write(CLog::Debug,"Dock %s is building a cargo ship.\n",getName().c_str());
 }
 

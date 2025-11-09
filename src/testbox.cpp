@@ -2507,6 +2507,12 @@ void test26()
     islands.push_back(midway);
     islands.push_back(enewetak);
     islands.push_back(statera);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 }
 
 void checktest26(unsigned long timer)
@@ -2528,7 +2534,7 @@ void checktest26(unsigned long timer)
         }
     }
 
-    if (timer > 3500)
+    if (timer > 10000)
     {
         if (fps > 40)
         {
@@ -2614,13 +2620,13 @@ void checktest27(unsigned long timer)
     if (timer == 1000)
     {
         Manta *m = (Manta*)findManta(b->getFaction(),FlyingStatus::FLYING);
-        if ((b->getBearing()-(m->getBearing()))<5)
+        if ((b->getForwardAzimuth()-(m->getForwardAzimuth()))<5)
         {
             printf("Test passed OK!\n");
             endWorldModelling();
             exit(1);
         } else {
-            printf("Test failed: Manta bearing do not match carrier bearing.\n");
+            printf("Test failed: Manta azimuth do not match carrier azimuth.\n");
             endWorldModelling();
             exit(0);
         }
@@ -7738,9 +7744,10 @@ void checktest80(unsigned long timer)
 void test82()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
-    nemesis->setName("Nemesis");
+    nemesis->setName("Atolon");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    nemesis->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
+    nemesis->preCalculateCoastlinePoints();
 
     islands.push_back(nemesis);
 
@@ -8485,6 +8492,13 @@ void test91()
 
     islands.push_back(thermopilae);
 
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -8494,15 +8508,6 @@ void test91()
 
     entities.push_back(_b, _b->getGeom());
 
-
-    CargoShip *cg = new CargoShip(GREEN_FACTION);
-    cg->init();
-    cg->embody(world,space);
-    cg->setPos(0.0f,20.5f,-10000.0f);
-    cg->stop();
-    cg->setOrder(1);
-
-    entities.push_back(cg, cg->getGeom());
 
 
     Structure *runway = new Runway(GREEN_FACTION);
@@ -8520,7 +8525,7 @@ void test91()
     Structure *t3 = islands[0]->addStructure(new WindTurbine(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Radar(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
 
-    islands[0]->addStructure(dock        ,       0.0f,    1790.0f,PI,world);
+    islands[0]->addStructureAtCoast(dock,world);
 
     Structure *t5 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,        20.0f,    80.0f,0,world);
     Structure *t6 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,         -60.0f,    -80.0f,0,world);
@@ -8536,7 +8541,33 @@ void test91()
 
 void checktest91(unsigned long timer)
 {
+    if (timer==1000)
+    {
+        std::vector<VehicleSubTypes> types;
+        types.push_back(VehicleSubTypes::CARGOSHIP);
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(GREEN_FACTION, types, Vec3f(0,0,0), 300 kmf);
+        if (vehicles.size() > 0)
+        {
+            Vehicle *v = entities[vehicles[0]];
+            v->damage(10000); // Destroy it.
+        }
+    }
 
+    if (timer==6000)
+    {
+        Vehicle *b = findCarrier(GREEN_FACTION);
+
+        if (b)
+        {
+            if (b->getPower() > 0)
+            {
+                testSucceeded(); 
+            } else {
+                testFailed();
+            }
+        }
+
+    }
 }
 
 void test92()
@@ -8547,6 +8578,12 @@ void test92()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -8692,9 +8729,15 @@ void test93()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/vulcano.bmp");
+    nemesis->buildTerrainModel(space,"terrain/parentum.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -8705,9 +8748,11 @@ void test93()
 
     entities.push_back(_b, _b->getGeom());
 
+    islands[0]->addStructureAtCoast(new Dock(GREEN_FACTION),world);
     islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 2.0f);
     islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 3.0);
-    islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION),world,3.9f);
+    //islands[0]->addStructureAtDesiredHeight(new Dock(GREEN_FACTION),world,3.9f);
+
 
     Structure *runway = new Runway(GREEN_FACTION);
 
@@ -8725,7 +8770,7 @@ void test93()
     camera.yAngle = 38;
     controller.controllingid = CONTROLLING_NONE;
 
-    aiplayer = GREEN_AI;
+    aiplayer = FREE_AI;
 }
 
 void checktest93(unsigned long timer)
@@ -8980,16 +9025,110 @@ void checktest95(unsigned long timer)
     }
 }
 
+
+void test96()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+
+
+    std::vector<std::string> terrain_files;
+    terrain_files.push_back("terrain/goku.bmp");
+    terrain_files.push_back("terrain/baltimore.bmp");
+    terrain_files.push_back("terrain/parentum.bmp");
+    terrain_files.push_back("terrain/atom.bmp");
+    terrain_files.push_back("terrain/gaijin.bmp");
+    terrain_files.push_back("terrain/ishinomaki.bmp");
+    terrain_files.push_back("terrain/nemesis.bmp");
+    terrain_files.push_back("terrain/tristan.bmp");
+    terrain_files.push_back("terrain/vulcano.bmp");
+    terrain_files.push_back("terrain/thermopilae.bmp");
+    terrain_files.push_back("terrain/vulcrum.bmp");
+    terrain_files.push_back("terrain/oshima.bmp");
+    int r = rand() % terrain_files.size();
+
+    nemesis->buildTerrainModel(space, terrain_files[r].c_str());
+
+    islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(GREEN_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(0.0f,20.5f,-3000.0f);
+    _b->stop();
+
+    entities.push_back(_b, _b->getGeom());
+
+    islands[0]->addStructureAtCoast(new Dock(GREEN_FACTION),world);
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 2.0f);
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 3.0);
+
+
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(0.0f,1700.5f,-3000);
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 0;
+    camera.yAngle = 38;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI;
+}
+
+void checktest96(unsigned long timer)
+{
+    if (timer==200)
+    {
+        Vehicle *b = entities[1];
+
+        dockInNearestIsland(b);
+
+        // Structure *dock = findStructureFromIsland(islands[0],VehicleSubTypes::DOCK);
+
+        // if (dock)
+        // {
+        //     b->setAutoStatus(AutoStatus::DOCKING);
+        //     b->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+        //     b->enableAuto();
+        // }
+    }
+
+    if (timer>15000)
+    {
+        Vehicle *b = entities[1];
+        
+        if (b->getStatus() == SailingStatus::DOCKED)
+        {
+            testSucceeded();
+        }
+    }
+
+    if (timer == 30000)
+    {
+        testFailed();
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
 {
     initWorldModelling(-1);
 }
-void setupWorldModelling()
+void setupWorldModelling(unsigned long seedvalue)
 {
     /* create world */
-    dRandSetSeed(1);
+    dRandSetSeed(seedvalue);
     dInitODE();
     //dInitODE2(dInitFlagManualThreadCleanup);
     //dAllocateODEDataForThread(dAllocateMaskAll);
@@ -9118,9 +9257,10 @@ void initWorldModelling(int testcase)
     case 90:test90();break;                         // Check Moving to a friendly island to reach then an empty island.
     case 91:test91();break;                         // AI Stranded carrier refueling from a cargo ship.
     case 92:test92();break;                         // Carrier defending from an attacking walrus (with all its weapons).
-    case 93:test93();break;                         // Carrier send a walrus to capture an island.
+    case 93:test93();break;                         // Test docks on islands with complex terrain.
     case 94:test94();break;                         // Test carrier force field for walruses
     case 95:test95();break;                         // Test walruses going back to carrier rear.
+    case 96:test96();break;                         // Test Carrier docking on an island.
     default:initIslands();test1();break;
     }
 
@@ -9233,6 +9373,7 @@ void worldStep(int value)
     case 93:checktest93(timer);break;
     case 94:checktest94(timer);break;
     case 95:checktest95(timer);break;
+    case 96:checktest96(timer);break;
     default: break;
     }
 

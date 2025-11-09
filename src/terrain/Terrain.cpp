@@ -442,16 +442,45 @@ Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
     return getPos();
 }
 
+/**
+ * Use the coastal locations identified on each island to randomly pick one of them and use it 
+ * to place the given structure (likely a Dock)
+ * 
+ * Docks are important because they allow to carriers to dock on islands and refill materials.  The game's logistic is based on docks.
+ * All the islands has borders at height 3.5 which are suitable for docks.
+ * 
+ */
+Structure* BoxIsland::addStructureAtCoast(Structure *structure, dWorldID world)
+{
+    // Pick a random point from the coastline points.
+    int idx = rand() % coastlinePoints.size();
+
+    assert ( coastlinePoints.size() > 0 || !"No coastline points calculated for this island.");
+
+    Vec3f coastPoint = coastlinePoints[idx];
+
+    float t = atan2(coastPoint[2], coastPoint[0])*180.0/PI;
+
+    if (t>=90) t -= 90;
+    else t += 270;
+
+    t = t * PI/180.0f + PI/2.0f;    // Shift the value 90 degrees, because islands locations start in zero at West and are clockwise.
+
+    // One side of the dock should be inside the island, forwarding to the outward sea.
+    Vec3f structureOrientation = Vec3f( coastPoint[0],0,coastPoint[2] ).normalize();
+    structureOrientation = coastPoint + structureOrientation * 300.0f; // Move it forward 300m.
+
+    coastPoint = structureOrientation;
+
+    printf("Coast point selected at (%10.5f, %10.5f) with angle %10.5f radians.\n", coastPoint[0], coastPoint[2], t);
+    return addStructure(structure, coastPoint[0], coastPoint[1], coastPoint[2], -t + 3 * (PI / 2), world);
+
+}
 
 /**
  * Add the specified structure in a desirable "desiredHeight".  Get a random angle and determines the position in polar coordinates.  After that start
  * from the center and try to find the closed height to the desired one.  As all the islands fit into the 36x36, there should be one height that matches.
  *
- * @brief BoxIsland::addStructureAtDesiredHeight
- * @param structure
- * @param world
- * @param desiredHeight
- * @return
  */
 Structure* BoxIsland::addStructureAtDesiredHeight(Structure *structure, dWorldID world, float desiredHeight)
 {
@@ -621,6 +650,33 @@ float BoxIsland::findHighestPointAlongPath(dWorldID world, float centerX, float 
     return maxHeight;
 }
 
+void BoxIsland::preCalculateCoastlinePoints() 
+{
+    coastlinePoints.clear();
+
+    // Threshold to determine coastline (e.g., height close to sea level)
+    const float desiredHeight = COAST_HEIGHT; // Adjust as needed
+
+    for (int x=-1799; x<=1799; x+=TERRAIN_SCALE)
+    {
+        for (int z=-1799; z<=1799; z+=TERRAIN_SCALE)
+        {
+            assert ( _landmass != NULL || !"Landmass is null !  This is quite weird.");
+
+            float heightOffset = _landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
+
+            float heightDifference = abs(heightOffset - desiredHeight);
+
+            if (  heightDifference<0.5 )
+            {
+                printf("Coast point found at (%d, %d) with height %10.5f\n", x, z, heightOffset);
+                coastlinePoints.emplace_back(Vec3f(x,heightOffset, z));
+            }
+        }
+    }
+
+    CLog::Write(CLog::Debug, "Island %s Pre-calculated %zu coastline points.\n", name.c_str(), coastlinePoints.size());
+}
 
 Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries)
 {

@@ -470,17 +470,10 @@ void Vehicle::antigravity(dBodyID myBodySelf)
     dBodyAddForce(myBodySelf, 0,9.81f,0);
 }
 
-//@FIXME swithc to getAzimuth in yamathutil.
-float Vehicle::getBearing()
+
+float Vehicle::getForwardAzimuth()
 {
-    Vec3f f = (getForward().normalize())*30;
-
-    float val = atan2(f[2], f[0])*180.0/PI;
-
-    if (val>=90) val -= 90;
-    else val += 270;
-
-    return val;
+    return getAzimuth(forward, 30.0f);
 }
 
 Vehicle* Vehicle::fire(int weapon, dWorldID world, dSpaceID space)
@@ -572,6 +565,16 @@ int Vehicle::getOrder() const
 void Vehicle::setOrder(int value)
 {
     order = value;
+}
+
+int Vehicle::getAssignedTo() const
+{
+    return assignmentId;
+}
+
+void Vehicle::setAssignedTo(int assignedTo)
+{
+    assignmentId = assignedTo;
 }
 
 bool Vehicle::isAutoStatusFree()
@@ -727,7 +730,7 @@ void Vehicle::wrapDynamics(dBodyID body)
 //        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
 //        dout << s << std::endl;
 
-        telemetryme(lastUpdateTimer,number, health, power, getBearing(), (float *)dBodyPosition, (float *)dBodyRotation);
+        telemetryme(lastUpdateTimer,number, health, power, getForwardAzimuth(), (float *)dBodyPosition, (float *)dBodyRotation);
     }
 
 

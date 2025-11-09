@@ -185,11 +185,13 @@ public:
 class RefuelStrandedCarrierQAction : public QAction
 {   
     TSequencer T;
+    const int REFUEL_ORDER = 32;   // @FIXME put it somewhere else.
 
     void start() 
     {
-        T[0] = 1;
+        T[0] = 0;
         T[1] = 0;
+        T[2] = 0;
 
         std::cout << "RefuelStrandedCarrierQAction started." << std::endl;
 
@@ -200,46 +202,61 @@ class RefuelStrandedCarrierQAction : public QAction
         T = T + T.sign() * 1;
     }
 
+
     bool findAndOrderNearestCargoShip(int faction, Balaenidae *b, Dock *dock)
     {
+
+
+        Vehicle *v = findWalrusByOrder2(faction, REFUEL_ORDER);  // Just to avoid multiple orders.
+
+        if (v)
+            return false;  // Already ordered.
+
         std::vector<VehicleSubTypes> types;
         types.push_back(VehicleSubTypes::CARGOSHIP);
 
         //std::cout << "RefuelStrandedCarrierQAction: " << T[0] << std::endl;
 
-        if (T[0] == 200)
+        // Find the nearest cargoship (from the nearest dock)
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, dock->getPos(), 300 kmf);
+
+        CargoShip *cg = NULL;
+        if (vehicles.size()>0)
         {
-            // Find the nearest cargoship (from the nearest dock)
-            std::vector<size_t> vehicles = findNearestFriendlyVehicles(faction, types, dock->getPos(), 300 kmf);
+            cg = (CargoShip*)entities[vehicles[0]];
 
-            CargoShip *cg = NULL;
-            if (vehicles.size()>0)
+            if (cg && entities.isValid(vehicles[0]))
             {
-                cg = (CargoShip*)entities[vehicles[0]];
                 std::cout << "Found cargo ship: " << cg->getName() << std::endl;
-            } 
 
-            cg->setAutoStatus(AutoStatus::DOCKING);
-            cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
-            cg->enableAuto();
-            cg->setOrder(10);  //@FIXME: Set an order number that means to refill the carrier.
+                cg->setAutoStatus(AutoStatus::DOCKING);
+                cg->setDestination(dock->getPos()-dock->getForward().normalize()*400);
+                cg->enableAuto();
+                cg->setOrder(REFUEL_ORDER);  // Mark as ordered.
 
-            b->readyForDock();
+                b->readyForDock();
 
-            T[1] = 0;
+                T[0] = 1;
+                T[1] = 0;
+                T[2] = 0;
+            }
+        } 
 
-        }
+
 
         return true;
 
     }
     bool sendCargoShipToStrandedCarrier(int faction, Balaenidae *b, Dock *dock)
     {
-        Walrus *w = findWalrusByOrder2(faction, 10);
+        Vehicle *v = findWalrusByOrder2(faction, REFUEL_ORDER);  // Just to avoid multiple orders.
 
-        CargoShip *cg = (CargoShip*) w;
+        if (!v)
+            return false;  // There are no vehicles ordered for refueling.
 
-        if (w && w->getStatus() == SailingStatus::DOCKED && T[1] == 0)
+        CargoShip *cg = (CargoShip*) v;
+
+        if (cg && cg->getStatus() == SailingStatus::DOCKED && T[1] == 0)
         {
             std::cout << "Cargo ship is docked, undocking it." << std::endl;
             T[1] = 1;
@@ -247,7 +264,7 @@ class RefuelStrandedCarrierQAction : public QAction
 
         if (cg && T[1] == 200)
         {
-            refill(dock);
+            refill(dock);  // @NOTE: Refill the cargoship with whatever is available...
         }
 
         if (cg && T[1] == 400)
@@ -255,44 +272,50 @@ class RefuelStrandedCarrierQAction : public QAction
             departure(dock);
         }
 
-        if (cg && T[1] == 600)
+
+        if (cg && T[1] == 1000)
+        {
+            departure(dock);
+        }
+
+        if (cg && T[1] == 1200)
         {
             std::cout << "Cargo ship is ready to go." << std::endl;
             cg->setStatus(SailingStatus::SAILING);
             cg->setAutoStatus(AutoStatus::DOCKING);
             cg->setDestination(b->getPos()-(b->getForward().normalize()*200));
-            cg->enableAuto();
-            cg->setOrder(10);         
+            cg->enableAuto();  
         }
 
         return false;     
     }
     bool refuelCarrier(int faction, Vehicle *b)
     {
+        Vehicle *v = findWalrusByOrder2(faction, REFUEL_ORDER);  // Just to avoid multiple orders.
+
+        if (!v)
+            return false;  // There are no vehicles ordered for refueling.
+
+        CargoShip *cg = (CargoShip*) v;
+
         if (b->getType() == CARRIER)
         {
-            dout << "Refueling carrier." << std::endl;
+            //dout << "Refueling carrier." << std::endl;
 
             if (b->getStatus() == SailingStatus::DOCKED && T[2] == 0)
             {
-                Walrus *w = findWalrusByOrder2(faction, 10);
-
-                CargoShip *cg = (CargoShip*) w;
-
                 refuel(cg);
                 T[2] = 1;
             }
 
             if (T[2] == 100)
             {
-                Walrus *w = findWalrusByOrder2(faction, 10);
-
-                CargoShip *cg = (CargoShip*) w;
-
                 departure(cg);
                 dout << "Carrier refueled." << std::endl;
 
-                cg->setOrder(0); // Reset the order of the cargo ship.
+                cg->setOrder(-1);  // Free the cargoship.
+                cg->disableAuto();
+                T[0] = T[1] = T[2] = 0;
             }
 
         }
@@ -934,7 +957,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsFree" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsFree" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)
@@ -963,7 +986,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsEnemy" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsEnemy" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)
@@ -993,7 +1016,7 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        dout << "ClosestFarAwayIslandIsFriendly" << std::endl;  
+        //dout << "ClosestFarAwayIslandIsFriendly" << std::endl;  
 
         // Do I have power to get to the next island
         if (b && b->getPower()>nextOperationPerFaction[faction].requiredFuel)

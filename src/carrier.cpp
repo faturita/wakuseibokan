@@ -317,7 +317,7 @@ void drawHUD()
 
     f = (camera.fw.normalize())*30;
 
-    snprintf(str,7,  "%5.2f",camera.getBearing());
+    snprintf(str,7,  "%5.2f",camera.getAzimuth());
     drawString(1150-40,-130,1,str,0.1f,0.0f,1.0f,1.0f);
 
     // Add typical noisy signal when the aircraft has lost their signal.
@@ -366,7 +366,7 @@ void drawHUD()
 
         drawCross(uc + camera.xAngle,lc + camera.yAngle);
 
-        // Bearing arrow
+        // Azimuth arrow
 
         int cx=1150, cy=350;
 
@@ -1712,17 +1712,19 @@ int main(int argc, char** argv) {
     CLog::SetLevel(CLog::None);
 #endif
 
+    int seedvalue = 0;
+
     if (isPresentCommandLineParameter(argc,argv,"-seed"))
     {
-        int seed = getDefaultedIntCommandLineParameter(argc,argv,"-seed",0);
-        srand( seed );
-        srand48(seed);
+        seedvalue = getDefaultedIntCommandLineParameter(argc,argv,"-seed",0);
     }
     else
     {
-        srand (time(NULL));
-        srand48(time(NULL));
+        seedvalue = time(NULL);
     }
+
+    srand( seedvalue );
+    srand48(seedvalue);
 
     if (isPresentCommandLineParameter(argc,argv,"-mute"))
         mute = true;
@@ -1834,7 +1836,7 @@ int main(int argc, char** argv) {
     initSound();
 
 
-    setupWorldModelling();
+    setupWorldModelling(seedvalue);
     initRendering();
 
     // Initialize ODE, create islands, structures and populate the world.

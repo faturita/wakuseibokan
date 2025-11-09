@@ -169,7 +169,7 @@ Vehicle* Turret::fire(int weapon, dWorldID world, dSpaceID space)
     dBodySetRotation(action->getBodyID(),Re);
 
     // Shell loading time.
-    setTtl(20);
+    setTtl(20 + getRandomInteger(0,5));
 
     // I can set power or something here.
     return (Vehicle*)action;

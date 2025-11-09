@@ -1018,7 +1018,7 @@ void SimplifiedDynamicManta::rotateBody(dBodyID body)
 
     float x = getAzimuthRadians(getForward());
 
-    //dout << "Bearing:" << getBearing() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
+    //dout << "Azimuth:" << getAzimuth() << "," << x << " Anglular Pos:" << angularPos[0] << std::endl;
 
     if (!Vehicle::inert)
         dBodySetQuaternion(body,q3);

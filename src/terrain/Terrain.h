@@ -205,6 +205,8 @@ private:
     std::string name;
     size_t islandId;
     std::string modelname;
+
+    std::vector<Vec3f> coastlinePoints;
     
 public:
     Terrain *_landmass;
@@ -223,6 +225,7 @@ public:
 
     dGeomID getGeom();
 
+	Structure* addStructureAtCoast(Structure *structure, dWorldID world);
 	Structure* addStructure(Structure* structure, float x, float offsetHeight, float z, float angle, dWorldID world);
     Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
@@ -246,6 +249,8 @@ public:
     Structure* getCommandCenter();
     std::vector<size_t> getStructures();
     void checkStructures();
+
+    void preCalculateCoastlinePoints();
 };
 
 

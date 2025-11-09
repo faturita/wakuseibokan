@@ -421,7 +421,7 @@ void inline initIslands()
         BoxIsland *vulcano = new BoxIsland(&entities);
         vulcano->setName("Vulcano");
         vulcano->setLocation(-12000.0f, -1.0f, 0.0f);
-        vulcano->buildTerrainModel(space,filereader("terrain/vulcano.bmp"));
+        vulcano->buildTerrainModel(space,filereader("terrain/thermopilae.bmp"));
 
         islands.push_back(statera);
         islands.push_back(thermopilae);
@@ -646,6 +646,7 @@ void inline initIslands()
     for(size_t j=0;j<islands.size();j++)
     {
         islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
     }
 
 }
@@ -994,10 +995,10 @@ void initWorldModelling(int testcase)
 {
     initWorldModelling();
 }
-void setupWorldModelling()
+void setupWorldModelling(unsigned long seed)
 {
     /* create world */
-    dRandSetSeed(1);
+    dRandSetSeed(seed);
     dInitODE();
     //dInitODE2(dInitFlagManualThreadCleanup);
     //dAllocateODEDataForThread(dAllocateMaskAll);

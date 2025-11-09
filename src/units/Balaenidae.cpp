@@ -211,13 +211,13 @@ void Balaenidae::doControlDocking()
                 T = T.normalize();
             }
 
-            c.registers.thrust = 40.0f;
+            c.registers.thrust = 60.0f;
             
         }
 
         if (distance<800.0f)
         {
-            c.registers.thrust = 10.0f;
+            c.registers.thrust = 20.0f;
         }
 
 

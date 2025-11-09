@@ -163,7 +163,7 @@ void Camera::lookAtFrom(Vec3f pos, Vec3f forward)
     lookAtFrom(up,pos,forward);
 }
 
-float Camera::getBearing()
+float Camera::getAzimuth()
 {
     Vec3f f = (getForward().normalize())*30;
 
