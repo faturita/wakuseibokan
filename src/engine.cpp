@@ -2173,7 +2173,8 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                     if (!ca)
                     {
-                        if (d->noCargoShip())
+                        std::cout << "Spawning cargo ship for island " << island->getName() << " " << i << std::endl;
+                        if (!d->isBuildingCargoShip())
                         {
                             d->buildCargoShip(); // Build a new cargo ship if it is not there.
                         }
@@ -2187,6 +2188,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 size_t idx = entities.push_back(ca, ca->getGeom());
                                 ca->ready();
                             }
+                            d->cargoShipCompleted(); // Reset the flag.
                         }
                     }
                 }

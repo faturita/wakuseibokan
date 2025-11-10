@@ -149,16 +149,17 @@ void Dock::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fwd)
     fwd = orig-position;
 }
 
-bool Dock::noCargoShip()
+bool Dock::isBuildingCargoShip()
 {
-    return getTtl() == 0;
+    return internalTimer > 0 || internalTimer < 0;
 }
 
 bool Dock::cargoShipReady()
 {
-    if (getTtl() < 0)
+    internalTimer--;
+    std::cout << "Dock internal timer: " << internalTimer << std::endl;
+    if (internalTimer == 0)
     {
-        setTtl(0);
         return true;
     }
     return false;
@@ -166,7 +167,14 @@ bool Dock::cargoShipReady()
 
 void Dock::buildCargoShip()
 {
-    setTtl(getRandomInteger(2000, 4000)); // Build a cargo ship in 2000 to 4000 ticks.
-    CLog::Write(CLog::Debug,"Dock %s is building a cargo ship.\n",getName().c_str());
+    //setTtl(getRandomInteger(2000, 4000)); // Build a cargo ship in 2000 to 4000 ticks.
+    CLog::Write(CLog::Debug,"%s is building a cargo ship.\n",getName().c_str());
+
+    internalTimer = getRandomInteger(400, 800);
+}
+
+void Dock::cargoShipCompleted()
+{
+    internalTimer = 0;
 }
 
