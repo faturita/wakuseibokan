@@ -424,6 +424,28 @@ void AdvancedWalrus::doControlDestination()
 
     float roundederror = 100;
 
+    int ls = abs(getTtl());
+
+    if (ls % 2000 == 0)
+    {
+        if ((oldPos-Po).magnitude() < 10.0f)
+        {
+            shaking = true;
+        }
+        else
+            shaking = false;
+        oldPos = Po;
+    }
+
+    if (shaking)
+    {
+        // Stuck walrus, try to unstick it.
+        c.registers.thrust = -20.0f;
+        doControl(c);
+        std::cout << "Unsticking walrus." << std::endl;
+        return;
+    }
+
     if (getStatus() == SailingStatus::ROLLING)
         roundederror = 5;
 
@@ -504,7 +526,7 @@ void AdvancedWalrus::doControlDestination()
         float signn = T.cross(F) [1];
 
 
-        CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f %10.3f\n", distance, closest, obstacle, e, signn);
+        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f %10.3f\n", distance, closest, obstacle, e, signn);
 
         if (abs(e)>=0.5f)
         {

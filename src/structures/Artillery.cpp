@@ -47,12 +47,12 @@ void Artillery::drawModel(float yRot, float xRot, float x, float y, float z)
 
         glScalef(1.0f,1.0f,1.0f);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        //_model->draw(Structure::texture);
+        _model->draw();
         //drawRectangularBox(Structure::width, Structure::height, Structure::length);
         glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
         glRotatef(-Structure::azimuth,0.0f,1.0f,0.0f);
         glRotatef(-Structure::elevation,0.0f,0.0f,1.0f);
-        draw3DSModel(filereader("structures/turrettop.3ds"),0.0f,0.0f,0.0f,1,textures["sky"]);
+        draw3DSModel(filereader("structures/turrettop.3ds"),0.0f,27.97f-8.14f,0.0f,1,textures["sky"]);
         glPopMatrix();
 
     }
@@ -123,7 +123,7 @@ Vehicle* Artillery::fire(int weapon, dWorldID world, dSpaceID space)
     action->init();
 
 
-    Vec3f position = getPos();
+    Vec3f position = getFiringPort();
     forward = getForward();forward = toVectorInFixedSystem(0, 0, 1,azimuth,-elevation);
     Vec3f Up = toVectorInFixedSystem(0.0f, 1.0f, 0.0f,0,0);
 

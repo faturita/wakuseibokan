@@ -2640,9 +2640,15 @@ void test28()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -2664,6 +2670,8 @@ void test28()
 
     controller.controllingid = CONTROLLING_NONE;
 
+    aiplayer = FREE_AI; 
+    controller.faction = BOTH_FACTION;
 
 }
 
@@ -2695,18 +2703,14 @@ void checktest28(unsigned long timer)
         }
     }
 
-    if (timer == 1200)
+    if (timer == 12200)
     {
 
         if (!entities.isValid(1) || entities[1]->getHealth()<1000)
         {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         } else {
-            printf("Test failed: Artillery did not hit carrier.\n");
-            endWorldModelling();
-            exit(0);
+            testFailed();
         }
 
     }
@@ -5834,9 +5838,15 @@ void test81()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Baltimore");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+    nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -5872,13 +5882,10 @@ void checktest81(unsigned int timer)
             {
                 if (w->getHealth()<1000)
                 {
-                    printf("Test failed: It seems like Walrus is stumbled.\n");
-                    endWorldModelling();
-                    exit(0);
+                    testFailed();
                 } else {
-                    printf("Test passed OK!\n");
-                    endWorldModelling();
-                    exit(1);
+                    testSucceeded();
+
                 }
             }
         }
@@ -5888,9 +5895,7 @@ void checktest81(unsigned int timer)
 
     if (timer > starttime + 20000)
     {
-        printf("Test failed: It seems like Walrus has been destroyed.\n");
-        endWorldModelling();
-        exit(0);
+        testFailed();
     }
 }
 
@@ -8903,7 +8908,7 @@ void test95()
     BoxIsland *nemesis = new BoxIsland(&entities);
     nemesis->setName("Nemesis");
     nemesis->setLocation(0.0f,-1.0,0.0f);
-    nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
+    nemesis->buildTerrainModel(space,"terrain/atom.bmp");
 
     islands.push_back(nemesis);
 
@@ -9119,6 +9124,94 @@ void checktest96(unsigned long timer)
 
 }
 
+
+
+void test97()
+{
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+
+    islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
+    // Entities will be added later in time.
+    Balaenidae *_b = new Balaenidae(BLUE_FACTION);
+    _b->init();
+    _b->embody(world,space);
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
+    _b->stop();
+
+    //_b->enableTelemetry();
+
+    entities.push_back(_b, _b->getGeom());
+
+    islands[0]->addStructureAtCoast(new Dock(GREEN_FACTION),world);
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 2.0f);
+    islands[0]->addStructureAtDesiredHeight(new WindTurbine(GREEN_FACTION),world, 3.0);
+    islands[0]->addStructure(new Artillery(GREEN_FACTION)     ,         0.0f,    -650.0f,0,world);
+    
+    // Use me to set the camera anywhere you want.
+    Vec3f pos(1986.0f,60.5f,-1758);  //Watch the position, because the sky could disspear
+    camera.setPos(pos);
+    camera.dy = 0;
+    camera.dz = 0;
+    camera.xAngle = 90;
+    camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+
+    aiplayer = FREE_AI;
+}
+
+void checktest97(unsigned long timer)
+{
+    Turret *l2=(Turret*)entities[islands[0]->getStructures()[3]]; // Risky
+    static int firecount=0;
+
+    if (timer % 300 == 30)
+    {
+
+        l2->elevation = -firecount++;
+        l2->azimuth = 180;
+
+        struct controlregister c;
+        c.pitch = 0.0;
+        c.roll = 0.0;
+        l2->setControlRegisters(c);
+        l2->setForward(toVectorInFixedSystem(0,0,1,l2->azimuth, -l2->elevation));
+
+        Vehicle *action = (l2)->fire(0,world,space);
+
+        action->enableTelemetry();
+        //dBodySetLinearDamping(action->getBodyID(),0);
+        //dBodySetAngularDamping(action->getBodyID(),0);
+
+        if (action != NULL)
+        {
+            entities.push_back(action, action->getGeom());
+        }
+    }
+
+    if (timer == 1222222200)
+    {
+
+        if (!entities.isValid(1) || entities[1]->getHealth()<1000)
+        {
+            testSucceeded();
+        } else {
+            testFailed();
+        }
+
+    }
+
+}
+
 static int testing=-1;
 
 void initWorldModelling()
@@ -9261,6 +9354,7 @@ void initWorldModelling(int testcase)
     case 94:test94();break;                         // Test carrier force field for walruses
     case 95:test95();break;                         // Test walruses going back to carrier rear.
     case 96:test96();break;                         // Test Carrier docking on an island.
+    case 97:test97();break;                         // Test Artillery range an trajectory.
     default:initIslands();test1();break;
     }
 
@@ -9374,6 +9468,7 @@ void worldStep(int value)
     case 94:checktest94(timer);break;
     case 95:checktest95(timer);break;
     case 96:checktest96(timer);break;
+    case 97:checktest97(timer);break;
     default: break;
     }
 

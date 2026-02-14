@@ -1860,7 +1860,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
             for(size_t i=0;i<str.size();i++)
             {
-                if (entities[str[i]]->getFaction()==sc->getFaction())
+                if (entities.isValid(str[i]) && entities[str[i]]->getFaction()==sc->getFaction())
                 {
                     // RTTI Stuff
                     if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))

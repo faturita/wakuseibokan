@@ -12,6 +12,9 @@ protected:
     Vec3f firingpos;
     Vec3f aim;
     float viewport_height = 20.0;
+
+    Vec3f oldPos;
+    bool shaking = false;
 public:
     bool no_damping_on_bullets = false;
     bool enable_heatup = false;
