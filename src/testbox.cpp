@@ -111,6 +111,7 @@
 #include "units/Otter.h"
 
 #include "actions/ArtilleryAmmo.h"
+#include "actions/Shell.h"
 #include "actions/Debris.h"
 #include "actions/Explosion.h"
 #include "actions/Torpedo.h"
@@ -131,6 +132,12 @@ extern  Controller controller;
 static dGeomID ground;
 
 unsigned long timer=0;
+
+/* Artillery trajectory calibration: when shell hits ground/water, record landing position */
+static bool artilleryCalibMode = false;
+static Vec3f artilleryCalibFiringPos;
+static float artilleryCalibLandingDist = 0;
+static bool artilleryCalibShellLanded = false;
 
 dWorldID world;
 dSpaceID space;
@@ -383,8 +390,25 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);groundexplosion(v2,world, space);}
                  if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);groundexplosion(v1,world, space);}
 
-                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {groundexplosion(v2,world, space);}
-                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {groundexplosion(v1,world, space);}
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {
+                    // This is ok to be here because this method is only for testing !! Be sure that is not contained in the keplerivworld version of this method, because it is not good to have this kind of code in the main game loop (too much processing).
+                     if (artilleryCalibMode && v2->getTypeId() == EntityTypeId::TShell) {
+                         Vec3f land = v2->getPos();
+                         Vec3f d(land[0]-artilleryCalibFiringPos[0], 0, land[2]-artilleryCalibFiringPos[2]);
+                         artilleryCalibLandingDist = sqrtf(d[0]*d[0] + d[2]*d[2]);
+                         artilleryCalibShellLanded = true;
+                     }
+                     groundexplosion(v2,world, space);
+                 }
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {
+                     if (artilleryCalibMode && v1->getTypeId() == EntityTypeId::TShell) {
+                         Vec3f land = v1->getPos();
+                         Vec3f d(land[0]-artilleryCalibFiringPos[0], 0, land[2]-artilleryCalibFiringPos[2]);
+                         artilleryCalibLandingDist = sqrtf(d[0]*d[0] + d[2]*d[2]);
+                         artilleryCalibShellLanded = true;
+                     }
+                     groundexplosion(v1,world, space);
+                 }
 
 
             } else
@@ -414,8 +438,24 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (v1 && isWalrus(v1)) { v1->inert = false;}
                  if (v2 && isWalrus(v2)) { v2->inert = false;}
 
-                 if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {waterexplosion(v2,world, space);}
-                 if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {waterexplosion(v1,world, space);}
+                 if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {
+                     if (artilleryCalibMode && v2->getTypeId() == EntityTypeId::TShell) {
+                         Vec3f land = v2->getPos();
+                         Vec3f d(land[0]-artilleryCalibFiringPos[0], 0, land[2]-artilleryCalibFiringPos[2]);
+                         artilleryCalibLandingDist = sqrtf(d[0]*d[0] + d[2]*d[2]);
+                         artilleryCalibShellLanded = true;
+                     }
+                     waterexplosion(v2,world, space);
+                 }
+                 if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {
+                     if (artilleryCalibMode && v1->getTypeId() == EntityTypeId::TShell) {
+                         Vec3f land = v1->getPos();
+                         Vec3f d(land[0]-artilleryCalibFiringPos[0], 0, land[2]-artilleryCalibFiringPos[2]);
+                         artilleryCalibLandingDist = sqrtf(d[0]*d[0] + d[2]*d[2]);
+                         artilleryCalibShellLanded = true;
+                     }
+                     waterexplosion(v1,world, space);
+                 }
 
                  if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);waterexplosion(v2,world, space);}
                  if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);waterexplosion(v1,world, space);}
@@ -2635,6 +2675,84 @@ void checktest27(unsigned long timer)
 
 }
 
+void test98()
+{
+    /* Artillery trajectory calibration: fire at known angles, measure landing distance */
+    BoxIsland *nemesis = new BoxIsland(&entities);
+    nemesis->setName("Nemesis");
+    nemesis->setLocation(0.0f,-1.0,0.0f);
+    nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
+    islands.push_back(nemesis);
+    for (size_t j=0; j<islands.size(); j++) {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+    Structure *t = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)     ,         0.0f,    +100.0f,0,world);
+    t = islands[0]->addStructure(new Artillery(BLUE_FACTION), 0.0f, -650.0f, 0, world);
+    Vec3f pos(4000, 60.0f, -1500);
+    camera.setPos(pos);
+    camera.dy = 0; camera.dz = 0; camera.xAngle = 90; camera.yAngle = 0;
+    controller.controllingid = CONTROLLING_NONE;
+    aiplayer = FREE_AI;
+    controller.faction = BOTH_FACTION;
+}
+
+void checktest98(unsigned long timer)
+{
+    static int state = 0;
+    static int angleIdx = 0;
+    static unsigned long lastFireTime = 0;
+    static const float CALIB_ANGLES[] = { -2.0f, -3.0f, -4.0f, -5.0f, -6.0f, -7.0f, -8.0f, -9.0f, -10.0f, -11.0f, -12.0f, -13.0f, -14.0f, -15.0f, -16.0f, -17.0f, -18.0f, -19.0f, -20.0f, -21.0f, -22.0f, -23.0f, -24.0f, -25.0f, -26.0f, -27.0f, -28.0f, -29.0f, -30.0f, -31.0f, -32.0f, -33.0f, -34.0f, -35.0f, -36.0f, -37.0f, -38.0f, -39.0f, -40.0f, -41.0f, -42.0f, -43.0f, -44.0f, -45.0f, -46.0f, -47.0f, -48.0f, -49.0f, -50.0f };
+    static const int NUM_CALIB_ANGLES = sizeof(CALIB_ANGLES)/sizeof(CALIB_ANGLES[0]);
+    static float calibDistances[NUM_CALIB_ANGLES];
+
+    if (state == 0 && timer == 100) {
+        Artillery *artillery = (Artillery*)entities[islands[0]->getStructures()[1]];
+        artilleryCalibMode = true;
+        artilleryCalibFiringPos = artillery->getFiringPort();
+        artilleryCalibShellLanded = false;
+        angleIdx = 0;
+        artillery->elevation = CALIB_ANGLES[0];
+        artillery->azimuth = 180.0f;
+        artillery->setForward(toVectorInFixedSystem(0, 0, 1, artillery->azimuth, -artillery->elevation));
+        struct controlregister c; c.pitch = 0; c.roll = 0;
+        artillery->setControlRegisters(c);
+        Vehicle *action = artillery->fire(0, world, space);
+        if (action) entities.push_back(action, action->getGeom());
+        lastFireTime = timer;
+        state = 1;
+    } else if (state == 1) {
+        if (artilleryCalibShellLanded) {
+            calibDistances[angleIdx] = artilleryCalibLandingDist;
+            printf("Calib: elevation %.1f -> distance %.1f\n", CALIB_ANGLES[angleIdx], artilleryCalibLandingDist);
+            artilleryCalibShellLanded = false;
+            angleIdx++;
+            if (angleIdx >= NUM_CALIB_ANGLES) {
+                printf("\n--- Artillery trajectory calibration (copy to Artillery.cpp TRAJ_CALIB) ---\n");
+                printf("static const TrajectoryCalib TRAJ_CALIB[] = {\n");
+                for (int i = 0; i < NUM_CALIB_ANGLES; i++)
+                    printf("    { %.1ff, %.1ff },\n", calibDistances[i], CALIB_ANGLES[i]);
+                printf("};\n---\n");
+                artilleryCalibMode = false;
+                testSucceeded();
+                return;
+            }
+            lastFireTime = timer;
+        }
+        if (timer - lastFireTime >= 220) {  /* Artillery TTL=200, wait for cooldown */
+            Artillery *artillery = (Artillery*)entities[islands[0]->getStructures()[1]];
+            if (artillery->getTtl() <= 0) {
+                artillery->elevation = CALIB_ANGLES[angleIdx];
+                artillery->azimuth = 180.0f;
+                artillery->setForward(toVectorInFixedSystem(0, 0, 1, artillery->azimuth, -artillery->elevation));
+                Vehicle *action = artillery->fire(0, world, space);
+                if (action) entities.push_back(action, action->getGeom());
+                lastFireTime = timer;
+            }
+        }
+    }
+}
+
 void test28()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
@@ -2653,12 +2771,14 @@ void test28()
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,3000.0f));
+    // Random distance in same direction (-Z); min 1800 or carrier gets stranded on island
+    float carrierDistance = 1800.0f + getRandom(0.0f, 4000.0f, 2);  // 1800-6000 units
+    _b->setPos(nemesis->getPos()-Vec3f(0.0f,0.0f,carrierDistance));
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
 
-    Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,0,world);
+   Structure *t = islands[0]->addStructure(new Artillery(BLUE_FACTION)     ,         0.0f,    -650.0f,0,world);
 
     Vec3f pos(4000,60.0f,-1500);
     camera.setPos(pos);
@@ -2675,27 +2795,27 @@ void test28()
 
 }
 
-void checktest28(unsigned long timer)
+void checktest28(unsigned long timer) 
 {
-    Turret *l2=(Turret*)entities[islands[0]->getStructures()[0]]; // Risky
+    Artillery *artillery = (Artillery*)entities[islands[0]->getStructures()[0]];
+    Vehicle *carrier = findCarrier(GREEN_FACTION);
 
-    if (timer == 100)
+    if (timer == 100 && carrier)
     {
+        // Use ballistic aiming to hit the carrier - accounts for shell trajectory and gravity
+        Vec3f targetPos = carrier->getPos();
+        Vehicle *action = artillery->aimAndFireAtTarget(targetPos, world, space);
 
-        l2->elevation = -5;
-        l2->azimuth = 180;
-
-        struct controlregister c;
-        c.pitch = 0.0;
-        c.roll = 0.0;
-        l2->setControlRegisters(c);
-        l2->setForward(toVectorInFixedSystem(0,0,1,l2->azimuth, -l2->elevation));
+        if (action != NULL)
+        {
+            entities.push_back(action, action->getGeom());
+        }
 
     }
 
     if (timer == 300)
     {
-        Vehicle *action = (l2)->fire(0,world,space);
+        Vehicle *action = artillery->fire(0,world,space);
 
         if (action != NULL)
         {
@@ -2705,16 +2825,14 @@ void checktest28(unsigned long timer)
 
     if (timer == 12200)
     {
-
-        if (!entities.isValid(1) || entities[1]->getHealth()<1000)
+        Vehicle *carrier = findCarrier(GREEN_FACTION);
+        if (!carrier || carrier->getHealth() < 1000)
         {
             testSucceeded();
         } else {
             testFailed();
         }
-
     }
-
 }
 
 void test29()
@@ -9355,6 +9473,7 @@ void initWorldModelling(int testcase)
     case 95:test95();break;                         // Test walruses going back to carrier rear.
     case 96:test96();break;                         // Test Carrier docking on an island.
     case 97:test97();break;                         // Test Artillery range an trajectory.
+    case 98:test98();break;                       // Artillery calibration: fire at angles, measure distances
     default:initIslands();test1();break;
     }
 
@@ -9469,6 +9588,7 @@ void worldStep(int value)
     case 95:checktest95(timer);break;
     case 96:checktest96(timer);break;
     case 97:checktest97(timer);break;
+    case 98:checktest98(timer);break;
     default: break;
     }
 

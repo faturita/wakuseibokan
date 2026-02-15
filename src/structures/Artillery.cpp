@@ -1,10 +1,15 @@
 #include <unordered_map>
+#include <cmath>
 #include "Artillery.h"
 #include "../actions/Shell.h"
+#include "../math/yamathutil.h"
 
 #include "../sounds/sounds.h"
 
 #include "../profiling.h"
+
+// Muzzle velocity - only angle is varied for aiming (interpolation table)
+static const float SHELL_MUZZLE_VELOCITY = 15.0f;
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -90,6 +95,83 @@ Vec3f Artillery::getFiringPort()
     return Vec3f(getPos()[0],getPos()[1]+firingpos[1],getPos()[2]);
 }
 
+/**
+ * Calibration table: (landing_distance, elevation_used).
+ * To calibrate: set fixed elevation, fire, measure where shell lands (horizontal dist).
+ * Fill table with (distance, elevation) pairs. Interpolation gives elevation for any distance.
+ * elevation: -90=zenith, 0=horizon, positive=down (game convention)
+ * Tune these values from actual game firings for best accuracy.
+ */
+struct TrajectoryCalib { float distance; float elevation; };
+static const TrajectoryCalib TRAJ_CALIB[] = {
+    { 1918.4f, -2.0f },
+    { 2199.9f, -3.0f },
+    { 2402.3f, -4.0f },
+    { 2553.4f, -5.0f },
+    { 2658.2f, -6.0f },
+    { 2736.7f, -7.0f },
+    { 2736.7f, -8.0f },
+    { 2833.6f, -9.0f },
+    { 2833.6f, -10.0f },
+    { 2879.4f, -11.0f },
+    { 2879.4f, -12.0f },
+    { 2896.6f, -13.0f },
+    { 2896.6f, -14.0f },
+    { 2894.7f, -15.0f },
+    { 2894.7f, -16.0f },
+    { 2880.4f, -17.0f },
+    { 2880.4f, -18.0f },
+    { 2880.4f, -19.0f },
+    { 2842.8f, -20.0f }
+};
+static const int NUM_TRAJ_CALIB = sizeof(TRAJ_CALIB) / sizeof(TRAJ_CALIB[0]);
+
+/** Interpolate elevation for target horizontal distance (and optional height correction). */
+static float interpolateElevation(float targetDist, float targetHeightOffset)
+{
+    // Simple linear interpolation between nearest calibration points. Could be improved with better interpolation or a formula.
+    if (targetDist <= TRAJ_CALIB[0].distance) return TRAJ_CALIB[0].elevation;
+    if (targetDist >= TRAJ_CALIB[NUM_TRAJ_CALIB-1].distance) return TRAJ_CALIB[NUM_TRAJ_CALIB-1].elevation;
+
+    for (int i = 1; i < NUM_TRAJ_CALIB; i++) {
+        if (targetDist < TRAJ_CALIB[i].distance) {
+            float distRange = TRAJ_CALIB[i].distance - TRAJ_CALIB[i-1].distance;
+            float elevRange = TRAJ_CALIB[i].elevation - TRAJ_CALIB[i-1].elevation;
+            float distFrac = (targetDist - TRAJ_CALIB[i-1].distance) / distRange;
+            float elevation = TRAJ_CALIB[i-1].elevation + elevRange * distFrac;
+
+            // Optional height correction: simple proportional adjustment based on target height offset
+            elevation += targetHeightOffset * 0.5f; // Tune this factor as needed
+
+            return elevation;
+        }
+    }
+    return 0.0f; // Should never reach here
+}
+
+Vehicle* Artillery::aimAndFireAtTarget(Vec3f target,dWorldID world, dSpaceID space)
+{
+    // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
+    Vec3f firingloc = getFiringPort();
+
+    dout << "Target distance: " << (target - firingloc).magnitude() << " Target height offset: " << (target[1] - firingloc[1]) << std::endl;
+
+    elevation = interpolateElevation((target - firingloc).magnitude(), target[1] - firingloc[1]);
+    azimuth = getAzimuth((target)-(firingloc));
+
+    struct controlregister c;
+    c.pitch = 0.0;
+    c.roll = 0.0;
+    setControlRegisters(c);
+    setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
+
+    dout << this <<  ":Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+
+    Vehicle *action = fire(0,world,space);
+
+    return action;
+}
+
 void Artillery::getViewPort(Vec3f &Up, Vec3f &position, Vec3f &fw)
 {
     position = getPos();
@@ -135,7 +217,7 @@ Vehicle* Artillery::fire(int weapon, dWorldID world, dSpaceID space)
     position = position + 40*forward;
     forward = -orig+position;
 
-    Vec3f Ft = forward*15;
+    Vec3f Ft = forward * SHELL_MUZZLE_VELOCITY;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);
