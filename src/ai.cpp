@@ -305,11 +305,6 @@ class RefuelStrandedCarrierQAction : public QAction
             if (b->getStatus() == SailingStatus::DOCKED && T[2] == 0)
             {
                 refuel(cg);
-                T[2] = 1;
-            }
-
-            if (T[2] == 100)
-            {
                 departure(cg);
                 dout << "Carrier refueled." << std::endl;
 

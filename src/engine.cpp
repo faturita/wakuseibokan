@@ -1860,28 +1860,14 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
 
             for(size_t i=0;i<str.size();i++)
             {
-                if (entities[str[i]]->getFaction()==sc->getFaction())
+                if (entities.isValid(str[i]) && entities[str[i]]->getFaction()==sc->getFaction())
                 {
                     // RTTI Stuff
                     if(Artillery* lb = dynamic_cast<Artillery*>(entities[str[i]]))
                     {
                         if (b->getPos()[1]<60)   // 60 is island height.  Only aim to ground based units
                         {
-                            // Find the vector between them, and the parameters for the turret to hit the vehicle, regardless of its random position.
-                            Vec3f firingloc = lb->getFiringPort();
-
-                            lb->elevation = -5;
-                            lb->azimuth = getAzimuth((b->getPos())-(firingloc));
-
-                            struct controlregister c;
-                            c.pitch = 0.0;
-                            c.roll = 0.0;
-                            lb->setControlRegisters(c);
-                            lb->setForward(toVectorInFixedSystem(0,0,1,lb->azimuth, -lb->elevation));
-
-                            dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
-
-                            Vehicle *action = (lb)->fire(0,world,space);
+                            Vehicle *action = (lb)->aimAndFireAtTarget(b->getPos(),world,space);
 
                             if (action != NULL)
                             {
@@ -2173,7 +2159,8 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                     if (!ca)
                     {
-                        if (d->noCargoShip())
+                        std::cout << "Spawning cargo ship for island " << island->getName() << " " << i << std::endl;
+                        if (!d->isBuildingCargoShip())
                         {
                             d->buildCargoShip(); // Build a new cargo ship if it is not there.
                         }
@@ -2187,6 +2174,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 size_t idx = entities.push_back(ca, ca->getGeom());
                                 ca->ready();
                             }
+                            d->cargoShipCompleted(); // Reset the flag.
                         }
                     }
                 }

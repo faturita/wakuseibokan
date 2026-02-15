@@ -158,6 +158,8 @@ void savegame(std::string filename)
 
             ss << entities[i]->getOrder() << std::endl;
 
+            ss << entities[i]->getAssignedTo() << std::endl;
+
             // @NOTE Take care when you write string with namespaces.
             std::string name = entities[i]->getName();
             name = std::regex_replace(name, std::regex(" "), "-");
@@ -627,6 +629,11 @@ void loadgame(std::string filename)
 
             v->setOrder(order);
 
+            int assignedTo;
+            ss >> assignedTo;
+
+            v->setAssignedTo(assignedTo);
+
             std::string name;
             ss >> name;
 
@@ -774,6 +781,12 @@ void loadgame(std::string filename)
             }
         }
 
+    }
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
     }
 
 

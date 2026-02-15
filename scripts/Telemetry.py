@@ -117,6 +117,7 @@ while shouldrun:
         
         # Read both tanks' telemetry packets
         tank1values = read()
+        print(int(tank1values[td['number']]))
         if int(tank1values[td['number']]) != 1:
             continue
 
