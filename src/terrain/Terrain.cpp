@@ -472,7 +472,7 @@ Structure* BoxIsland::addStructureAtCoast(Structure *structure, dWorldID world)
 
     coastPoint = structureOrientation;
 
-    printf("Coast point selected at (%10.5f, %10.5f) with angle %10.5f radians.\n", coastPoint[0], coastPoint[2], t);
+    //printf("Coast point selected at (%10.5f, %10.5f) with angle %10.5f radians.\n", coastPoint[0], coastPoint[2], t);
     return addStructure(structure, coastPoint[0], coastPoint[1], coastPoint[2], -t + 3 * (PI / 2), world);
 
 }
@@ -669,13 +669,13 @@ void BoxIsland::preCalculateCoastlinePoints()
 
             if (  heightDifference<0.5 )
             {
-                printf("Coast point found at (%d, %d) with height %10.5f\n", x, z, heightOffset);
+                //printf("Coast point found at (%d, %d) with height %10.5f\n", x, z, heightOffset);
                 coastlinePoints.emplace_back(Vec3f(x,heightOffset, z));
             }
         }
     }
 
-    CLog::Write(CLog::Debug, "Island %s Pre-calculated %zu coastline points.\n", name.c_str(), coastlinePoints.size());
+    //CLog::Write(CLog::Debug, "Island %s Pre-calculated %zu coastline points.\n", name.c_str(), coastlinePoints.size());
 }
 
 Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries)
@@ -708,7 +708,7 @@ Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure,
 
     int height = std::distance(hist.begin(), std::max_element(hist.begin(), hist.end()));
 
-    std::cout << "Found " << count << " of spots with height " << height << std::endl;
+    //std::cout << "Found " << count << " of spots with height " << height << std::endl;
 
     for (const auto& pos : heights[height])
     {
@@ -732,7 +732,7 @@ Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure,
 
     float placementHeight = findHighestPointAlongPath(world,x, z, t, structure->getLength(), TERRAIN_SCALE);
 
-    std::cout << "Highest point in " << selected << " is " << placementHeight << std::endl;
+    //std::cout << "Highest point in " << selected << " is " << placementHeight << std::endl;
 
     x = clipped(x, -1799, 1799);
     z = clipped(z, -1799, 1799);
@@ -774,7 +774,7 @@ Structure* BoxIsland::addStructure(Structure *structure, dWorldID world)
         // @FIXME Put this line in a different function and use it from there.  Repeated code here.
         heightOffset = +_landmass->getHeight((int)(x/TERRAIN_SCALE)+TERRAIN_SCALE/2,(int)(z/TERRAIN_SCALE)+TERRAIN_SCALE/2);
 
-        CLog::Write(CLog::Debug,"Height %10.5f\n", heightOffset);
+        //CLog::Write(CLog::Debug,"Height %10.5f\n", heightOffset);
 
         if (breakcounter++==10) break;
 

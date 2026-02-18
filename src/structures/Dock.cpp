@@ -157,7 +157,7 @@ bool Dock::isBuildingCargoShip()
 bool Dock::cargoShipReady()
 {
     internalTimer--;
-    std::cout << "Dock internal timer: " << internalTimer << std::endl;
+
     if (internalTimer == 0)
     {
         return true;
@@ -168,7 +168,7 @@ bool Dock::cargoShipReady()
 void Dock::buildCargoShip()
 {
     //setTtl(getRandomInteger(2000, 4000)); // Build a cargo ship in 2000 to 4000 ticks.
-    CLog::Write(CLog::Debug,"%s is building a cargo ship.\n",getName().c_str());
+    //CLog::Write(CLog::Debug,"%s is building a cargo ship.\n",getName().c_str());
 
     internalTimer = getRandomInteger(400, 800);
 }

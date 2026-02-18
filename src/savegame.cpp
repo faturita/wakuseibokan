@@ -68,6 +68,8 @@ extern std::vector<Message> messages;
 extern dWorldID world;
 extern dSpaceID space;
 
+extern std::unordered_map<std::string, GLuint> textures;
+
 
 void savegame(std::string filename)
 {
@@ -471,6 +473,7 @@ void loadgame(std::string filename)
                     Otter* _ot = new Otter(faction);
                     v = _ot;
                     _ot->init();
+                    _ot->setTexture(textures["sky"]);
                     dSpaceID car_space = _ot->embody_in_space(world, space);
                     ss >> f[0] >> f[1] >> f[2] ;
                     v->setPos(f);

@@ -2159,7 +2159,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                     if (!ca)
                     {
-                        std::cout << "Spawning cargo ship for island " << island->getName() << " " << i << std::endl;
+                        //std::cout << "Spawning cargo ship for island " << island->getName() << " " << i << std::endl;
                         if (!d->isBuildingCargoShip())
                         {
                             d->buildCargoShip(); // Build a new cargo ship if it is not there.
@@ -2167,14 +2167,22 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                         
                         if (d->cargoShipReady())
                         {
-                            Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
-                            ca->setAssignedTo(i);  // Assigned to island index.
-                            if (ca)
-                            {
-                                size_t idx = entities.push_back(ca, ca->getGeom());
-                                ca->ready();
+
+
+                            // Abort spawn if the Carrier from this faction is within 1000 radius of the Dock
+                            Vehicle* carrier = findCarrier(d->getFaction());
+                            std::cout << "Carrier position: " << (carrier ? carrier->getPos() : Vec3f(0,0,0)) << ", Dock position: " << d->getPos() << std::endl;
+                            if (carrier && (carrier->getPos() - d->getPos()).magnitude() > 2000.0f) {
+                                // Carrier is too close, likely docking for refuel, so skip spawning
+                                Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
+                                ca->setAssignedTo(i);  // Assigned to island index.
+                                if (ca)
+                                {
+                                    size_t idx = entities.push_back(ca, ca->getGeom());
+                                    ca->ready();
+                                }
+                                d->cargoShipCompleted(); // Reset the flag.
                             }
-                            d->cargoShipCompleted(); // Reset the flag.
                         }
                     }
                 }
@@ -2285,7 +2293,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     }
 
 
-                    CLog::Write(CLog::Debug,"Build Structure %d ? Prob %10.5f < %10.5f likelihood.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
+                    //CLog::Write(CLog::Debug,"Build Structure %d ? Prob %10.5f < %10.5f likelihood.\n", islandstructs[which].subType, prob, islandstructs[which].chance );
                     if (prob<islandstructs[which].chance)
                     {
 
@@ -2505,7 +2513,7 @@ void dockWalrus(Vehicle *dock)
     for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
     {
         // @FIXME: Only put back the walrus that is close to the carrier.
-        //CLog::Write(CLog::Debug,"Type and ttl: %d, %d\n", vehicles[i]->getType(),vehicles[i]->getTtl());
+
         if (entities[i]->getType()==WALRUS && entities[i]->getStatus()==SailingStatus::SAILING &&
                 entities[i]->getFaction()==dock->getFaction() && (dock->getPos()-entities[i]->getPos()).magnitude()<DOCK_RANGE)
         {
@@ -2518,6 +2526,25 @@ void dockWalrus(Vehicle *dock)
 
             deleteEntity(i);
         }
+    }
+}
+
+void dockWalrus(Vehicle *dock, Vehicle *w)
+{
+    std::cout << "status:" << w->getStatus() << " type:" << w->getType() << " faction:" << w->getFaction() << " dock faction:" << dock->getFaction() << " distance:" << (dock->getPos()-w->getPos()).magnitude() << std::endl;
+    if (w->getType() == WALRUS && w->getStatus() == SailingStatus::SAILING &&
+        w->getFaction() == dock->getFaction() && (dock->getPos()-w->getPos()).magnitude()<DOCK_RANGE)
+    {
+        char msg[256];
+        Message mg;
+        mg.faction = w->getFaction();
+        sprintf(msg, "%s is now back on deck.",w->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+
+        size_t id = entities.findId(w->getGeom());   // @NOTE: This is to make sure that the walrus is removed from the spatial hash before deleting it.
+
+        deleteEntity(id);
     }
 }
 

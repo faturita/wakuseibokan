@@ -127,6 +127,32 @@ public:
 
                         if (d->getFaction() == faction)
                         {
+
+                            // Find the closest CargoShip to the dock
+                            std::vector<VehicleSubTypes> types;
+                            types.push_back(VehicleSubTypes::CARGOSHIP);
+                            std::vector<size_t> cargoships = findNearestFriendlyVehicles(faction, types, d->getPos(), 2000.0);
+
+                            std::cout << "Found " << cargoships.size() << " cargo ships near the dock." << std::endl;
+                            if (!cargoships.empty()) {
+                                CargoShip* cg = (CargoShip*)entities[cargoships[0]];
+                                if (cg && entities.isValid(cargoships[0])) {
+                                    // Draw a line between the dock and the carrier
+                                    Vec3f dockPos = d->getPos();
+                                    Vec3f carrierPos = b->getPos();
+                                    Vec3f dockToCarrier = (carrierPos - dockPos).normalize();
+                                    // Perpendicular vector in XZ plane
+                                    Vec3f up(0,1,0);
+                                    Vec3f perp = dockToCarrier.cross(up).normalize();
+                                    // Move 300 units away from the line (perpendicular)
+                                    Vec3f targetPos = dockPos + perp * 300.0f;
+                                    cg->setDestination(targetPos);
+                                    cg->setAutoStatus(AutoStatus::DESTINATION);
+                                    cg->enableAuto();
+                                    std::cout << "Instructing cargo ship " << cg->getName() << " to move 300 units perpendicular to the dock-carrier line." << std::endl;
+                                }
+                            }
+
                             b->ready();
                             b->setDestination(d->getPos()-d->getForward().normalize()*400);
                             b->setAutoStatus(AutoStatus::DOCKING);
@@ -476,7 +502,7 @@ class InvadeIslandQAction : public QAction
                         w->enableAuto();
                     }
 
-                    dout << "Walrus status:" << (int)w->getAutoStatus() << std::endl;
+                    //dout << "Walrus status:" << (int)w->getAutoStatus() << std::endl;
 
                     if (w->getAutoStatus() == AutoStatus::IDLE)
                     {
@@ -541,7 +567,7 @@ class RendezvousQAction : public QAction
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             Vehicle *v=entities[i];
-            if (v->getType() == WALRUS && v->getFaction() == faction)
+            if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType()!= VehicleSubTypes::CARGOSHIP)
             {
                 if ((v->getPos()-b->getPos()).magnitude()<10000)   {
 
@@ -551,7 +577,8 @@ class RendezvousQAction : public QAction
                     {
                         synchronized(entities.m_mutex)
                         {
-                            dockWalrus(b);
+                            //std::cout << "Docking walrus " << w->getName() << " to carrier " << b->getName() << std::endl;
+                            dockWalrus(b,v);
                         }
                     }
                 }
@@ -777,7 +804,7 @@ public:
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             Vehicle *v=entities[i];
-            if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType()!= VehicleSubTypes::CARGOSHIP)
+            if (v->getType() == WALRUS && v->getFaction() == faction && v->getSubType()!= VehicleSubTypes::CARGOSHIP && v->getStatus() != SailingStatus::DOCKED)
             {
                 if ((v->getPos()-b->getPos()).magnitude()<10000)   {
 
@@ -814,6 +841,14 @@ public:
     }
 };
 
+class ThereAreUnitsAround : public AllUnitsDocked
+{
+public:
+    bool evaluate(int faction) override
+    {
+        return !AllUnitsDocked::evaluate(faction);
+    }
+};
 
 class NoNearbyFreeIsland : public Condition
 {
@@ -864,6 +899,18 @@ public:
         }
 
         return false;
+    }
+};
+
+class ThereAreUnitsAroundAndClosestIslandIsFriendly : public Condition
+{
+    ClosestIslandIsFriendly closestIslandIsFriendly;
+    ThereAreUnitsAround thereAreUnitsAround;
+
+public:
+    bool evaluate(int faction) override
+    {
+        return closestIslandIsFriendly.evaluate(faction) && thereAreUnitsAround.evaluate(faction);
     }
 };
 
@@ -1727,6 +1774,7 @@ Player::Player(int faction)
     interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
     interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around
     interruptions[2] = new Interruption(State::REFUEL,new RefuelCon());                       // Empty fuel
+    interruptions[3] = new Interruption(State::RENDEZVOUS,new ThereAreUnitsAroundAndClosestIslandIsFriendly());     // Gather all the units back to the carrier.
 
     qactions[(int)State::IDLE] = new ResetQAction();
     qactions[(int)State::DOCKING] = new DockingQAction();

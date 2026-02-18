@@ -112,6 +112,13 @@ public:
     T find(dGeomID element);
 
     /**
+     * @brief Find an id of an object given its geomID.
+     * @param element
+     * @return NULL if it is not present.
+     */
+    size_t findId(dGeomID geom);
+
+    /**
      * Returns the index for a given position (1-based).
      * @brief indexAt
      * @param position

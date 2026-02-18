@@ -204,6 +204,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx);
 
 Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner);
 void dockWalrus(Vehicle *dock);
+void dockWalrus(Vehicle *dock, Vehicle *w);
 void dockManta();
 
 Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner);
