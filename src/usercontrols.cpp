@@ -779,6 +779,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                 list();
             } else
 
+            if (controller.str.find("center") != std::string::npos)
+            {
+                if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
+                {
+                    centerMapOnWorldPos(entities[controller.controllingid]->getPos());
+                    controller.view = 2;
+                }
+            } else
             if (strcmp(controller.str.c_str(),"map")==0)
                 controller.view = 2;
             else {
@@ -929,6 +937,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 co.parameters.spawnid = VehicleSubTypes::ADVANCEDWALRUS;
 
                 controller.push(co);
+            }
+            break;
+        case 'g':
+            {
+                if (controller.controllingid != CONTROLLING_NONE && entities.isValid(controller.controllingid))
+                {
+                    centerMapOnWorldPos(entities[controller.controllingid]->getPos());
+                    controller.view = 2;
+                }
             }
             break;
         case 'h':

@@ -11,4 +11,6 @@ void zoommapout();
 
 Vec3f setLocationOnMap(int ccx, int ccy);
 
+void centerMapOnWorldPos(Vec3f pos);
+
 #endif // MAP_H

@@ -240,6 +240,13 @@ float Y(float y)
     return 0+(y/1000);
 }
 
+void centerMapOnWorldPos(Vec3f pos)
+{
+    cx = (int)X(pos[0]);
+    cy = 400 - (int)Y(pos[2]);
+    mapzoom = 11;
+}
+
 void placeMark(Vec3f pos, int iconsize, const char* modelName)
 {
     placeMark(X(pos[0]),Y(pos[2]),iconsize,modelName);
