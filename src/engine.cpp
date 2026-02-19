@@ -219,6 +219,12 @@ bool stranded(Vehicle *carrier, Island *island)
     if (island && carrier && carrier->getType() == CARRIER && carrier->getStatus() != SailingStatus::OFFSHORING)
     {
         Balaenidae *b = (Balaenidae*)carrier;
+
+        // @NOTE: Avoided the backwards force on the carrier if the carrier is trying to reach the dock.
+        // Prevent applying the backward force if the carrier is docking
+        if (carrier->getStatus() == SailingStatus::INDOCKING || carrier->getStatus() == SailingStatus::DOCKED)
+            return false;
+
         Vec3f offshoreDirection = b->getPos() - ((BoxIsland*)island)->getPos();
         offshoreDirection = offshoreDirection.normalize();
         b->offshore(offshoreDirection);
@@ -2171,7 +2177,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
                             // Abort spawn if the Carrier from this faction is within 1000 radius of the Dock
                             Vehicle* carrier = findCarrier(d->getFaction());
-                            std::cout << "Carrier position: " << (carrier ? carrier->getPos() : Vec3f(0,0,0)) << ", Dock position: " << d->getPos() << std::endl;
+                            //std::cout << "Carrier position: " << (carrier ? carrier->getPos() : Vec3f(0,0,0)) << ", Dock position: " << d->getPos() << std::endl;
                             if (carrier && (carrier->getPos() - d->getPos()).magnitude() > 2000.0f) {
                                 // Carrier is too close, likely docking for refuel, so skip spawning
                                 Vehicle *ca = d->spawn(world,space,CARGOSHIP,findNextNumber(d->getFaction(),WALRUS,CARGOSHIP));
@@ -2533,7 +2539,7 @@ void dockWalrus(Vehicle *dock)
 
 void dockWalrus(Vehicle *dock, Vehicle *w)
 {
-    std::cout << "status:" << w->getStatus() << " type:" << w->getType() << " faction:" << w->getFaction() << " dock faction:" << dock->getFaction() << " distance:" << (dock->getPos()-w->getPos()).magnitude() << std::endl;
+    //std::cout << "status:" << w->getStatus() << " type:" << w->getType() << " faction:" << w->getFaction() << " dock faction:" << dock->getFaction() << " distance:" << (dock->getPos()-w->getPos()).magnitude() << std::endl;
     if (w->getType() == WALRUS && w->getStatus() == SailingStatus::SAILING &&
         w->getFaction() == dock->getFaction() && (dock->getPos()-w->getPos()).magnitude()<DOCK_RANGE)
     {

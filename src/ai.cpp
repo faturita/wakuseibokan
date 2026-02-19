@@ -424,9 +424,14 @@ class ApproachFriendlyIslandQAction : public QAction
         {
             BoxIsland *is = nextOperationPerFaction[faction].nextIsland;
 
+            //std::cout << "Approaching friendly island: " << (is ? is->getName() : "None") << std::endl;
+
             if (is)
             {
                 Vec3f vector = (b->getPos()) - (is->getPos());
+
+                std::cout << "Distance to friendly island: " << vector.magnitude() << " and range " << RANGE[2] << std::endl;
+
 
                 // @FIXME: Solve the range
                 if (b->getAutoStatus() == AutoStatus::IDLE && vector.magnitude()>RANGE[2])
