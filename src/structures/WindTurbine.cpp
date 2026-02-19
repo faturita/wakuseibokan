@@ -12,8 +12,8 @@ WindTurbine::WindTurbine(int faction)
 
 void WindTurbine::init()
 {
-    //Load the model for the pole/tower
-    _model = (Model*)T3DSModel::loadModel(filereader("structures/windmill.3ds"),-0,15*5,0,5,5,5,textures["metal"]);
+    //Load the model for the pole/tower (turretbase is just a cylinder, no baked-in blades)
+    _model = (Model*)T3DSModel::loadModel(filereader("structures/turretbase.3ds"), 0.0f, 0.0f, 0.0f, 1, 5, 1, textures["metal"]);
     if (_model != NULL)
     {
 
@@ -33,10 +33,15 @@ void WindTurbine::drawBlades()
     // Draw 3 blades (helices) as simple flat quads, evenly spaced at 120 degrees.
     // Each blade is a flat elongated rectangle extending outward from the hub.
     float bladeLength = 60.0f;
-    float bladeWidth = 8.0f;
-    float bladeThickness = 1.5f;
+    float bladeWidth = 16.0f;
+    float bladeThickness = 4.0f;
 
-    glColor3f(0.85f, 0.85f, 0.80f);
+    // Enable texturing so blades use the metal texture
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures["metal"]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
 
     for (int i = 0; i < 3; i++)
     {
@@ -47,34 +52,34 @@ void WindTurbine::drawBlades()
         glBegin(GL_QUADS);
         // Front face
         glNormal3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(-bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
         // Back face
         glNormal3f(0.0f, 0.0f, -1.0f);
-        glVertex3f(-bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
         // Top face (blade tip)
         glNormal3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
-        glVertex3f( bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
         // Side faces
         glNormal3f(-1.0f, 0.0f, 0.0f);
-        glVertex3f(-bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
-        glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
 
         glNormal3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
-        glVertex3f(bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
-        glVertex3f(bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
-        glVertex3f(bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(bladeWidth * 0.5f, 0.0f, -bladeThickness * 0.5f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(bladeWidth * 0.5f, bladeLength, -bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(bladeWidth * 0.5f, bladeLength,  bladeThickness * 0.5f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(bladeWidth * 0.5f, 0.0f,  bladeThickness * 0.5f);
         glEnd();
 
         glPopMatrix();
@@ -98,17 +103,15 @@ void WindTurbine::drawModel(float yRot, float xRot, float x, float y, float z)
 
         _model->draw(textures["metal"]);
 
-        // Move to the hub position at the top of the pole.
-        // The model is loaded with y-offset 75 and scale 5.
-        // The hub is near the top of the windmill tower.
-        glTranslatef(0.0f, 140.0f, 0.0f);
+        // Move to the hub position at the top of the turretbase pole.
+        // turretbase at scale 5: height ~140 (27.97*5), center of mass at y~-40,
+        // so the top is around y=100. Tune as needed.
+        glTranslatef(0.0f, 100.0f, 5.0f);
 
         // Rotate the blades around the Z axis (facing forward)
         glRotatef(bladeAngle, 0.0f, 0.0f, 1.0f);
 
-        glDisable(GL_TEXTURE_2D);
         drawBlades();
-        glEnable(GL_TEXTURE_2D);
 
         glPopMatrix();
     }
