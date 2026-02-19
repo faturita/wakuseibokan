@@ -210,6 +210,14 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
     const int N = 10;
     dContact contact[N];
+
+    // @NOTE Uncomment me if you have OUT OF MEMORY problems with ODE's heightmaps.
+    //Vehicle *k = gVehicle(o1);
+    //Vehicle *l = gVehicle(o2);
+
+    //if (k) dout << "Vehicle1:" << k->getName() << std::endl;
+    //if (l) dout << "Vehicle2:" << l->getName() << std::endl;
+
     n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
     if (n > 0) {
         for (i=0; i<n; i++) {
@@ -242,8 +250,8 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.slip1 = 0.1f;
                 contact[i].surface.slip2 = 0.1f;
                 //printf("2\n");
-                if (isAction(v1) && isCarrier(v2) && hit(v2,(Gunshot*)v1)) {}
-                if (isAction(v2) && isCarrier(v1) && hit(v1,(Gunshot*)v2)) {}
+                if (isAction(v1) && isCarrier(v2) && !isMineFire(v2, (Gunshot*)v1) && hit(v2,(Gunshot*)v1)) {}
+                if (isAction(v2) && isCarrier(v1) && !isMineFire(v1, (Gunshot*)v2) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isManta(v2) && hit(v2,(Gunshot*)v1)) {}
                 if (isAction(v2) && isManta(v1) && hit(v1,(Gunshot*)v2)) {}
                 if (isAction(v1) && isWalrus(v2) && hit(v2,(Gunshot*)v1)) {}
@@ -262,6 +270,34 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                 contact[i].surface.slip1 = 0.0f;
                 contact[i].surface.slip2 = 0.0f;
                 contact[i].surface.bounce = 0.2f;
+            } else
+            if (isDock(s1) || isDock(s2))
+            {
+                contact[i].surface.mu = 0.9;  //dInfinity;
+                contact[i].surface.bounce = 0.2f;
+                contact[i].surface.slip1 = 0.1f;
+                contact[i].surface.slip2 = 0.1f;
+
+                contact[i].surface.soft_erp = 0;   // 0 in both will force the surface to be tight.
+                contact[i].surface.soft_cfm = 0;
+
+                if (isDock(s1) && docked(v2, s1->island)) {}
+                if (isDock(s2) && docked(v1, s2->island)) {}
+            } else
+            if (isSubType(v1,VehicleSubTypes::CARGOSHIP) &&  isCarrier(v2) || (isSubType(v2,VehicleSubTypes::CARGOSHIP) && isCarrier(v1)))
+            {
+                // CargoShip landing on Carrier
+                contact[i].surface.mode = dContactBounce |
+                dContactApprox1;
+                //printf("4\n");
+                contact[i].surface.mu = dInfinity;
+                contact[i].surface.slip1 = 0.0f;
+                contact[i].surface.slip2 = 0.0f;
+                contact[i].surface.bounce = 0.2f;
+
+                if (isSubType(v1,VehicleSubTypes::CARGOSHIP) && docked(v1, v2)) {}
+                if (isSubType(v2,VehicleSubTypes::CARGOSHIP) && docked(v2, v1)) {}
+
             } else
             if  (isRunway(s1) || isRunway(s2))
             {
@@ -373,6 +409,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
 
                  if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {waterexplosion(v2,world, space);}
                  if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {waterexplosion(v1,world, space);}
+
+                 if (ground == contact[i].geom.g1 && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);waterexplosion(v2,world, space);}
+                 if (ground == contact[i].geom.g2 && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);waterexplosion(v1,world, space);}
 
 
             } else {
