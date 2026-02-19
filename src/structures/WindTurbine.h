@@ -7,6 +7,9 @@ class WindTurbine : public Structure
 {
 private:
     float production=1;
+    float bladeAngle=0;
+
+    void drawBlades();
 public:
     WindTurbine(int faction);
     void init();
