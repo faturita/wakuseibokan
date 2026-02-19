@@ -2393,7 +2393,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
 
 
         // @NOTE: Logistics
-        // Move naturally the fuel from wind turbines to docks and runways.
+        // Move naturally the fuel from wind turbines to warehouses, docks and runways.
         if (c)
         {
             if (c->getTtl()<=0|| force)
@@ -2406,6 +2406,8 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                 {
                     if (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
                         ws.push_back(str[id]);
+                    if (entities[str[id]]->getSubType() == VehicleSubTypes::WAREHOUSE)
+                        shares.push_back(str[id]);
                     if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
                         shares.push_back(str[id]);
                     if (entities[str[id]]->getSubType() == VehicleSubTypes::RUNWAY)
@@ -2812,10 +2814,12 @@ void collect(Vehicle *v)
 
         for(size_t id=0;id<str.size();id++)
         {
-            // Bring the stuff from all the others.
+            // Bring the stuff from all the others: windturbines, warehouses, other docks, and runways.
             if (entities[str[id]] != v)
             {
                 if (entities[str[id]]->getSubType() == VehicleSubTypes::WINDTURBINE)
+                    ws.push_back(str[id]);
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::WAREHOUSE)
                     ws.push_back(str[id]);
                 if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
                     ws.push_back(str[id]);
