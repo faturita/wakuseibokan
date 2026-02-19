@@ -120,7 +120,7 @@ public:
                 for(size_t id=0;id<str.size();id++)
                 {
 
-                    dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
+                    //dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
                     if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
                     {
                         Dock *d = (Dock*)entities[str[id]];
@@ -1130,12 +1130,13 @@ public:
 
 class NotEnoughFuelForNextOperation : public EnoughFuelForNextOperation
 {
+    ClosestIslandIsFriendly closestIslandIsFriendly;
 public:
     bool evaluate(int faction) override
     {
         Vehicle *b = findCarrier(faction);
 
-        if (b && nextOperationPerFaction[faction].nextIsland)
+        if (b && nextOperationPerFaction[faction].nextIsland && closestIslandIsFriendly.evaluate(faction))
             return !EnoughFuelForNextOperation::evaluate(faction);
 
         return false;
@@ -1751,11 +1752,12 @@ Player::Player(int faction)
     for(int i=0;i<25;i++) transitions[i] = new Transition(State::IDLE,State::IDLE,new Condition());
     for(int i=0;i<25;i++) interruptions[i] = new Interruption(State::IDLE,new Condition());
 
-    transitions[0] = new Transition(State::IDLE,State::DOCKING,new NotEnoughFuelForNextOperation());            // Power < REQUIRED_FUEL
-    transitions[1] = new Transition(State::DOCKING,State::DOCKED,new DockedCondition());                        // SailingStatus::DOCKED
+    transitions[0] = new Transition(State::IDLE,State::INVADEISLAND,new ClosestIslandIsFree());                 // <10000.0, no command center
+    transitions[1] = new Transition(State::IDLE,State::DOCKING,new NotEnoughFuelForNextOperation());            // Power < REQUIRED_FUEL
+    transitions[2] = new Transition(State::DOCKING,State::DOCKED,new DockedCondition());                        // SailingStatus::DOCKED
     //transitions[2] = new Transition(State::IDLE,State::IDLE,new EnoughFuelForNextOperation());                  // Power > REQUIRED_FUEL
     transitions[3] = new Transition(State::DOCKED,State::IDLE,new CarrierIsSailing());                          // SailingStatus::SAILING 
-    transitions[4] = new Transition(State::IDLE,State::INVADEISLAND,new ClosestIslandIsFree());                 // <10000.0, no command center
+
     transitions[5] = new Transition(State::IDLE,State::BALLISTICATTACK,new ClosestIslandIsEnemy());             // <10000.0, command center
     transitions[6] = new Transition(State::IDLE,State::APPROACHENEMYISLAND,new ClosestFarAwayIslandIsEnemy());  // >40000.0, closer than any other empty island
     transitions[7] = new Transition(State::IDLE,State::APPROACHFREEISLAND,new ClosestFarAwayIslandIsFree());    // >40000.0, closer than any other enemy island

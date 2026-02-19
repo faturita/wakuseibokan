@@ -84,6 +84,8 @@ void WindTurbine::drawBlades()
 
         glPopMatrix();
     }
+
+    glDisable(GL_TEXTURE_2D);
 }
 
 void WindTurbine::drawModel(float yRot, float xRot, float x, float y, float z)

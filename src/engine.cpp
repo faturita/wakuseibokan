@@ -1890,7 +1890,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         c.roll = 0.0;
                         lb->setControlRegisters(c);
 
-                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        //dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                         lb->setForward((b->getPos())-(firingloc));
 
@@ -1916,7 +1916,7 @@ void defendIsland(unsigned long timer, dSpaceID space, dWorldID world)
                         c.roll = 0.0;
                         lb->setControlRegisters(c);
 
-                        dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
+                        //dout << lb <<  ":Azimuth: " << lb->azimuth << " Inclination: " << lb->elevation << std::endl;
 
                         lb->setForward((b->getPos())-(firingloc));
 
@@ -2779,7 +2779,7 @@ void dockInNearestIsland(Vehicle *b)
             for(size_t id=0;id<str.size();id++)
             {
 
-                dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
+                //dout << entities[str[id]]->getName() << ":" << entities[str[id]]->getSubType() << std::endl;
                 if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK)
                 {
                     Dock *d = (Dock*)entities[str[id]];

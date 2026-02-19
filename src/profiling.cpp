@@ -5,10 +5,10 @@
 #include <cstdarg>
 
 #ifdef DEBUG
-std::ostream &dout = std::cout;
+std::ostream &dout_stream = std::cout;
 #else
 std::ofstream dev_null("/dev/null");
-std::ostream &dout = dev_null;
+std::ostream &dout_stream = dev_null;
 #endif
 
 bool CLog::m_bInitialised;

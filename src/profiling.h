@@ -10,7 +10,13 @@
 // Comment the following define to allow quick suppression of all debug printfs or couts.
 #define DEBUG 1
 
-extern std::ostream &dout;
+extern std::ostream &dout_stream;
+
+#ifdef DEBUG
+#define dout (dout_stream << "[" << __FILE__ << ":" << __LINE__ << "] ")
+#else
+#define dout dout_stream
+#endif
 
 class CLog
 {
