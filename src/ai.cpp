@@ -1148,6 +1148,34 @@ public:
     }
 };
 
+// Condition: carrier doesn't have enough fuel to reach the target island.
+// Unlike NotEnoughFuelForNextOperation, this does NOT require being near a friendly island.
+// Used as escape hatch when approaching a far-away friendly island and running out of fuel.
+class NotEnoughFuelToReachTarget : public Condition
+{
+public:
+    bool evaluate(int faction) override
+    {
+        Vehicle *b = findCarrier(faction);
+
+        if (b && nextOperationPerFaction[faction].nextIsland)
+        {
+            BoxIsland *is = nextOperationPerFaction[faction].nextIsland;
+            float distance = (is->getPos() - b->getPos()).magnitude();
+            float requiredfuel = distance * (1000.0 / 254000.0) + 50.0;
+
+            if (b->getPower() < requiredfuel)
+            {
+                dout << "Not enough fuel to reach target island " << is->getName()
+                     << ": need " << requiredfuel << " have " << b->getPower() << std::endl;
+                return true;
+            }
+        }
+
+        return false;
+    }
+};
+
 // The condition should return true or false and this must be implemented in classes because it is code
 // The evaluator and the transition from one state to the other can be just one class because it is always the same based on input.
 
@@ -1221,12 +1249,25 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
-        //std::cout << "CarrierHasArrived  " << (int)b->getAutoStatus() << "."  << (int)b->dst_status << std::endl;
-
-        if (b && b->arrived())
+        if (b)
         {
-            nextOperationPerFaction[faction].requiredFuel  = 1000.0;
-            return ClosestIslandIsFriendly::evaluate(faction);
+            // Check arrived() OR distance-based arrival.
+            // The QAction stops issuing goTo() when within RANGE[2] (6000),
+            // but it runs before transitions, stealing the REACHED status.
+            // So also check if the carrier is close enough and auto-idle.
+            bool closeEnough = false;
+            BoxIsland *is = nextOperationPerFaction[faction].nextIsland;
+            if (is)
+            {
+                float dist = (b->getPos() - is->getPos()).magnitude();
+                closeEnough = (dist < RANGE[2] && b->getAutoStatus() == AutoStatus::IDLE);
+            }
+
+            if (b->arrived() || closeEnough)
+            {
+                nextOperationPerFaction[faction].requiredFuel  = 1000.0;
+                return ClosestIslandIsFriendly::evaluate(faction);
+            }
         }
 
         return false;
@@ -1771,7 +1812,8 @@ Player::Player(int faction)
     transitions[9] = new Transition(State::APPROACHFREEISLAND,State::INVADEISLAND,new CarrierHasArrivedToFreeIsland());     // arrived(), dst_status == REACHED
     transitions[10] = new Transition(State::APPROACHFREEISLAND,State::BALLISTICATTACK,new ClosestIslandIsEnemy(RANGE[1])); 
     transitions[11] = new Transition(State::APPROACHENEMYISLAND,State::BALLISTICATTACK,new CarrierHasArrivedToEnemyIsland(RANGE[1]));    // arrived(), dst_status == REACHED
-    transitions[12] = new Transition(State::APPROACHFRIENDLYISLAND,State::IDLE,new CarrierHasArrivedToFriendlyIsland());       // arrived(), dst_status == REACHED
+    transitions[12] = new Transition(State::APPROACHFRIENDLYISLAND,State::IDLE,new CarrierHasArrivedToFriendlyIsland());       // arrived() or close enough
+    transitions[18] = new Transition(State::APPROACHFRIENDLYISLAND,State::DOCKING,new NotEnoughFuelToReachTarget());       // Escape: dock if fuel won't reach target
     transitions[13] = new Transition(State::BALLISTICATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1])); 
     transitions[14] = new Transition(State::BALLISTICATTACK,State::AIRBORNEATTACK, new UnitsDeployedForAttack());                  // No enemies around
     transitions[15] = new Transition(State::AIRBORNEATTACK,State::APPROACHFREEISLAND,new ClosestIslandIsFree(RANGE[1]));                  // No enemies around
