@@ -2266,7 +2266,7 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                     } else {
                         // Logistics island
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::WAREHOUSE;tp.chance = 0.7;islandstructs.push_back(tp);}
-                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.7;islandstructs.push_back(tp);}
+                        {struct templatestructure tp;tp.subType = VehicleSubTypes::DOCK;tp.mandatory=true;tp.chance = 0.5;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::RUNWAY;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ANTENNA;tp.chance = 0.9;tp.onlyonce=true;islandstructs.push_back(tp);}
                         {struct templatestructure tp;tp.subType = VehicleSubTypes::ARTILLERY;tp.chance = 0.2;tp.onlyonce=true;islandstructs.push_back(tp);}
@@ -2350,9 +2350,18 @@ void buildAndRepair(bool force, dSpaceID space, dWorldID world)
                                 island->addStructure(s,world);
                                 break;
                             case VehicleSubTypes::DOCK:
+                            {
+                                // Collect existing dock positions in island-local coordinates
+                                std::vector<Vec3f> dockPositions;
+                                for (size_t di = 0; di < strs.size(); di++)
+                                {
+                                    if (entities[strs[di]]->getSubType() == VehicleSubTypes::DOCK)
+                                        dockPositions.push_back(entities[strs[di]]->getPos() - island->getPos());
+                                }
                                 s = new Dock(c->getFaction());
-                                island->addStructureAtCoast(s,world);
+                                island->addStructureAtCoast(s, world, dockPositions);
                                 break;
+                            }
                             case VehicleSubTypes::ANTENNA:
                                 s = new Antenna(c->getFaction());
                                 island->addStructure(s,world);
