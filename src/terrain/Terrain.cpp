@@ -37,6 +37,7 @@
 #include "../imageloader.h"
 #include "../math/vec3f.h"
 #include "../openglutils.h"
+#include "../math/geometry.h"
 #include "Terrain.h"
 
 // Islands of 3600x3600 (based on heightmaps of 60x60). Max height is 100m.
@@ -475,6 +476,38 @@ Structure* BoxIsland::addStructureAtCoast(Structure *structure, dWorldID world)
     //printf("Coast point selected at (%10.5f, %10.5f) with angle %10.5f radians.\n", coastPoint[0], coastPoint[2], t);
     return addStructure(structure, coastPoint[0], coastPoint[1], coastPoint[2], -t + 3 * (PI / 2), world);
 
+}
+
+/**
+ * Place a structure at the coastline point that is farthest from any existing dock.
+ * The caller provides the list of existing dock positions (in island-local coordinates).
+ * Uses findFarthestPoint from geometry to pick the best coastline spot.
+ */
+Structure* BoxIsland::addStructureAtCoast(Structure *structure, dWorldID world, const std::vector<Vec3f>& existingDockPositions)
+{
+    // No existing docks: fall back to the original random placement
+    if (existingDockPositions.empty())
+    {
+        return addStructureAtCoast(structure, world);
+    }
+
+    assert ( coastlinePoints.size() > 0 || !"No coastline points calculated for this island.");
+
+    Vec3f coastPoint = findFarthestPoint(existingDockPositions, coastlinePoints);
+
+    float t = atan2(coastPoint[2], coastPoint[0])*180.0/PI;
+
+    if (t>=90) t -= 90;
+    else t += 270;
+
+    t = t * PI/180.0f + PI/2.0f;
+
+    Vec3f structureOrientation = Vec3f( coastPoint[0],0,coastPoint[2] ).normalize();
+    structureOrientation = coastPoint + structureOrientation * 300.0f;
+
+    coastPoint = structureOrientation;
+
+    return addStructure(structure, coastPoint[0], coastPoint[1], coastPoint[2], -t + 3 * (PI / 2), world);
 }
 
 /**

@@ -226,6 +226,7 @@ public:
     dGeomID getGeom();
 
 	Structure* addStructureAtCoast(Structure *structure, dWorldID world);
+	Structure* addStructureAtCoast(Structure *structure, dWorldID world, const std::vector<Vec3f>& existingDockPositions);
 	Structure* addStructure(Structure* structure, float x, float offsetHeight, float z, float angle, dWorldID world);
     Structure* addStructure(Structure* structure, float x, float z,  float angle, dWorldID world);
     Structure* addStructure(Structure* structure,  dWorldID world);
