@@ -198,6 +198,7 @@ void Balaenidae::doControlDocking()
 
 
         // Potential fields to avoid islands (works great).
+        float STRENGTH = 0.9f;
         if (closest > 1800 && closest < 4000)
         {
             BoxIsland *b = islands[nearesti];
@@ -207,7 +208,7 @@ void Balaenidae::doControlDocking()
 
             if (distance>2000.0)
             {
-                T = T+d;
+                T = T+STRENGTH*d;
                 T = T.normalize();
             }
 

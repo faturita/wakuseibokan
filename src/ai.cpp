@@ -350,7 +350,7 @@ class RefuelStrandedCarrierQAction : public QAction
 
         if (b && b->getPower() <= 0)
         {
-            BoxIsland *is = findNearestIsland(b->getPos());
+            BoxIsland *is = findNearestFriendlyIsland(b->getPos(),false,faction,300 kmf);
 
             Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
 
@@ -430,7 +430,7 @@ class ApproachFriendlyIslandQAction : public QAction
             {
                 Vec3f vector = (b->getPos()) - (is->getPos());
 
-                std::cout << "Distance to friendly island: " << vector.magnitude() << " and range " << RANGE[2] << std::endl;
+                //std::cout << "Distance to friendly island: " << vector.magnitude() << " and range " << RANGE[2] << std::endl;
 
 
                 // @FIXME: Solve the range
@@ -1572,17 +1572,20 @@ class RefuelCon : public Condition
 
         if (b->getPower() <= 0)
         {
-            BoxIsland *is = findNearestIsland(b->getPos());
+            //std::cout << "Carrier is out of fuel!" << std::endl;
+            return true;
 
-            if (!is) return false;
+            // BoxIsland *is = findNearestIsland(b->getPos());
 
-            Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+            // if (!is) return false;
 
-            // This is the condition that triggers the refuel condition.
-            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
-            {
-                return true;
-            }
+            // Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+
+            // // This is the condition that triggers the refuel condition.
+            // if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
+            // {
+            //     return true;
+            // }
 
         }
         return false;   
@@ -1951,7 +1954,7 @@ void Player::playStrategy(unsigned long timer)
 
             for(size_t i = 0; i < islands.size(); ++i) {
                 if (islands[i] == destiny) {
-                    std::cout << "Nearest empty island is: " << destiny->getName() << " at index " << i << std::endl;
+                    std::cout << "Faction:" << faction << "-" << " Nearest empty island is: " << destiny->getName() << " at index " << i << std::endl;
                     end = i;  // Update the destination index
                 }
             }
