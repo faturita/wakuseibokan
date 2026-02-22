@@ -466,7 +466,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 size_t index = CONTROLLING_NONE;
                 findMantaBySubTypeAndFactionAndNumber(index, VehicleSubTypes::MEDUSA,controller.faction, content);
 
-                CLog::Write(CLog::Debug,"Medusa %d\n", content);
+                CLog::Write(CLog::Debug,"Medusa %d at %d\n", content, index);
 
                 switchControl(index);
             } else

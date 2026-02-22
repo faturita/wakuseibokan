@@ -197,7 +197,7 @@ Vehicle* CarrierLauncher::fire(int weapon, dWorldID world, dSpaceID space)
     }
 
     // @NOTE: we are using the autostatus to determine if we consider or not the weapon type.
-    CLog::Write(CLog::Error, "CarrierLauncher::Fire %d.\n", weapon);
+    //CLog::Write(CLog::Error, "CarrierLauncher::Fire %d.\n", weapon);
     switch (weapon) {
     case 1:return fireGround(world,space);
         break;

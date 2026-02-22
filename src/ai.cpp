@@ -826,16 +826,16 @@ public:
 
         Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 
-        if (m)
+        if (m && m->getSubType() != VehicleSubTypes::MEDUSA)
         {
             done2=false;
         }
-        if (m2)
+        if (m2 && m2->getSubType() != VehicleSubTypes::MEDUSA)
         {
             done2 = false;
         } else
         {
-            if (m3)
+            if (m3 && m3->getSubType() != VehicleSubTypes::MEDUSA)
             {
                 done2 = false;
             }
@@ -1826,7 +1826,6 @@ Player::Player(int faction)
     interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
     interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around
     interruptions[2] = new Interruption(State::REFUEL,new RefuelCon());                       // Empty fuel
-    interruptions[3] = new Interruption(State::RENDEZVOUS,new ThereAreUnitsAroundAndClosestIslandIsFriendly());     // Gather all the units back to the carrier.
 
     qactions[(int)State::IDLE] = new ResetQAction();
     qactions[(int)State::DOCKING] = new DockingQAction();

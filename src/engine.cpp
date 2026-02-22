@@ -2754,7 +2754,7 @@ void refill(Vehicle *f)
     }
 
     // If the CargoShip is docked on an island and no other vehicle was found, transfer fuel to the nearest island Dock.
-    if (!m && f->getSubType() == VehicleSubTypes::CARGOSHIP && f->getStatus() == SailingStatus::DOCKED)
+    if (!m && f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
         BoxIsland *is = findNearestIsland(f->getPos());
         if (is)
