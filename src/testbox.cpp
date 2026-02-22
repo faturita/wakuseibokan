@@ -898,10 +898,10 @@ void checktest3(unsigned long timer)
     if (timer==90)  // Slow down Manta so that it can hit the structure.
     {
         SimplifiedDynamicManta *_manta1 = (SimplifiedDynamicManta*)entities[2];
-        _manta1->elevator = -4;
+        _manta1->elevator = -3;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
-        c.pitch = -4;
+        c.pitch = -2;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
     }
@@ -933,7 +933,7 @@ void checktest4(unsigned long  timer)
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
-        c.pitch = -4;
+        c.pitch = -2;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
         _manta1->setStatus(FlyingStatus::FLYING);
@@ -960,7 +960,7 @@ void checktest5(unsigned long  timer)   // Manta lands on carrier.
         _manta1->elevator = -4;
         struct controlregister c;
         c.thrust = 400.0f/(10.0);
-        c.pitch = -4;
+        c.pitch = -2;
         _manta1->setControlRegisters(c);
         _manta1->setThrottle(400.0f);
         _manta1->setStatus(FlyingStatus::FLYING);
@@ -1933,6 +1933,12 @@ void test20()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -2043,6 +2049,12 @@ void test21()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
@@ -2101,6 +2113,12 @@ void test22()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
@@ -2109,7 +2127,7 @@ void test22()
 
     entities.push_back(_b, _b->getGeom());
 
-    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          550.0f,    0.0f,0,world);
+    Structure *t = islands[0]->addStructure(new Turret(BLUE_FACTION)     ,          -550.0f,   -1000.0f,0,world);
 
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
@@ -2133,7 +2151,7 @@ void checktest22(unsigned long timer)
 
     if (!b)
     {
-        printf("Test passed OK!\n");
+        testSucceeded();
         endWorldModelling();
         exit(1);
     }
@@ -2161,6 +2179,17 @@ void checktest22(unsigned long timer)
             gunshot(l2->getPos());
         }
     }
+
+    if (timer == 3000)
+    {
+        if (b->getHealth() == 1000.0f)
+        {
+            testFailed("Test failed: Walrus has not been hit. Either aiming or fire was wrong..\n");
+        } else {
+            testSucceeded();
+        }
+
+    }
 }
 
 void test23()
@@ -2172,6 +2201,12 @@ void test23()
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -2258,6 +2293,12 @@ void test24()
     nemesis->buildTerrainModel(space,"terrain/nemesis.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -2844,6 +2885,12 @@ void test29()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
@@ -3001,6 +3048,12 @@ void test30()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
@@ -3117,6 +3170,12 @@ void test31()
     atom->buildTerrainModel(space,"terrain/nonsquareisland.bmp");
 
     islands.push_back(atom);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 }
 
 void checktest31(unsigned long timer)
@@ -3258,6 +3317,12 @@ void test33()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
     _b->embody(world,space);
@@ -3395,6 +3460,12 @@ void test35()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, DEFENSE_ISLAND)    ,       200.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)           ,         0.0f,    -650.0f,0,world);
@@ -3542,6 +3613,12 @@ void test36()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
     Structure *t9 = islands[0]->addStructure(new Turret(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
 
@@ -3662,6 +3739,12 @@ void test37()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
     Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
@@ -3796,6 +3879,12 @@ void test38()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -3864,6 +3953,12 @@ void test39()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -3948,6 +4043,12 @@ void test40()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -4035,6 +4136,12 @@ void test41()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -4124,6 +4231,12 @@ void test42()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -4210,6 +4323,12 @@ void test43()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -4361,6 +4480,12 @@ void test44()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -4486,6 +4611,12 @@ void test45()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -4770,6 +4901,12 @@ void test46()
     islands.push_back(arachnid);
     islands.push_back(outcrop);
     islands.push_back(taksaven);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 }
 
 void checktest46(unsigned long timer)
@@ -4937,6 +5074,12 @@ void test47()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -4991,6 +5134,12 @@ void test48()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -5062,6 +5211,12 @@ void test49()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -5089,7 +5244,10 @@ void test49()
 
 void checktest49(unsigned long timer)
 {
-
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 void test50()
@@ -5100,6 +5258,12 @@ void test50()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -5157,6 +5321,12 @@ void test51()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
@@ -5267,6 +5437,12 @@ void test52()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
@@ -5359,6 +5535,12 @@ void test53()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
@@ -5498,6 +5680,12 @@ void test54()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
@@ -5578,6 +5766,12 @@ void test55()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
@@ -5808,6 +6002,12 @@ void test57()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
@@ -5900,6 +6100,12 @@ void test58()
     nemesis->buildTerrainModel(space,"terrain/tristan.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
@@ -6027,6 +6233,12 @@ void test59()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Balaenidae *_b = new Balaenidae(GREEN_FACTION);
     _b->init();
@@ -6095,6 +6307,12 @@ void test60()
     nemesis->buildTerrainModel(space,"terrain/atom.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
@@ -6174,6 +6392,12 @@ void test61()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
@@ -6241,6 +6465,12 @@ void test62()
     nemesis->buildTerrainModel(space,"terrain/sentinel.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     // Entities will be added later in time.
     Beluga *_b = new Beluga(BLUE_FACTION);
@@ -6428,6 +6658,12 @@ void test63()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Launcher(GREEN_FACTION)        ,         -230.0f,    230.0f,0,world);
     Structure *t9 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,           -330.0f,    230.0f,0,world);
@@ -6515,6 +6751,12 @@ void test64()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
@@ -6615,6 +6857,12 @@ void test65()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
     Structure *t9 = islands[0]->addStructure(new Warehouse(BLUE_FACTION)        ,           -330.0f,    230.0f,0,world);
@@ -6637,8 +6885,10 @@ void test65()
 
 void checktest65(unsigned long timer)
 {
-
-
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 
@@ -6677,6 +6927,12 @@ void test66()
     nemesis->buildTerrainModel(space,"terrain/thermopilae.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(BLUE_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Launcher(BLUE_FACTION)        ,         -230.0f,    230.0f,0,world);
@@ -6794,6 +7050,12 @@ void test67()
 
     islands.push_back(thermopilae);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
 
     Walrus *_walrus = new Walrus(GREEN_FACTION);
 
@@ -6851,6 +7113,12 @@ void test68()
 
     islands.push_back(thermopilae);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,33,world);
 
@@ -6896,6 +7164,12 @@ void test69()
     thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
 
     islands.push_back(thermopilae);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,0,world);
@@ -7025,6 +7299,12 @@ void test70()
     thermopilae->buildTerrainModel(space,"terrain/gaijin.bmp");
 
     islands.push_back(thermopilae);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
@@ -7178,6 +7458,12 @@ void test72()
     nemesis->buildTerrainModel(space,"terrain/goku.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
@@ -7340,6 +7626,12 @@ void test74()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
 }
 
 void checktest74(unsigned long timer)
@@ -7424,6 +7716,12 @@ void test75()
 
     islands.push_back(nemesis);
 
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
+
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       20.0f,      -20.0f,  0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
 
@@ -7497,6 +7795,10 @@ void checktest76(unsigned long timer)
         messages.insert(messages.begin(), mg);
     }
 
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 
@@ -7559,6 +7861,10 @@ void checktest77(unsigned long timer)
         messages.insert(messages.begin(), mg);
     }
 
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 void test78()
@@ -7570,6 +7876,12 @@ void test78()
     nemesis->buildTerrainModel(space,"terrain/goku.bmp");
 
     islands.push_back(nemesis);
+
+    for(size_t j=0;j<islands.size();j++)
+    {
+        islands[j]->setIslandId(j);
+        islands[j]->preCalculateCoastlinePoints();
+    }
 
     Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       0.0f,      -0.0f,  0,world);
     Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION),                                    200.0f,     200.0f,127,world);
@@ -7901,7 +8213,10 @@ void test82()
 
 void checktest82(unsigned long timer)
 {
-
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 
@@ -8900,6 +9215,10 @@ void checktest93(unsigned long timer)
 {
     static int number = 0;
 
+    if (timer == 10000)
+    {
+        testSucceeded();
+    }
 }
 
 void test94()
