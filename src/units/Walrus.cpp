@@ -281,7 +281,7 @@ void Walrus::doControlDestination()
         if (b)
         {
             closest = (b->getPos() - Po).magnitude();
-            if (closest > 1600 && closest < 2200)
+            if (closest < 2200)
             {
                 c.registers.thrust = 15.0f;
 
@@ -290,7 +290,7 @@ void Walrus::doControlDestination()
 
         if (island != NULL)
         {
-            c.registers.thrust = 400.0;
+            c.registers.thrust = -15.0f;
         }
 
         // Potential fields from Carrier
