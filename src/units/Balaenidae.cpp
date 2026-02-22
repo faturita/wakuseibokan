@@ -258,7 +258,7 @@ void Balaenidae::doControlDocking()
             sprintf(str, "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
-            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            CLog::Write(CLog::Debug,"Balaenidae has reached its destination.\n");
             dst_status = DestinationStatus::REACHED;
             c.registers.thrust = 0.0f;
             setThrottle(0.0);

@@ -220,14 +220,14 @@ void AAM::doControlFlipping(Vec3f target, float thrust)
     setForward(T);
     release(T);
 
-    dout << "T:Az:"
-              << std::setw(10) << getAzimuth(getForward())
-              << std::setw(10) << getAzimuth(T)
-              << "(" << std::setw(12) << e1 << ")"
-              << std::setw(10) << declination
-              << std::setw(10) << sp2
-              << " Destination:"
-              << std::setw(10) << T.magnitude() << std::endl;
+    //dout << "T:Az:"
+    //          << std::setw(10) << getAzimuth(getForward())
+    //          << std::setw(10) << getAzimuth(T)
+    //          << "(" << std::setw(12) << e1 << ")"
+    //          << std::setw(10) << declination
+    //          << std::setw(10) << sp2
+    //          << " Destination:"
+    //          << std::setw(10) << T.magnitude() << std::endl;
 
     if (abs(height - sp3)<5)
     {

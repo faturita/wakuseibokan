@@ -2742,12 +2742,34 @@ void refill(Vehicle *f)
 
     if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
     {
-        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
-        if (vehicles.size()>0)
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);
+        for (size_t vi = 0; vi < vehicles.size(); vi++)
         {
-            m = entities[vehicles[0]];
+            if (entities[vehicles[vi]] != f)
+            {
+                m = entities[vehicles[vi]];
+                break;
+            }
         }
-    } 
+    }
+
+    // If the CargoShip is docked on an island and no other vehicle was found, transfer fuel to the nearest island Dock.
+    if (!m && f->getSubType() == VehicleSubTypes::CARGOSHIP && f->getStatus() == SailingStatus::DOCKED)
+    {
+        BoxIsland *is = findNearestIsland(f->getPos());
+        if (is)
+        {
+            std::vector<size_t> str = is->getStructures();
+            for (size_t id = 0; id < str.size(); id++)
+            {
+                if (entities[str[id]]->getSubType() == VehicleSubTypes::DOCK && entities[str[id]]->getFaction() == f->getFaction())
+                {
+                    m = entities[str[id]];
+                    break;
+                }
+            }
+        }
+    }
 
     if (m)
     {
@@ -2763,7 +2785,7 @@ void refill(Vehicle *f)
         messages.insert(messages.begin(), mg);
     }
 
-    return; 
+    return;
 }
 
 int getIslandCargo(BoxIsland *is, int cargotype)

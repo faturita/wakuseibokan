@@ -347,7 +347,7 @@ void CargoShip::doControlDocking()
             sprintf(str, "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
-            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            CLog::Write(CLog::Debug,"CargoShip has reached its destination.\n");
             dst_status = DestinationStatus::REACHED;
             autostatus = AutoStatus::IDLE;
             c.registers.thrust = 0.0f;
@@ -490,7 +490,7 @@ void CargoShip::doControlDestination()
             sprintf(str, "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
-            CLog::Write(CLog::Debug,"Walrus has reached its destination.\n");
+            CLog::Write(CLog::Debug,"CargoShip has reached its destination.\n");
             dst_status = DestinationStatus::REACHED;
             autostatus = AutoStatus::IDLE;
             c.registers.thrust = 0.0f;
