@@ -252,6 +252,7 @@ public:
     void checkStructures();
 
     void preCalculateCoastlinePoints();
+    Vec3f getClosestCoastalPoint(const Vec3f& pos) const;
 };
 
 

@@ -711,6 +711,34 @@ void BoxIsland::preCalculateCoastlinePoints()
     //CLog::Write(CLog::Debug, "Island %s Pre-calculated %zu coastline points.\n", name.c_str(), coastlinePoints.size());
 }
 
+Vec3f BoxIsland::getClosestCoastalPoint(const Vec3f& pos) const
+{
+    if (coastlinePoints.empty())
+        return Vec3f(X, 0.0f, Z);   // fall back to island center
+
+    // coastlinePoints are in island-local coordinates; convert pos to local
+    float localX = pos[0] - X;
+    float localZ = pos[2] - Z;
+
+    float bestDist2 = 1e18f;
+    const Vec3f* best = &coastlinePoints[0];
+
+    for (const Vec3f& cp : coastlinePoints)
+    {
+        float dx = cp[0] - localX;
+        float dz = cp[2] - localZ;
+        float dist2 = dx*dx + dz*dz;
+        if (dist2 < bestDist2)
+        {
+            bestDist2 = dist2;
+            best = &cp;
+        }
+    }
+
+    // Return in world coordinates
+    return Vec3f((*best)[0] + X, (*best)[1], (*best)[2] + Z);
+}
+
 Structure* BoxIsland::addRectangularStructureOnFlatTerrain(Structure *structure, dWorldID world, float searchRadius, int searchTries, int angleTries)
 {
 

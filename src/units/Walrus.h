@@ -17,6 +17,14 @@ protected:
 
     BoxIsland *island=NULL;
 
+    // PID state for heading control in doControlDestination()
+    float _pid_integral  = 0.0f;
+    float _pid_prev_error = 0.0f;
+
+    // When true: approach and beach on the island (invasion mode).
+    // When false: navigate around the island using potential fields (avoidance mode).
+    bool allowIslandLanding = false;
+
 public:
     Walrus(int faction);
 
@@ -47,6 +55,9 @@ public:
     void virtual setStatus(int status);
 
     void attack(Vec3f target);
+
+    bool getLandingMode() const { return allowIslandLanding; }
+    void setLandingMode(bool value) { allowIslandLanding = value; }
 
     void virtual setNameByNumber(int number);
 

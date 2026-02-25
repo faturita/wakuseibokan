@@ -59,6 +59,8 @@ void Walrus::init()
     width=5.0f;
     length=10.0f;
 
+    _pid_integral   = 0.0f;
+    _pid_prev_error = 0.0f;
 }
 
 int Walrus::getType()
@@ -268,7 +270,6 @@ void Walrus::doControlDestination()
 
 
         // Potential fields from the islands (to slow down Walrus)
-
         c.registers.thrust = 400.0f;
 
         if (distance<800.0f)
@@ -276,21 +277,72 @@ void Walrus::doControlDestination()
             c.registers.thrust = 20.0f;
         }
 
-        float closest=0;
+        float closest = 1e9f;
+        float islandFactor = 1.0f;   // 1.0 = far away, near 0 = very close to island
+
         BoxIsland *b = findNearestIsland(Po);
         if (b)
         {
-            closest = (b->getPos() - Po).magnitude();
-            if (closest < 2200)
+            Vec3f coastPt = b->getClosestCoastalPoint(Po);
+            coastPt[1] = 0.0f;
+            Vec3f PoPlanar = Po; PoPlanar[1] = 0.0f;
+            closest = (coastPt - PoPlanar).magnitude();
+
+            if (allowIslandLanding)
             {
-                c.registers.thrust = 15.0f;
+                // --- Landing mode: head straight for the island, slow near the coast,
+                //     reverse thrust once beached (island != NULL). ---
+
+                // Slow down linearly from full speed at 1000 units to crawl at 200 units.
+                const float INV_FAR  = 1000.0f;
+                const float INV_NEAR =  800.0f;
+                if (closest < INV_FAR)
+                {
+                    float t = (INV_FAR - closest) / (INV_FAR - INV_NEAR);
+                    if (t > 1.0f) t = 1.0f;
+                    float thrust = 400.0f * (1.0f - 0.85f * t);
+                    if (thrust < 20.0f) thrust = 20.0f;
+                    c.registers.thrust = thrust;
+                }
 
             }
-        }
+            else
+            {
+                // --- Avoidance mode: deflect around the island using potential fields. ---
 
-        if (island != NULL)
-        {
-            c.registers.thrust = -15.0f;
+                const float FAR_DIST  = 1500.0f;
+                const float NEAR_DIST =  500.0f;
+
+                if (closest < FAR_DIST)
+                {
+                    Vec3f l = coastPt;
+                    Vec3f d = PoPlanar - l;
+                    d = d.normalize();
+
+                    // Tangential direction: rotate radial 90° in XZ plane (counterclockwise)
+                    Vec3f tangent(-d[2], 0.0f, d[0]);
+                    tangent = tangent.normalize();
+
+                    // Head-on factor: 1 = heading straight into island, 0 = perpendicular/away
+                    float headOn = -d.dot(T);
+                    if (headOn < 0.0f) headOn = 0.0f;
+
+                    // Blend radial repulsion and tangential circumnavigation
+                    Vec3f avoidDir = ((1.0f - headOn) * d + headOn * tangent);
+                    avoidDir = avoidDir.normalize();
+
+                    float t = (FAR_DIST - closest) / (FAR_DIST - NEAR_DIST);
+                    if (t > 1.0f) t = 1.0f;
+                    float fieldWeight  = 0.8f * t;
+                    float targetWeight = 1.0f - fieldWeight;
+
+                    T = targetWeight * T + fieldWeight * avoidDir;
+                    T = T.normalize();
+
+                    // islandFactor: 1.0 at FAR_DIST, 0.15 at NEAR_DIST
+                    islandFactor = 1.0f - 0.85f * t;
+                }
+            }
         }
 
         // Potential fields from Carrier
@@ -317,28 +369,47 @@ void Walrus::doControlDestination()
 
         float signn = T.cross(F) [1];
 
+        // PD heading controller  (gains tuned via testcase_130)
+        const float Kp       = 12.0f;
+        const float Kd       = 200.0f;
+        const float MAX_ROLL = 25.0f;    // cap so large errors don't spin too hard
+        const float DEADBAND = 0.070f;   // ~4 degrees — no steering below this
 
-        //CLog::Write(CLog::Debug,"T: %10.3f %10.3f %10.3f %10.3f\n", closest, distance, e, signn);
+        float e_signed = e * (signn > 0 ? +1.0f : -1.0f);
 
-
-        /**
-        if (abs(e)>=0.5f)
+        // Speed regulation: combine heading alignment and island proximity.
+        //   headFactor: 0.05 when 90° off, 1.0 when aligned
+        //   islandFactor: 0.05 very close to island, 1.0 far away
+        // Only applies when thrust hasn't been overridden by destination/carrier proximity.
+        if (c.registers.thrust >= 200.0f)
         {
-            c.registers.roll = 30.0 * (signn>0?+1:-1) ;
-        } else
-        if (abs(e)>=0.4f)
+            float headFactor = 1.0f - fabsf(e_signed) / (0.5f * (float)M_PI);
+            if (headFactor < 0.05f) headFactor = 0.05f;
+            float thrust = 400.0f * headFactor * islandFactor;
+            if (thrust < 25.0f) thrust = 25.0f;   // always enough thrust to steer
+            c.registers.thrust = thrust;
+        }
+
+        float derivative    = e_signed - _pid_prev_error;
+        _pid_prev_error     = e_signed;
+
+        if (fabsf(e_signed) < DEADBAND)
         {
-            c.registers.roll = 20.0 * (signn>0?+1:-1) ;
-        } else
-        if (abs(e)>=0.2f)
-            c.registers.roll = 10.0 * (signn>0?+1:-1) ;
-        else {
             c.registers.roll = 0.0f;
-        }**/
+        }
+        else
+        {
+            float roll = Kp * e_signed + Kd * derivative;
+            if (roll >  MAX_ROLL) roll =  MAX_ROLL;
+            if (roll < -MAX_ROLL) roll = -MAX_ROLL;
+            c.registers.roll = roll;
+        }
 
-
-        c.registers.roll = abs(e) * (signn>0?+1:-1)  * 40;
-
+        // Once beached, reverse to back off the island.
+        if (allowIslandLanding && island != NULL)
+        {
+            c.registers.thrust = -40.0f;
+        }
 
     } else {
         if (dst_status != DestinationStatus::REACHED)
@@ -355,6 +426,7 @@ void Walrus::doControlDestination()
             c.registers.thrust = 0.0f;
             setThrottle(0.0);
             c.registers.roll = 0.0f;
+            setLandingMode(false);
             disableAuto();
         }
     }

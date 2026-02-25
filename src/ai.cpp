@@ -504,6 +504,7 @@ class InvadeIslandQAction : public QAction
                     {
                         w = spawnWalrus(space,world,b);
                         w->goTo(getRandomCircularSpot(is->getPos(),200.0));
+                        w->setLandingMode(true);
                         w->enableAuto();
                     }
 
