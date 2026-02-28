@@ -164,7 +164,7 @@ void Missile::doControlControl2(Vec3f target, float thrust)
     float r2 =  rt2 + Kp2 * (e2 - et2)        + Ki2 * (e2 + et2)/2.0 + Kd2 * (e2 - 2 * et2 + ett2);
     float r3 =  rt3 + Kp3 * (e3 - et3)        + Ki3 * (e3 + et3)/2.0 + Kd3 * (e3 - 2 * et3 + ett3);
 
-    dout << "Azimuth:" << getAzimuth(fwd) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
+    //dout << "Azimuth:" << getAzimuth(fwd) << "/" << e1 << "- Declination: " << declination << "/" << sp2 << " Destination:" << T.magnitude() << std::endl;
 
 
     if (abs((getAzimuth(fwd)-getAzimuth(T)))<0.1) {
