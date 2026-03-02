@@ -408,7 +408,7 @@ void Walrus::doControlDestination()
         // Once beached, reverse to back off the island.
         if (allowIslandLanding && island != NULL)
         {
-            c.registers.thrust = -40.0f;
+            c.registers.thrust = -90.0f;
         }
 
     } else {

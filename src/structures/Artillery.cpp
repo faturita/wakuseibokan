@@ -8,8 +8,6 @@
 
 #include "../profiling.h"
 
-// Muzzle velocity - only angle is varied for aiming (interpolation table)
-static const float SHELL_MUZZLE_VELOCITY = 15.0f;
 
 extern std::unordered_map<std::string, GLuint> textures;
 
@@ -33,6 +31,7 @@ void Artillery::init()
     Structure::width=11.68;
 
     Artillery::firingpos = Vec3f(0.0f,19.0f,0.0f);
+    muzzleVelocity = 15.0f;
 
     setName("Artillery");
 
@@ -102,51 +101,76 @@ Vec3f Artillery::getFiringPort()
  * elevation: -90=zenith, 0=horizon, positive=down (game convention)
  * Tune these values from actual game firings for best accuracy.
  */
-struct TrajectoryCalib { float distance; float elevation; };
+struct TrajectoryCalib { float distance; float elevation; float velocity; };
+// Ascending-only calibration table: each entry is the low-angle shot that reaches that distance.
+// Using only the ascending portion of each velocity curve ensures monotone interpolation.
+// Gaps between velocity bands (2896→3193, 3905→4231, 4915→5889) interpolate smoothly.
 static const TrajectoryCalib TRAJ_CALIB[] = {
-    { 1918.4f, -2.0f },
-    { 2199.9f, -3.0f },
-    { 2402.3f, -4.0f },
-    { 2553.4f, -5.0f },
-    { 2658.2f, -6.0f },
-    { 2736.7f, -7.0f },
-    { 2736.7f, -8.0f },
-    { 2833.6f, -9.0f },
-    { 2833.6f, -10.0f },
-    { 2879.4f, -11.0f },
-    { 2879.4f, -12.0f },
-    { 2896.6f, -13.0f },
-    { 2896.6f, -14.0f },
-    { 2894.7f, -15.0f },
-    { 2894.7f, -16.0f },
-    { 2880.4f, -17.0f },
-    { 2880.4f, -18.0f },
-    { 2880.4f, -19.0f },
-    { 2842.8f, -20.0f }
+    // v=15: ascending -2° to -13°, range 1918–2897m
+    { 1918.4f,  -2.0f, 15.0f },
+    { 2199.9f,  -3.0f, 15.0f },
+    { 2402.3f,  -4.0f, 15.0f },
+    { 2553.4f,  -5.0f, 15.0f },
+    { 2658.2f,  -6.0f, 15.0f },
+    { 2736.7f,  -7.0f, 15.0f },
+    { 2833.6f,  -9.0f, 15.0f },
+    { 2879.4f, -11.0f, 15.0f },
+    { 2896.6f, -13.0f, 15.0f },
+    // v=20: ascending -3° to -11°, range 3193–3905m
+    { 3193.2f,  -3.0f, 20.0f },
+    { 3444.9f,  -4.0f, 20.0f },
+    { 3613.5f,  -5.0f, 20.0f },
+    { 3798.9f,  -7.0f, 20.0f },
+    { 3878.8f,  -9.0f, 20.0f },
+    { 3905.2f, -11.0f, 20.0f },
+    // v=25: ascending -3° to -10°, range 4231–4915m
+    { 4231.5f,  -3.0f, 25.0f },
+    { 4513.1f,  -4.0f, 25.0f },
+    { 4787.4f,  -6.0f, 25.0f },
+    { 4888.6f,  -8.0f, 25.0f },
+    { 4915.1f, -10.0f, 25.0f },
+    // v=30: ascending -7° to -9°, range 5889–5922m
+    { 5889.2f,  -7.0f, 30.0f },
+    { 5922.2f,  -9.0f, 30.0f },
 };
 static const int NUM_TRAJ_CALIB = sizeof(TRAJ_CALIB) / sizeof(TRAJ_CALIB[0]);
 
-/** Interpolate elevation for target horizontal distance (and optional height correction). */
-static float interpolateElevation(float targetDist, float targetHeightOffset)
+/** Interpolate elevation and muzzle velocity for target horizontal distance (and optional height correction). */
+static void interpolateAimParams(float targetDist, float targetHeightOffset,
+                                 float &outElevation, float &outVelocity)
 {
-    // Simple linear interpolation between nearest calibration points. Could be improved with better interpolation or a formula.
-    if (targetDist <= TRAJ_CALIB[0].distance) return TRAJ_CALIB[0].elevation;
-    if (targetDist >= TRAJ_CALIB[NUM_TRAJ_CALIB-1].distance) return TRAJ_CALIB[NUM_TRAJ_CALIB-1].elevation;
+    if (targetDist <= TRAJ_CALIB[0].distance) {
+        outElevation = TRAJ_CALIB[0].elevation;
+        outVelocity  = TRAJ_CALIB[0].velocity;
+        return;
+    }
+    if (targetDist >= TRAJ_CALIB[NUM_TRAJ_CALIB-1].distance) {
+        outElevation = TRAJ_CALIB[NUM_TRAJ_CALIB-1].elevation;
+        outVelocity  = TRAJ_CALIB[NUM_TRAJ_CALIB-1].velocity;
+        return;
+    }
 
     for (int i = 1; i < NUM_TRAJ_CALIB; i++) {
         if (targetDist < TRAJ_CALIB[i].distance) {
             float distRange = TRAJ_CALIB[i].distance - TRAJ_CALIB[i-1].distance;
-            float elevRange = TRAJ_CALIB[i].elevation - TRAJ_CALIB[i-1].elevation;
-            float distFrac = (targetDist - TRAJ_CALIB[i-1].distance) / distRange;
-            float elevation = TRAJ_CALIB[i-1].elevation + elevRange * distFrac;
+            float distFrac  = (targetDist - TRAJ_CALIB[i-1].distance) / distRange;
 
-            // Optional height correction: simple proportional adjustment based on target height offset
-            elevation += targetHeightOffset * 0.5f; // Tune this factor as needed
+            float elevation = TRAJ_CALIB[i-1].elevation
+                            + (TRAJ_CALIB[i].elevation - TRAJ_CALIB[i-1].elevation) * distFrac;
+            // Optional height correction
+            elevation += targetHeightOffset * 0.5f;
 
-            return elevation;
+            float velocity = TRAJ_CALIB[i-1].velocity
+                           + (TRAJ_CALIB[i].velocity - TRAJ_CALIB[i-1].velocity) * distFrac;
+
+            outElevation = elevation;
+            outVelocity  = velocity;
+            return;
         }
     }
-    return 0.0f; // Should never reach here
+    // Should never reach here
+    outElevation = 0.0f;
+    outVelocity  = 15.0f;
 }
 
 Vehicle* Artillery::aimAndFireAtTarget(Vec3f target,dWorldID world, dSpaceID space)
@@ -156,7 +180,11 @@ Vehicle* Artillery::aimAndFireAtTarget(Vec3f target,dWorldID world, dSpaceID spa
 
     dout << "Target distance: " << (target - firingloc).magnitude() << " Target height offset: " << (target[1] - firingloc[1]) << std::endl;
 
-    elevation = interpolateElevation((target - firingloc).magnitude(), target[1] - firingloc[1]);
+    float outElevation, outVelocity;
+    interpolateAimParams((target - firingloc).magnitude(), target[1] - firingloc[1],
+                         outElevation, outVelocity);
+    elevation = outElevation;
+    muzzleVelocity = outVelocity;
     azimuth = getAzimuth((target)-(firingloc));
 
     struct controlregister c;
@@ -165,7 +193,7 @@ Vehicle* Artillery::aimAndFireAtTarget(Vec3f target,dWorldID world, dSpaceID spa
     setControlRegisters(c);
     setForward(toVectorInFixedSystem(0,0,1,azimuth, -elevation));
 
-    dout << this <<  ":Azimuth: " << azimuth << " Inclination: " << elevation << std::endl;
+    dout << this <<  ":Azimuth: " << azimuth << " Inclination: " << elevation << " Muzzle Velocity: " << muzzleVelocity << std::endl;
 
     Vehicle *action = fire(0,world,space);
 
@@ -217,7 +245,7 @@ Vehicle* Artillery::fire(int weapon, dWorldID world, dSpaceID space)
     position = position + 40*forward;
     forward = -orig+position;
 
-    Vec3f Ft = forward * SHELL_MUZZLE_VELOCITY;
+    Vec3f Ft = forward * muzzleVelocity;
 
     Vec3f f1(0.0,0.0,1.0);
     Vec3f f2 = forward.cross(f1);

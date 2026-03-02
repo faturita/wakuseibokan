@@ -2742,10 +2742,22 @@ void checktest98(unsigned long timer)
 {
     static int state = 0;
     static int angleIdx = 0;
+    static int velIdx = 0;
     static unsigned long lastFireTime = 0;
-    static const float CALIB_ANGLES[] = { -2.0f, -3.0f, -4.0f, -5.0f, -6.0f, -7.0f, -8.0f, -9.0f, -10.0f, -11.0f, -12.0f, -13.0f, -14.0f, -15.0f, -16.0f, -17.0f, -18.0f, -19.0f, -20.0f, -21.0f, -22.0f, -23.0f, -24.0f, -25.0f, -26.0f, -27.0f, -28.0f, -29.0f, -30.0f, -31.0f, -32.0f, -33.0f, -34.0f, -35.0f, -36.0f, -37.0f, -38.0f, -39.0f, -40.0f, -41.0f, -42.0f, -43.0f, -44.0f, -45.0f, -46.0f, -47.0f, -48.0f, -49.0f, -50.0f };
+    static const float CALIB_ANGLES[] = {
+        -2.0f, -3.0f, -4.0f, -5.0f, -6.0f, -7.0f, -8.0f, -9.0f, -10.0f,
+        -11.0f, -12.0f, -13.0f, -14.0f, -15.0f, -16.0f, -17.0f, -18.0f,
+        -19.0f, -20.0f, -21.0f, -22.0f, -23.0f, -24.0f, -25.0f, -26.0f,
+        -27.0f, -28.0f, -29.0f, -30.0f, -31.0f, -32.0f, -33.0f, -34.0f,
+        -35.0f, -36.0f, -37.0f, -38.0f, -39.0f, -40.0f, -41.0f, -42.0f,
+        -43.0f, -44.0f, -45.0f, -46.0f, -47.0f, -48.0f, -49.0f, -50.0f
+    };
     static const int NUM_CALIB_ANGLES = sizeof(CALIB_ANGLES)/sizeof(CALIB_ANGLES[0]);
-    static float calibDistances[NUM_CALIB_ANGLES];
+    static const float CALIB_VELOCITIES[] = { 15.0f, 20.0f, 25.0f, 30.0f };
+    static const int NUM_CALIB_VELS = sizeof(CALIB_VELOCITIES)/sizeof(CALIB_VELOCITIES[0]);
+
+    // calibDistances[velIdx][angleIdx]
+    static float calibDistances[4][50];
 
     if (state == 0 && timer == 100) {
         Artillery *artillery = (Artillery*)entities[islands[0]->getStructures()[1]];
@@ -2753,6 +2765,8 @@ void checktest98(unsigned long timer)
         artilleryCalibFiringPos = artillery->getFiringPort();
         artilleryCalibShellLanded = false;
         angleIdx = 0;
+        velIdx = 0;
+        artillery->muzzleVelocity = CALIB_VELOCITIES[0];
         artillery->elevation = CALIB_ANGLES[0];
         artillery->azimuth = 180.0f;
         artillery->setForward(toVectorInFixedSystem(0, 0, 1, artillery->azimuth, -artillery->elevation));
@@ -2764,25 +2778,60 @@ void checktest98(unsigned long timer)
         state = 1;
     } else if (state == 1) {
         if (artilleryCalibShellLanded) {
-            calibDistances[angleIdx] = artilleryCalibLandingDist;
-            printf("Calib: elevation %.1f -> distance %.1f\n", CALIB_ANGLES[angleIdx], artilleryCalibLandingDist);
+            calibDistances[velIdx][angleIdx] = artilleryCalibLandingDist;
+            printf("Calib: vel %.1f elev %.1f -> dist %.1f\n",
+                   CALIB_VELOCITIES[velIdx], CALIB_ANGLES[angleIdx], artilleryCalibLandingDist);
             artilleryCalibShellLanded = false;
             angleIdx++;
             if (angleIdx >= NUM_CALIB_ANGLES) {
-                printf("\n--- Artillery trajectory calibration (copy to Artillery.cpp TRAJ_CALIB) ---\n");
-                printf("static const TrajectoryCalib TRAJ_CALIB[] = {\n");
-                for (int i = 0; i < NUM_CALIB_ANGLES; i++)
-                    printf("    { %.1ff, %.1ff },\n", calibDistances[i], CALIB_ANGLES[i]);
-                printf("};\n---\n");
-                artilleryCalibMode = false;
-                testSucceeded();
-                return;
+                angleIdx = 0;
+                velIdx++;
+                if (velIdx >= NUM_CALIB_VELS) {
+                    // All sweeps done — collect, sort, filter, print
+                    struct CalibEntry { float dist; float elev; float vel; };
+                    static CalibEntry allEntries[4*50];
+                    int totalEntries = 0;
+                    for (int vi = 0; vi < NUM_CALIB_VELS; vi++) {
+                        for (int ai = 0; ai < NUM_CALIB_ANGLES; ai++) {
+                            allEntries[totalEntries].dist = calibDistances[vi][ai];
+                            allEntries[totalEntries].elev = CALIB_ANGLES[ai];
+                            allEntries[totalEntries].vel  = CALIB_VELOCITIES[vi];
+                            totalEntries++;
+                        }
+                    }
+                    // Sort by distance (bubble sort — small table)
+                    for (int a = 0; a < totalEntries-1; a++) {
+                        for (int b = a+1; b < totalEntries; b++) {
+                            if (allEntries[b].dist < allEntries[a].dist) {
+                                CalibEntry tmp = allEntries[a];
+                                allEntries[a] = allEntries[b];
+                                allEntries[b] = tmp;
+                            }
+                        }
+                    }
+                    // Filter: keep only entries where distance strictly increases by >= 50m
+                    printf("\n--- Artillery trajectory calibration (copy to Artillery.cpp TRAJ_CALIB) ---\n");
+                    printf("static const TrajectoryCalib TRAJ_CALIB[] = {\n");
+                    float lastDist = -1e9f;
+                    for (int i = 0; i < totalEntries; i++) {
+                        if (allEntries[i].dist - lastDist >= 50.0f) {
+                            printf("    { %.1ff, %.1ff, %.1ff },\n",
+                                   allEntries[i].dist, allEntries[i].elev, allEntries[i].vel);
+                            lastDist = allEntries[i].dist;
+                        }
+                    }
+                    printf("};\n---\n");
+                    artilleryCalibMode = false;
+                    testSucceeded();
+                    return;
+                }
             }
             lastFireTime = timer;
         }
         if (timer - lastFireTime >= 220) {  /* Artillery TTL=200, wait for cooldown */
             Artillery *artillery = (Artillery*)entities[islands[0]->getStructures()[1]];
             if (artillery->getTtl() <= 0) {
+                artillery->muzzleVelocity = CALIB_VELOCITIES[velIdx];
                 artillery->elevation = CALIB_ANGLES[angleIdx];
                 artillery->azimuth = 180.0f;
                 artillery->setForward(toVectorInFixedSystem(0, 0, 1, artillery->azimuth, -artillery->elevation));
