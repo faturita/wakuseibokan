@@ -11,6 +11,7 @@ public:
     GLfloat modelview[16];
 
     float zoom;
+    float muzzleVelocity;
 
     Artillery(int faction);
     void init();
