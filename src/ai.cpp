@@ -194,7 +194,7 @@ public:
                             // Check if refueling is enough...
                             if ( (getIslandCargo(is,CargoTypes::POWERFUEL)+b->getPower()) > nextOperationPerFaction[faction].requiredFuel)
                             {
-                                dout << "Refueling!" << std::endl;
+                                //dout << "Refueling!" << std::endl;
                                 collect(d);
                                 refuel(d);
                                 departure(d);
@@ -776,15 +776,27 @@ class AirborneAttackQAction : public QAction
                 m4->enableAuto() ;                    
             } 
         } else {
-            // Launch a new manta.
-            Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
 
-            if (!m)
+            // Check if there is any manta on deck
+            Manta *m = findManta(faction,FlyingStatus::ON_DECK);
+
+            if (m)
             {
-                size_t idx = 0;
-                Manta *m = spawnManta(space,world,b, idx);
-
                 m->setOrder(ATTACK_ISLAND);
+            }
+            else
+            {
+                // Launch a new manta.
+                Manta *m = findMantaByOrder(faction, ATTACK_ISLAND);
+
+                if (!m)
+                {
+                    size_t idx = 0;
+                    Manta *m = spawnManta(space,world,b, idx);
+
+                    if (m) 
+                        m->setOrder(ATTACK_ISLAND);
+                }
             }
             T[1] = 1;  // Reset the counter
         }
