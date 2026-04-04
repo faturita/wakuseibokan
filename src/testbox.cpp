@@ -5553,6 +5553,19 @@ void checktest52(unsigned long timer)
         launchManta(b);
     }
 
+    if (timer == starttime + 600)
+    {
+        Cephalopod *m = (Cephalopod*)findManta(BLUE_FACTION);
+
+        if (m)
+        {
+            dBodyAddRelTorque(m->getBodyID(),2000,0,10);
+        }
+
+
+    }
+
+
 
     if (timer > starttime + 15000)
     {
@@ -5595,12 +5608,12 @@ void test53()
     Beluga *_b = new Beluga(BLUE_FACTION);
     _b->init();
     _b->embody(world,space);
-    _b->setPos(0.0f,20.5f,-16000.0f);
+    _b->setPos(0.0f,20.5f,-9000.0f);
     _b->stop();
 
     entities.push_back(_b, _b->getGeom());
 
-    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, FACTORY_ISLAND)    ,       800.0f,    -100.0f,0,world);
+    Structure *t1 = islands[0]->addStructure(new CommandCenter(GREEN_FACTION, LOGISTICS_ISLAND)    ,       800.0f,    -100.0f,0,world);
     //Structure *t2 = islands[0]->addStructure(new Runway(GREEN_FACTION)           ,         0.0f,    -650.0f,-PI/4,world);
     Structure *t3 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,         0.0f,    650.0f,0,world);
     Structure *t4 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       100.0f,    -650.0f,0,world);
@@ -5608,6 +5621,16 @@ void test53()
     Structure *t6 = islands[0]->addStructure(new Dock(GREEN_FACTION)             ,         -0,    -1700,0,world);
     Structure *t7 = islands[0]->addStructure(new Factory(GREEN_FACTION)        ,         0.0f,    1000.0f,0,world);
     Structure *t8 = islands[0]->addStructure(new Antenna(GREEN_FACTION)        ,         -1000.0f,    230.0f,0,world);
+    Structure *t9 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)      ,       200.0f,    -100.0f,0,world);
+    Structure *t10 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       300.0f,    -500.0f,0,world);  
+    Structure *t11 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       400.0f,    -520.0f,0,world);
+    Structure *t12 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       500.0f,    -600.0f,0,world);
+    Structure *t13 = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       600.0f,    -700.0f,0,world);
+    for(int i=0;i<10;i++)
+    {
+        Structure *t = islands[0]->addStructure(new Warehouse(GREEN_FACTION)        ,       -700.0f + i*100,    -800.0f,0,world);
+    }
+
 
     Vec3f pos(0.0,1.32, - 60);
     camera.setPos(pos);
@@ -5655,26 +5678,16 @@ void checktest53(unsigned long timer)
     if (timer > starttime + 250)
     {
         Cephalopod *m = (Cephalopod*)findManta(BLUE_FACTION,FlyingStatus::HOLDING);
+        CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
 
         if (m && m->getStatus()==FlyingStatus::HOLDING)
         {
-            CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
-
-            if (c)
+            
+            if (c && m->getAutoStatus()!=AutoStatus::ATTACK)
             {
-
                 m->attack(c->getPos());
-                m->enableAuto();
-                m->setStatus(FlyingStatus::FLYING);
 
             }
-        }
-
-        m = (Cephalopod*)findManta(BLUE_FACTION,FlyingStatus::FLYING);
-
-        if (m)
-        {
-            CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
 
             if (!c)
             {
@@ -5684,7 +5697,6 @@ void checktest53(unsigned long timer)
                 if ( (b->getPos()-m->getPos()).magnitude() > 1000)
                 {
                     m->goTo(b->getPos());
-                    m->enableAuto();
                 } else {
                     runonce {landManta(b,m);}
                     // @FIXME What happen if the carrier moves?
@@ -5692,28 +5704,23 @@ void checktest53(unsigned long timer)
             }
         }
 
-
     }
 
 
-    if (timer > starttime + 15000)
+    if (timer > starttime + 13000)
     {
         Cephalopod *m = (Cephalopod*)findManta(BLUE_FACTION);
 
         if (!m)
         {
-            printf("Test failed: Cephalopod has been destroyed.\n");
-            endWorldModelling();
-            exit(0);
+            testFailed();
         }
 
         CommandCenter *c = (CommandCenter*)findIslandByName("Nemesis")->getCommandCenter();
 
         if (!c)
         {
-            printf("Test passed OK!\n");
-            endWorldModelling();
-            exit(1);
+            testSucceeded();
         }
     }
 

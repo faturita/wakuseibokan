@@ -642,7 +642,9 @@ Vehicle* Balaenidae::spawn(dWorldID  world,dSpaceID space,int type, int number)
 void Balaenidae::taxi(Manta *m)
 {
     m->setPos(pos[0],pos[1]+10, pos[2]);
-    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+28,pos[2]);
+    // @NOTE: The value 48 is fixed.  This should be obtained from each type of manta.  The idea is to move the
+    //   manta a little bit higher than the carrier to avoid collisions.
+    dBodySetPosition(m->getBodyID(),pos[0],pos[1]+48,pos[2]);
     m->setStatus(FlyingStatus::ON_DECK);
     alignToMe(m->getBodyID());
 }
@@ -656,7 +658,21 @@ void Balaenidae::launch(Manta* m)
 {
     if (m->getSubType() == CEPHALOPOD)
     {
+        m->inert = false;
+        m->setStatus(FlyingStatus::FLYING);
+        m->elevator = +0;
+        struct controlregister c;
+        c.thrust = 2000.0f/(10.0);
+        c.pitch = 0;
+        m->setControlRegisters(c);
+        m->setThrottle(200.0f);
+        Vec3f p = m->getPos();
+        p[1] += 20;
+        m->setPos(p);
+        dBodySetPosition(m->getBodyID(),p[0],p[1],p[2]);
+        m->goTo(m->getPos() + Vec3f(0,400,0));
         m->enableAuto();
+
     } else
     {
         m->inert = false;

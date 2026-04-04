@@ -974,6 +974,7 @@ void SimplifiedDynamicManta::flyingCoefficients(float &Cd, float &CL, float &Cm,
 void SimplifiedDynamicManta::attack(Vec3f target)
 {
     autostatus = AutoStatus::ATTACK;
+    dst_status = DestinationStatus::READY;
     destination = target;
 }
 

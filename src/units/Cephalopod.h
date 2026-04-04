@@ -14,6 +14,8 @@ protected:
     float getPitchAngle();
 
     BoxIsland *island = NULL;
+
+    const int FIRE_TTL = 10;        // @NOTE: This control how fast Cephalopod can fire.
 public:
     Cephalopod(int newfaction);
 

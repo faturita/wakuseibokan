@@ -314,9 +314,9 @@ void Cephalopod::doDynamics(dBodyID body)
         dBodyAddRelTorque(body,pitchtorque, 0,0);
         dBodyAddRelTorque(body,0, 0,rolltorque);
 
-        dout << "Pitch Deviation:" << pitchattitude << "(" << pitchtorque << ")" <<
-                ":" << " roll deviation:" << rollattitude << "(" << rolltorque << ")" <<
-                std::endl;
+        // dout << "Pitch Deviation:" << pitchattitude << "(" << pitchtorque << ")" <<
+        //         ":" << " roll deviation:" << rollattitude << "(" << rolltorque << ")" <<
+        //         std::endl;
 
 
         if (attitude < 45)
@@ -342,7 +342,7 @@ void Cephalopod::doDynamics(dBodyID body)
             // In degrees.  The max value of the rotor axis inclination is 90 degrees (body coordinates)
             float inclination = clipped(elevator*10, -90, +90);
 
-            CLog::Write(CLog::Debug,"Inclination %10.5f\n", inclination);
+            //CLog::Write(CLog::Debug,"Inclination %10.5f\n", inclination);
 
             p1 = toVectorInFixedSystem(p1[0],p1[1],p1[2],0*10,inclination);
             p2 = toVectorInFixedSystem(p2[0],p2[1],p2[2],0*10,inclination);
@@ -477,6 +477,11 @@ void Cephalopod::hoover(float sp3)
 
 void Cephalopod::doControl()
 {
+    if (getStatus() == FlyingStatus::ON_DECK)
+    {
+        // Do nothing, just wait for orders.
+        return;
+    }
     switch (autostatus) {
     case AutoStatus::DOGFIGHT:
         doControlDogFight();
@@ -503,16 +508,18 @@ void Cephalopod::doControl()
 
 void Cephalopod::doControlAttack()
 {
-    dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
+    //dout << "A:" << std::setw(3) << getName() << std::setw(11) << destination << std::setw(3) << flyingstate << std::endl;
 
     Vec3f target = destination;
     switch (flyingstate) {
         default:case 0:
         {
             target = Vec3f(destination[0],400,destination[2]);
-            doControlDestination(target,1000);
+            doControlDestination(destination,1000);
             Vec3f loc(destination[0],400,destination[2]);
             Vec3f ploc(getPos()[0],400,getPos()[2]);
+
+            printf("Distance to target: %10.5f\n", (loc-ploc).magnitude());
             if ((loc-ploc).magnitude()<2500)
                 flyingstate = 1;
         }
@@ -535,7 +542,7 @@ void Cephalopod::doControlAttack()
             c.precesion = c.roll = c.pitch = 0;
             c.thrust = 10;
             setControlRegisters(c);
-            if (getTtl() % 23 == 0)
+            if (getTtl() % FIRE_TTL == 0)
             {
 
                 Vehicle *action = fire(0,world,space);
@@ -597,21 +604,21 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
     float e2 = sp2 - declination;
     float e3 = sp3 - height;
 
-    dout << "T:Az:"
-              << std::setw(10) << getAzimuth(getForward())
-              << std::setw(10) << getAzimuth(T)
-              << "(" << std::setw(12) << e1 << ")"
-              << std::setw(10) << declination
-              << std::setw(10) << sp2
-              << " Destination:"
-              << std::setw(10) << T.magnitude() << std::endl;
+    // dout << "T:Az:"
+    //           << std::setw(10) << getAzimuth(getForward())
+    //           << std::setw(10) << getAzimuth(T)
+    //           << "(" << std::setw(12) << e1 << ")"
+    //           << std::setw(10) << declination
+    //           << std::setw(10) << sp2
+    //           << " Destination:"
+    //           << std::setw(10) << T.magnitude() << std::endl;
 
     et1 = e1;
     et2 = e2;
     et3 = e3;
 
 
-    dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
+    //dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
 
     c.registers.roll = 0;
     if (height > 200)
