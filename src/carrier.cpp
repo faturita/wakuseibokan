@@ -1384,7 +1384,7 @@ void inline processCommandOrders()
 
                                 if (snd != NULL && rec != NULL)
                                 {
-                                    printf ("Updating....\n");
+                                    //printf ("Updating....\n");
                                     rec->goTo(snd->getPos());
                                     //rec->enableAuto();
                                     return true;
