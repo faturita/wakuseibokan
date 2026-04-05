@@ -1463,12 +1463,12 @@ Vehicle* SimplifiedDynamicManta::fireAAM(dWorldID world, dSpaceID space)
 
     fw = fw.normalize();
     orig = position;
-    position = position + 60.0f*fw;
+    position = position + 300.0f*fw;
     fw = -orig+position;
 
 
     position = orig;
-    position[1] += 40;
+    //position[1] += 40;
     action->embody(world,space);
     action->setPos(position[0],position[1],position[2]);
 
@@ -1489,7 +1489,7 @@ Vehicle* SimplifiedDynamicManta::fireAAM(dWorldID world, dSpaceID space)
 
 
     Vec3f Ft=fw + Vec3f(0,20,0);
-    Ft=Ft*1;
+    Ft=Ft*30;
 
     dBodyAddForce(action->getBodyID(), Ft[0],Ft[1],Ft[2]);
     dBodySetQuaternion(action->getBodyID(),q3);

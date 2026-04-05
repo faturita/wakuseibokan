@@ -956,7 +956,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                     CommandOrder co;
                     co.command = Command::FireOrder;
                     Vec3f target;
-                    if (controller.weapon==1)
+                    // @NOTE: Torpedos and missiles.
+                    if (controller.weapon==1 || controller.weapon==4 || controller.weapon==3) 
                     {
                         target = Vec3f(controller.targetX, controller.targetY, controller.targetZ);
 

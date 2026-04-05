@@ -13,6 +13,7 @@ extern std::unordered_map<std::string, GLuint> textures;
 
 AAM::AAM(int faction)
 {
+    // Air to Air missiles.  For flying objects.
     Vehicle::setTtl(1000);
     setFaction(faction);
 }
