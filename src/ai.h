@@ -90,7 +90,8 @@ enum class State {
     BALLISTICATTACK=9,
     AIRBORNEATTACK=10,
     AIRDEFENSE=11,
-    REFUEL=12
+    REFUEL=12,
+    ABORT=13
 };
 
 

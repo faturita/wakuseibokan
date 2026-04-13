@@ -246,14 +246,6 @@ void CargoShip::doControlDocking()
             }
         }
 
-        if (T.magnitude()>2000)
-        {
-            BoxIsland *b = islands[nearesti];
-            Vec3f l = b->getPos();
-            T = T-l;
-            Vec3f newdestination = destination + T.normalize()*1000.0;
-            T = newdestination - Po;
-        }
         float distance = T.magnitude();
 
         Vec3f F = getForward();

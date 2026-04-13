@@ -254,8 +254,10 @@ bool structurecollisions(Structure *s, Vehicle *vehicle);
 void trackTargets();
 
 void departure(Vehicle *f);
+void departure(Vehicle *f, Vehicle *m);
 void refuel(Vehicle *v);
 void refill(Vehicle *f);
+void refill(Vehicle *f, Vehicle *m);
 void unfill(Vehicle *f);
 void collect(Vehicle *v);
 int getIslandCargo(BoxIsland *is,int cargo);

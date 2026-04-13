@@ -2638,28 +2638,9 @@ Manta* taxiManta(Vehicle *v)
     return m;
 }
 
-// Order the docked unit to depart from the carrier or dock.
-void departure(Vehicle *f)
+void departure(Vehicle *f, Vehicle *m)
 {
-    Vehicle *m = NULL;
-
-    std::vector<VehicleTypes> types;
-
-    types.push_back(VehicleTypes::MANTA);
-    types.push_back(VehicleTypes::WALRUS);
-    types.push_back(VehicleTypes::CARRIER);
-
-    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
-    {
-        // @NOTE: This could be an issue when there are more than one.
-        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000);   
-        if (vehicles.size()>0)
-        {
-            m = entities[vehicles[0]];
-        }
-    } 
-
-    if (m)
+    if (f && m)
     {
         m->setDelayedStatus(SailingStatus::OFFSHORING, 100, SailingStatus::SAILING);
         m->ready();
@@ -2696,6 +2677,33 @@ void departure(Vehicle *f)
             f->setStatus(SailingStatus::SAILING);  // If the docker is a cargoshop, then it should be sailing again. 
         }
     }
+}
+// Order the docked unit to depart from the carrier or dock.
+void departure(Vehicle *f)
+{
+    Vehicle *m = NULL;
+
+    std::vector<VehicleTypes> types;
+
+    types.push_back(VehicleTypes::MANTA);
+    types.push_back(VehicleTypes::WALRUS);
+    types.push_back(VehicleTypes::CARRIER);
+
+    if (f->getType() == CARRIER || f->getType() == LANDINGABLE || f->getSubType() == DOCK || f->getSubType() == VehicleSubTypes::CARGOSHIP)
+    {
+        std::cout << "Finding nearest friendly vehicles for departure from " << f->getName() << " at position " << f->getPos() << std::endl;
+        // @NOTE: This could be an issue when there are more than one.
+        std::vector<size_t> vehicles = findNearestFriendlyVehicles(f->getFaction(),types, f->getPos(), 1000); 
+        
+        
+        std::cout << "Found " << vehicles.size() << " candidate vehicles for departure." << std::endl;
+        if (vehicles.size()>0)
+        {
+            m = entities[vehicles[0]];
+        }
+    } 
+
+    departure(f, m);
 
     return;    
 }
@@ -2723,6 +2731,24 @@ void unfill(Vehicle *f)
             messages.insert(messages.begin(), mg);
         }
     } 
+}
+
+void refill(Vehicle *f, Vehicle *m)
+{
+    if (f && m)
+    {
+        int cargo = m->getCargo(CargoTypes::POWERFUEL);
+        int fillcargo = 1000-cargo;
+        int remanent = f->removeCargo(CargoTypes::POWERFUEL,fillcargo);
+        m->addCargo(CargoTypes::POWERFUEL,remanent);
+        char msg[256];
+        Message mg;
+        mg.faction = m->getFaction();
+        sprintf(msg, "%s cargo has been refilled.", m->getName().c_str());
+        mg.msg = std::string(msg); mg.timer = timer;
+        messages.insert(messages.begin(), mg);
+    }
+    return;
 }
 
 // Vehicle f is used to refill a nearby vehicle

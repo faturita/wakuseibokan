@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <sstream>
 
 #include "weapons/CarrierArtillery.h"
 #include "weapons/CarrierTurret.h"
@@ -58,6 +59,7 @@ std::string getStateMachineName(State state)
         case State::AIRBORNEATTACK: return "AIRBORNEATTACK";
         case State::AIRDEFENSE: return "AIRDEFENSE";
         case State::REFUEL: return "REFUELEMERGENCY";
+        case State::ABORT: return "ABORT";
         default: return "UNKNOWN";
     }
 }
@@ -107,11 +109,15 @@ public:
     {
         Vehicle *b = findCarrier(faction);
 
+        //std::cout << "Applying DockingQAction for faction " << faction << " - Autostatus: " << static_cast<int>(b->getAutoStatus()) << std::endl;
+
         if (b && b->getPower()<nextOperationPerFaction[faction].requiredFuel && b->getAutoStatus() != AutoStatus::DOCKING)
         {
             //BoxIsland *enemyis = findNearestIsland(b->getPos(), false, faction);
 
             BoxIsland *is = findNearestIsland(b->getPos());
+
+            //std::cout << "Faction " << faction << " - Nearest island to carrier: " << is->getName() << std::endl;
 
             if (is)
             {
@@ -219,8 +225,8 @@ class RefuelStrandedCarrierQAction : public QAction
         T[1] = 0;
         T[2] = 0;
 
-        std::cout << "RefuelStrandedCarrierQAction started." << std::endl;
-
+        //std::cout << "RefuelStrandedCarrierQAction started." << std::endl;
+        
     }
 
     void tick()
@@ -231,7 +237,6 @@ class RefuelStrandedCarrierQAction : public QAction
 
     bool findAndOrderNearestCargoShip(int faction, Balaenidae *b, Dock *dock)
     {
-
 
         Vehicle *v = findWalrusByOrder2(faction, REFUEL_ORDER);  // Just to avoid multiple orders.
 
@@ -265,6 +270,14 @@ class RefuelStrandedCarrierQAction : public QAction
                 T[0] = 1;
                 T[1] = 0;
                 T[2] = 0;
+
+                Message msg;
+                msg.faction = faction;
+                std::stringstream ss;
+                ss << "Carrier " << b->getName() << " has run out of fuel, sending cargo ship " << cg->getName() << " to refuel it.";
+                msg.msg = ss.str();
+                msg.timer = timer;
+                messages.insert(messages.begin(), msg);
             }
         } 
 
@@ -311,6 +324,10 @@ class RefuelStrandedCarrierQAction : public QAction
             cg->setAutoStatus(AutoStatus::DOCKING);
             cg->setDestination(b->getPos()-(b->getForward().normalize()*200));
             cg->enableAuto();  
+
+            dock->setOrder(-1);  // Free the dock.
+            dock = NULL;
+
         }
 
         return false;     
@@ -332,7 +349,6 @@ class RefuelStrandedCarrierQAction : public QAction
             {
                 refuel(cg);
                 departure(cg);
-                dout << "Carrier refueled." << std::endl;
 
                 cg->setOrder(-1);  // Free the cargoship.
                 cg->disableAuto();
@@ -342,6 +358,7 @@ class RefuelStrandedCarrierQAction : public QAction
         }
         return false;
     }
+    Structure *s;  // @FIXME: This is risky.
     void apply(int faction)
     {
         tick();
@@ -350,12 +367,33 @@ class RefuelStrandedCarrierQAction : public QAction
 
         if (b && b->getPower() <= 0)
         {
-            BoxIsland *is = findNearestFriendlyIsland(b->getPos(),false,faction,300 kmf);
 
-            Structure *s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+            if (!s)
+            {
+                BoxIsland *is = findNearestFriendlyIsland(b->getPos(),false,faction,300 kmf);
+
+                std::vector<size_t> strs = is->getStructures();
+
+                for(size_t i=0;i<strs.size();i++)
+                {
+                    Structure *s2 = (Structure*)entities[strs[i]];
+                    if (s2->getSubType()==VehicleSubTypes::DOCK && s2->getOrder() == REFUEL_ORDER)
+                    {
+                        s = s2;
+                        break;
+                    }
+                }
+
+                if (!s)
+                {
+                    s = findStructureFromIsland(is, VehicleSubTypes::DOCK);
+                    s->setOrder(REFUEL_ORDER);  // Mark as ordered.
+                }
+            }
+
 
             // This is the condition that triggers the refuel condition.
-            if (is && s && (s->getPos()-b->getPos()).magnitude() > 100.0)
+            if (s && (s->getPos()-b->getPos()).magnitude() > 100.0)
             {
                 //dout << "RefuelCon: Carrier is stranded, sending cargo ship to refuel it." << std::endl;
                 findAndOrderNearestCargoShip(faction,(Balaenidae *)b,(Dock *)s);
@@ -993,7 +1031,7 @@ public:
         {
             BoxIsland *is =findNearestIsland(b->getPos());
 
-            //std::cout << "Distance:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
+            //std::cout << "Distance to Enemy island:" << (is->getPos()-b->getPos()).magnitude() << std::endl;
 
             if (is && (is->getPos()-b->getPos()).magnitude()<range)
             {
@@ -1605,6 +1643,56 @@ class RefuelCon : public Condition
     }
 };
 
+class AbortCon : public ClosestIslandIsEnemy
+{
+    TSequencer T;
+
+    void start()
+    {
+        T[0] = 1;
+        T[1] = 0;
+    }
+
+    void tick()
+    {
+        T = T + T.sign() * 1;
+    }
+
+    public:
+    AbortCon() : ClosestIslandIsEnemy(7000.0)
+    {
+    }
+
+    bool evaluate(int faction) override
+    {
+        if (ClosestIslandIsEnemy::evaluate(faction))
+        {
+
+            Vehicle *b = findCarrier(faction);
+
+            BoxIsland *is = findNearestIsland(b->getPos());
+
+            Vec3f vector = (b->getPos()) - (is->getPos());
+
+            if (T[1] == 0)
+            {
+                vector = vector.normalize();
+
+                Vec3f approachaddress = getRandomCircularSpot(is->getPos()+Vec3f(12500.0f * vector),400.0);
+
+                b->goTo(approachaddress);
+                b->enableAuto();
+
+                T[1] = 1;
+            }
+
+
+            return true;
+        }
+
+        return false;
+    }    
+};
 
 class EngageDefCon : public Condition
 {
@@ -1836,9 +1924,10 @@ Player::Player(int faction)
     transitions[16] = new Transition(State::INVADEISLAND,State::RENDEZVOUS,new ClosestIslandIsFriendly());       // <10000.0, command center
     transitions[17] = new Transition(State::RENDEZVOUS,State::IDLE,new AllUnitsDocked());                       // No units around
 
-    interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                       // No units around
-    interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());                       // No units around
-    interruptions[2] = new Interruption(State::REFUEL,new RefuelCon());                       // Empty fuel
+    interruptions[0] = new Interruption(State::AIRDEFENSE,new DefCon());                 // Enemy units around
+    interruptions[1] = new Interruption(State::AIRDEFENSE,new EngageDefCon());           // Enemy units around
+    interruptions[2] = new Interruption(State::REFUEL,new RefuelCon());                  // Empty fuel
+    interruptions[3] = new Interruption(State::ABORT, new AbortCon());                   // Enemy city too close
 
     qactions[(int)State::IDLE] = new ResetQAction();
     qactions[(int)State::DOCKING] = new DockingQAction();
@@ -1853,6 +1942,7 @@ Player::Player(int faction)
 
     qactions[(int)State::AIRDEFENSE] = new QAction();
     qactions[(int)State::REFUEL] = new RefuelStrandedCarrierQAction();
+    qactions[(int)State::ABORT] = new QAction();
 
 
     state = State::IDLE;
