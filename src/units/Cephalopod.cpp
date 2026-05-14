@@ -496,7 +496,7 @@ void Cephalopod::doControl()
         doControlDrop();
         break;
     default:case AutoStatus::DESTINATION:
-        doControlDestination(destination,1000);
+        doControlDestination(destination,300.0);
         break;
     case AutoStatus::IDLE:
         goTo(getPos()+getForward().normalize()*100);
@@ -618,7 +618,7 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
     et3 = e3;
 
 
-    //dout << "Destination:" << T.magnitude() << std::setw(11) << target << std::endl;
+    dout << "Destination:" << map(T).magnitude() << std::setw(11) << target << std::endl;
 
     c.registers.roll = 0;
     if (height > 200)
@@ -645,6 +645,11 @@ void Cephalopod::doControlDestination(Vec3f target, float threshold)
 
     // Add Hoovering
     float thrust = 200;
+
+    if (map(T).magnitude()<300.0f)
+    {
+        thrust = 100.0;    
+    }
 
     if (height > (sp3 - 10))
     {

@@ -1,3 +1,34 @@
+/* ============================================================================
+**
+** AI - Wakuseiboukan - Around 2020
+**
+** Copyright (C) 2014  Rodrigo Ramele
+**
+** For personal, educationnal, and research purpose only, this software is
+** provided under the Gnu GPL (V.3) license. To use this software in
+** commercial application, please contact the author.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License V.3 for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+**
+** This is a general state machine, on top of all the others that drive any
+** individual unit. It is raw.  I've found that it is much more difficult to
+** do something generic, nice, that actually works.
+** When you need something workable you have to cook up a lot of details.
+** Player represent an AI that tries to behave like a human player.  This has
+** been a mantra on this project. Hence each class is a state in the sequence
+** of steps that you need to perform to win the game, and each transition
+** represent some action.  The idea was to model like state-action diagram,
+** able for use in a RL model.
+** ========================================================================= */
+
+
 #include <assert.h>
 
 #ifdef __linux
@@ -519,6 +550,139 @@ class ApproachEnemyIslandQAction : public QAction
     }
 };
 
+
+class AirborneInvadeIslandQAction : public QAction
+{
+    TSequencer T;
+
+    void start() 
+    {
+        T[0] = 0;
+        T[1] = 0;
+        T[2] = 0;
+        
+    }
+
+    void tick()
+    {
+        T = T + T.sign() * 1;
+    }
+
+    void step1(int faction, Vehicle *b, BoxIsland *is)
+    {
+        // Check if the island is still free
+        if (T[0] == 0) if (!is->getCommandCenter() || is->getCommandCenter()->getFaction()!=faction)
+        {
+            if ((b->getPos()-is->getPos()).magnitude()<10000.0 && b->getAutoStatus() != AutoStatus::DESTINATION)
+            {
+
+                // @FIXME: Find the closest walrus to the carrier or to the island.
+                Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+                if (!m)
+                {
+                    m = spawnCephalopod(space,world,b);
+                }
+
+                assert( m!=NULL || !"The carrier seems to have the wrong faction.");
+
+                m->setOrder(CONQUEST_ISLAND);
+                T[0] = 1;
+                std::cout << "AirborneInvadeIslandQAction: Step 1 started." << std::endl;
+            }
+        }
+
+
+        if (T[0] == 400)
+        {
+            Manta *m = launchManta(b);
+        }
+
+        if (T[0] == 800)
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (m)
+            {
+                // @NOTE: Try to find a spot where the island is not water
+                Vec3f desiredPos = is->getClosestCoastalPoint(m->getPos());
+
+                m->goTo(desiredPos);
+                m->enableAuto();
+            }
+        }
+
+
+
+        if (T[0] >= 850 && T[0] <= 3500)
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (!m)
+            {
+                T[0] = 0; // Reset the sequence if the manta is lost.
+            }
+
+            Vec3f d = m->getPos() - is->getPos();
+            d[1] = 0;
+            CLog::Write(CLog::Debug,"Distance to island: %10.5f\n", d.magnitude());
+
+            Cephalopod *c = (Cephalopod*)m;
+            if (c->getIsland() == NULL && m->arrived() && d.magnitude()<2000.0)
+            {
+                // The drone is instructed to drop to the floor.
+                c->drop();
+            }
+        }
+
+        if (T[0] >= 3800 && T[1] == 0)
+        {
+            Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
+
+            if (!m)
+            {
+                T[0] = 0; // Reset the sequence if the manta is lost.
+            }
+
+            Cephalopod *c = (Cephalopod*)m;
+            if (c->getIsland() != NULL)
+            {
+                // @FIXME: Decide which island to create
+                int which = (arc4random() % 3);
+                captureIsland(c,is,m->getFaction(),which,space, world);
+                //landManta(b,c);
+
+                m->goTo(b->getPos());
+                m->enableAuto();
+
+                // The rendezvouz will do the work after the island is captured.
+
+                T[1] = 1;
+
+            }
+        }
+    }
+
+    void apply(int faction)
+    {
+        tick();
+
+        Vehicle *b = findCarrier(faction);
+
+        if (b)
+        {
+            BoxIsland *is = findNearestIsland(b->getPos());
+
+            // Check if the island is still free
+            if (!is->getCommandCenter() || is->getCommandCenter()->getFaction()!=faction)
+            {
+                step1(faction, b, is);
+            }
+        }
+    }
+};
+
+
 class InvadeIslandQAction : public QAction
 {
     void apply(int faction)
@@ -637,9 +801,10 @@ class RendezvousQAction : public QAction
 
         Manta *m = findMantaByOrder(faction, CONQUEST_ISLAND);
 
-        if (m)
+        if (m && (m->getPos()-b->getPos()).magnitude()<900)
         {
-            landManta(b,m);
+            std::cout << "Rendezvous: Landing manta " << m->getName() << " to carrier " << b->getName() << std::endl;
+            runonce {landManta(b,m);}
             b->stop();
         }
 
@@ -1935,7 +2100,12 @@ Player::Player(int faction)
     qactions[(int)State::APPROACHFREEISLAND] = new ApproachFreeIslandQAction();
     qactions[(int)State::APPROACHENEMYISLAND] = new ApproachEnemyIslandQAction();
     qactions[(int)State::APPROACHFRIENDLYISLAND] = new ApproachFriendlyIslandQAction();
-    qactions[(int)State::INVADEISLAND] = new InvadeIslandQAction();
+
+
+    if (faction == 2)
+       qactions[(int)State::INVADEISLAND] = new AirborneInvadeIslandQAction();
+    else
+        qactions[(int)State::INVADEISLAND] = new InvadeIslandQAction();
     qactions[(int)State::RENDEZVOUS] = new RendezvousQAction();
     qactions[(int)State::BALLISTICATTACK] = new BallisticAttackQAction();
     qactions[(int)State::AIRBORNEATTACK] = new AirborneAttackQAction();
@@ -2038,6 +2208,7 @@ void Player::playStrategy(unsigned long timer)
             }
             
 
+            // @NOTE: AI Decision Making 
             size_t end = start;  // Default to the current island if no empty island is found
             // Find index of nearest EMPTY island
             BoxIsland *destiny = findNearestEmptyIsland(b->getPos());
@@ -2076,7 +2247,7 @@ void Player::playStrategy(unsigned long timer)
 
             nextOperationPerFaction[faction].nextIsland = islands[path[1]];  // Set the second island in the path as the next operation target (0 is where I am)
         }
-        if (nextOperationPerFaction[faction].nextIsland && faction == GREEN_FACTION )
+        if (nextOperationPerFaction[faction].nextIsland)
             std::cout << "Faction:" << faction << "-" << "Next Operation:" << nextOperationPerFaction[faction].nextIsland->getName() << std::endl;
     }
 

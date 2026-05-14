@@ -418,5 +418,6 @@ More info
 * https://github.com/gfx-rs/wgpu
 * https://wiki.libsdl.org/wiki/index
 * https://strudel.cc/
+* https://spectrum.ieee.org/ai-video-games-llms-togelius
 
 

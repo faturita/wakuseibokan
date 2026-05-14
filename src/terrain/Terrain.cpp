@@ -396,6 +396,8 @@ void BoxIsland::draw(Vec3f offset)
     //drawBoxIsland(300,5,300,600,5*2);
 }
 
+// Returns a position in island coordinates (0,0,0) is the center.
+// The position is not guaranteed to be exactly at the desired height.
 Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
 {
     float heightOffset = 0;
@@ -440,7 +442,7 @@ Vec3f BoxIsland::getPosAtDesiredHeight(float desiredHeight)
     }
     assert (false || !"You are asking for a height which is invalid for this island.");
 
-    return getPos();
+    return Vec3f(0,0,0);
 }
 
 /**
