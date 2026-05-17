@@ -1,6 +1,15 @@
 '''
-This script defines a Controller class that receives telemetry from a tank simulation,
-logs sensor data, and sends basic commands to control a tank's behavior.
+UDP Telemetry Receiving and Control PID Recording
+
+This script receives the information from the simulator (the telemetry)
+picks only the data that corresponds to one of the tanks, and sends
+a command to the simulator to control the tank.
+
+It implements a basic PID controller to control the steering of the tank
+based on the azimuth angle, and records the process variable.
+
+
+Real time Data Science
 '''
 
 import socket
