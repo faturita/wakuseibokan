@@ -101,8 +101,8 @@ class Controller:
         self.sock.bind(self.server_address)
         self.sock.settimeout(5)
 
-        self.length = 84
-        self.unpackcode = '<LLififfffffffffffffff'
+        self.length = 84+3*4 # 84 bytes for the telemetry struct + 3 floats for the landing position
+        self.unpackcode = '<LLififffffffffffffffffff'
 
         self.recorder = Recorder()
 
@@ -149,6 +149,8 @@ class Controller:
                 #print(f"Tank1: {tank1values[td['number']]}, {tank1values[td['azimuth']]}, Tank 2: {tank2values[td['number']]}, {tank1values[td['azimuth']]}")
                 #print (f"Health: {myvalues[td['health']]}")
                 self.recorder.recordvalues(myvalues,othervalues)
+                
+                print (f"Tank {myvalues[td['number']]}: x={myvalues[td['x']]:.2f}, z={myvalues[td['z']]:.2f}, Radar X={myvalues[td['radarx']]:.2f}, Radar Y={myvalues[td['radary']]:.2f}, Radar Z={myvalues[td['radarz']]:.2f}, health={myvalues[td['health']]:.2f}")
                 
                 
                 #m -------

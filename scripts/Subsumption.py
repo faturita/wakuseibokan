@@ -48,8 +48,8 @@ class Controller:
         self.sock.settimeout(10)
 
         # Telemetry packet length and unpacking format
-        self.length = 84
-        self.unpackcode = '<LLififfffffffffffffff'
+        self.length = 84+3*4 # 84 bytes for the telemetry struct + 3 floats for the landing position
+        self.unpackcode = '<LLififffffffffffffffffff'
 
         self.recorder = Recorder()  # Initialize recorder to store episodes
 
@@ -109,7 +109,8 @@ class Controller:
 
                 # Write select telemetry values to file
                 f.write(','.join([str(myvalues[0]), str(myvalues[1]), str(myvalues[2]),
-                                  str(myvalues[3]), str(myvalues[4]), str(myvalues[6])]) + '\n')
+                                  str(myvalues[3]), str(myvalues[4]), str(myvalues[6]),
+                                  str(myvalues[84]), str(myvalues[85]), str(myvalues[86])]) + '\n')
                 f.flush()
 
                 # Calculate distance from origin and print it

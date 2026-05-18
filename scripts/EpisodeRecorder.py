@@ -36,8 +36,9 @@ class Controller:
         self.sock.bind(self.server_address)
         self.sock.settimeout(10)
 
-        self.length = 84
-        self.unpackcode = '<LLififfffffffffffffff'
+        # 96
+        self.length = 84+3*4 # 84 bytes for the telemetry struct + 3 floats for the landing position
+        self.unpackcode = '<LLififffffffffffffffffff'
 
         self.recorder = Recorder()
 

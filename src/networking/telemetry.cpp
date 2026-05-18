@@ -31,6 +31,10 @@ struct ModelRecord {
     float health;
     int32_t power;
     float azimuth; 
+    
+    float landingPos1;
+    float landingPos2;
+    float landingPos3;
 
     float pos1;
     float pos2;
@@ -137,7 +141,7 @@ void inittelemetry()
 }
 
 
-void telemetryme(unsigned long lastUpdateTimer, int number, float health, int power, float azimuth, float *dBodyPosition, float *dBodyRotation)
+void telemetryme(unsigned long lastUpdateTimer, int number, float health, int power, float azimuth, float *dBodyPosition, float *dBodyRotation, float *landingPosition)
 {
     ModelRecord logstructure;
 
@@ -147,6 +151,9 @@ void telemetryme(unsigned long lastUpdateTimer, int number, float health, int po
     logstructure.health = health;
     logstructure.power = power;
     logstructure.azimuth = azimuth;
+    logstructure.landingPos1 = landingPosition[0];
+    logstructure.landingPos2 = landingPosition[1];
+    logstructure.landingPos3 = landingPosition[2];
 
     logstructure.pos1 = dBodyPosition[0];
     logstructure.pos2 = dBodyPosition[1];

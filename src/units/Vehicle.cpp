@@ -730,7 +730,8 @@ void Vehicle::wrapDynamics(dBodyID body)
 //        Vec3f s = Vec3f(fPos[0], fPos[1], fPos[2]);
 //        dout << s << std::endl;
 
-        telemetryme(lastUpdateTimer,number, health, power, getForwardAzimuth(), (float *)dBodyPosition, (float *)dBodyRotation);
+        float dRadar[3] = {radar[0], radar[1], radar[2]};
+        telemetryme(lastUpdateTimer,number, health, power, getForwardAzimuth(), (float *)dBodyPosition, (float *)dBodyRotation, dRadar);
     }
 
 
@@ -1035,6 +1036,18 @@ void Vehicle::setTheOrientation(Vec3f orientation)
     if (!Vehicle::inert)
         dBodySetQuaternion(me,q3);
 }
+
+void Vehicle::setRadar(Vec3f location)
+{
+    radar = location;
+}
+
+Vec3f Vehicle::getRadar() const
+{
+    return radar;
+}
+
+
 
 TickRecord Vehicle::serialize()
 {

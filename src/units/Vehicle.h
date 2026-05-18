@@ -235,6 +235,8 @@ protected:
     
     void doMaterial();
 
+    Vec3f radar;
+
 public:
     bool inert=false;
     float xRotAngle=0;
@@ -403,6 +405,9 @@ public:
     DestinationStatus dst_status;
 
     std::vector<Vec3f> getVertices();
+
+    void setRadar(Vec3f radarLocation);
+    Vec3f getRadar() const;
 
 };
 

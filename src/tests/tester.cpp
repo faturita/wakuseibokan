@@ -141,6 +141,8 @@ extern bool wincondition;
 
 static int testing=-1;
 
+Vec3f landingLocation;
+
 
 /**
  * Collision detection function.
@@ -376,8 +378,16 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
                  if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType()==CONTROLABLEACTION) { ((Missile*)v2)->setVisible(false);groundexplosion(v2,world, space);}
                  if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType()==CONTROLABLEACTION) { ((Missile*)v1)->setVisible(false);groundexplosion(v1,world, space);}
 
-                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {groundexplosion(v2,world, space);}
-                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {groundexplosion(v1,world, space);}
+                 if (isIsland(contact[i].geom.g1) && isAction(v2) && v2->getType() == EXPLOTABLEACTION) {
+                    Vec3f land = v2->getPos();
+                    landingLocation = land;
+                    groundexplosion(v2,world, space);
+                }
+                 if (isIsland(contact[i].geom.g2) && isAction(v1) && v1->getType() == EXPLOTABLEACTION) {
+                    Vec3f land = v1->getPos();
+                    landingLocation = land;
+                    groundexplosion(v1,world, space);
+                }
 
 
             } else

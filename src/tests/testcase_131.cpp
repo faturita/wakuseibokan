@@ -59,6 +59,8 @@ extern int  aiplayer;
 extern int controlmap[];
 extern bool episodesmode;
 
+extern Vec3f landingLocation;
+
 extern std::unordered_map<std::string, GLuint> textures;
 
 typedef struct sockaddr SA;
@@ -329,6 +331,31 @@ void TestCase_131::checkBeforeDone(unsigned long timertick)
 
 int TestCase_131::check(unsigned long timertick)
 {
+
+    std::cout << "Landing location: " << landingLocation << std::endl;
+    // @NOTE cool at this point I need to update the nearest walrus and add this message to the telemetry.
+
+    // Update landLocation for the nearest walrus
+        for(int i=0;i<iendpoints;i++)    
+        {
+            size_t p;
+            Vehicle* _b = findWalrusByFactionAndNumber(p, i+1, i+1);
+            if (_b)
+            {
+                Vec3f walrusPos = _b->getPos();
+                Vec3f toLanding = landingLocation - walrusPos;
+                float distToLanding = toLanding.magnitude();
+
+                if (distToLanding < 500.0f) {
+                    // Update telemetry with landing location
+                    _b->setRadar(landingLocation);
+                }
+            }
+        }
+
+
+
+
     if (timertick ==1)
     {
         for(int i=0;i<iendpoints;i++)    
