@@ -89,9 +89,9 @@ class Controller:
                 self.recorder.recordvalues(myvalues, othervalues)
 
                 # Write select telemetry values to file
-                f.write(','.join([str(myvalues[0]), str(myvalues[1]), str(myvalues[2]),
-                                  str(myvalues[3]), str(myvalues[4]), str(myvalues[6]),
-                                  str(myvalues[84]), str(myvalues[85]), str(myvalues[86])]) + '\n')
+                f.write(','.join([str(myvalues[td['timer']]), str(myvalues[td['x']]), str(myvalues[td['y']]),
+                                  str(myvalues[td['z']]), str(myvalues[td['radarx']]), str(myvalues[td['radary']]),
+                                  str(myvalues[td['radarz']])]) + '\n')
                 f.flush()
 
                 # Calculate distance from origin and print it
