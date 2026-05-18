@@ -38,6 +38,8 @@ private:
     unsigned long endtimer = DEFAULT_MATCH_DURATION;
     int whowon;
     int iendpoints;
+    float _cityX = 0.0f;
+    float _cityZ = 0.0f;
 
     std::vector<float> healthes;
     std::vector<float> powers;

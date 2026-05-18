@@ -40,6 +40,7 @@
 #include "../weapons/CarrierArtillery.h"
 #include "../weapons/CarrierTurret.h"
 #include "../weapons/CarrierLauncher.h"
+#include "../structures/Warehouse.h"
 
 
 #include "testcase_131.h"
@@ -88,8 +89,14 @@ size_t TestCase_131::addTank(BoxIsland *nemesis, int faction, int walusnumber,GL
     std::string line;
     
     int wnumber = 0;
-    int x = getRandomInteger(-1400,1400);
-    int z = getRandomInteger(-1400,1400);
+    int x, z;
+    // Retry random position until outside the city exclusion zone (radius 680)
+    do {
+        x = getRandomInteger(-1400, 1400);
+        z = getRandomInteger(-1400, 1400);
+        float dx = x - _cityX, dz = z - _cityZ;
+        if (dx*dx + dz*dz >= 680.0f * 680.0f) break;
+    } while (true);
     float iazimuth = (float) -getRandomInteger(0, 360)*PI/180.0;
 
     if (initlocations.is_open())
@@ -239,6 +246,36 @@ void TestCase_131::init()
     nemesis->buildCellularAutomataTerrain(space);
 
     islands.push_back(nemesis);
+
+    // City of Warehouses — faction 3, random location on the island
+    {
+        float cityX = (float)getRandomInteger(-500, 500);
+        float cityZ = (float)getRandomInteger(-500, 500);
+        _cityX = cityX;
+        _cityZ = cityZ;
+
+        // Main road: two parallel rows of 5 warehouses running along Z
+        // Road gap = 260 units wide (110 clear on each side of center line)
+        // Along-road gap between warehouses = 110 units
+        const float roadHalf = 130.0f;
+        const float step     = 180.0f;
+        for (int k = -2; k <= 2; k++) {
+            float pz = cityZ + k * step;
+            nemesis->addStructure(new Warehouse(BOTH_FACTION), cityX - roadHalf, pz, 0.0f, world);
+            nemesis->addStructure(new Warehouse(BOTH_FACTION), cityX + roadHalf, pz, 0.0f, world);
+        }
+
+        // Cross blocks: two perpendicular warehouses on each side of the road,
+        // placed in the outer gaps of the main road (z = cityZ ± 270)
+        // 95-unit gap to main road wall, 100-unit gap between cross blocks
+        float crossZOffsets[] = { -270.0f, +270.0f };
+        float crossXOffsets[] = { -280.0f, -450.0f, +280.0f, +450.0f };
+        for (float dz : crossZOffsets) {
+            for (float dx : crossXOffsets) {
+                nemesis->addStructure(new Warehouse(BOTH_FACTION), cityX + dx, cityZ + dz, (float)PI / 2.0f, world);
+            }
+        }
+    }
 
     reset(nemesis);
 
