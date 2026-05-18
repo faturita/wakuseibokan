@@ -215,6 +215,7 @@ public:
     BoxIsland(container<Vehicle*> *entities);
     dGeomID buildTerrainModel(dSpaceID space, const char* model);
     dGeomID buildFractalTerrainModel(dSpaceID space );
+    dGeomID buildCellularAutomataTerrain(dSpaceID space);
     dGeomID buildRegularTerrainModel(dSpaceID space );
     dGeomID buildTerrainModel(dSpaceID space, Terrain *_landmass, const char *model );
     dGeomID buildModel();

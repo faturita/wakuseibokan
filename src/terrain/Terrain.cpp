@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <algorithm>
+#include <cmath>
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
@@ -115,6 +116,72 @@ Terrain* loadFractalTerrain(float height)
     //
     //	Note: To create an island approximation, pre-seed the buffer 'edges' with zero and
     //	the centre point with some positive value.
+
+    t->computeNormals();
+    return t;
+}
+
+Terrain* loadCellularAutomataTerrain(float height)
+{
+    Terrain* t = new Terrain(60, 60);
+
+    const int SIDE = 60;
+    float grid[SIDE][SIDE];
+
+    // Minimum land height — above COAST_HEIGHT to keep the entire island above sea
+    float coast_h = COAST_HEIGHT + 1.5f;
+    float peak_h  = height * 1.0f;
+
+    // Random mountain summit offset from grid center, and random spread
+    float cx    = 29.5f + (float)getRandomInteger(-3, 3);
+    float cy    = 29.5f + (float)getRandomInteger(-3, 3);
+    float sigma = 18.0f + (float)getRandomInteger(0, 6);
+    float s2    = 2.0f * sigma * sigma;
+
+    // Seed grid: Gaussian mountain + small random jitter
+    for (int y = 0; y < SIDE; y++) {
+        for (int x = 0; x < SIDE; x++) {
+            float dx = (float)x - cx;
+            float dy = (float)y - cy;
+            float gauss  = (peak_h - coast_h) * expf(-(dx*dx + dy*dy) / s2);
+            float jitter = (float)getRandomInteger(-50, 50) / 10.0f;
+            grid[y][x]   = coast_h + gauss + jitter;
+        }
+    }
+
+    // Cellular automata: 8 passes of 8-neighbourhood averaging for smooth terrain
+    float tmp[SIDE][SIDE];
+    for (int pass = 0; pass < 8; pass++) {
+        for (int y = 0; y < SIDE; y++) {
+            for (int x = 0; x < SIDE; x++) {
+                float sum = 0.0f;
+                int   cnt = 0;
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx, ny = y + dy;
+                        if (nx >= 0 && nx < SIDE && ny >= 0 && ny < SIDE) {
+                            sum += grid[ny][nx];
+                            cnt++;
+                        }
+                    }
+                }
+                tmp[y][x] = sum / (float)cnt;
+            }
+        }
+        for (int y = 0; y < SIDE; y++)
+            for (int x = 0; x < SIDE; x++)
+                grid[y][x] = tmp[y][x];
+    }
+
+    // Apply floor/ceiling and write to terrain
+    for (int y = 0; y < SIDE; y++) {
+        for (int x = 0; x < SIDE; x++) {
+            float h = grid[y][x];
+            if (h < coast_h) h = coast_h;
+            if (h > height)  h = height;
+            t->setHeight(x, y, h);
+        }
+    }
 
     t->computeNormals();
     return t;
@@ -272,6 +339,12 @@ dGeomID BoxIsland::buildFractalTerrainModel(dSpaceID space )
     return buildTerrainModel(space, loadFractalTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
 }
 
+
+dGeomID BoxIsland::buildCellularAutomataTerrain(dSpaceID space)
+{
+    dynamic_island = true;
+    return buildTerrainModel(space, loadCellularAutomataTerrain(TERRAIN_MAX_HEIGHT), getName().c_str());
+}
 
 dGeomID BoxIsland::buildRegularTerrainModel(dSpaceID space )
 {
