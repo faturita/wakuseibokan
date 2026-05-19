@@ -332,7 +332,7 @@ void TestCase_131::checkBeforeDone(unsigned long timertick)
 int TestCase_131::check(unsigned long timertick)
 {
 
-    std::cout << "Landing location: " << landingLocation << std::endl;
+    //std::cout << "Landing location: " << landingLocation << std::endl;
     // @NOTE cool at this point I need to update the nearest walrus and add this message to the telemetry.
 
     // Update landLocation for the nearest walrus
