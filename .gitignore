@@ -15,4 +15,5 @@ scripts/data/*.dat
 messageboard.dat
 .vscode/*
 .idea
-data
+data.qtc_clangd/**/*
+.qtc_clangd/
