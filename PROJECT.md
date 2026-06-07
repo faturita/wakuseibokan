@@ -1,0 +1,1 @@
+The scenario TC=113 of this game (testcase_113.cpp) consist of two tanks that fight against each other.  Each tank is controlled by a python script that runs on the scripts/ directoy.  The engine is in C++ and send telemetry information to each tank on the UDP ports 460n where n is the tank number and receives UDP commands in the port 450n.
