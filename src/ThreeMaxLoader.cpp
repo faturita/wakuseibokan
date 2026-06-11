@@ -32,7 +32,7 @@ int get_file_size(std::string filename) // path to file
     return size;
 };
 
-void draw3DSModel(obj_type object, float x, float y, float z, float scale)
+void draw3DSModel(const obj_type &object, float x, float y, float z, float scale)
 {
     int l_index;
 
@@ -84,6 +84,10 @@ void draw3DSModel(obj_type object, float x, float y, float z, float scale)
 
 char Load3DS (obj_type_ptr p_object, char *p_filename)
 {
+    // Same as in load3DSModel: the polygon index freads only write the low 2 bytes
+    // of each int, the rest of the struct must be zeroed.
+    memset(p_object, 0, sizeof(obj_type));
+
     int i; //Index variable
 
     FILE *l_file; //File pointer
@@ -227,6 +231,12 @@ obj_type load3DSModel(const char *p_filename)
 {
     obj_type object;
     obj_type *p_object;
+
+    // The chunk reader writes only 2 of the 4 bytes of each polygon index (fread of an
+    // unsigned short into an int), so every byte of this ~2MB struct that is not
+    // overwritten MUST be zero: with stack garbage the indices become huge and the
+    // game crashes (this is why it worked on Ubuntu 22.04 and crashed on 24.04).
+    memset(&object, 0, sizeof(obj_type));
 
     p_object = &object;
 
@@ -384,7 +394,7 @@ obj_type load3DSModel(const char *p_filename)
  * @param _texture
  * @return
  */
-int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float scaley, float scalez, GLuint _texture)
+int draw3DSModel(const obj_type &object,float x, float y, float z, float scalex, float scaley, float scalez, GLuint _texture)
 {
 
     int l_index;
@@ -464,12 +474,16 @@ int draw3DSModel(obj_type object,float x, float y, float z, float scalex, float 
     glPopMatrix();
 }
 
-int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint _texture)
+int draw3DSModel(const obj_type &object,float x, float y, float z, float scale, GLuint _texture)
 {
     return draw3DSModel(object,x,y,z,scale,scale,scale,_texture);
 }
 void calculateCenterOfMass(obj_type &object)
 {
+    // An empty object (e.g. the model file was not found) has no polygon[0] to read.
+    if (object.polygons_qty < 1)
+        return;
+
     int l_index;
     Vec3f centerOfMass(0.0f,0.0f,0.0f);
 
@@ -554,6 +568,12 @@ int draw3DSModel(char *p_filename,float x, float y, float z, float scale, GLuint
 {
     obj_type object;
     obj_type *p_object;
+
+    // The chunk reader writes only 2 of the 4 bytes of each polygon index (fread of an
+    // unsigned short into an int), so every byte of this ~2MB struct that is not
+    // overwritten MUST be zero: with stack garbage the indices become huge and the
+    // game crashes (this is why it worked on Ubuntu 22.04 and crashed on 24.04).
+    memset(&object, 0, sizeof(obj_type));
 
     p_object = &object;
 
@@ -795,7 +815,7 @@ void T3DSModel::setTexture(GLuint texture)
     T3DSModel::texture=texture;
 }
 
-void T3DSModel::setObject(obj_type object)
+void T3DSModel::setObject(const obj_type &object)
 {
     T3DSModel::object = object;
     calculateCenterOfMass(T3DSModel::object);
