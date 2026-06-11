@@ -292,7 +292,7 @@ void drawMap()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     char str[256];
-    sprintf (str, "Kepler IV Sea");
+    snprintf(str, sizeof(str),  "Kepler IV Sea");
     // width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f,1.0f,1.0f,1.0f);
 
@@ -425,13 +425,13 @@ void drawMap()
                         Vehicle *b = entities[i];
                         if (b->getNumber()>0 && b->getNumber()<10)
                         {
-                            sprintf(msg, "ui/%d.bmp", b->getNumber());
+                            snprintf(msg, sizeof(msg),  "ui/%d.bmp", b->getNumber());
                             placeMark(entities[i]->getPos()+Vec3f(-3500,0,0),iconsize,filereader(msg)); 
                         } else if (b->getNumber()>=10 && b->getNumber()<100)
                         {
-                            sprintf(msg, "ui/%d.bmp", b->getNumber()/10);
+                            snprintf(msg, sizeof(msg),  "ui/%d.bmp", b->getNumber()/10);
                             placeMark(entities[i]->getPos()+Vec3f(-3500,0,0),iconsize,filereader(msg)); 
-                            sprintf(msg, "ui/%d.bmp", b->getNumber()%10);
+                            snprintf(msg, sizeof(msg),  "ui/%d.bmp", b->getNumber()%10);
                             placeMark(entities[i]->getPos()+Vec3f(-7000,0,0),iconsize,filereader(msg)); 
                         }
                     } else if (entities[i]->getType() == WALRUS)

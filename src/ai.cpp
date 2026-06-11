@@ -1167,7 +1167,7 @@ public:
             char msg[256];
             Message mg;
             mg.faction = b->getFaction();
-            sprintf(msg, "Required fuel for next operation %5.2f.", nextOperationPerFaction[faction].requiredFuel );
+            snprintf(msg, sizeof(msg),  "Required fuel for next operation %5.2f.", nextOperationPerFaction[faction].requiredFuel );
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
 

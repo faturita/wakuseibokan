@@ -111,7 +111,7 @@ void drawIntro()
 
         memset(str,0,256);memset(str2,0,256);memset(str3,0,256);memset(str4,0,256);memset(str5,0,256);
 
-        sprintf(str, "Wakuseibokan");
+        snprintf(str, sizeof(str),  "Wakuseibokan");
         if (getRandomInteger(1,2)==1)
             drawString(400,300,0,str,0.5f,0.1f,1.0f,1.0f);
         else
@@ -196,7 +196,7 @@ void drawBoard()
     glPushMatrix(); {
         glTranslatef(0, -400, 1);
 
-        sprintf(str, "Message Board");
+        snprintf(str, sizeof(str),  "Message Board");
         drawString(500,300,0,str,0.2f,0.1f,1.0f,1.0f);
 
         std::ifstream messageboard("messageboard.dat");
@@ -223,7 +223,7 @@ void drawBoard()
                     if (controller.faction == FACTIONS::BOTH_FACTION || controller.faction == atoi(faction.c_str()))
                     {
                         char bfr[256];
-                        sprintf(bfr, "%08ul:%s", atol(timestamp.c_str()), msg.c_str());
+                        snprintf(bfr, sizeof(bfr),  "%08ul:%s", atol(timestamp.c_str()), msg.c_str());
 
                         //std::cout << message << std::endl;
                         drawString(10,200-(showingcounter++)*25,0,(char *)bfr,0.2f,0.1f,1.0f,1.0f);
@@ -288,7 +288,7 @@ void drawEntities()
         for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
         {
             CLog::Write(CLog::Debug,"[%d]: Body ID (%16p) Position (%d) Type: %d\n", i,(void*)entities[i]->getBodyID(), entities.indexOf(i), entities[i]->getType());
-            sprintf(str, "[%3d]\t%s", i, entities[i]->getName().c_str());
+            snprintf(str, sizeof(str),  "[%3d]\t%s", i, entities[i]->getName().c_str());
             drawString(X(+550000.0-((int)(counter/78))*150000.0)-10,Y(+400000.0-(counter%78)*10000.0)-20,0,str,0.1f,1.0f,1.0f,1.0f);
             counter++;
         }

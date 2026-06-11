@@ -1580,7 +1580,7 @@ void checktest14(unsigned long timer)
                 char str[256];
                 Message mg;
                 mg.faction = _manta1->getFaction();
-                sprintf(str, "Manta %d has arrived to destination.", _manta1->getNumber()+1);
+                snprintf(str, sizeof(str),  "Manta %d has arrived to destination.", _manta1->getNumber()+1);
                 mg.msg = std::string(str);mg.timer = timer;
                 messages.insert(messages.begin(), mg);
                 reached = true;
@@ -2840,6 +2840,123 @@ void checktest98(unsigned long timer)
                 lastFireTime = timer;
             }
         }
+    }
+}
+
+void test99()
+{
+    // Issue #109: savegame integrity (CRC) and encryption.
+    initIslands();
+    test1();
+}
+
+void checktest99(unsigned long timer)
+{
+    static const char *savefile    = "savegames/test99.w";
+    static const char *tamperfile  = "savegames/test99_tampered.w";
+
+    // The savegame restores the global timer, so use an independent tick counter
+    // to avoid re-running the phases after loading.
+    static unsigned long ticks = 0;
+    ticks++;
+    timer = ticks;
+
+    if (timer == 100)
+    {
+        savegame(savefile);
+        printf("Game saved.\n");
+    }
+
+    if (timer == 200)
+    {
+        // The file must carry the WKSV header and the payload must not be readable plaintext.
+        std::ifstream file(savefile, std::ios_base::binary);
+        if (file.fail())
+            testFailed("Savegame file was not created.");
+
+        std::string raw((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        file.close();
+
+        if (raw.size() < 12 || raw.compare(0, 4, "WKSV") != 0)
+            testFailed("Savegame has no integrity header.");
+
+        if (raw.find("Thermopilae") != std::string::npos)
+            testFailed("Savegame payload is plaintext (no encryption).");
+
+        // Tampered copy: flip one byte in the middle of the payload.
+        std::string tampered = raw;
+        tampered[12 + (tampered.size()-12)/2] ^= 0x55;
+        std::ofstream out(tamperfile, std::ios_base::binary);
+        out.write(tampered.data(), tampered.size());
+        out.close();
+
+        if (loadgame(tamperfile))
+            testFailed("Tampered savegame was accepted (CRC not verified).");
+
+        printf("Tampered savegame rejected.\n");
+    }
+
+    if (timer == 300)
+    {
+        // Wipe the world and restore it from the valid savegame.
+        islands.clear();
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            entities[i]->damage(100000);
+        }
+    }
+
+    if (timer == 1000)
+    {
+        if (!loadgame(savefile))
+            testFailed("Valid savegame failed to load.");
+        printf("Game restored.\n");
+    }
+
+    if (timer == 1300)
+    {
+        bool carrierfound = false;
+        for(size_t i=entities.first();entities.hasMore(i);i=entities.next(i))
+        {
+            if (entities[i]->getType() == CARRIER)
+                carrierfound = true;
+        }
+
+        if (carrierfound && islands.size() > 0)
+            testSucceeded();
+        else
+            testFailed("World was not restored from the savegame.");
+    }
+}
+
+void test100()
+{
+    // 3DS loader: polygon indices were built from uninitialized memory (the loader
+    // freads an unsigned short into each int index), crashing on Ubuntu 24.xx.
+    initIslands();
+    test1();
+}
+
+void checktest100(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        obj_type object = load3DSModel(filereader("structures/hangar.3ds"));
+
+        if (object.vertices_qty <= 0 || object.polygons_qty <= 0)
+            testFailed("3DS model was not loaded.");
+
+        for (int i=0; i<object.polygons_qty; i++)
+        {
+            if (object.polygon[i].a < 0 || object.polygon[i].a >= object.vertices_qty ||
+                object.polygon[i].b < 0 || object.polygon[i].b >= object.vertices_qty ||
+                object.polygon[i].c < 0 || object.polygon[i].c >= object.vertices_qty)
+                testFailed("3DS polygon index out of vertex range (uninitialized memory).");
+        }
+
+        printf("Model loaded: %d vertices, %d polygons, all indices in range.\n",
+               object.vertices_qty, object.polygons_qty);
+        testSucceeded();
     }
 }
 
@@ -4977,7 +5094,7 @@ void checktest46(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Schedule attack at %ld", starttime);
+        snprintf(msg, sizeof(msg),  "Schedule attack at %ld", starttime);
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5021,7 +5138,7 @@ void checktest46(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Air and amphibious attack started.");
+        snprintf(msg, sizeof(msg),  "Air and amphibious attack started.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5347,7 +5464,7 @@ void checktest50(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
+        snprintf(msg, sizeof(msg),  "Check visually the structures (cannot do that from a unit test).");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5406,7 +5523,7 @@ void message(char* mms)
 {
     char msg[256];
     Message mg;
-    sprintf(msg, "%s",mms);
+    snprintf(msg, sizeof(msg),  "%s",mms);
     mg.faction = BOTH_FACTION;
     mg.msg = std::string(msg); mg.timer = timer;
     messages.insert(messages.begin(), mg);
@@ -5421,7 +5538,7 @@ void checktest51(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Initiating islands configuration");
+        snprintf(msg, sizeof(msg),  "Initiating islands configuration");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5527,7 +5644,7 @@ void checktest52(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC52: Cephalopod basic dynamics, hoovering, stability and basic auto destination.");
+        snprintf(msg, sizeof(msg),  "TC52: Cephalopod basic dynamics, hoovering, stability and basic auto destination.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5649,7 +5766,7 @@ void checktest53(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC53: Cephalopod positioning and aiming to target.");
+        snprintf(msg, sizeof(msg),  "TC53: Cephalopod positioning and aiming to target.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5777,7 +5894,7 @@ void checktest54(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC54: Stop aircraft from departing if the island is already free.");
+        snprintf(msg, sizeof(msg),  "TC54: Stop aircraft from departing if the island is already free.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5864,7 +5981,7 @@ void checktest55(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC55: Checking comm link interruption.");
+        snprintf(msg, sizeof(msg),  "TC55: Checking comm link interruption.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -5893,7 +6010,7 @@ void checktest55(unsigned long timer)
 
         char msg[256];
         Message mg;
-        sprintf(msg, "TC55: Manta will be flying far away.");
+        snprintf(msg, sizeof(msg),  "TC55: Manta will be flying far away.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -6097,7 +6214,7 @@ void checktest57(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC57: Check landing after the command center is destroyed.");
+        snprintf(msg, sizeof(msg),  "TC57: Check landing after the command center is destroyed.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -6321,7 +6438,7 @@ void checktest59(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "Check visually the structures (cannot do that from a unit test).");
+        snprintf(msg, sizeof(msg),  "Check visually the structures (cannot do that from a unit test).");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -6750,7 +6867,7 @@ void checktest63(unsigned int timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC63: Order Manta to follow a path using waypoints.");
+        snprintf(msg, sizeof(msg),  "TC63: Order Manta to follow a path using waypoints.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -6845,7 +6962,7 @@ void checktest64(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC64: Verifying launcher destroys Mantas by missiles.");
+        snprintf(msg, sizeof(msg),  "TC64: Verifying launcher destroys Mantas by missiles.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7018,7 +7135,7 @@ void checktest66(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC66: Carrier approaches an enemy island and the carrier shoots the CC.");
+        snprintf(msg, sizeof(msg),  "TC66: Carrier approaches an enemy island and the carrier shoots the CC.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7315,7 +7432,7 @@ void checktest69(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC69: Testing the controllers of a wheeled Walrus.");
+        snprintf(msg, sizeof(msg),  "TC69: Testing the controllers of a wheeled Walrus.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7381,7 +7498,7 @@ void checktest70(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC70: Testing manually manta landing on islands");
+        snprintf(msg, sizeof(msg),  "TC70: Testing manually manta landing on islands");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7416,7 +7533,7 @@ void checktest71(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC71: Landing Manta on a moving Carrier.");
+        snprintf(msg, sizeof(msg),  "TC71: Landing Manta on a moving Carrier.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7539,7 +7656,7 @@ void checktest72(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC72: Visually Checking explosions.");
+        snprintf(msg, sizeof(msg),  "TC72: Visually Checking explosions.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7617,7 +7734,7 @@ void checktest73(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC73: Testing torpedos chasing Carrier.");
+        snprintf(msg, sizeof(msg),  "TC73: Testing torpedos chasing Carrier.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7696,7 +7813,7 @@ void checktest74(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC73: Testing torpedos chasing Walruses.");
+        snprintf(msg, sizeof(msg),  "TC73: Testing torpedos chasing Walruses.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7799,7 +7916,7 @@ void checktest75(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Testing bombs.");
+        snprintf(msg, sizeof(msg),  "TC75: Testing bombs.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7845,7 +7962,7 @@ void checktest76(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC76: Playground on radar HUD. Move and check position.");
+        snprintf(msg, sizeof(msg),  "TC76: Playground on radar HUD. Move and check position.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7901,7 +8018,7 @@ void checktest77(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Testing radar hud with enemy units.");
+        snprintf(msg, sizeof(msg),  "TC75: Testing radar hud with enemy units.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7911,7 +8028,7 @@ void checktest77(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Switch to the carrier or the turret and verify if there is a pink cross on the target");
+        snprintf(msg, sizeof(msg),  "TC75: Switch to the carrier or the turret and verify if there is a pink cross on the target");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -7979,7 +8096,7 @@ void checktest78(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC75: Testing Mantas bombing an island.");
+        snprintf(msg, sizeof(msg),  "TC75: Testing Mantas bombing an island.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -8105,7 +8222,7 @@ void checktest79(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC79: Visually testing smoke.");
+        snprintf(msg, sizeof(msg),  "TC79: Visually testing smoke.");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -8115,7 +8232,7 @@ void checktest79(unsigned long timer)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC79: Check if the missile has a smoke tail");
+        snprintf(msg, sizeof(msg),  "TC79: Check if the missile has a smoke tail");
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -9849,6 +9966,8 @@ void initWorldModelling(int testcase)
     case 96:test96();break;                         // Test Carrier docking on an island.
     case 97:test97();break;                         // Test Artillery range an trajectory.
     case 98:test98();break;                       // Artillery calibration: fire at angles, measure distances
+    case 99:test99();break;                         // Savegame CRC integrity and encryption (Issue #109).
+    case 100:test100();break;                       // 3DS loader polygon indices must not come from uninitialized memory.
     default:initIslands();test1();break;
     }
 
@@ -9964,6 +10083,8 @@ void worldStep(int value)
     case 96:checktest96(timer);break;
     case 97:checktest97(timer);break;
     case 98:checktest98(timer);break;
+    case 99:checktest99(timer);break;
+    case 100:checktest100(timer);break;
     default: break;
     }
 

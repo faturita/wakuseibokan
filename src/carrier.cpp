@@ -205,7 +205,7 @@ void drawHUD()
     fps = getTimedFPS(fps, timer);
 
     
-    sprintf (str, "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, camera.pos[0],camera.pos[1],camera.pos[2],timer / CYCLES_IN_SOL, timer);
+    snprintf(str, sizeof(str),  "fps %4.2f  Lat: %4.2f Cam: (%8.2f,%8.2f,%8.2f) Sols: %lu TIME:%lu\n", fps, latency, camera.pos[0],camera.pos[1],camera.pos[2],timer / CYCLES_IN_SOL, timer);
 	// width, height, 0 0 upper left
     drawString(0,-30,1,str,0.2f);
     
@@ -246,27 +246,27 @@ void drawHUD()
 
 
     }
-    sprintf (str, "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
+    snprintf(str, sizeof(str),  "Speed:%10.2f - X,Y,Z,P (%5.2f,%5.2f,%5.2f,%5.2f)\n", speed, controller.registers.roll,controller.registers.pitch,controller.registers.yaw,controller.registers.precesion);
 	drawString(0,-60,1,str,0.2f);
     
-    sprintf (str, "Vehicle:%d %s - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,name.c_str(), controller.registers.thrust, health, power);
+    snprintf(str, sizeof(str),  "Vehicle:%d %s - Thrust:%5.2f - Health: %5.2f - Power:  %5.2f\n", controller.controllingid,name.c_str(), controller.registers.thrust, health, power);
 	drawString(0,-90,1,str,0.2f);
 
 
 
-    sprintf (str, "Cargo: %d\n", cargo );
+    snprintf(str, sizeof(str),  "Cargo: %d\n", cargo );
 	drawString(0,-120,1,str,0.2f);
 
 
     if (controller.isTeletype())
     {
-        sprintf(str, ">>>%s",controller.str.c_str());
+        snprintf(str, sizeof(str),  ">>>%s",controller.str.c_str());
         drawString(0,-180,1,str,0.2f);
     }
 
     if (wincondition)
     {
-        sprintf(str, "You have won!");
+        snprintf(str, sizeof(str),  "You have won!");
         if (getRandomInteger(1,2)==1)
             drawString(75,-270,1,str,1.0f,1.0f,1.0f,0.0f);
         else
@@ -1028,7 +1028,7 @@ void replayupdate(int value)
                     char msg[256];
                     Message mg;
                     mg.faction = FACTIONS::BOTH_FACTION;
-                    sprintf(msg, "Connection with remote server interrupted.");
+                    snprintf(msg, sizeof(msg),  "Connection with remote server interrupted.");
                     mg.msg = std::string(msg); mg.timer = timer;
                     messages.insert(messages.begin(), mg);                   
                 }
@@ -1056,6 +1056,11 @@ void replayupdate(int value)
             if (ret>0)
             {
                 //printf(" %ld vs %ld \n", record.timerparam, timer);
+
+                // Issue #113: the record comes from the network or from a ledger file,
+                // its id must stay inside the container range.
+                if (!(record.id >= MIN && record.id < MAX))
+                    continue;
 
                 visited.push_back(record.id);
 
@@ -1165,7 +1170,7 @@ void inline processCommandOrders()
                 char msg[256];
                 Message mg;
                 mg.faction = FACTIONS::BOTH_FACTION;
-                sprintf(msg, "%s has joined the game.", co.parameters.buf);
+                snprintf(msg, sizeof(msg),  "%s has joined the game.", co.parameters.buf);
                 mg.msg = std::string(msg); mg.timer = timer;
                 messages.insert(messages.begin(), mg);
 
@@ -1217,7 +1222,7 @@ void inline processCommandOrders()
                     char msg[256];
                     Message mg;
                     mg.faction = v->getFaction();
-                    sprintf(msg, "%s is waiting and ready for docking.",v->getName().c_str());
+                    snprintf(msg, sizeof(msg),  "%s is waiting and ready for docking.",v->getName().c_str());
                     mg.msg = std::string(msg); mg.timer = timer;
                     messages.insert(messages.begin(), mg);
                 }
@@ -1278,7 +1283,7 @@ void inline processCommandOrders()
                             char msg[256];
                             Message mg;
                             mg.faction = entities[i]->getFaction();
-                            sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
+                            snprintf(msg, sizeof(msg),  "%s is now back on deck.",entities[i]->getName().c_str());
                             mg.msg = std::string(msg); mg.timer = timer;
                             messages.insert(messages.begin(), mg);
 
@@ -1301,7 +1306,7 @@ void inline processCommandOrders()
                             char str[256];
                             Message mg;
                             mg.faction = entities[i]->getFaction();
-                            sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
+                            snprintf(str, sizeof(str),  "%s is now on bay.",entities[i]->getName().c_str());
                             mg.msg = std::string(str);mg.timer = timer;
                             messages.insert(messages.begin(), mg);
                             //CLog::Write(CLog::Debug,"Eliminating....\n");
@@ -1471,7 +1476,11 @@ void update(int value)
 
         int n = receiveCommand(&mesg);
 
-        if (n!=-1)
+        // Issue #113: the command comes from the network: only accept ids inside the
+        // container range and known factions, otherwise drop the datagram.
+        if (n!=-1
+            && mesg.controllingid >= 0 && mesg.controllingid < MAX
+            && (mesg.faction == GREEN_FACTION || mesg.faction == BLUE_FACTION || mesg.faction == BOTH_FACTION))
         {
             // @FIXME: I need to go through all the registered users and get the information from their controllers.
             controllers[1]->controllingid = mesg.controllingid;
@@ -1592,7 +1601,7 @@ void update(int value)
                         char str[256];
                         Message m;
                         m.faction = BOTH_FACTION;
-                        sprintf(str, "%s Carrier has been destroyed !", FACTION(entities[i]->getFaction()));
+                        snprintf(str, sizeof(str),  "%s Carrier has been destroyed !", FACTION(entities[i]->getFaction()));
                         m.msg = std::string(str);
                         messages.insert(messages.begin(), m);
 
@@ -1609,7 +1618,7 @@ void update(int value)
                         char str[256];
                         Message m;
                         m.faction = BOTH_FACTION;
-                        sprintf(str, "Island %s is now a free island.", c->island->getName().c_str());
+                        snprintf(str, sizeof(str),  "Island %s is now a free island.", c->island->getName().c_str());
                         m.msg = std::string(str);
                         messages.insert(messages.begin(), m);
                     }
@@ -1620,7 +1629,7 @@ void update(int value)
                         char str[256];
                         Message mg;
                         mg.faction = BOTH_FACTION;
-                        sprintf(str, "%s has been destroyed.", v->getName().c_str());
+                        snprintf(str, sizeof(str),  "%s has been destroyed.", v->getName().c_str());
                         mg.msg = std::string(str);mg.timer = timer;
                         messages.insert(messages.begin(), mg);
                     }

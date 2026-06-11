@@ -452,7 +452,7 @@ void Cephalopod::hoover(float sp3)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "%s has arrived to destination.", getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s has arrived to destination.", getName().c_str());
         mg.faction = getFaction();
         mg.msg = std::string(msg); mg.timer = 0;
         messages.insert(messages.begin(), mg);

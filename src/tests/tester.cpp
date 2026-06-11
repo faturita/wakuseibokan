@@ -573,7 +573,7 @@ void worldStep(int value)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "TC%03d: %s", t->number(), t->title().c_str());
+        snprintf(msg, sizeof(msg),  "TC%03d: %s", t->number(), t->title().c_str());
         mg.faction = BOTH_FACTION;
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -592,7 +592,7 @@ void worldStep(int value)
         else
         {
             char msg[256];
-            sprintf(msg, "Test Failed: %s\n", t->failedMessage().c_str());
+            snprintf(msg, sizeof(msg),  "Test Failed: %s\n", t->failedMessage().c_str());
             printf(msg);
             endWorldModelling();
             exit(0);

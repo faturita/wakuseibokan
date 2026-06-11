@@ -239,7 +239,7 @@ bool stranded(Vehicle *carrier, Island *island)
         char str[256];
         Message mg;
         mg.faction = b->getFaction();
-        sprintf(str, "Carrier has stranded on %s.", island->getName().c_str());
+        snprintf(str, sizeof(str),  "Carrier has stranded on %s.", island->getName().c_str());
         mg.msg = std::string(str);mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -267,7 +267,7 @@ bool departed(Vehicle *walrus)
         w->setStatus(SailingStatus::OFFSHORING);
         char str[256];
         Message mg;
-        sprintf(str, "%s has departed.", w->getName().c_str());
+        snprintf(str, sizeof(str),  "%s has departed.", w->getName().c_str());
         mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -283,9 +283,9 @@ bool departed(Vehicle *walrus)
         char str[256];
         Message mg;
         if (island)
-            sprintf(str, "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has departed from %s.", w->getName().c_str(), island->getName().c_str());
         else
-            sprintf(str, "%s has departed.", w->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has departed.", w->getName().c_str());
         mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -320,7 +320,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         w->setStatus(SailingStatus::INSHORING);
         char str[256];
         Message mg;
-        sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
+        snprintf(str, sizeof(str),  "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
         mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -336,7 +336,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
         w->setIsland((BoxIsland*)island);
         char str[256];
         Message mg;
-        sprintf(str, "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
+        snprintf(str, sizeof(str),  "%s has arrived to %s.", w->getName().c_str(), island->getName().c_str());
         mg.msg = std::string(str);mg.timer = timer;
         mg.faction = w->getFaction();
         messages.insert(messages.begin(), mg);
@@ -353,7 +353,7 @@ bool arrived(Vehicle *invadingunit, Island *island)
             c->setIsland((BoxIsland*)island);
             char str[256];
             Message mg;
-            sprintf(str, "%s has landed in %s.", c->getName().c_str(), island->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has landed in %s.", c->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             mg.faction = c->getFaction();
             messages.insert(messages.begin(), mg);
@@ -377,7 +377,7 @@ bool docked(Vehicle *boat, Island *island)
             char str[256];
             Message mg;
             mg.faction = boat->getFaction();
-            sprintf(str, "%s has docked on Island %s.", boat->getName().c_str(), island->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has docked on Island %s.", boat->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             return true;
@@ -401,7 +401,7 @@ bool docked(Vehicle *boat, Vehicle *c)
             char str[256];
             Message mg;
             mg.faction = boat->getFaction();
-            sprintf(str, "%s has docked on Carrier %s.", boat->getName().c_str(), c->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has docked on Carrier %s.", boat->getName().c_str(), c->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             return true;
@@ -430,7 +430,7 @@ bool landed(Vehicle *manta, Island *island)
             char str[256];
             Message mg;
             mg.faction = manta->getFaction();
-            sprintf(str, "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has landed on Island %s.", s->getName().c_str(), island->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             return true;
@@ -500,7 +500,7 @@ bool hit(Structure* structure, Gunshot *g)
             char str[256];
             Message mg;
             mg.faction = BOTH_FACTION;
-            sprintf(str, "Island %s under attack!", structure->island->getName().c_str());
+            snprintf(str, sizeof(str),  "Island %s under attack!", structure->island->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             b = structure->island;
@@ -592,7 +592,7 @@ bool releasecontrol(Vehicle* vehicle)
             Message mg;
             mg.faction = s->getFaction();
             char str[256];
-            sprintf(str, "%s has landed on Aircraft.", s->getName().c_str());
+            snprintf(str, sizeof(str),  "%s has landed on Aircraft.", s->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
         }
@@ -2460,7 +2460,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
     {
         char msg[256];
         Message mg;
-        sprintf(msg, "%s","There is another aircraft on deck.");
+        snprintf(msg, sizeof(msg),  "%s","There is another aircraft on deck.");
         mg.faction = spawner->getFaction();
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
@@ -2477,7 +2477,7 @@ Manta* spawnManta(dSpaceID space, dWorldID world,Vehicle *spawner, size_t &idx)
         char msg[256];
         Message mg;
         mg.faction = manta->getFaction();
-        sprintf(msg, "%s is ready to takeoff.",manta->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s is ready to takeoff.",manta->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -2494,7 +2494,7 @@ Manta* spawnCephalopod(dSpaceID space, dWorldID world, Vehicle *spawner)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "%s has been deployed.",m->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s has been deployed.",m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -2515,7 +2515,7 @@ Walrus* spawnWalrus(dSpaceID space, dWorldID world, Vehicle *spawner)
         char msg[256];
         Message mg;
         mg.faction = walrus->getFaction();
-        sprintf(msg, "%s has been deployed.",walrus->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s has been deployed.",walrus->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -2537,7 +2537,7 @@ void dockWalrus(Vehicle *dock)
             char msg[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(msg, "%s is now back on deck.",entities[i]->getName().c_str());
+            snprintf(msg, sizeof(msg),  "%s is now back on deck.",entities[i]->getName().c_str());
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
 
@@ -2555,7 +2555,7 @@ void dockWalrus(Vehicle *dock, Vehicle *w)
         char msg[256];
         Message mg;
         mg.faction = w->getFaction();
-        sprintf(msg, "%s is now back on deck.",w->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s is now back on deck.",w->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
 
@@ -2576,7 +2576,7 @@ void dockManta()
             char str[256];
             Message mg;
             mg.faction = entities[i]->getFaction();
-            sprintf(str, "%s is now on bay.",entities[i]->getName().c_str());
+            snprintf(str, sizeof(str),  "%s is now on bay.",entities[i]->getName().c_str());
             mg.msg = std::string(str);mg.timer = timer;
             messages.insert(messages.begin(), mg);
             //CLog::Write(CLog::Debug,"Eliminating....\n");
@@ -2621,7 +2621,7 @@ Manta* taxiManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = m->getFaction();
-            sprintf(msg,"%s is ready for launch.",m->getName().c_str());
+            snprintf(msg, sizeof(msg), "%s is ready for launch.",m->getName().c_str());
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
         }
@@ -2668,7 +2668,7 @@ void departure(Vehicle *f, Vehicle *m)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "%s has departured.", m->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s has departured.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
 
@@ -2726,7 +2726,7 @@ void unfill(Vehicle *f)
             char msg[256];
             Message mg;
             mg.faction = dock->getFaction();
-            sprintf(msg, "%s cargo has been unloaded on %s.", f->getName().c_str(), is->getName().c_str());
+            snprintf(msg, sizeof(msg),  "%s cargo has been unloaded on %s.", f->getName().c_str(), is->getName().c_str());
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
         }
@@ -2744,7 +2744,7 @@ void refill(Vehicle *f, Vehicle *m)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "%s cargo has been refilled.", m->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s cargo has been refilled.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -2806,7 +2806,7 @@ void refill(Vehicle *f)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "%s cargo has been refilled.", m->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s cargo has been refilled.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
     }
@@ -2946,7 +2946,7 @@ void refuel(Vehicle *f)
         char msg[256];
         Message mg;
         mg.faction = m->getFaction();
-        sprintf(msg, "%s has been recharged.", m->getName().c_str());
+        snprintf(msg, sizeof(msg),  "%s has been recharged.", m->getName().c_str());
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(), mg);
 
@@ -2968,7 +2968,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = b->getFaction();
-            sprintf(msg, "%s has been launched.", m->getName().c_str());
+            snprintf(msg, sizeof(msg),  "%s has been launched.", m->getName().c_str());
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
             takeoff(m->getPos());
@@ -2990,7 +2990,7 @@ Manta* launchManta(Vehicle *v)
             char msg[256];
             Message mg;
             mg.faction = r->getFaction();
-            sprintf(msg, "%s is departing from %s.", m->getName().c_str(), is->getName().c_str());
+            snprintf(msg, sizeof(msg),  "%s is departing from %s.", m->getName().c_str(), is->getName().c_str());
             mg.msg = std::string(msg); mg.timer = timer;
             messages.insert(messages.begin(), mg);
             takeoff(m->getPos());
@@ -3050,7 +3050,7 @@ void captureIsland(Vehicle *b, BoxIsland *island, int faction, int typeofisland,
         char msg[256];
         Message mg;
         mg.faction = BOTH_FACTION;
-        sprintf(msg, "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
+        snprintf(msg, sizeof(msg),  "Island %s is now under control of %s.", island->getName().c_str(),FACTION(faction));
         mg.msg = std::string(msg); mg.timer = timer;
         messages.insert(messages.begin(),  mg);
 

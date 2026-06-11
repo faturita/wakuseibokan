@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
     for(int i=0;i<nTests;i++)
     {
-        sprintf(cmd, "./test -test %d",i+1);
+        snprintf(cmd, sizeof(cmd), "./test -test %d",i+1);
         tests[i] = system(cmd);
     }
 

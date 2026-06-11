@@ -255,7 +255,7 @@ void Balaenidae::doControlDocking()
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            snprintf(str, sizeof(str),  "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"Balaenidae has reached its destination.\n");
@@ -295,7 +295,7 @@ void Balaenidae::doControlWaypoint()
         char str[256];
         Message mg;
         mg.faction = getFaction();
-        sprintf(str, "%s has arrived to destination.", getName().c_str());
+        snprintf(str, sizeof(str),  "%s has arrived to destination.", getName().c_str());
         mg.msg = std::string(str);mg.timer = 0;
         messages.insert(messages.begin(), mg);
         CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
@@ -410,7 +410,7 @@ void Balaenidae::doControlDestination(bool notifyfinish)
                 char str[256];
                 Message mg;
                 mg.faction = getFaction();
-                sprintf(str, "%s has arrived to destination.", FACTION(getFaction()));
+                snprintf(str, sizeof(str),  "%s has arrived to destination.", FACTION(getFaction()));
                 CLog::Write(CLog::Debug,"Carrier has reached its destination.\n");
                 mg.msg = std::string(str);mg.timer = 0;
                 messages.insert(messages.begin(), mg);
