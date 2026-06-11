@@ -49,15 +49,15 @@ typedef struct {
 
  int get_file_size(std::string filename) ;
 
- void draw3DSModel(obj_type object, float x, float y, float z, float scale);
+ void draw3DSModel(const obj_type &object, float x, float y, float z, float scale);
 
  char Load3DS (obj_type_ptr p_object, char *p_filename);
 
  int draw3DSModel(char *p_filename,float x, float y, float z, float scale,GLuint _textureMetal);
 
- obj_type load3DSModel(char *p_filename);
+ obj_type load3DSModel(const char *p_filename);
 
- int draw3DSModel(obj_type object,float x, float y, float z, float scale, GLuint _textureMetal);
+ int draw3DSModel(const obj_type &object,float x, float y, float z, float scale, GLuint _textureMetal);
 
 
  class T3DSModel : Model {
@@ -75,7 +75,7 @@ typedef struct {
          void setLocation(float x,float y,float z);
          void setScale(float scalex,float scaley, float scalez);
          void virtual setTexture(GLuint texture);
-         void setObject(obj_type object);
+         void setObject(const obj_type &object);
 
          //Switches to the given animation
          void setAnimation(const char* name);

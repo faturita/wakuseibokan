@@ -33,6 +33,9 @@ The scenario TC=113 of this game (testcase_113.cpp) consist of two tanks that fi
 
 ## BACKLOG
 
+- Ubuntu 24.xx startup crash (ThreeMaxLoader): fixed on 2026-06-11 by zeroing the ~2MB obj_type before the chunk reader fills it (the polygon-index freads only write 2 of the 4 bytes of each int) and by passing obj_type by const reference instead of by value. Covered by testbox test 100. STILL PENDING: verify on a real Ubuntu 24.xx machine.
+- ThreeMaxLoader.cpp: the two int draw3DSModel(...) functions never return a value (pre-existing -Wreturn-type warnings, callers ignore the result). Left untouched.
+
 - Issue #112 (sprintf removal): one sprintf remains at src/units/Vehicle.cpp:962 — file is off-limits per user instruction. src/mainworkingstd.cpp and src/maincarrierbackup.cpp also have one each but are not compiled by the Makefile (dead backup files).
 - Issue #113 (input sanitation), remaining surfaces not yet hardened:
   - src/propertystore.cpp:154-157 — unbounded strcpy/strcat into fixed sAux buffer while serializing config values read from .ini files.

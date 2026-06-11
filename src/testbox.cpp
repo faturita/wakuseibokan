@@ -2929,6 +2929,37 @@ void checktest99(unsigned long timer)
     }
 }
 
+void test100()
+{
+    // 3DS loader: polygon indices were built from uninitialized memory (the loader
+    // freads an unsigned short into each int index), crashing on Ubuntu 24.xx.
+    initIslands();
+    test1();
+}
+
+void checktest100(unsigned long timer)
+{
+    if (timer == 50)
+    {
+        obj_type object = load3DSModel(filereader("structures/hangar.3ds"));
+
+        if (object.vertices_qty <= 0 || object.polygons_qty <= 0)
+            testFailed("3DS model was not loaded.");
+
+        for (int i=0; i<object.polygons_qty; i++)
+        {
+            if (object.polygon[i].a < 0 || object.polygon[i].a >= object.vertices_qty ||
+                object.polygon[i].b < 0 || object.polygon[i].b >= object.vertices_qty ||
+                object.polygon[i].c < 0 || object.polygon[i].c >= object.vertices_qty)
+                testFailed("3DS polygon index out of vertex range (uninitialized memory).");
+        }
+
+        printf("Model loaded: %d vertices, %d polygons, all indices in range.\n",
+               object.vertices_qty, object.polygons_qty);
+        testSucceeded();
+    }
+}
+
 void test28()
 {
     BoxIsland *nemesis = new BoxIsland(&entities);
@@ -9936,6 +9967,7 @@ void initWorldModelling(int testcase)
     case 97:test97();break;                         // Test Artillery range an trajectory.
     case 98:test98();break;                       // Artillery calibration: fire at angles, measure distances
     case 99:test99();break;                         // Savegame CRC integrity and encryption (Issue #109).
+    case 100:test100();break;                       // 3DS loader polygon indices must not come from uninitialized memory.
     default:initIslands();test1();break;
     }
 
@@ -10052,6 +10084,7 @@ void worldStep(int value)
     case 97:checktest97(timer);break;
     case 98:checktest98(timer);break;
     case 99:checktest99(timer);break;
+    case 100:checktest100(timer);break;
     default: break;
     }
 
