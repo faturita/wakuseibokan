@@ -122,7 +122,8 @@ int receive(TickRecord *record)
     len = clilen;
     n = recvfrom(modelsockasserverfd, record, sizeof(TickRecord), 0, &pcliaddr, &len);
 
-    if (n == -1) n = 0;
+    // Issue #113: discard datagrams that do not carry a complete TickRecord.
+    if (n != sizeof(TickRecord)) n = 0;
 
     return n;
 
@@ -173,7 +174,7 @@ void setupControllerClient(char serverip[256])
     mesg.controllingid = 4;
     char localip[256];
     getlocalip(localip);
-    sprintf(mesg.order.parameters.buf, "%s", localip);
+    snprintf(mesg.order.parameters.buf, sizeof(mesg.order.parameters.buf), "%s", localip);
 
     printf("Connecting to server %s from %s\n",serverip, localip);
     sendCommand(mesg);
@@ -195,6 +196,13 @@ int receiveCommand(ControlStructure *mesg)
     int n;
 
     n = recvfrom(controllersockfd, mesg, sizeof(ControlStructure), 0, &pcliaddr, &len);
+
+    // Issue #113: discard datagrams that do not carry a complete ControlStructure,
+    // and make sure the string parameter is always null-terminated.
+    if (n != sizeof(ControlStructure))
+        return -1;
+
+    mesg->order.parameters.buf[sizeof(mesg->order.parameters.buf)-1] = '\0';
 
     return n;
 }

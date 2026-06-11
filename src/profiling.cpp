@@ -51,7 +51,7 @@ char fullfilename[256];
 
 char * filereader(char filename[256])
 {
-    sprintf(fullfilename,"%s/%s",WORKING_PATH,filename);
+    snprintf(fullfilename, sizeof(fullfilename), "%s/%s",WORKING_PATH,filename);
 
     return fullfilename;
 }

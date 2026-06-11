@@ -83,7 +83,7 @@ Connection addNewTelemetryListener(char ip[], int port)
 int pickendpoint()
 {
     char filename[256];
-    sprintf(filename,"%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
+    snprintf(filename, sizeof(filename), "%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
     PropertyStore ps(filename);
 
     //ps.Set("client","127.0.0.1");
@@ -106,7 +106,7 @@ void inittelemetry()
     //connections.push_back(addNewTelemetryListener("127.0.0.1",4500));
 
     char filename[256];
-    sprintf(filename,"%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
+    snprintf(filename, sizeof(filename), "%s%s%s",filereader("conf"),DIRSEPARATOR,"telemetry.endpoints.ini");
     PropertyStore ps(filename);
 
     //ps.Set("client","127.0.0.1");
@@ -119,12 +119,16 @@ void inittelemetry()
 
     int iendpoints = atoi(endpoints);
 
+    // Issue #113: the value comes from a configuration file, keep it within sane bounds.
+    if (iendpoints < 0) iendpoints = 0;
+    if (iendpoints > 64) iendpoints = 64;
+
     for(int i=0;i<iendpoints;i++)
     {
         char telkey[256];
         char ipkey[256];
-        sprintf(telkey,"endpoint@%d",i+1);
-        sprintf(ipkey,"port@%d", i+1);
+        snprintf(telkey, sizeof(telkey), "endpoint@%d",i+1);
+        snprintf(ipkey, sizeof(ipkey), "port@%d", i+1);
         char *telemetryendpoint = ps.Get(telkey);
         char *portendpoint = ps.Get(ipkey);
         int portnumber = atoi(portendpoint);

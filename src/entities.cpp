@@ -134,7 +134,12 @@ void createEntity(TickRecord record,dSpaceID space, dWorldID world)
         else if (record.typeId == EntityTypeId::TCephalopod)
             _manta1 = new Cephalopod(record.faction);
 
-        assert( _manta1 != NULL || !"Unrecognized manta type on ledger.");
+        // Issue #113: records come from the network/ledger, do not crash on garbage.
+        if (_manta1 == NULL)
+        {
+            CLog::Write(CLog::Error,"Unrecognized manta type %d on ledger.\n", (int)record.typeId);
+            return;
+        }
 
         _manta1->init();
         _manta1->embody(world, space);

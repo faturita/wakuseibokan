@@ -5,7 +5,10 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <regex>
+#include <cstdint>
+#include <cstring>
 
 
 #include "container.h"
@@ -71,9 +74,42 @@ extern dSpaceID space;
 extern std::unordered_map<std::string, GLuint> textures;
 
 
+// Issue #109: savegames carry a header with a CRC32 of the payload (integrity) and the
+// payload itself is scrambled with a XOR keystream (obfuscation against casual editing;
+// the key lives in the binary, so this is not cryptographically strong).
+static const char SAVEGAME_MAGIC[4] = {'W','K','S','V'};
+static const uint32_t SAVEGAME_KEY = 0x57414B55;     // "WAKU"
+static const size_t SAVEGAME_HEADER_SIZE = 4 + sizeof(uint32_t) + sizeof(uint32_t);
+
+static uint32_t savegamecrc32(const unsigned char *data, size_t len)
+{
+    uint32_t crc = 0xFFFFFFFFu;
+    for (size_t i=0; i<len; i++)
+    {
+        crc ^= data[i];
+        for (int b=0; b<8; b++)
+            crc = (crc >> 1) ^ (0xEDB88320u & (0u - (crc & 1u)));
+    }
+    return ~crc;
+}
+
+// xorshift32 keystream.  Symmetric: applying it twice recovers the original.
+static void savegamecipher(std::string &payload)
+{
+    uint32_t state = SAVEGAME_KEY ^ (uint32_t)payload.size();
+    if (state == 0) state = 0x0BADC0DEu;
+    for (size_t i=0; i<payload.size(); i++)
+    {
+        state ^= state << 13;
+        state ^= state >> 17;
+        state ^= state << 5;
+        payload[i] = payload[i] ^ (char)(state & 0xFF);
+    }
+}
+
 void savegame(std::string filename)
 {
-    std::ofstream ss(filename, std::ios_base::binary);
+    std::ostringstream ss;
 
     // @FIXME: Include a .h that is generated on compile time that calculates the hash of this .cpp, that is the version.
     // Version
@@ -237,32 +273,69 @@ void savegame(std::string filename)
 
     }
 
-    ss.flush();
-    ss.close();
+    std::string payload = ss.str();
+    uint32_t crc = savegamecrc32((const unsigned char*)payload.data(), payload.size());
+    uint32_t length = (uint32_t)payload.size();
+
+    savegamecipher(payload);
+
+    std::ofstream file(filename, std::ios_base::binary);
+    file.write(SAVEGAME_MAGIC, sizeof(SAVEGAME_MAGIC));
+    file.write((const char*)&crc, sizeof(crc));
+    file.write((const char*)&length, sizeof(length));
+    file.write(payload.data(), payload.size());
+    file.flush();
+    file.close();
 
 
 }
 
 
-void loadgame(std::string filename)
+bool loadgame(std::string filename)
 {
-    /**std::ifstream ss("savegame.w", std::ios_base::binary);
+    std::ifstream file(filename, std::ios_base::binary);
 
-    Vec3f f(0,0,0);
-    ss >> f[0] >> f[1] >> f[2] ;
-
-    dout << f << std::endl;
-
-    ss.close();**/
-
-    std::ifstream ss(filename, std::ios_base::binary);
-
-    if (ss.fail())
+    if (file.fail())
     {
         CLog::Write(CLog::Error,"Failed to open file %s\n", filename.c_str());
         assert(!"Savegame file not found.  A universe has vanished.");
-        return;
+        return false;
     }
+
+    std::string raw((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+
+    std::string payload;
+
+    if (raw.size() >= SAVEGAME_HEADER_SIZE && memcmp(raw.data(), SAVEGAME_MAGIC, sizeof(SAVEGAME_MAGIC)) == 0)
+    {
+        uint32_t crc, length;
+        memcpy(&crc,    raw.data() + 4, sizeof(crc));
+        memcpy(&length, raw.data() + 8, sizeof(length));
+
+        payload = raw.substr(SAVEGAME_HEADER_SIZE);
+
+        if (payload.size() != length)
+        {
+            CLog::Write(CLog::Error,"Savegame %s is corrupted (truncated payload).\n", filename.c_str());
+            return false;
+        }
+
+        savegamecipher(payload);
+
+        if (savegamecrc32((const unsigned char*)payload.data(), payload.size()) != crc)
+        {
+            CLog::Write(CLog::Error,"Savegame %s is corrupted or has been tampered with (CRC mismatch).\n", filename.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        // Legacy plain-text savegame (saved before the integrity header existed).
+        payload = raw;
+    }
+
+    std::istringstream ss(payload);
 
     // @FIXME: Verify the version when loading.
     int version;
@@ -410,6 +483,13 @@ void loadgame(std::string filename)
                     _manta1 = new AdvancedManta(faction);
                 else if (subtype == VehicleSubTypes::CEPHALOPOD)
                     _manta1 = new Cephalopod(faction);
+
+                // Issue #113: do not crash on a savegame with an unknown subtype.
+                if (_manta1 == NULL)
+                {
+                    CLog::Write(CLog::Error,"Savegame %s holds an unknown manta subtype %d.\n", filename.c_str(), subtype);
+                    return false;
+                }
 
                 v = _manta1;
                 _manta1->init();
@@ -793,7 +873,7 @@ void loadgame(std::string filename)
     }
 
 
-    ss.close();
+    return true;
 
 }
 

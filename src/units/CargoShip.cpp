@@ -336,7 +336,7 @@ void CargoShip::doControlDocking()
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            snprintf(str, sizeof(str),  "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"CargoShip has reached its destination.\n");
@@ -479,7 +479,7 @@ void CargoShip::doControlDestination()
             char str[256];
             Message mg;
             mg.faction = getFaction();
-            sprintf(str, "%s has arrived to destination.", getName().c_str());
+            snprintf(str, sizeof(str),  "%s has arrived to destination.", getName().c_str());
             mg.msg = std::string(str);mg.timer = 0;
             messages.insert(messages.begin(), mg);
             CLog::Write(CLog::Debug,"CargoShip has reached its destination.\n");

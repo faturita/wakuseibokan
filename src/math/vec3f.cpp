@@ -145,7 +145,8 @@ istream &operator>>(istream &input, Vec3f &v) {
 }
 
 char* Vec3f::toString(char *dat) const {
-    sprintf(dat,"(%10.5f,%10.5f,%10.5f)", v[0],v[1],v[2]);
+    // The caller must provide a buffer of at least 64 bytes.
+    snprintf(dat,64,"(%10.5f,%10.5f,%10.5f)", v[0],v[1],v[2]);
     return dat;
 }
 
